@@ -1,0 +1,48 @@
+@import "lesshat";
+
+table.ess-table {
+  width: 100%;
+
+  thead {
+    tr {
+      background: #2f8697;
+      color: white;
+      border-bottom: 1px solid @teal;
+      font-size: .9em;
+      th {
+        padding: 5px 5px;
+      }
+    }
+  }
+
+  &.no-focus {
+    tbody {
+      tr {
+        &:hover {
+          background: #cff09e;
+          .transition(.5s);
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #bbb;
+      height: 40px;
+
+      td {
+        text-align: center;
+      }
+
+      &.active {
+        background: #DAE5EE;
+        td {
+          &:nth-child(1) {
+            border-left: 3px solid @teal;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+.idea
+*.iml
+*.class
+*.swp
+.classpath
+.project
+.settings
+.tmp
+target
+app.properties
+test.app.properties
+bower_components/
+node_modules/
