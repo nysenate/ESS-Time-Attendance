@@ -16,11 +16,14 @@ public class AgencyRowMapper implements RowMapper<Agency>
 
     @Override
     public Agency mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Agency agency = new Agency();
-        agency.setCode(rs.getString(pfx + "CDAGENCY"));
-        agency.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
-        agency.setShortName(rs.getString(pfx + "DEAGENCYS"));
-        agency.setName(rs.getString(pfx + "DEAGENCYF"));
-        return agency;
+        if (rs.getString(pfx + "CDSTATUS") != null) {
+            Agency agency = new Agency();
+            agency.setCode(rs.getString(pfx + "CDAGENCY"));
+            agency.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
+            agency.setShortName(rs.getString(pfx + "DEAGENCYS"));
+            agency.setName(rs.getString(pfx + "DEAGENCYF"));
+            return agency;
+        }
+        return null;
     }
 }

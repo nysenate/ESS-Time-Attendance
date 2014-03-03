@@ -4,8 +4,10 @@ public class Employee extends Person
 {
     protected int employeeId;
     protected int supervisorId;
-    protected String uid;
     protected boolean active;
+    protected String uid;
+    protected String jobTitle;
+    protected PayType payType;
     protected ResponsibilityCenter respCenter;
     protected Location location;
 
@@ -29,6 +31,14 @@ public class Employee extends Person
         this.supervisorId = supervisorId;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public String getUid() {
         return uid;
     }
@@ -37,12 +47,20 @@ public class Employee extends Person
         this.uid = uid;
     }
 
-    public boolean isActive() {
-        return active;
+    public String getJobTitle() {
+        return jobTitle;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public PayType getPayType() {
+        return payType;
+    }
+
+    public void setPayType(PayType payType) {
+        this.payType = payType;
     }
 
     public ResponsibilityCenter getRespCenter() {

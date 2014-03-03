@@ -1,5 +1,9 @@
 package gov.nysenate.seta.model;
 
+import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+
 import java.util.Date;
 
 public class Person
@@ -18,6 +22,22 @@ public class Person
     protected MaritalStatus maritalStatus;
 
     public Person() {}
+
+    /** Functional Getters */
+
+    /**
+     * Returns the age of the person in years based on dateOfBirth.
+     * @return int - age or null if dateOfBirth is null.
+     */
+    public int getAge() {
+        if (dateOfBirth != null) {
+            Period period = new Period(new DateTime(dateOfBirth), DateTime.now(), PeriodType.years());
+            return period.getYears();
+        }
+        return -1;
+    }
+
+    /** Basic Getters/Setters */
 
     public String getTitle() {
         return title;

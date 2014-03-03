@@ -3,14 +3,18 @@ package gov.nysenate.seta.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class EmployeeFinancialInfo
+public class EmployeePayInfo
 {
+    protected Employee employee;
+    protected PayType payType;
     protected BigDecimal biweeklySalary;
     protected Date payUpdatedDate;
     protected Date w4SignedDate;
     protected boolean directDepositActive;
 
-    public EmployeeFinancialInfo() {}
+    public EmployeePayInfo(Employee employee) {
+        this.employee = employee;
+    }
 
     public BigDecimal getBiweeklySalary() {
         return biweeklySalary;

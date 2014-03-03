@@ -8,17 +8,19 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeDao.class);
 
-    private static final String GET_EMP_SQL_TMPL =
-        "SELECT " +
-            "per.*,\n" +
+    protected static final String GET_EMP_SQL_TMPL =
+        "SELECT DISTINCT \n" +
+            "per.*, ttl.FFDEEMPTITLL,\n" +
 
             "rctr.DTEFFECTBEG AS RCTR_DTEFFECTBEG, rctr.DTEFFECTEND AS RCTR_DTEFFECTEND,\n" +
             "rctr.CDSTATUS AS RCTR_CDSTATUS, rctr.CDRESPCTR AS RCTR_CDRESPCTR,\n" +
@@ -37,16 +39,16 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
             "loc.ADZIPCODE AS LOC_ADZIPCODE\n" +
 
         "FROM PM21PERSONN per\n" +
-        "LEFT JOIN SL16RESPCTR rctr ON per.CDRESPCTR = rctr.CDRESPCTR\n" +
-        "LEFT JOIN SL16RSPCTRHD rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
-        "LEFT JOIN SL16AGENCY agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
-        "LEFT JOIN SL16LOCATION loc ON per.CDLOCAT = loc.CDLOCAT\n" +
-        "WHERE %s \n" +
-        "AND rctr.CDSTATUS = 'A' AND rctrhd.CDSTATUS = 'A' AND per.CDAGENCY = rctr.CDAGENCY \n" +
-        "AND loc.CDSTATUS = 'A'";
+        "LEFT JOIN PL21EMPTITLE ttl ON per.CDEMPTITLE = ttl.CDEMPTITLE\n" +
+        "LEFT JOIN (SELECT DISTINCT * FROM SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
+        "LEFT JOIN (SELECT DISTINCT * FROM SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
+        "LEFT JOIN (SELECT DISTINCT * FROM SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
+        "LEFT JOIN (SELECT DISTINCT * FROM SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
+        "WHERE %s \n";
 
     private static final String GET_EMP_BY_ID_SQL = String.format(GET_EMP_SQL_TMPL, "per.NUXREFEM = :empId");
     private static final String GET_EMP_BY_EMAIL_SQL = String.format(GET_EMP_SQL_TMPL, "per.NAEMAIL = :email");
+    private static final String GET_ACTIVE_EMPS_SQL = String.format(GET_EMP_SQL_TMPL, "per.CDEMPSTATUS = 'A'");
 
     /**
      * {@inheritDoc}
@@ -61,7 +63,8 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
                     new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
         }
         catch (DataRetrievalFailureException ex) {
-            throw new EmployeeNotFoundEx("No matching record for employee id: " + empId);
+            logger.warn("Retrieve employee {} error: {}", empId, ex.getMessage());
+            throw new EmployeeNotFoundEx("No matching employee record for employee id: " + empId);
         }
         return employee;
     }
@@ -70,7 +73,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
      * {@inheritDoc}
      */
     @Override
-    public Employee getEmployeeByEmail(String uid) throws EmployeeNotFoundEx {
+    public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds) throws EmployeeNotFoundEx {
         return null;
     }
 
@@ -78,15 +81,39 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
      * {@inheritDoc}
      */
     @Override
-    public List<Employee> getEmployees() {
-        return null;
+    public Employee getEmployeeByEmail(String email) throws EmployeeNotFoundEx {
+        Employee employee;
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("email", email);
+        try {
+            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_EMAIL_SQL, params,
+                    new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
+        }
+        catch (DataRetrievalFailureException ex) {
+            throw new EmployeeNotFoundEx("No matching employee record for email: " + email);
+        }
+        return employee;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<Integer, Employee> getEmployeeIdMap() {
-        return null;
+    public List<Employee> getActiveEmployees() {
+        return remoteNamedJdbc.query(GET_ACTIVE_EMPS_SQL,
+                new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Integer, Employee> getActiveEmployeeMap() {
+        List<Employee> activeEmployees = getActiveEmployees();
+        Map<Integer, Employee> actEmpMap = new ConcurrentHashMap<>();
+        for (Employee emp : activeEmployees) {
+            actEmpMap.put(emp.getEmployeeId(), emp);
+        }
+        return actEmpMap;
     }
 }

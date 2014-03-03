@@ -6,8 +6,13 @@ public enum PayType
     SA("Special Annual"),
     TE("Temporary");
 
-    String desc;
+    private String desc;
+
     PayType(String desc) {
         this.desc = desc;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

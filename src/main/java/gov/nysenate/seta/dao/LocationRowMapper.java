@@ -17,14 +17,17 @@ public class LocationRowMapper implements RowMapper<Location>
 
     @Override
     public Location mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Location loc = new Location();
-        loc.setCode(rs.getString(pfx + "CDLOCAT"));
-        loc.setType(LocationType.valueOfCode(rs.getString(pfx + "CDLOCTYPE").charAt(0)));
-        loc.setAddr1(rs.getString(pfx + "FFADSTREET1"));
-        loc.setAddr2(rs.getString(pfx + "FFADSTREET2"));
-        loc.setCity(rs.getString(pfx + "FFADCITY"));
-        loc.setState(rs.getString(pfx + "ADSTATE"));
-        loc.setZip5(rs.getString(pfx + "ADZIPCODE"));
-        return loc;
+        if (rs.getString(pfx + "CDLOCAT") != null) {
+            Location loc = new Location();
+            loc.setCode(rs.getString(pfx + "CDLOCAT"));
+            loc.setType(LocationType.valueOfCode(rs.getString(pfx + "CDLOCTYPE").charAt(0)));
+            loc.setAddr1(rs.getString(pfx + "FFADSTREET1"));
+            loc.setAddr2(rs.getString(pfx + "FFADSTREET2"));
+            loc.setCity(rs.getString(pfx + "FFADCITY"));
+            loc.setState(rs.getString(pfx + "ADSTATE"));
+            loc.setZip5(rs.getString(pfx + "ADZIPCODE"));
+            return loc;
+        }
+        return null;
     }
 }

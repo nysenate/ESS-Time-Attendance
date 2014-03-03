@@ -21,14 +21,17 @@ public class RespCenterRowMapper implements RowMapper<ResponsibilityCenter>
 
     @Override
     public ResponsibilityCenter mapRow(ResultSet rs, int rowNum) throws SQLException {
-        ResponsibilityCenter rctr = new ResponsibilityCenter();
-        rctr.setCode(rs.getInt(pfx + "CDRESPCTR"));
-        rctr.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
-        rctr.setName(rs.getString(pfx + "DERESPCTR"));
-        rctr.setEffectiveDateBegin(rs.getDate(pfx + "DTEFFECTBEG"));
-        rctr.setEffectiveDateEnd(rs.getDate(pfx + "DTEFFECTEND"));
-        rctr.setHead(respHeadMapper.mapRow(rs, rowNum));
-        rctr.setAgency(agencyRowMapper.mapRow(rs, rowNum));
-        return rctr;
+        if (rs.getString(pfx + "CDSTATUS") != null) {
+            ResponsibilityCenter rctr = new ResponsibilityCenter();
+            rctr.setCode(rs.getInt(pfx + "CDRESPCTR"));
+            rctr.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
+            rctr.setName(rs.getString(pfx + "DERESPCTR"));
+            rctr.setEffectiveDateBegin(rs.getDate(pfx + "DTEFFECTBEG"));
+            rctr.setEffectiveDateEnd(rs.getDate(pfx + "DTEFFECTEND"));
+            rctr.setHead(respHeadMapper.mapRow(rs, rowNum));
+            rctr.setAgency(agencyRowMapper.mapRow(rs, rowNum));
+            return rctr;
+        }
+        return null;
     }
 }
