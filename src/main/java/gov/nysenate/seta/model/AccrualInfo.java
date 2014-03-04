@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class AccrualInfo
 {
+    protected int employeeId;
     protected PayPeriod payPeriod;
-    protected Employee employee;
     protected Map<AccrualType, Integer> accruedHours;
     protected Map<AccrualType, Integer> usedHours;
     protected Map<AccrualType, Integer> accrualRate;
@@ -22,12 +22,12 @@ public class AccrualInfo
         this.payPeriod = payPeriod;
     }
 
-    public Employee getEmployee() {
-        return employee;
+    public int getEmployeeId() {
+        return employeeId;
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
     }
 
     public Map<AccrualType, Integer> getAccruedHours() {

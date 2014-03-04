@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * Service implementation to provide senate accrual related functionality.
  */
 @Service
-public class SenateAccrualService implements AccrualService
+public class SetaAccrualService implements AccrualService
 {
     @Autowired
     private AccrualDao accrualDao;

@@ -10,6 +10,7 @@ public class PayPeriod
     protected Date endDate;
     protected String payPeriodCode;
     protected boolean active;
+    protected boolean split;
 
     public PayPeriod() {}
 
@@ -59,5 +60,13 @@ public class PayPeriod
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isSplit() {
+        return split;
+    }
+
+    public void setSplit(boolean split) {
+        this.split = split;
     }
 }
