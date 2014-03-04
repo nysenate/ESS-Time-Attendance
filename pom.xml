@@ -14,29 +14,43 @@
     </parent>
 
     <properties>
+        <commons.io.version>2.4</commons.io.version>
+        <commons.lang3.version>3.1</commons.lang3.version>
         <tomcat.jdbc.version>8.0.3</tomcat.jdbc.version>
+        <joda-time.version>2.3</joda-time.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
+            <version>${commons.lang3.version}</version>
         </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+            <version>${commons.io.version}</version>
         </dependency>
+
+        <!-- Tomcat jdbc/connection pool -->
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-dbcp</artifactId>
             <version>${tomcat.jdbc.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
             <version>${tomcat.jdbc.version}</version>
+        </dependency>
+
+        <!-- Date/Time helper -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
         </dependency>
     </dependencies>
 
