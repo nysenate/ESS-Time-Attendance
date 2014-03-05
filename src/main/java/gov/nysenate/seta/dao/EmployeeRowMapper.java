@@ -13,11 +13,13 @@ public class EmployeeRowMapper implements RowMapper<Employee>
 {
     private String pfx = "";
 
+    private AddressRowMapper addressRowMapper;
     private RespCenterRowMapper respCenterRowMapper;
     private LocationRowMapper locationRowMapper;
 
     public EmployeeRowMapper(String pfx, String rctrPfx, String rctrhdPfx, String agcyPfx, String locPfx) {
         this.pfx = pfx;
+        this.addressRowMapper = new AddressRowMapper(pfx);
         this.respCenterRowMapper = new RespCenterRowMapper(rctrPfx, rctrhdPfx, agcyPfx);
         this.locationRowMapper = new LocationRowMapper(locPfx);
     }
@@ -42,8 +44,9 @@ public class EmployeeRowMapper implements RowMapper<Employee>
         emp.setGender(Gender.valueOf(rs.getString(pfx +"CDSEX")));
         emp.setDateOfBirth(rs.getDate(pfx +"DTBIRTH"));
         emp.setMaritalStatus(MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL").charAt(0)));
+        emp.setHomeAddress(addressRowMapper.mapRow(rs, rowNum));
         emp.setRespCenter(respCenterRowMapper.mapRow(rs, rowNum));
-        emp.setLocation(locationRowMapper.mapRow(rs, rowNum));
+        emp.setWorkLocation(locationRowMapper.mapRow(rs, rowNum));
 
         if (emp.getEmail() != null) {
             emp.setUid(emp.getEmail().split("@")[0]);

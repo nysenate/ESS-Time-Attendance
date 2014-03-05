@@ -8,6 +8,7 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
 
     protected static final String GET_EMP_SQL_TMPL =
         "SELECT DISTINCT \n" +
-            "per.*, ttl.FFDEEMPTITLL,\n" +
+            "per.*, ttl.FFDEEMPTITLL, addr.ADSTREET1, addr.ADSTREET2, addr.ADCITY, addr.ADSTATE, addr.ADZIPCODE,\n" +
 
             "rctr.DTEFFECTBEG AS RCTR_DTEFFECTBEG, rctr.DTEFFECTEND AS RCTR_DTEFFECTEND,\n" +
             "rctr.CDSTATUS AS RCTR_CDSTATUS, rctr.CDRESPCTR AS RCTR_CDRESPCTR,\n" +
@@ -40,6 +41,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
 
         "FROM PM21PERSONN per\n" +
         "LEFT JOIN PL21EMPTITLE ttl ON per.CDEMPTITLE = ttl.CDEMPTITLE\n" +
+        "LEFT JOIN (SELECT * FROM PM21ADDRESS WHERE CDADDRTYPE = 'LEGL') addr ON per.NUXREFEM = addr.NUXREFEM\n" +
         "LEFT JOIN (SELECT DISTINCT * FROM SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
         "LEFT JOIN (SELECT DISTINCT * FROM SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
         "LEFT JOIN (SELECT DISTINCT * FROM SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
@@ -67,6 +69,14 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
             throw new EmployeeNotFoundEx("No matching employee record for employee id: " + empId);
         }
         return employee;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Employee getEmployeeByIdDuring(int empId, Date date) throws EmployeeNotFoundEx {
+        return null;
     }
 
     /**

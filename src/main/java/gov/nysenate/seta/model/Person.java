@@ -20,6 +20,7 @@ public class Person
     protected Date dateOfBirth;
     protected Gender gender;
     protected MaritalStatus maritalStatus;
+    protected Address homeAddress;
 
     public Person() {}
 
@@ -133,5 +134,13 @@ public class Person
 
     public void setMaritalStatus(MaritalStatus maritalStatus) {
         this.maritalStatus = maritalStatus;
+    }
+
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
     }
 }

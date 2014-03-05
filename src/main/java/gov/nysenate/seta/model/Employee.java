@@ -9,7 +9,7 @@ public class Employee extends Person
     protected String jobTitle;
     protected PayType payType;
     protected ResponsibilityCenter respCenter;
-    protected Location location;
+    protected Location workLocation;
 
     public Employee() {}
 
@@ -71,11 +71,11 @@ public class Employee extends Person
         this.respCenter = respCenter;
     }
 
-    public Location getLocation() {
-        return location;
+    public Location getWorkLocation() {
+        return workLocation;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setWorkLocation(Location workLocation) {
+        this.workLocation = workLocation;
     }
 }

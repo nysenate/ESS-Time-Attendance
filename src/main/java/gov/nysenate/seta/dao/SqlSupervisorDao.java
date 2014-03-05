@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.model.Supervisor;
 import gov.nysenate.seta.model.SupervisorException;
 import gov.nysenate.seta.model.SupervisorNotFoundEx;
 import org.joda.time.DateTime;
@@ -25,16 +26,15 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao {
     @Autowired
     private EmployeeDao employeeDao;
 
-    protected static final String GET_SUPERVISOR_BY_ID_SQL =
-        "SELECT NUXREFEM, DTBEGINSUP, DTENDSUP, NUXREFSV, DTBEGIN, DTEND, DTBEGINSPLIT, DTENDSPLIT \n" +
-        "FROM PV23TASUP \n" +
-        "WHERE NUXREFEM = :empId AND (:endDate BETWEEN DTBEGINSPLIT AND DTENDSPLIT)";
-
     protected static final String IS_EMP_ID_CURR_SUPERVISOR_SQL =
         "SELECT DISTINCT 1 FROM PM21PERSONN WHERE NUXREFSV = :empId";
 
     protected static final String IS_EMP_ID_SUPERVISOR_DURING_DATE_SQL =
         "SELECT DISTINCT 1 FROM PV23TASUP WHERE NUXREFSV = :empId AND (:endDate BETWEEN DTBEGINSPLIT AND DTENDSPLIT)";
+
+    protected static final String GET_SUPERVISOR_BY_ID_SQL =
+        "SELECT NUXREFSV FROM PV23TASUP \n" +
+        "WHERE NUXREFEM = :empId AND (:endDate BETWEEN DTBEGINSPLIT AND DTENDSPLIT)";
 
     /**
      * {@inheritDoc}
@@ -91,4 +91,28 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao {
             throw new SupervisorNotFoundEx();
         }
     };
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Supervisor getSupervisor(int supId) throws SupervisorException {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Supervisor getSupervisor(int supId, Date date) throws SupervisorException {
+        return null;
+    }
 }

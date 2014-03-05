@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.model.Supervisor;
 import gov.nysenate.seta.model.SupervisorException;
 
 import java.util.Date;
@@ -29,18 +30,29 @@ public interface SupervisorDao extends BaseDao
      */
     public int getSupervisorIdForEmp(int empId) throws SupervisorException;
 
+    /**
+     * Retrieve the effective T&A supervisor id for the given employee id during the supplied date.
+     * @param empId int - Employee id
+     * @param date Date - Date during which the supervisor is active
+     * @return int - Supervisor id
+     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
+     */
+    public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException;
 
-    /*
-    public Supervisor getSupervisorForEmp(int empId);
+    /**
+     * Retrieves a Supervisor object for the given supId for the most current date range.
+     * @param supId int - employee id for supervisor
+     * @return Supervisor for matching supId
+     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
+     */
+    public Supervisor getSupervisor(int supId) throws SupervisorException;
 
-    public Supervisor getSupervisorForEmpDuring(int empId, Date start, Date end);
-
-    public Supervisor getSupervisorForEmpDuring(int empId, PayPeriod payPeriod);
-
-    public List<Employee> getEmployeesForSupervisor(int supId);
-
-    public List<Employee> getEmployeesForSupervisorDuring(int supId, PayPeriod payPeriod);
-
-    public List<Employee> getEmployeesForSupervisorDuring(int supId, Date start, Date end);
-      */
+    /**
+     * Retrieves a Supervisor object for the given supId during a period containing the supplied date.
+     * @param supId int - employee id for supervisor
+     * @param date Date - Date during which the supervisor is active
+     * @return Supervisor for matching supId
+     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
+     */
+    public Supervisor getSupervisor(int supId, Date date) throws SupervisorException;
 }
