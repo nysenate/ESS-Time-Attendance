@@ -42,10 +42,10 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         "FROM PM21PERSONN per\n" +
         "LEFT JOIN PL21EMPTITLE ttl ON per.CDEMPTITLE = ttl.CDEMPTITLE\n" +
         "LEFT JOIN (SELECT * FROM PM21ADDRESS WHERE CDADDRTYPE = 'LEGL') addr ON per.NUXREFEM = addr.NUXREFEM\n" +
-        "LEFT JOIN (SELECT DISTINCT * FROM SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
-        "LEFT JOIN (SELECT DISTINCT * FROM SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
-        "LEFT JOIN (SELECT DISTINCT * FROM SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
-        "LEFT JOIN (SELECT DISTINCT * FROM SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
+        "LEFT JOIN (SELECT * FROM SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
+        "LEFT JOIN (SELECT * FROM SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
+        "LEFT JOIN (SELECT * FROM SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
+        "LEFT JOIN (SELECT * FROM SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
         "WHERE %s \n";
 
     private static final String GET_EMP_BY_ID_SQL = String.format(GET_EMP_SQL_TMPL, "per.NUXREFEM = :empId");
@@ -75,8 +75,10 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
      * {@inheritDoc}
      */
     @Override
-    public Employee getEmployeeByIdDuring(int empId, Date date) throws EmployeeNotFoundEx {
-        return null;
+    public Employee getEmployeeById(int empId, Date date) throws EmployeeNotFoundEx {
+        /** TODO: Use the audit table to get the latest batch of audits and apply them. */
+        Employee emp = getEmployeeById(empId);
+        return emp;
     }
 
     /**

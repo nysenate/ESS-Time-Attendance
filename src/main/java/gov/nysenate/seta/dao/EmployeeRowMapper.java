@@ -1,9 +1,6 @@
 package gov.nysenate.seta.dao;
 
-import gov.nysenate.seta.model.Employee;
-import gov.nysenate.seta.model.Gender;
-import gov.nysenate.seta.model.MaritalStatus;
-import gov.nysenate.seta.model.PayType;
+import gov.nysenate.seta.model.*;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -41,8 +38,8 @@ public class EmployeeRowMapper implements RowMapper<Employee>
         emp.setWorkPhone(rs.getString(pfx + "ADPHONENUMW"));
         emp.setJobTitle(rs.getString(pfx + "FFDEEMPTITLL"));
         emp.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));
-        emp.setGender(Gender.valueOf(rs.getString(pfx +"CDSEX")));
-        emp.setDateOfBirth(rs.getDate(pfx +"DTBIRTH"));
+        emp.setGender(Gender.valueOf(rs.getString(pfx + "CDSEX")));
+        emp.setDateOfBirth(rs.getDate(pfx + "DTBIRTH"));
         emp.setMaritalStatus(MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL").charAt(0)));
         emp.setHomeAddress(addressRowMapper.mapRow(rs, rowNum));
         emp.setRespCenter(respCenterRowMapper.mapRow(rs, rowNum));

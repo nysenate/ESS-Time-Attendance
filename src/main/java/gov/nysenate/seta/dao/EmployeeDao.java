@@ -25,7 +25,7 @@ public interface EmployeeDao extends BaseDao
      * @return Employee if found, throws EmployeeNotFoundEx otherwise.
      * @throws EmployeeNotFoundEx
      */
-    public Employee getEmployeeByIdDuring(int empId, Date date) throws EmployeeNotFoundEx;
+    public Employee getEmployeeById(int empId, Date date) throws EmployeeNotFoundEx;
 
     /**
      * Retrieve an Employee object based on the employee email.
