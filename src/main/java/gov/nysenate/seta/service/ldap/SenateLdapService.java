@@ -1,9 +1,8 @@
 package gov.nysenate.seta.service.ldap;
 
-import gov.nysenate.seta.dao.SenateLdapDao;
+import gov.nysenate.seta.dao.LdapAuthDao;
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
 import gov.nysenate.seta.model.ldap.LdapAuthStatus;
-import gov.nysenate.seta.model.ldap.SenateLdapPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class SenateLdapService implements LdapService
     private static final Logger logger = LoggerFactory.getLogger(SenateLdapService.class);
 
     @Autowired
-    private SenateLdapDao senateLdapDao;
+    private LdapAuthDao ldapAuthDao;
 
     /**
      * {@inheritDoc}
@@ -40,7 +39,7 @@ public class SenateLdapService implements LdapService
         logger.debug("Trying to authenticate user {} with password {}", uid, credentials);
         LdapAuthStatus authStatus = LdapAuthStatus.UNKNOWN_EXCEPTION;
         try {
-            Name name = senateLdapDao.authenticateByUid(uid, credentials);
+            Name name = ldapAuthDao.authenticateByUid(uid, credentials);
             if (name != null) {
                 return new LdapAuthResult(LdapAuthStatus.AUTHENTICATED, uid, name);
             }

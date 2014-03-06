@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.ldap.AuthenticationException;
 import org.springframework.ldap.NameNotFoundException;
 
@@ -19,7 +18,7 @@ import static junit.framework.Assert.assertNotNull;
 public class SenateLdapDaoTests extends AbstractContextTests
 {
     @Autowired
-    SenateLdapDao senateLdapDao;
+    LdapAuthDao ldapAuthDao;
 
     @Value("${test.ldap.valid.uid}") private String validUid;
     @Value("${test.ldap.valid.dn}") private String validDn;
@@ -38,62 +37,47 @@ public class SenateLdapDaoTests extends AbstractContextTests
 
     @Test
     public void testSenateLdapDaoAutowired() throws Exception {
-        assertNotNull(senateLdapDao);
+        assertNotNull(ldapAuthDao);
     }
 
-    /** {@link SenateLdapDao#getPerson(javax.naming.Name)} (String)} tests
+    /** {@link LdapAuthDao#getPerson(javax.naming.Name)} (String)} tests
      * -------------------------------------------------------------------- */
 
     @Test
     public void testGetPerson() throws Exception {
         Name name = new LdapName(validDn);
-        SenateLdapPerson person = senateLdapDao.getPerson(name);
+        SenateLdapPerson person = ldapAuthDao.getPerson(name);
         assertNotNull(person);
         assertEquals(validSenateLdapPerson.getUid(), person.getUid());
     }
 
     @Test(expected = NameNotFoundException.class)
     public void testGetPersonThrowsNameNotFoundException() throws Exception {
-        SenateLdapPerson person = senateLdapDao.getPerson(invalidLdapName);
+        SenateLdapPerson person = ldapAuthDao.getPerson(invalidLdapName);
     }
 
-    /** {@link SenateLdapDao#getDnFromUserId(String)} tests
-     * -------------------------------------------------------- */
-
-    @Test
-    public void testGetDnFromUserIdSucceeds() throws Exception {
-        Name name = senateLdapDao.getDnFromUserId(validUid);
-        assertEquals(validDn.toLowerCase(), name.toString().toLowerCase());
-    }
-
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void testGetDnFromUserIdWithInvalidUid_throwsEmptyResultException() throws Exception {
-        String invalidUid = "moosekitten";
-        Name name = senateLdapDao.getDnFromUserId(invalidUid);
-    }
-
-    /** {@link SenateLdapDao#authenticateByUid(String, String)} tests
+    /** {@link LdapAuthDao#authenticateByUid(String, String)} tests
      * ------------------------------------------------------------------*/
 
     @Test
     public void testAuthenticateByUidSucceeds() throws Exception {
-        Name name = senateLdapDao.authenticateByUid(validUid, validPassword);
+        Name name = ldapAuthDao.authenticateByUid(validUid, validPassword);
         assertNotNull(name);
         assertEquals(validDn.toLowerCase(), name.toString().toLowerCase());
     }
 
     @Test(expected = AuthenticationException.class)
     public void testAuthenticateByUidWithWrongPassword_throwsAuthenticationException() throws Exception {
-        senateLdapDao.authenticateByUid(validUid, "clearlyAWrongPassword");
+        ldapAuthDao.authenticateByUid(validUid, "clearlyAWrongPassword");
     }
 
     @Test(expected = AuthenticationException.class)
     public void testAuthenticateByUidWithWrongUidAndPassword_throwsAuthenticationException() throws Exception {
-        senateLdapDao.authenticateByUid(invalidUid, "clearlyAWrongPassword");
+        ldapAuthDao.authenticateByUid(invalidUid, "clearlyAWrongPassword");
     }
 
     @Test(expected = AuthenticationException.class)
     public void testAuthenticateByUidWithNullUidAndPassword_throwsAuthenticationException() throws Exception {
-        senateLdapDao.authenticateByUid(null, null);
+        ldapAuthDao.authenticateByUid(null, null);
     }
 }
