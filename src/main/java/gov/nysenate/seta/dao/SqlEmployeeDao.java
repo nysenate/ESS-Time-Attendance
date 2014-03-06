@@ -48,9 +48,9 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         "LEFT JOIN (SELECT * FROM SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
         "WHERE %s \n";
 
-    private static final String GET_EMP_BY_ID_SQL = String.format(GET_EMP_SQL_TMPL, "per.NUXREFEM = :empId");
-    private static final String GET_EMP_BY_EMAIL_SQL = String.format(GET_EMP_SQL_TMPL, "per.NAEMAIL = :email");
-    private static final String GET_ACTIVE_EMPS_SQL = String.format(GET_EMP_SQL_TMPL, "per.CDEMPSTATUS = 'A'");
+    protected static final String GET_EMP_BY_ID_SQL = String.format(GET_EMP_SQL_TMPL, "per.NUXREFEM = :empId");
+    protected static final String GET_EMP_BY_EMAIL_SQL = String.format(GET_EMP_SQL_TMPL, "per.NAEMAIL = :email");
+    protected static final String GET_ACTIVE_EMPS_SQL = String.format(GET_EMP_SQL_TMPL, "per.CDEMPSTATUS = 'A'");
 
     /**
      * {@inheritDoc}
