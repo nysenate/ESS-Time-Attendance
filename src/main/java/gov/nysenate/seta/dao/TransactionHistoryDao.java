@@ -9,6 +9,12 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The transactions referred to in this interface are the actions performed by Personnel and Payroll staff on
+ * a particular employee's record. Since an employee's information will change over time (e.g their salary, or T&A
+ * Supervisor) this interface helps to obtain a collection of the transactions that have taken place so that a
+ * point in time representation can be re-created for an employee.
+ */
 public interface TransactionHistoryDao
 {
     /**
