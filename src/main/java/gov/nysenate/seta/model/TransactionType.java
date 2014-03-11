@@ -52,7 +52,7 @@ public enum TransactionType
     PRS("PER", "", "PRESS LIST"),
     PYA("PAY", "MOPRIORYRTE", "TE PRIOR YEAR AMOUNT"),
     RHD("PER", "DTCONTSERV", "REHIRE DATE"),
-    RSH("PAY", "", "RESP. CENTER HEAD CODE"),
+    RSH("PAY", "", "RESP. CENTER HEAD CODE"),   /** TODO: Fix this.. */
     RTP("PER", "", "RE-APPOINTMENT"),
     SAL("PAY", "MOSALBIWKLY", "BIWEEKLY/HOURLY RATE"),
     SAT("PAY", "MOADDSTATTAX", "ADDITION STATE WITHHELD"),
