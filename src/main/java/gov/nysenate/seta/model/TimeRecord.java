@@ -22,7 +22,7 @@ public class TimeRecord {
     protected String exeDetails;
     protected Date proDate;
     protected PayType payType;
-    protected TRecordStatus recordStatus;
+    protected TimeRecordStatus recordStatus;
 
     /** Getters and Setters **/
 
@@ -130,6 +130,14 @@ public class TimeRecord {
         this.proDate = proDate;
     }
 
+    public TimeRecordStatus getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(TimeRecordStatus recordStatus) {
+        this.recordStatus = recordStatus;
+    }
+
     public PayType getPayType() {
         return payType;
     }
@@ -137,13 +145,4 @@ public class TimeRecord {
     public void setPayType(PayType payType) {
         this.payType = payType;
     }
-
-    public TRecordStatus getRecordStatus() {
-        return recordStatus;
-    }
-
-    public void setRecordStatus(TRecordStatus recordStatus) {
-        this.recordStatus = recordStatus;
-    }
-
 }

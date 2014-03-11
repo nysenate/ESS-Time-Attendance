@@ -28,7 +28,7 @@ public interface TimeRecordDao extends BaseDao {
      * @throws TimeRecordNotFoundException
      */
 
-    public Map<Integer,TimeRecord> getRecordByEmployeeIdMap(List<Integer> empIds)throws TimeRecordNotFoundException;
+    public Map<Integer,List<TimeRecord>> getRecordByEmployeeIdMap(List<Integer> empIds)throws TimeRecordNotFoundException;
 
     /**
      * Retrieves TimeRecord using PayPeriod
@@ -40,20 +40,15 @@ public interface TimeRecordDao extends BaseDao {
     public List<TimeRecord> getRecordByPayPeriod(Date startDate, Date endDate) throws TimeRecordNotFoundException;
 
     /**
-     * Retrieves TimeRecord using SupervisorId
-     * @param supervisorId
-     * @return List of TimeRecord Objects if found otherwise throws TimeRecordNotFoundException
-     * @throws TimeRecordNotFoundException
-     */
-    public List<TimeRecord> getRecordBySupervisorId(int supervisorId) throws TimeRecordNotFoundException;
-
-    /**
-     * Retrieves TimeRecord using Timesheet Status
+     * Retrieves TimeRecord using TimesheetStatusId, EmployeeId and PayPeriod Combination
      * @param tSStatusId
-     * @return List of TimeRecord Objects if found otherwise throws TimeRecordNotFoundException
+     * @param empId
+     * @param startDate
+     * @param endDate
+     * @return List of TimeRecord Objects if found otherwise throws TimeRecordNotFountException
      * @throws TimeRecordNotFoundException
      */
-    public List<TimeRecord> getRecordByTSStatus(int tSStatusId) throws TimeRecordNotFoundException;
+    public List<TimeRecord> getRecordByTSStatus(String tSStatusId, int empId, Date startDate, Date endDate) throws TimeRecordNotFoundException;
 
     /**
      *
