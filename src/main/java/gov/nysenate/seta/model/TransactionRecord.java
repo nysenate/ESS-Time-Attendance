@@ -16,6 +16,10 @@ public class TransactionRecord
 
     public TransactionRecord() {}
 
+    public boolean hasValues() {
+        return valueMap != null && !valueMap.isEmpty();
+    }
+
     public int getEmployeeId() {
         return employeeId;
     }
