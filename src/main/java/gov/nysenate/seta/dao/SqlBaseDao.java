@@ -28,4 +28,8 @@ public abstract class SqlBaseDao
     public static Date getEpoch() {
         return new DateTime((long) 0).toDate();
     }
+
+    public static char getStatusCode(Boolean status){
+        if(status.equals(true)){return 'A';} else{return 'I';}
+    }
 }

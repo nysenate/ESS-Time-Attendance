@@ -8,6 +8,7 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,20 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
     protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts.EmpId = :empId");
     protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts.DateBegin = :startDate AND ts.DateEnd = :endDate");
     protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts.TSStatusId = :tSStatusId AND ts.EmpId = :empId AND ts.DateBegin = :startDate AND ts.DateEnd = :endDate");
+
+
+    protected static final String SET_TIME_REC_SQL =
+        "INSERT \n" +
+            "INTO Timesheet ts \n" +
+            "(TimesheetId , EmpId, TOriginalUserId, TUpdateUserId, TOriginalDate, TUpdateDate, Status, TSStatusId, BeginDate, EndDate, PayType, Remarks, SupervisorId, ExcDetails, ProcDate) \n" +
+            "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :payType, :remarks, :supervisorId, :excDetails, :procDate) \n";
+
+    protected static final String UPDATE_TIME_REC_SQL =
+        "UPDATE Timesheet \n" +
+            "SET \n" +
+            "(EmpId = :empId, TOriginalUserId = :tOriginalUserId, TUpdateUserId = :tUpdateUserId, TOriginalDate = :tOriginalDate, TUpdateDate = :tUpdateDate, Status = :status, TSStatusId = :tSStatusId, BeginDate = :beginDate, EndDate = :endDate, PayType = :payType, Remarks = :remarks, SupervisorId = :supervisorId, ExcDetails = :excDetails, ProcDate = :procDate) \n" +
+            "WHERE TimesheetId = :timesheetId";
+
 
     @Override
     public List<TimeRecord> getRecordByEmployeeId(int empId) throws TimeRecordNotFoundException {
@@ -107,7 +122,58 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
     }
 
     @Override
-    public Boolean AddTimeRecord() {
-        return null;
+    public boolean setRecord(TimeRecord tr) {
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        params.addValue("timesheetId", tr.getTimesheetId());
+        params.addValue("empId", tr.getEmployeeId());
+        params.addValue("tOriginalUserId", tr.gettOriginalUserId());
+        params.addValue("tUpdateUserId", tr.gettUpdateUserId());
+        params.addValue("tOriginalDate", tr.gettOriginalDate());
+        params.addValue("tUpdateDate", tr.gettUpdateDate());
+        if(tr.isActive()==true){params.addValue("status", "A");}
+        else{ params.addValue("status", "I");}
+        params.addValue("tSStatusId", tr.getRecordStatus());
+        params.addValue("beginDate", tr.getBeginDate());
+        params.addValue("endDate", tr.getEndDate());
+        params.addValue("payType", tr.getPayType().name());
+        params.addValue("remarks", tr.getRemarks());
+        params.addValue("supervisorId", tr.getSupervisorId());
+        params.addValue("excDetails", tr.getExeDetails());
+        params.addValue("procDate", tr.getProDate());
+
+        if (localNamedJdbc.update(SET_TIME_REC_SQL, params)==1) {    return true;}
+        else{   return false;}
+
     }
+
+    @Override
+    public boolean updateRecord(TimeRecord tr) {
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        params.addValue("timesheetId", tr.getTimesheetId());
+        params.addValue("empId", tr.getEmployeeId());
+        params.addValue("tOriginalUserId", tr.gettOriginalUserId());
+        params.addValue("tUpdateUserId", tr.gettUpdateUserId());
+        params.addValue("tOriginalDate", tr.gettOriginalDate());
+        params.addValue("tUpdateDate", tr.gettUpdateDate());
+        params.addValue("status", getStatusCode(tr.isActive()));
+        params.addValue("tSStatusId", tr.getRecordStatus());
+        params.addValue("beginDate", tr.getBeginDate());
+        params.addValue("endDate", tr.getEndDate());
+        params.addValue("payType", tr.getPayType().name());
+        params.addValue("remarks", tr.getRemarks());
+        params.addValue("supervisorId", tr.getSupervisorId());
+        params.addValue("excDetails", tr.getExeDetails());
+        params.addValue("procDate", tr.getProDate());
+
+        if (localNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
+        else return false;
+
+    }
+
+
+
 }

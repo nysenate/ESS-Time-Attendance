@@ -3,6 +3,7 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.model.TimeRecord;
 import gov.nysenate.seta.model.TimeRecordNotFoundException;
 
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +52,16 @@ public interface TimeRecordDao extends BaseDao {
     public List<TimeRecord> getRecordByTSStatus(String tSStatusId, int empId, Date startDate, Date endDate) throws TimeRecordNotFoundException;
 
     /**
-     *
-     * @return
+     * Add New TimeRecord to the Timesheet Table
+     * @param tr - TimeRecord class object containing data to be inserted into the table
+     * @return Boolean value, true if data successfully inserted else false.
      */
-    public Boolean AddTimeRecord();
+    public boolean setRecord(TimeRecord tr);
 
+    /**
+     * Update TimeRecord to the Timesheet Table
+     * @param tr - TimeRecord class object containing data to be updated into the table
+     * @return Boolean value, true if data successfully updated else false.
+     */
+    public boolean updateRecord(TimeRecord tr);
 }

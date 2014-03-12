@@ -28,5 +28,17 @@ public interface TimeEntryDao extends BaseDao {
      */
     public Map<Integer,List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,TimeRecordNotFoundException;
 
+    /**
+     * Insert time entry using TimeEntry Object
+     * @param tsd - TimeEntry class object containing data to be inserted
+     * @return Boolean value, true if data successfully inserted else false.
+     */
+    public boolean setTimeEntry(TimeEntry tsd);
 
+    /**
+     * Update time entry using TimeEntry Object
+     * @param tsd - TimeEntry class object containing data to be updated
+     * @return @return Boolean value, true if data successfully updated else false.
+     */
+    public boolean updateTimeEntry(TimeEntry tsd);
   }
