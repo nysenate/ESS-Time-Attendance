@@ -1,5 +1,9 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Miscellaneous leave time must be accompanied by a code representing the type of leave.
+ * This is an enumeration of all those various codes with condensed and full descriptions.
+ */
 public enum MiscLeaveType
 {
     BEREAVEMENT_LEAVE('B',"Bereavement Leave", "Bereavement Leave"),

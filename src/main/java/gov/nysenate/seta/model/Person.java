@@ -6,6 +6,9 @@ import org.joda.time.PeriodType;
 
 import java.util.Date;
 
+/**
+ * Represents basic information that is associated with a person.
+ */
 public class Person
 {
     protected String title;

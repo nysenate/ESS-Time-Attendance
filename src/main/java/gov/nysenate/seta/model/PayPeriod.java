@@ -2,6 +2,9 @@ package gov.nysenate.seta.model;
 
 import java.util.Date;
 
+/**
+ * Represents any of the various Senate Pay Periods.
+ */
 public class PayPeriod
 {
     protected int payPeriodId;

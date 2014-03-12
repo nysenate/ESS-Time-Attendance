@@ -1,5 +1,10 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Represents a Responsibility Center Head. Various responsibility centers can
+ * share a common organizational head.
+ * @see ResponsibilityCenter
+ */
 public class ResponsibilityHead
 {
     protected boolean active;

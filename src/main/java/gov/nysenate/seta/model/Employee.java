@@ -1,5 +1,11 @@
 package gov.nysenate.seta.model;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
+/**
+ * Represents information that identifies an employee in the NYS Senate
+ */
 public class Employee extends Person
 {
     protected int employeeId;
@@ -10,8 +16,9 @@ public class Employee extends Person
     protected PayType payType;
     protected ResponsibilityCenter respCenter;
     protected Location workLocation;
+    public Timestamp time;
 
-    public Employee() {}
+    public Employee() { time = new Timestamp(new Date().getTime());}
 
     /** Basic Getters/Setters */
 

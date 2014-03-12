@@ -1,5 +1,9 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Typically used to represent a Senate employee's place of work or some other location
+ * that serves a business purpose.
+ */
 public class Location
 {
     protected String code;

@@ -1,5 +1,8 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Enumeration of all possible location codes
+ */
 public enum LocationType
 {
     WAREHOUSE('H', "Warehouse Location"),

@@ -2,6 +2,11 @@ package gov.nysenate.seta.model;
 
 import java.util.Date;
 
+/**
+ * A responsibility center is basically an organizational unit that is headed by a manager.
+ * The ResponsibilityCenter is primarily defined by the agency and resp center head codes and
+ * therefore contains those objects as well.
+ */
 public class ResponsibilityCenter
 {
     protected boolean active;

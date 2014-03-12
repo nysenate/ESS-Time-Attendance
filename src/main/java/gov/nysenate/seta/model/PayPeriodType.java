@@ -1,5 +1,9 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Maps the various pay period codes used by the Senate. For time and attendance
+ * purposes, the Attendance Fiscal Period (AF) type is primarily used.
+ */
 public enum PayPeriodType
 {
     AF("AF", "Attendance Fiscal Period"),

@@ -1,5 +1,10 @@
 package gov.nysenate.seta.model;
 
+/**
+ * The different pay types used at the Senate are enumerated here.
+ * Refer to the Senate's Time and Attendance Plan for more information about
+ * the details for each pay type.
+ */
 public enum PayType
 {
     RA("Regular Annual", 1820, true),

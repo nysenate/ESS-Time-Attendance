@@ -2,9 +2,15 @@ package gov.nysenate.seta.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The TransactionType refers to a specific change made to an employee's personnel record.
+ * The dbColumns stored for each type refer to the set of columns in the SFMS audit table
+ * where the relevant changes are stored.
+ */
 public enum TransactionType
 {
     ACC("PER", "CDACCRUE", "ACCRUE"),
@@ -95,6 +101,14 @@ public enum TransactionType
 
     public List<String> getDbColumnList() {
         return Arrays.asList(StringUtils.split(dbColumns, ","));
+    }
+
+    public static List<String> getAllDbColumnsList() {
+        List<String> columns = new ArrayList<>();
+        for (TransactionType t : TransactionType.values()) {
+            columns.addAll(t.getDbColumnList());
+        }
+        return columns;
     }
 
     public String getDesc() {

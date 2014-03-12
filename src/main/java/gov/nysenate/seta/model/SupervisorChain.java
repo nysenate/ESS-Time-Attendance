@@ -5,11 +5,9 @@ import java.util.Map;
 
 public class SupervisorChain
 {
-    protected Supervisor supervisor;
+    protected int supervisorId;
     protected Map<Integer, Supervisor> supervisorMap;
     protected List<Integer> supChainList;
 
-    public SupervisorChain(Supervisor supervisor) {
-        this.supervisor = supervisor;
-    }
+    public SupervisorChain() {}
 }

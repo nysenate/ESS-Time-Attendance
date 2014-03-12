@@ -5,6 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Basic model for a street address
+ */
 public class Address
 {
     protected String addr1 = "";

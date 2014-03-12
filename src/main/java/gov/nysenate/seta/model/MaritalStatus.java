@@ -1,30 +1,33 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Enumerates all possible codes for martial status
+ */
 public enum MaritalStatus
 {
-    SINGLE('S', "Single"),
-    DIVORCED('D', "Divorced"),
-    MARRIED('M', "Married"),
-    WIDOWED('W', "Widowed");
+    SINGLE("S", "Single"),
+    DIVORCED("D", "Divorced"),
+    MARRIED("M", "Married"),
+    WIDOWED("W", "Widowed");
 
-    char code;
+    String code;
     String desc;
 
-    MaritalStatus(char code, String desc) {
+    MaritalStatus(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static MaritalStatus valueOfCode(char code) {
+    public static MaritalStatus valueOfCode(String code) {
         for (MaritalStatus status : MaritalStatus.values()) {
-            if (status.code == code) {
+            if (status.code.equals(code)) {
                 return status;
             }
         }
         return null;
     }
 
-    public char getCode() {
+    public String getCode() {
         return code;
     }
 

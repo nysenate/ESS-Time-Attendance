@@ -1,5 +1,8 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Gender enumeration
+ */
 public enum Gender
 {
     M("Male"),

@@ -1,5 +1,8 @@
 package gov.nysenate.seta.model;
 
+/**
+ * Represents a senate agency.
+ */
 public class Agency
 {
     protected String code;
