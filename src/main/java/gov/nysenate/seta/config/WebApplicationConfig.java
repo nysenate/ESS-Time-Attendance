@@ -4,6 +4,7 @@ import gov.nysenate.seta.web.CommonAttributeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
@@ -19,7 +20,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @Configuration
 @EnableWebMvc
 @ComponentScan("gov.nysenate.seta")
-@Import({PropertyConfig.class, SecurityConfig.class, DatabaseConfig.class})
+@Import({PropertyConfig.class, SecurityConfig.class, DatabaseConfig.class, CacheConfig.class})
 public class WebApplicationConfig extends WebMvcConfigurerAdapter
 {
     private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
