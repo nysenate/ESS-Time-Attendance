@@ -40,7 +40,7 @@ public class EmployeeRowMapper implements RowMapper<Employee>
         emp.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));
         emp.setGender(Gender.valueOf(rs.getString(pfx + "CDSEX")));
         emp.setDateOfBirth(rs.getDate(pfx + "DTBIRTH"));
-        emp.setMaritalStatus(MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL").charAt(0)));
+        emp.setMaritalStatus(MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL")));
         emp.setHomeAddress(addressRowMapper.mapRow(rs, rowNum));
         emp.setRespCenter(respCenterRowMapper.mapRow(rs, rowNum));
         emp.setWorkLocation(locationRowMapper.mapRow(rs, rowNum));
