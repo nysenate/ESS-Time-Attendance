@@ -3,7 +3,6 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -12,9 +11,9 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class SqlTransactionHistoryDao extends SqlBaseDao implements TransactionHistoryDao
+public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTransactionDao
 {
-    private static final Logger logger = LoggerFactory.getLogger(SqlTransactionHistoryDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeTransactionDao.class);
 
     protected static final String GET_LAST_TRANS_REC_SQL =
         "SELECT * FROM (\n" +
@@ -23,8 +22,7 @@ public class SqlTransactionHistoryDao extends SqlBaseDao implements TransactionH
         "          MAX(ptx.DTTXNORIGIN) OVER (PARTITION BY ptx.CDTRANS) AS LATEST_DTTXNORIGIN\n" +
         "          ${audColumns}\n" +
         "   FROM PM21PERAUDIT aud\n" +
-        "   LEFT JOIN PD21PTXNCODE ptx ON aud.NUCHANGE  = ptx.NUCHANGE\n" +
-        "   LEFT JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM PL21TRANCODE) code ON ptx.CDTRANS = code.CDTRANS\n" +
+        "   JOIN PD21PTXNCODE ptx ON aud.NUCHANGE  = ptx.NUCHANGE\n" +
         "   WHERE aud.NUXREFEM = :empId AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
         "   AND ptx.CDTRANS IN (:transCodes)\n" +
         ")\n" +
@@ -81,14 +79,15 @@ public class SqlTransactionHistoryDao extends SqlBaseDao implements TransactionH
     public Map<TransactionType, TransactionRecord> getLastTransactionRecords(int empId, Set<TransactionType> types,
                                                                              Date start, Date end) {
         Map<String, String> selectMap = new HashMap<>();
-        List<String> auditColList = new ArrayList<>();
+
+        /** The set of transaction 'codes' to use in the where clause */
         Set<String> transCodes = new HashSet<>();
         for (TransactionType type : types) {
-            if (!type.getDbColumnList().isEmpty()) {
-                auditColList.add(type.getDbColumns());
-            }
             transCodes.add(type.name());
         }
+
+        /** The list of column names to be used in the select statement */
+        List<String> auditColList = TransactionType.getAllDbColumnsList();
         String auditColumns = StringUtils.join(auditColList, ",");
         selectMap.put("audColumns", (!auditColumns.isEmpty()) ? ("," + auditColumns) : "");
 

@@ -15,7 +15,7 @@ import java.util.Set;
  * Supervisor) this interface helps to obtain a collection of the transactions that have taken place so that a
  * point in time representation can be re-created for an employee.
  */
-public interface TransactionHistoryDao
+public interface EmployeeTransactionDao
 {
     /** See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
      * @see #getLastTransactionRecord(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
@@ -70,7 +70,6 @@ public interface TransactionHistoryDao
      */
     public TransactionHistory getTransactionHistory(int empId, TransactionType type) throws TransRecordException;
 
-
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
      * @see #getTransactionHistory(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
@@ -94,7 +93,6 @@ public interface TransactionHistoryDao
      * @see #getTransactionHistoryMap(int, java.util.Set, java.util.Date, java.util.Date)
      */
     public Map<TransactionType, TransactionHistory> getTransactionHistoryMap(int empId, Set<TransactionType> types);
-
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
