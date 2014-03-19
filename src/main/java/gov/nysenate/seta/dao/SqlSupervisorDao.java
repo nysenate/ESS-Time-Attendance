@@ -232,7 +232,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
             Map<Integer, Map<Integer, Date>> possibleSupOvrEmps = new HashMap<>();
 
             for (Map<String,Object> colMap : res) {
-                logger.debug(colMap.toString());
+                logger.trace(colMap.toString());
                 String group = colMap.get("EMP_GROUP").toString();
                 int empId = Integer.parseInt(colMap.get("NUXREFEM").toString());
                 TransactionType transType = TransactionType.valueOf(colMap.get("CDTRANS").toString());
