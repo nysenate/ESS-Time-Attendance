@@ -12,15 +12,18 @@ public class SupervisorEmpGroup
 {
     protected int supervisorId;
 
-    /** List of direct employees */
-    protected List<Integer> primaryEmpList;
+    /** Primary employees (directly assigned to this supervisor).
+     *  Mapping of empId -> EmployeeSupInfo */
+    protected Map<Integer, EmployeeSupInfo> primaryEmployees;
 
-    /** Map of employees obtained by supervisor overrides.
-     *  (Supervisor id -> List of their employee ids) */
-    protected Map<Integer, List<Integer>> supOverrideEmpMap;
+    /** Override employees are specific employees that this supervisor was given access to.
+     *  Mapping of empId -> EmployeeSupInfo */
+    protected Map<Integer, EmployeeSupInfo> overrideEmployees;
 
-    /** List of other employees that this supervisor also has access to */
-    protected List<Integer> empOverrideList;
+    /** Supervisor override employees are all the primary employees for the supervisors that
+     *  granted override access.
+     *  Mapping of the override granter supId -> (Map of empId -> EmployeeInfo) */
+    protected Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmployees;
 
     public SupervisorEmpGroup() {}
 
@@ -34,27 +37,27 @@ public class SupervisorEmpGroup
         this.supervisorId = supervisorId;
     }
 
-    public List<Integer> getPrimaryEmpList() {
-        return primaryEmpList;
+    public Map<Integer, EmployeeSupInfo> getPrimaryEmployees() {
+        return primaryEmployees;
     }
 
-    public void setPrimaryEmpList(List<Integer> primaryEmpList) {
-        this.primaryEmpList = primaryEmpList;
+    public void setPrimaryEmployees(Map<Integer, EmployeeSupInfo> primaryEmployees) {
+        this.primaryEmployees = primaryEmployees;
     }
 
-    public Map<Integer, List<Integer>> getSupOverrideEmpMap() {
-        return supOverrideEmpMap;
+    public Map<Integer, EmployeeSupInfo> getOverrideEmployees() {
+        return overrideEmployees;
     }
 
-    public void setSupOverrideEmpMap(Map<Integer, List<Integer>> supOverrideEmpMap) {
-        this.supOverrideEmpMap = supOverrideEmpMap;
+    public void setOverrideEmployees(Map<Integer, EmployeeSupInfo> overrideEmployees) {
+        this.overrideEmployees = overrideEmployees;
     }
 
-    public List<Integer> getEmpOverrideList() {
-        return empOverrideList;
+    public Map<Integer, Map<Integer, EmployeeSupInfo>> getSupOverrideEmployees() {
+        return supOverrideEmployees;
     }
 
-    public void setEmpOverrideList(List<Integer> empOverrideList) {
-        this.empOverrideList = empOverrideList;
+    public void setSupOverrideEmployees(Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmployees) {
+        this.supOverrideEmployees = supOverrideEmployees;
     }
 }

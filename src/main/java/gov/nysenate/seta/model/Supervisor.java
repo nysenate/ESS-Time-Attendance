@@ -6,4 +6,8 @@ package gov.nysenate.seta.model;
 public class Supervisor extends Employee
 {
     public Supervisor() {}
+
+    public Supervisor(Employee emp) {
+        super(emp);
+    }
 }
