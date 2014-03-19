@@ -10,24 +10,22 @@ import java.util.Date;
 public interface SupervisorDao extends BaseDao
 {
     /**
-     * See overloaded method. {@code date} defaults to the current date.
-     * @see #isSupervisor(int, java.util.Date)
+     * Retrieves a Supervisor object for the given supId.
+     * @param supId int - employee id for supervisor
+     * * @return Supervisor for matching supId
+     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
      */
-    public boolean isSupervisor(int empId);
+    public Supervisor getSupervisor(int supId) throws SupervisorException;
 
     /**
-     * Indicates whether the given supId is/was a T&A supervisor during the given date.
+     * Indicates whether the given supId is/was a T&A supervisor during the given dates.
      * @param empId int - employee id
-     * @param date Date - check for supervisor status during this date
-     * @return boolean - true if 'empId' is a supervisor during 'date', false otherwise
+     * @param start Date - start of date range
+     * @param end Date - end of date range
+     * @return boolean - true if 'empId' had subordinates during the date range and was thus
+     *                   a supervisor.
      */
-    public boolean isSupervisor(int empId, Date date);
-
-    /**
-     * See overloaded method. The {@code date} defaults to the current date.
-     * @see #getSupervisorIdForEmp(int, java.util.Date)
-     */
-    public int getSupervisorIdForEmp(int empId) throws SupervisorException;
+    public boolean isSupervisor(int empId, Date start, Date end);
 
     /**
      * Retrieve the effective T&A supervisor id for the given employee id during the supplied date.
@@ -37,20 +35,6 @@ public interface SupervisorDao extends BaseDao
      * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
      */
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException;
-
-    /**
-     * Retrieves a Supervisor object for the given supId.
-     * @param supId int - employee id for supervisor
-     * * @return Supervisor for matching supId
-     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
-     */
-    public Supervisor getSupervisor(int supId) throws SupervisorException;
-
-    /**
-     * See overloaded method. {@code date} defaults to the current date.
-     * @see #getSupervisorChain(int, java.util.Date)
-     */
-    public SupervisorChain getSupervisorChain(int supId) throws SupervisorException;
 
     /**
      * Computes and returns the SupervisorChain for the given supId during the specified date.
