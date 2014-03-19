@@ -1,13 +1,13 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
-import gov.nysenate.seta.util.OutputUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
@@ -27,7 +27,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     private static final Logger logger = LoggerFactory.getLogger(SqlSupervisorDao.class);
 
     @Autowired
-    private EmployeeTransactionDao transHistoryDao;
+    private EmployeeTransactionDao empTransactionDao;
 
     @Autowired
     private EmployeeDao employeeDao;
@@ -43,9 +43,8 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     protected static final String GET_SUP_EMP_TRANS_SQL =
         "SELECT empList.*, per.NALAST, per.NUXREFSV, per.CDEMPSTATUS, " +
         "       ptx.CDTRANS, ptx.CDTRANSTYP, ptx.DTEFFECT, per.DTTXNORIGIN,\n" +
-        "       ROW_NUMBER() OVER (PARTITION BY EMP_GROUP, NUXREFEM ORDER BY DTEFFECT DESC, DTTXNORIGIN DESC) AS TRANS_RANK,\n" +
-        "       FIRST_VALUE(DTEFFECT) OVER (PARTITION BY NUXREFEM, CDTRANS ORDER BY DTEFFECT DESC) AS LATEST_DTEFFECT,\n" +
-        "       FIRST_VALUE(DTTXNORIGIN) OVER (PARTITION BY NUXREFEM, CDTRANS ORDER BY DTTXNORIGIN DESC) AS LATEST_DTTXNORIGIN\n" +
+        "       ROW_NUMBER() " +
+        "       OVER (PARTITION BY EMP_GROUP, NUXREFEM, OVR_NUXREFSV ORDER BY DTEFFECT DESC, DTTXNORIGIN DESC) AS TRANS_RANK\n" +
         "FROM (\n" +
 
         /**  Fetch the ids of the supervisor's direct employees. */
@@ -139,7 +138,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
         Set<TransactionType> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
         Map<TransactionType, TransactionRecord> transMap =
-                transHistoryDao.getLastTransactionRecords(empId, transTypes, date);
+                empTransactionDao.getLastTransactionRecords(empId, transTypes, date);
 
         /** The RTP/APP should have a supervisor id to use as the base */
         int supId = -1;
@@ -210,30 +209,37 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("supId", supId);
         params.addValue("endDate", end);
-        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL, params, new ColumnMapRowMapper());
+        List<Map<String, Object>> res;
+        try {
+            res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL, params, new ColumnMapRowMapper());
+        }
+        catch (DataRetrievalFailureException ex) {
+            throw new SupervisorException("Failed to retrieve matching employees for supId: " + supId + " before: " + end);
+        }
 
+        /**
+         * The transactions for the matching employees need to be processed to determine if they
+         * are still under the given supervisor.
+         */
         if (!res.isEmpty()) {
-            SupervisorEmpGroup empGroup = new SupervisorEmpGroup();
+            SupervisorEmpGroup empGroup = new SupervisorEmpGroup(supId, start, end);
             Set<TransactionType> supTransTypes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
             Map<Integer, EmployeeSupInfo> primaryEmps = new HashMap<>();
             Map<Integer, EmployeeSupInfo> overrideEmps = new HashMap<>();
             Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmps = new HashMap<>();
 
-            Map<String, Map<Integer, Date>> possibleEmps = new HashMap<>();
-            possibleEmps.put("PRIMARY", new HashMap<Integer, Date>());
-            possibleEmps.put("EMP_OVR", new HashMap<Integer, Date>());
-            possibleEmps.put("SUP_OVR", new HashMap<Integer, Date>());
+            Map<Integer, Date> possiblePrimaryEmps = new HashMap<>();
+            Map<Integer, Map<Integer, Date>> possibleSupOvrEmps = new HashMap<>();
 
             for (Map<String,Object> colMap : res) {
-                logger.info(colMap.toString());
-                /** Extract the column data */
+                logger.debug(colMap.toString());
                 String group = colMap.get("EMP_GROUP").toString();
                 int empId = Integer.parseInt(colMap.get("NUXREFEM").toString());
                 TransactionType transType = TransactionType.valueOf(colMap.get("CDTRANS").toString());
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.S");
                 Date effectDate = formatter.parseDateTime(colMap.get("DTEFFECT").toString()).toDate();
-                Date originDate = formatter.parseDateTime(colMap.get("DTTXNORIGIN").toString()).toDate();
                 int rank = Integer.parseInt(colMap.get("TRANS_RANK").toString());
+                boolean effectDateIsPast = effectDate.compareTo(start) <= 0;
 
                 if (colMap.get("NUXREFSV") == null || !StringUtils.isNumeric(colMap.get("NUXREFSV").toString())) {
                     continue;
@@ -247,119 +253,106 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                     empSupInfo.setSupStartDate(effectDate);
                 }
 
-                /** The first record will contain the most recent personnel transaction */
+                boolean empTerminated = transType.equals(EMP);
+                if (empTerminated) {
+                    empSupInfo.setSupEndDate(effectDate);
+                }
+
+                /**
+                 * The first rank record for a given empId contains latest transaction that took effect
+                 * before/on the given 'end' date.
+                 */
                 if (rank == 1) {
-                    /** If the last transaction happened before the given start date, we don't have
-                     *  to worry about a possible supervisor change during the given range. */
-                    if (effectDate.before(start)) {
-                        /** Skip the employee if they left before the given start date */
-                        if (transType.equals(EMP)) {
-                            continue;
+                    /**
+                     * Add the employee to their supervisor's respective group if their supervisor id
+                     * matches the given 'supId'. For PRIMARY AND SUP_OVR types we flag mismatches as possible
+                     * employees when the effect date is between the 'start' and 'end' dates. The proceeding
+                     * record(s) for those employees will then need to be checked to see if the supervisor matches
+                     * at some point on/after the 'start' date.
+                     */
+                    switch (group) {
+                        case "PRIMARY": {
+                            if (currSupId == supId && !empTerminated) {
+                                primaryEmps.put(empId, empSupInfo);
+                            }
+                            else if (!effectDateIsPast) {
+                                possiblePrimaryEmps.put(empId, effectDate);
+                            }
+                            break;
                         }
-                        switch (group) {
-                            case "PRIMARY": {
-                                if (currSupId == supId) {
-                                    primaryEmps.put(empId, empSupInfo);
-                                }
-                                else {
-                                    continue;
-                                }
-                                break;
+                        case "EMP_OVR": {
+                            if (empTerminated && effectDateIsPast) {
+                                continue;
                             }
-                            case "EMP_OVR": {
-                                overrideEmps.put(empId, empSupInfo);
-                                break;
-                            }
-                            case "SUP_OVR": {
-                                int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
-                                if (currSupId == ovrSupId) {
-                                    if (!supOverrideEmps.containsKey(ovrSupId)) {
-                                        supOverrideEmps.put(ovrSupId, new HashMap<Integer, EmployeeSupInfo>());
-                                    }
-                                    supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
-                                }
-                                else {
-                                    continue;
-                                }
-                                break;
-                            }
+                            overrideEmps.put(empId, empSupInfo);
+                            break;
                         }
-                    }
-                    /** We might have to worry about a possible supervisor change during the date range */
-                    else {
-                        if (transType.equals(EMP)) {
-                            possibleEmps.get(group).put(empId, effectDate);
-                            continue;
-                        }
-                        switch (group) {
-                            case "PRIMARY": {
-                                if (currSupId == supId) {
-                                    primaryEmps.put(empId, empSupInfo);
+                        case "SUP_OVR": {
+                            int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
+                            if (currSupId == ovrSupId && !empTerminated) {
+                                if (!supOverrideEmps.containsKey(ovrSupId)) {
+                                    supOverrideEmps.put(ovrSupId, new HashMap<Integer, EmployeeSupInfo>());
                                 }
-                                else {
-                                    possibleEmps.get("PRIMARY").put(empId, effectDate);
-                                }
-                                break;
+                                supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
                             }
-                            case "EMP_OVR": {
-                                overrideEmps.put(empId, empSupInfo);
-                                break;
-                            }
-                            case "SUP_OVR": {
-                                int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
-                                if (currSupId == ovrSupId) {
-                                    if (!supOverrideEmps.containsKey(ovrSupId)) {
-                                        supOverrideEmps.put(ovrSupId, new HashMap<Integer, EmployeeSupInfo>());
-                                    }
-                                    supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
+                            else if (!effectDateIsPast) {
+                                if (!possibleSupOvrEmps.containsKey(ovrSupId)) {
+                                    possibleSupOvrEmps.put(ovrSupId, new HashMap<Integer, Date>());
                                 }
-                                else {
-                                    possibleEmps.get("SUP_OVR").put(empId, effectDate);
-                                }
-                                break;
+                                possibleSupOvrEmps.get(ovrSupId).put(empId, effectDate);
                             }
+                            break;
                         }
                     }
                 }
                 else {
-                    if (possibleEmps.get(group).containsKey(empId)) {
-                        switch (group) {
-                            case "PRIMARY": {
-                                if (currSupId == supId) {
-                                    empSupInfo.setSupEndDate(possibleEmps.get(group).get(empId));
+                    /**
+                     * Process the records of employees that had a supervisor change during the date range.
+                     * If a supervisor match is found to occur on/before the 'start' date, we add them to their
+                     * respective supervisor group. Otherwise if we can't find a match and the effect date has
+                     * occurred before the 'start' date, we know that they don't belong in the group for this range.
+                     */
+                    switch (group) {
+                        case "PRIMARY": {
+                            if (possiblePrimaryEmps.containsKey(empId)) {
+                                if (currSupId == supId && !empTerminated) {
+                                    empSupInfo.setSupEndDate(possiblePrimaryEmps.get(empId));
                                     primaryEmps.put(empId, empSupInfo);
                                 }
-                                else {
-                                    if (effectDate.before(start)) {
-                                        possibleEmps.get(group).remove(empId);
-                                    }
+                                else if (!effectDateIsPast) {
+                                    possiblePrimaryEmps.put(empId, effectDate);
                                 }
-                                break;
+                                else {
+                                    possiblePrimaryEmps.remove(empId);
+                                }
                             }
-                            case "SUP_OVR": {
-                                int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
-                                if (currSupId == ovrSupId) {
-                                    empSupInfo.setSupEndDate(possibleEmps.get(group).get(empId));
+                            break;
+                        }
+                        case "SUP_OVR": {
+                            int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
+                            if (possibleSupOvrEmps.containsKey(ovrSupId) && possibleSupOvrEmps.get(ovrSupId).containsKey(empId)) {
+                                if (currSupId == ovrSupId && !empTerminated) {
+                                    empSupInfo.setSupEndDate(possibleSupOvrEmps.get(ovrSupId).get(empId));
                                     supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
                                 }
-                                else {
-                                    if (effectDate.before(start)) {
-                                        possibleEmps.get(group).remove(empId);
-                                    }
+                                else if (!effectDateIsPast) {
+                                    possibleSupOvrEmps.get(ovrSupId).put(empId, effectDate);
                                 }
-                                break;
+                                else {
+                                    possibleSupOvrEmps.get(ovrSupId).remove(empId);
+                                }
                             }
+                            break;
                         }
-                        logger.info("Possible emp: " + empId + " rank " + rank);
                     }
                 }
             }
-            logger.info(OutputUtils.toJson(primaryEmps));
-            logger.info(OutputUtils.toJson(overrideEmps));
-            logger.info(OutputUtils.toJson(supOverrideEmps));
+
+            empGroup.setPrimaryEmployees(primaryEmps);
+            empGroup.setOverrideEmployees(overrideEmps);
+            empGroup.setSupOverrideEmployees(supOverrideEmps);
+            return empGroup;
         }
-
-
-        return null;
+        throw new SupervisorMissingEmpsEx("No employee associations could be found for supId: " + supId + " before " + end);
     }
 }
