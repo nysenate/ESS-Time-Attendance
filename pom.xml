@@ -17,6 +17,7 @@
         <commons.io.version>2.4</commons.io.version>
         <commons.lang3.version>3.1</commons.lang3.version>
         <tomcat.jdbc.version>8.0.3</tomcat.jdbc.version>
+        <c3p0.version>0.9.1.2</c3p0.version>
         <joda-time.version>2.3</joda-time.version>
     </properties>
 
@@ -44,6 +45,13 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
             <version>${tomcat.jdbc.version}</version>
+        </dependency>
+
+        <!-- cp30 connection pool -->
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>${c3p0.version}</version>
         </dependency>
 
         <!-- Date/Time helper -->

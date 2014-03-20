@@ -1,7 +1,8 @@
 package gov.nysenate.seta.config;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.beans.PropertyVetoException;
+
 /**
  * Configures dependencies necessary for any database related operations.
  */
@@ -18,6 +21,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 public class DatabaseConfig
 {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
+
     /** Local Database Configuration */
     @Value("${db.local.driver}") private String dbLocalDriver;
     @Value("${db.local.type}") private String dbLocalType;
@@ -64,24 +69,33 @@ public class DatabaseConfig
         return new DataSourceTransactionManager(remoteDataSource());
     }
 
-    private DataSource localDataSource() {
-        DataSource dataSource = new DataSource();
-        PoolProperties pool = buildPoolProperties(dbLocalType, dbLocalHost, dbLocalName, dbLocalDriver,
-                                                  dbLocalUser, dbLocalPass, 60);
-        dataSource.setPoolProperties(pool);
-        return dataSource;
+    private ComboPooledDataSource localDataSource() {
+        ComboPooledDataSource cpds = getComboPooledDataSource(dbLocalType, dbLocalHost, dbLocalName, dbLocalDriver,
+                                                              dbLocalUser, dbLocalPass);
+        cpds.setMinPoolSize(3);
+        cpds.setMaxPoolSize(10);
+        
+        return cpds;
     }
 
-    private DataSource remoteDataSource() {
-        DataSource dataSource = new DataSource();
-        PoolProperties pool = buildPoolProperties(dbRemoteType, dbRemoteHost, dbRemoteName, dbRemoteDriver,
-                                                  dbRemoteUser, dbRemotePass, 60);
-        dataSource.setPoolProperties(pool);
-        return dataSource;
+    private ComboPooledDataSource remoteDataSource() {
+        ComboPooledDataSource cpds = getComboPooledDataSource(dbRemoteType, dbRemoteHost, dbRemoteName, dbRemoteDriver,
+                                                              dbRemoteUser, dbRemotePass);
+        cpds.setMinPoolSize(3);
+        cpds.setMaxPoolSize(10);
+
+        /** Refresh the pool every 3 hours */
+        cpds.setMaxIdleTime(10800);
+
+        /** Verify connectivity before handing over the connection. */
+        cpds.setTestConnectionOnCheckout(true);
+        cpds.setPreferredTestQuery("SELECT 1 FROM DUAL");
+
+        return cpds;
     }
 
     /**
-     * Creates a database connection pool for use in a DataSource.
+     * Creates a basic pooled DataSource.
      *
      * @param type Database type
      * @param host Database host address
@@ -89,61 +103,21 @@ public class DatabaseConfig
      * @param driver Database driver string
      * @param user Database user
      * @param pass Database password
-     * @param timeoutSecs Connection timeout in seconds
      * @return PoolProperties
      */
-    private PoolProperties buildPoolProperties(String type, String host, String name, String driver,
-                                               String user, String pass, int timeoutSecs)
-    {
-        PoolProperties pool = new PoolProperties();
+    private ComboPooledDataSource getComboPooledDataSource(String type, String host, String name, String driver,
+                                                           String user, String pass) {
         final String jdbcUrlTemplate = "jdbc:%s//%s/%s";
-
-        /** Basic connection parameters. */
-        pool.setUrl(String.format(jdbcUrlTemplate, type, host, name));
-        pool.setDriverClassName(driver);
-        pool.setUsername(user);
+        ComboPooledDataSource pool = new ComboPooledDataSource();
+        try {
+            pool.setDriverClass(driver);
+        }
+        catch (PropertyVetoException ex) {
+            logger.error("Error when setting the database driver " + driver + "{}", ex.getMessage());
+        }
+        pool.setJdbcUrl(String.format(jdbcUrlTemplate, type, host, name));
+        pool.setUser(user);
         pool.setPassword(pass);
-
-        /** How big should the connection pool be? How big can it get? */
-        pool.setInitialSize(10);
-        pool.setMaxActive(100);
-        pool.setMinIdle(10);
-        pool.setMaxIdle(100);
-
-        pool.setDefaultAutoCommit(true);
-
-        /** Allow for 30 seconds between validating idle connections and cleaning abandoned connections. */
-        pool.setValidationInterval(30000);
-        pool.setTimeBetweenEvictionRunsMillis(30000);
-        pool.setMinEvictableIdleTimeMillis(30000);
-
-        /** Configure the connection validation testing. */
-        pool.setTestOnBorrow(true);
-        pool.setTestOnReturn(false);
-        pool.setTestWhileIdle(false);
-        pool.setValidationQuery("SELECT 1");
-
-        /**
-         * Connections are considered abandoned after staying open for 60+ seconds
-         * This should be set to longer than the longest expected query!
-         */
-        pool.setLogAbandoned(true);
-        pool.setRemoveAbandoned(true);
-        pool.setRemoveAbandonedTimeout(timeoutSecs);
-
-        /** How long should we wait for a connection before throwing an exception? */
-        pool.setMaxWait(10000);
-
-        /** Allow for JMX monitoring of the connection pool */
-        pool.setJmxEnabled(true);
-
-        /** Interceptors implement hooks into the query process; like Tomcat filters.
-         *  ConnectionState - Caches connection state information to avoid redundant queries.
-         *  StatementFinalizer - Finalizes all related statements when a connection is closed.
-         */
-        pool.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;" +
-                "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
-
         return pool;
     }
 }
