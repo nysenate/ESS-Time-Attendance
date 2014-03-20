@@ -7,6 +7,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -87,50 +88,24 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
     /**{@inheritDoc} */
     @Override
-    public boolean isSupervisor(int empId) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
+    public Supervisor getSupervisor(int supId) throws SupervisorException {
+        Supervisor sup;
         try {
-            remoteNamedJdbc.queryForObject(IS_EMP_ID_CURR_SUPERVISOR_SQL, params, Integer.class);
-            return true;
+            Employee emp = employeeDao.getEmployeeById(supId);
+            sup = new Supervisor(emp);
         }
-        catch (EmptyResultDataAccessException ex) {
-            return false;
+        catch (EmployeeNotFoundEx ex) {
+            throw new SupervisorNotFoundEx("Supervisor with id: " + supId + " not found.");
         }
+        catch (EmployeeException ex) {
+            throw new SupervisorException("Encountered error while retrieving supervisor with id: " + supId, ex);
+        }
+        return sup;
     }
 
-    /**{@inheritDoc} */
     @Override
-    public boolean isSupervisor(int empId, Date date) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
-        params.addValue("endDate", date);
-        try {
-            //remoteNamedJdbc.queryForObject(IS_EMP_ID_SUPERVISOR_DURING_DATE_SQL, params, Integer.class);
-            return true;
-        }
-        catch (EmptyResultDataAccessException ex) {
-            return false;
-        }
-    }
-
-    /**{@inheritDoc} */
-    @Override
-    public int getSupervisorIdForEmp(int empId) throws SupervisorException {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
-        try {
-            return remoteNamedJdbc.queryForObject(GET_CURR_SUPERVISOR_FOR_EMP_SQL, params, new RowMapper<Integer>() {
-                @Override
-                public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return rs.getInt("NUXREFSV");
-                }
-            });
-        }
-        catch (IncorrectResultSizeDataAccessException ex) {
-            logger.warn("Failed to retrieve curr supervisor id for emp id: {} error: {}", empId, ex);
-            throw new SupervisorNotFoundEx();
-        }
+    public boolean isSupervisor(int empId, Date start, Date end) {
+        return false;
     }
 
     /**{@inheritDoc} */
@@ -174,37 +149,40 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         throw new SupervisorNotFoundEx("Supervisor id not found for empId: " + empId + " for date: " + date);
     }
 
-    /**{@inheritDoc} */
+    /**
+     * Determine the chain by recursively retrieving the supervisor id for each successive employee.
+     * {@inheritDoc}
+     */
     @Override
-    public Supervisor getSupervisor(int supId) throws SupervisorException {
-        Supervisor sup;
-        try {
-            Employee emp = employeeDao.getEmployeeById(supId);
-            sup = new Supervisor(emp);
+    public SupervisorChain getSupervisorChain(int empId, Date date) throws SupervisorException {
+        int currEmpId = empId;
+        int currDepth = 0;
+        final int maxDepth = 10;
+        SupervisorChain chain = new SupervisorChain(currEmpId);
+
+        while (true) {
+            int currSupId = getSupervisorIdForEmp(currEmpId, date);
+            if (!chain.containsSupervisor(currSupId)) {
+                chain.addSupervisorToChain(currSupId);
+                currEmpId = currSupId;
+            }
+            else {
+                break;
+            }
+
+            /** Eliminate possibility of infinite recursion. */
+            if (currDepth >= maxDepth) {
+                break;
+            }
+            currDepth++;
         }
-        catch (EmployeeNotFoundEx ex) {
-            throw new SupervisorNotFoundEx("Supervisor with id: " + supId + " not found.");
-        }
-        catch (EmployeeException ex) {
-            throw new SupervisorException("Encountered error while retrieving supervisor with id: " + supId, ex);
-        }
-        return sup;
+
+        return chain;
     }
 
     /**{@inheritDoc} */
     @Override
-    public SupervisorChain getSupervisorChain(int supId) throws SupervisorException {
-        return null;
-    }
-
-    /**{@inheritDoc} */
-    @Override
-    public SupervisorChain getSupervisorChain(int supId, Date date) throws SupervisorException {
-        return null;
-    }
-
-    /**{@inheritDoc} */
-    @Override
+    @Cacheable(value = "supervisorEmps")
     public SupervisorEmpGroup getSupervisorEmpGroup(int supId, Date start, Date end) throws SupervisorException {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("supId", supId);
