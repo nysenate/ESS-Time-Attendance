@@ -9,15 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 import static gov.nysenate.seta.model.TransactionType.*;
@@ -32,9 +27,6 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
     @Autowired
     private EmployeeDao employeeDao;
-
-    protected static final String IS_EMP_ID_CURR_SUPERVISOR_SQL =
-        "SELECT 1 FROM PM21PERSONN WHERE NUXREFSV = :empId";
 
     /**
      * This query returns a listing of all supervisor related transactions for employees that have at
@@ -103,12 +95,28 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         return sup;
     }
 
+    /**{@inheritDoc}
+     *
+     * We determine this by simply checking if the empId managed any employees during the
+     * given time range.
+     */
     @Override
     public boolean isSupervisor(int empId, Date start, Date end) {
-        return false;
+        SupervisorEmpGroup supervisorEmpGroup;
+        try {
+            supervisorEmpGroup = getSupervisorEmpGroup(empId, start, end);
+        }
+        catch (SupervisorException ex) {
+            return false;
+        }
+        return supervisorEmpGroup.hasEmployees();
     }
 
-    /**{@inheritDoc} */
+    /**{@inheritDoc}
+     *
+     * The latest employee transactions before the given 'date' are checked to determine
+     * the supervisor id.
+     */
     @Override
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
         Set<TransactionType> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
