@@ -30,6 +30,11 @@ public abstract class SqlBaseDao
     }
 
     public static char getStatusCode(Boolean status){
-        if(status.equals(true)){return 'A';} else{return 'I';}
+        if (status != null && status.equals(true)) {
+            return 'A';
+        }
+        else {
+            return 'I';
+        }
     }
 }

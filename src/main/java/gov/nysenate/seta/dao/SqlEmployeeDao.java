@@ -1,23 +1,27 @@
 package gov.nysenate.seta.dao;
 
-import gov.nysenate.seta.model.Employee;
-import gov.nysenate.seta.model.EmployeeNotFoundEx;
+import gov.nysenate.seta.model.*;
+
+import static gov.nysenate.seta.model.TransactionType.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeDao.class);
+
+    @Autowired
+    protected EmployeeTransactionDao transHistoryDao;
 
     protected static final String GET_EMP_SQL_TMPL =
         "SELECT DISTINCT \n" +
@@ -52,11 +56,17 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     protected static final String GET_EMP_BY_EMAIL_SQL = String.format(GET_EMP_SQL_TMPL, "per.NAEMAIL = :email");
     protected static final String GET_ACTIVE_EMPS_SQL = String.format(GET_EMP_SQL_TMPL, "per.CDEMPSTATUS = 'A'");
 
-    /**
-     * {@inheritDoc}
-     */
+    /** Set of TransactionTypes that involve data used to construct an Employee. */
+    protected static Set<TransactionType> effectiveTransTypes = new HashSet<>();
+    static {
+        effectiveTransTypes.addAll(
+                Arrays.asList(APP, AGY, EMP, LEG, LOC, MAR, NAM, NAT, PHO, RTP, SEX, SUP, TLE, TYP));
+    }
+
+    /** {@inheritDoc} */
+    @Cacheable(value = "employees")
     @Override
-    public Employee getEmployeeById(int empId) throws EmployeeNotFoundEx {
+    public Employee getEmployeeById(int empId) throws EmployeeException {
         Employee employee;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
@@ -71,29 +81,30 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         return employee;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public Employee getEmployeeById(int empId, Date date) throws EmployeeNotFoundEx {
-        /** TODO: Use the audit table to get the latest batch of audits and apply them. */
-        Employee emp = getEmployeeById(empId);
-        return emp;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds) throws EmployeeNotFoundEx {
+    public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Employee getEmployeeByEmail(String email) throws EmployeeNotFoundEx {
+    public List<Integer> getActiveEmployeeIds() {
+        return null;
+    }
+
+    @Override
+    public List<Integer> getActiveEmployeesDuring(Date start, Date end) {
+        return null;
+    }
+
+    @Override
+    public Map<Integer, Employee> getActiveEmployeeMap(Date start, Date end) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Employee getEmployeeByEmail(String email) throws EmployeeException {
         Employee employee;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("email", email);
@@ -107,19 +118,15 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         return employee;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    /** {@inheritDoc} */
+    //@Override
     public List<Employee> getActiveEmployees() {
         return remoteNamedJdbc.query(GET_ACTIVE_EMPS_SQL,
                 new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    /** {@inheritDoc} */
+    //@Override
     public Map<Integer, Employee> getActiveEmployeeMap() {
         List<Employee> activeEmployees = getActiveEmployees();
         Map<Integer, Employee> actEmpMap = new ConcurrentHashMap<>();
@@ -127,5 +134,77 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
             actEmpMap.put(emp.getEmployeeId(), emp);
         }
         return actEmpMap;
+    }
+
+    /**
+     *
+     * @param emp Employee -
+     * @param latestTransMap Map(TransactionType, TransactionRecord) -
+     * @return Employee
+     */
+    protected Employee getEmployeeSnapshot(Employee emp, Map<TransactionType, TransactionRecord> latestTransMap) {
+        if (emp != null) {
+            for (TransactionType type : latestTransMap.keySet()) {
+                Map<String, String> valueMap = latestTransMap.get(type).getValueMap();
+                switch (type) {
+                    case AGY : { /** Responsibility center. */
+                        break;
+                    }
+                    case EMP : { /** Employee status (active/inactive) */
+                        emp.setActive(valueMap.get("CDEMPSTATUS").equals("A"));
+                        break;
+                    }
+                    case LEG : { /** Home address */
+                        Address address = new Address();
+                        address.setAddr1(valueMap.get("ADSTREET1"));
+                        address.setAddr1(valueMap.get("ADSTREET2"));
+                        address.setAddr1(valueMap.get("ADCITY"));
+                        address.setAddr1(valueMap.get("ADSTATE"));
+                        address.setAddr1(valueMap.get("ADZIPCODE"));
+                        emp.setHomeAddress(address);
+                        break;
+                    }
+                    case LOC : { /** Work location */
+                        break;
+                    }
+                    case MAR : { /** Marital status */
+                        emp.setMaritalStatus(MaritalStatus.valueOfCode(valueMap.get("CDMARITAL")));
+                        break;
+                    }
+                    case NAM : { /** Employee's name */
+                        emp.setFirstName(valueMap.get("NAFIRST"));
+                        emp.setLastName(valueMap.get("NALAST"));
+                        emp.setInitial(valueMap.get("NAMIDINIT"));
+                        emp.setFullName(String.format("%s %s %s", emp.getFirstName(), emp.getInitial(), emp.getLastName()));
+                        break;
+                    }
+                    case NAT : { /** Employee's title (Mr, Ms, etc.) */
+                        emp.setTitle(valueMap.get("NATITLE"));
+                        break;
+                    }
+                    case PHO : { /** Employee's phone number */
+                        emp.setHomePhone(valueMap.get("ADPHONENUM"));
+                        emp.setWorkPhone(valueMap.get("ADPHONENUMW"));
+                        break;
+                    }
+                    case SEX : { /** Gender info */
+                        emp.setGender(Gender.valueOf(valueMap.get("CDSEX")));
+                        break;
+                    }
+                    case SUP : { /** T&A Supervisor id */
+                        emp.setSupervisorId(Integer.parseInt(valueMap.get("NUXREFSV")));
+                        break;
+                    }
+                    case TLE : { /** Job title */
+                        break;
+                    }
+                    case TYP : { /** Pay type */
+                        emp.setPayType(PayType.valueOf(valueMap.get("CDPAYTYPE")));
+                        break;
+                    }
+                }
+            }
+        }
+        return emp;
     }
 }

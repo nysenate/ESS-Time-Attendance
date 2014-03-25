@@ -27,6 +27,22 @@ public class Person
 
     public Person() {}
 
+    public Person(Person other) {
+        this.title = other.title;
+        this.firstName = other.firstName;
+        this.lastName = other.lastName;
+        this.initial = other.initial;
+        this.suffix = other.suffix;
+        this.fullName = other.fullName;
+        this.email = other.email;
+        this.workPhone = other.workPhone;
+        this.homePhone = other.homePhone;
+        this.dateOfBirth = other.dateOfBirth;
+        this.gender = other.gender;
+        this.maritalStatus = other.maritalStatus;
+        this.homeAddress = other.homeAddress;
+    }
+
     /** Functional Getters */
 
     /**

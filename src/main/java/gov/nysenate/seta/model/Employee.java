@@ -16,9 +16,19 @@ public class Employee extends Person
     protected PayType payType;
     protected ResponsibilityCenter respCenter;
     protected Location workLocation;
-    public Timestamp time;
 
-    public Employee() { time = new Timestamp(new Date().getTime());}
+    public Employee() {}
+
+    public Employee(Employee other) {
+        this.employeeId = other.employeeId;
+        this.supervisorId = other.supervisorId;
+        this.active = other.active;
+        this.uid = other.uid;
+        this.jobTitle = other.jobTitle;
+        this.payType = other.payType;
+        this.respCenter = other.respCenter;
+        this.workLocation = other.workLocation;
+    }
 
     /** Basic Getters/Setters */
 
