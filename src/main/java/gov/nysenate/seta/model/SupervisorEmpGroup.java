@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,8 @@ import java.util.Map;
 public class SupervisorEmpGroup
 {
     protected int supervisorId;
+    protected Date startDate;
+    protected Date endDate;
 
     /** Primary employees (directly assigned to this supervisor).
      *  Mapping of empId -> EmployeeSupInfo */
@@ -27,6 +30,21 @@ public class SupervisorEmpGroup
 
     public SupervisorEmpGroup() {}
 
+    public SupervisorEmpGroup(int supervisorId, Date startDate, Date endDate) {
+        this.supervisorId = supervisorId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    /**
+     * @return true if any employees are stored, false otherwise.
+     */
+    public boolean hasEmployees() {
+        return (primaryEmployees != null && !primaryEmployees.isEmpty()) ||
+               (overrideEmployees != null && !overrideEmployees.isEmpty()) ||
+               (supOverrideEmployees != null && !supOverrideEmployees.isEmpty());
+    }
+
     /** Basic Getters/Setters */
 
     public int getSupervisorId() {
@@ -35,6 +53,22 @@ public class SupervisorEmpGroup
 
     public void setSupervisorId(int supervisorId) {
         this.supervisorId = supervisorId;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public Map<Integer, EmployeeSupInfo> getPrimaryEmployees() {
