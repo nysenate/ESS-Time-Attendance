@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -75,8 +76,8 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         "AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT <= :endDate\n" +
         "ORDER BY NUXREFEM, TRANS_RANK";
 
-    protected static final String GET_CURR_SUPERVISOR_FOR_EMP_SQL =
-        "SELECT NUXREFSV FROM PM21PERSONN WHERE NUXREFEM = :empId";
+    protected static final String GET_SUP_CHAIN_EXCEPTIONS =
+        "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM PM23SPCHNEX WHERE CDSTATUS = 'A' AND NUXREFEM = :empId";
 
     /**{@inheritDoc} */
     @Override
@@ -177,12 +178,26 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
             else {
                 break;
             }
-
             /** Eliminate possibility of infinite recursion. */
             if (currDepth >= maxDepth) {
                 break;
             }
             currDepth++;
+        }
+
+        /** Look for any active inclusions/exclusions */
+        SqlParameterSource params = new MapSqlParameterSource("empId", empId);
+        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_CHAIN_EXCEPTIONS, params, new ColumnMapRowMapper());
+        if (!res.isEmpty()) {
+            for (Map<String, Object> row : res) {
+                int supId = Integer.parseInt(row.get("NUXREFSV").toString());
+                if (row.get("CDTYPE").equals("I")) {
+                    chain.getChainInclusions().add(supId);
+                }
+                else {
+                    chain.getChainExclusions().add(supId);
+                }
+            }
         }
 
         return chain;
