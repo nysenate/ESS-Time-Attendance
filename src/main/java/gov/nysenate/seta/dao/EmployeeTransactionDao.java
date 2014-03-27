@@ -18,15 +18,15 @@ import java.util.Set;
 public interface EmployeeTransactionDao
 {
     /** See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
-     * @see #getLastTransactionRecord(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
+     * @see #getLastTransRecord(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
      */
-    public TransactionRecord getLastTransactionRecord(int empId, TransactionType type) throws TransRecordException;
+    public TransactionRecord getLastTransRecord(int empId, TransactionType type) throws TransRecordException;
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
-     * @see #getLastTransactionRecord(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
+     * @see #getLastTransRecord(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
      */
-    public TransactionRecord getLastTransactionRecord(int empId, TransactionType type, Date end) throws TransRecordException;
+    public TransactionRecord getLastTransRecord(int empId, TransactionType type, Date end) throws TransRecordException;
 
     /**
      * Retrieves the most recent TransactionRecord of the given type with an effective date between the 'start'
@@ -38,19 +38,19 @@ public interface EmployeeTransactionDao
      * @return TransactionRecord if exists, otherwise a TransRecordException is thrown
      * @throws TransRecordException - TransRecordNotFoundEx if given transaction does not exist for empId.
      */
-    public TransactionRecord getLastTransactionRecord(int empId, TransactionType type, Date start, Date end) throws TransRecordException;
+    public TransactionRecord getLastTransRecord(int empId, TransactionType type, Date start, Date end) throws TransRecordException;
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
-     * @see #getLastTransactionRecords(int, java.util.Set, java.util.Date, java.util.Date)
+     * @see #getLastTransRecords(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public Map<TransactionType, TransactionRecord> getLastTransactionRecords(int empId, Set<TransactionType> types);
+    public Map<TransactionType, TransactionRecord> getLastTransRecords(int empId, Set<TransactionType> types);
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
-     * @see #getLastTransactionRecords(int, java.util.Set, java.util.Date, java.util.Date)
+     * @see #getLastTransRecords(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public Map<TransactionType, TransactionRecord> getLastTransactionRecords(int empId, Set<TransactionType> types, Date end);
+    public Map<TransactionType, TransactionRecord> getLastTransRecords(int empId, Set<TransactionType> types, Date end);
 
     /**
      * Retrieves a map (TransactionType -> TransactionRecord) of the most recent transaction for each type in the
@@ -62,43 +62,19 @@ public interface EmployeeTransactionDao
      * @param end Date - the transaction's effective date must be equal to or before this date.
      * @return Map(TransactionType,TransactionRecord) - only found transaction types will be set in the map.
      */
-    public Map<TransactionType, TransactionRecord> getLastTransactionRecords(int empId, Set<TransactionType> types, Date start, Date end);
+    public Map<TransactionType, TransactionRecord> getLastTransRecords(int empId, Set<TransactionType> types, Date start, Date end);
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
-     * @see #getTransactionHistory(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
+     * @see #getTransHistoryMap(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public TransactionHistory getTransactionHistory(int empId, TransactionType type) throws TransRecordException;
+    public Map<TransactionType, TransactionHistory> getTransHistoryMap(int empId, Set<TransactionType> types);
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
-     * @see #getTransactionHistory(int, gov.nysenate.seta.model.TransactionType, java.util.Date, java.util.Date)
+     * @see #getTransHistoryMap(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public TransactionHistory getTransactionHistory(int empId, TransactionType type, Date end) throws TransRecordException;
-
-    /**
-     * Retrieves TransactionHistory for the given employee id and transaction type with an effective date that is
-     * before or equal to the 'end' date. If no records are matched a TransRecordException will be thrown.
-     * @param empId int - Employee id
-     * @param type TransactionType - the type of transaction to search for
-     * @param start Date - the transaction's effective date must be equal to or after this date.
-     * @param end Date - the transaction's effective date must be equal to or before this date.
-     * @return TransactionHistory if records exist, otherwise a TransRecordException is thrown
-     * @throws TransRecordException - TransRecordNotFoundEx if given transaction does not exist for empId.
-     */
-    public TransactionHistory getTransactionHistory(int empId, TransactionType type, Date start, Date end) throws TransRecordException;
-
-    /**
-     * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
-     * @see #getTransactionHistoryMap(int, java.util.Set, java.util.Date, java.util.Date)
-     */
-    public Map<TransactionType, TransactionHistory> getTransactionHistoryMap(int empId, Set<TransactionType> types);
-
-    /**
-     * See overloaded method. {@code start} defaults to the beginning of time.
-     * @see #getTransactionHistoryMap(int, java.util.Set, java.util.Date, java.util.Date)
-     */
-    public Map<TransactionType, TransactionHistory> getTransactionHistoryMap(int empId, Set<TransactionType> types, Date end);
+    public Map<TransactionType, TransactionHistory> getTransHistoryMap(int empId, Set<TransactionType> types, Date end);
 
     /**
      * Retrieves a map (TransactionType -> TransactionHistory) of all the records for the given set of TransactionTypes
@@ -110,5 +86,5 @@ public interface EmployeeTransactionDao
      * @param end Date - the transaction's effective date must be equal to or before this date.
      * @return Map(TransactionType, TransactionHistory)
      */
-    public Map<TransactionType, TransactionHistory> getTransactionHistoryMap(int empId, Set<TransactionType> types, Date start, Date end);
+    public Map<TransactionType, TransactionHistory> getTransHistoryMap(int empId, Set<TransactionType> types, Date start, Date end);
 }

@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -122,7 +123,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
         Set<TransactionType> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
         Map<TransactionType, TransactionRecord> transMap =
-                empTransactionDao.getLastTransactionRecords(empId, transTypes, date);
+                empTransactionDao.getLastTransRecords(empId, transTypes, date);
 
         /** The RTP/APP should have a supervisor id to use as the base */
         int supId = -1;
@@ -355,5 +356,10 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
             return empGroup;
         }
         throw new SupervisorMissingEmpsEx("No employee associations could be found for supId: " + supId + " before " + end);
+    }
+
+    @Override
+    public void setSupervisorOverride(int supId, int ovrSupId, Date start, Date end) throws SupervisorException {
+        throw new NotImplementedException();
     }
 }
