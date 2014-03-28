@@ -3,27 +3,19 @@ package gov.nysenate.seta.model;
 import java.util.Date;
 
 /**
- * Represents any of the various Senate Pay Periods.
+ * Contains the date information for a single pay period.
  */
 public class PayPeriod
 {
-    protected int payPeriodId;
     protected PayPeriodType type;
     protected Date startDate;
     protected Date endDate;
-    protected String payPeriodCode;
+    protected int payPeriodNum;
     protected boolean active;
-    protected boolean split;
 
     public PayPeriod() {}
 
-    public int getPayPeriodId() {
-        return payPeriodId;
-    }
-
-    public void setPayPeriodId(int payPeriodId) {
-        this.payPeriodId = payPeriodId;
-    }
+    /** Basic Getters/Setters */
 
     public PayPeriodType getType() {
         return type;
@@ -49,12 +41,12 @@ public class PayPeriod
         this.endDate = endDate;
     }
 
-    public String getPayPeriodCode() {
-        return payPeriodCode;
+    public int getPayPeriodNum() {
+        return payPeriodNum;
     }
 
-    public void setPayPeriodCode(String payPeriodCode) {
-        this.payPeriodCode = payPeriodCode;
+    public void setPayPeriodNum(int payPeriodNum) {
+        this.payPeriodNum = payPeriodNum;
     }
 
     public boolean isActive() {
@@ -63,13 +55,5 @@ public class PayPeriod
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public boolean isSplit() {
-        return split;
-    }
-
-    public void setSplit(boolean split) {
-        this.split = split;
     }
 }

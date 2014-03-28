@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model;
+package gov.nysenate.seta.model.exception;
 
 /**
  * Created by riken on 3/4/14.

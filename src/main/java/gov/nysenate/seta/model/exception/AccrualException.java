@@ -1,11 +1,13 @@
-package gov.nysenate.seta.model;
+package gov.nysenate.seta.model.exception;
+
+import gov.nysenate.seta.model.AccrualType;
 
 /**
  * Created by brian heitner on 3/14/14.
  */
 public class AccrualException extends Exception {
 
-    protected  AccrualType accrualType;
+    protected AccrualType accrualType;
 
     public AccrualException(){}
 
