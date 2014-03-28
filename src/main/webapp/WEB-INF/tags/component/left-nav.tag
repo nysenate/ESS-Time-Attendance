@@ -19,18 +19,17 @@
         </li>
         <li>
             <ul class="sub-topic-list">
-                <li class="sub-topic"><a href="${ctxPath}/ui/record/entry">Time Record Entry</a></li>
-                <li class="sub-topic"><a href="${ctxPath}/ui/record/history">Time Record History</a></li>
-                <li class="sub-topic"><a href="${ctxPath}/ui/record/request">Time Off Requests</a></li>
-                <li class="sub-topic"><a href="${ctxPath}/ui/record/manage">Manage Employee Records</a></li>
+                <li class="sub-topic"><a href="${ctxPath}/ui/record/entry">Enter Time Record</a></li>
+                <li class="sub-topic"><a href="${ctxPath}/ui/record/timeoff">Request Time Off</a></li>
+                <li class="sub-topic"><a href="${ctxPath}/ui/record/history">View History</a></li>
             </ul>
         </li>
         <li id="productivityLink" class="main-topic">
-            <a><div class="nav-icon"></div>Paychecks</a>
+            <a><div class="nav-icon"></div>Manage Employees</a>
         </li>
         <li>
             <ul class="sub-topic-list">
-                <li class="sub-topic"><a href="${ctxPath}/ui/productivity/tracker">Paycheck History</a></li>
+                <li class="sub-topic"><a href="${ctxPath}/ui/record/manage">Employee T&A</a></li>
             </ul>
         </li>
         <li id="helpLink" class="main-topic">
