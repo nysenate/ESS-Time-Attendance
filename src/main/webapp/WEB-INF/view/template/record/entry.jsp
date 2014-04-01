@@ -1,9 +1,47 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<h1 class="hero">Time Record Entry</h1>
+<h1 class="hero">Enter Time Record</h1>
+
+<section class="content-container">
+    <h1 class="olive">Pay Periods</h1>
+    <div id="payPeriodListContainer">
+        <p>You have multiple pay period records to submit. Please select one from the listing to edit it.</p>
+        <p></p>
+        <table>
+            <thead>
+            <tr>
+                <th>Edit</th>
+                <th>Pay Period</th>
+                <th>Days Remaining</th>
+                <th>Status</th>
+                <th>Supervisor</th>
+                <th>Last Updated</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="active">
+                <td><input checked="checked" name="activePayPeriod" type="radio"/></td>
+                <td>1/30/2014 - 2/12/2014</td>
+                <td style="color:#B90504;">Due</td>
+                <td>Not Submitted</td>
+                <td>Kenneth J. Zalewski</td>
+                <td>1/31/2014 3:04 PM</td>
+            </tr>
+            <tr>
+                <td><input name="activePayPeriod" type="radio"/></td>
+                <td>2/13/2014 - 2/27/2014</td>
+                <td>11</td>
+                <td>Not Due Yet</td>
+                <td>Kenneth J. Zalewski</td>
+                <td>12/20/2014 3:04 PM</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
 
 <section ng-controller="RecordEntryController">
     <section class="content-container">
-        <h1 class="orange">Accrual Summary</h1>
+        <h1 class="orange">Time Record Details 1/30 - 2/12</h1>
         <div id="hourlyAccrualContainer">
             <p style="">The following hours have accrued as of the latest pay period.<br/>
                 <strong>Note:</strong> All hours available need approval from your appointing authority.
@@ -39,54 +77,12 @@
                 <div style="clear:both;"></div>
             </section>
         </div>
-    </section>
-
-    <section class="content-container">
-        <h1 class="olive">Pay Periods</h1>
-        <div id="payPeriodListContainer">
-            <p>You have multiple pay period records to submit. Please select one from the listing to edit it.</p>
-            <p></p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Edit</th>
-                        <th>Pay Period</th>
-                        <th>Days Remaining</th>
-                        <th>Status</th>
-                        <th>Supervisor</th>
-                        <th>Last Updated</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="active">
-                        <td><input checked="checked" name="activePayPeriod" type="radio"/></td>
-                        <td>1/30/2014 - 2/12/2014</td>
-                        <td style="color:#B90504;">Due</td>
-                        <td>Not Submitted</td>
-                        <td>Kenneth J. Zalewski</td>
-                        <td>1/31/2014 3:04 PM</td>
-                    </tr>
-                    <tr>
-                        <td><input name="activePayPeriod" type="radio"/></td>
-                        <td>2/13/2014 - 2/27/2014</td>
-                        <td>11</td>
-                        <td>Not Due Yet</td>
-                        <td>Kenneth J. Zalewski</td>
-                        <td>12/20/2014 3:04 PM</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <section class="content-container" style="clear:left;">
-        <h1>Time Record Details for 1/30 - 2/12</h1>
-        <div id="timeRecordViewToggle">
+        <!--<div id="timeRecordViewToggle">
             <div class="calendar-icon">&nbsp;</div>
             <a class="active">Full</a>
             <a>Week</a>
             <a>Today</a>
-        </div>
+        </div>-->
         <section>
             <form id="timeRecordForm" method="post" action="">
                 <table class="ess-table" id="timeRecordTable">

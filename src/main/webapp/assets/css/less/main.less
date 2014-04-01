@@ -3,7 +3,7 @@
 @import "./common/common";
 
 /** Sizes */
-@nav-width: 220px;
+@nav-width: 225px;
 @docked-nav-width: 50px;
 @profile-tab-width: 220px;
 
@@ -134,8 +134,8 @@ h1 {
   position: fixed;
   width: 100%;
   background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
   height:50px;
-  .box-shadow(0px 1px 5px #999);
   z-index: 100;
 
   .left-header-area {
@@ -265,7 +265,7 @@ h1 {
   padding-top: 20px;
   margin-right: 20px;
   width: @nav-width;
-  background: #555;
+  background: #333;
 
   @media @small-width, @medium-width {
     left: (@nav-width * -1) + @docked-nav-width;
@@ -285,9 +285,8 @@ h1 {
     li {
       &.main-topic {
         color: white;
-        padding-left: 10px;
         .font-weight-light;
-        font-size: 1.3em;
+        font-size: 1.2em;
         margin: 0;
         padding: 10px 0;
         cursor: pointer;
@@ -317,23 +316,22 @@ h1 {
         }
 
         &:hover {
-          background: #444;
+          background: #555;
         }
 
         &.active {
-          background: #444;
-          border-bottom: 2px solid @teal;
+          border-bottom: 1px solid #555;
+          background: #00809a;
         }
       }
 
       .sub-topic-list {
-        background: #eee;
         padding: 0;
         display: none;
         cursor: pointer;
+        margin-top: 5px;
 
         .sub-topic {
-          border-bottom: 1px solid #ddd;
 
           a {
             padding-left: 30px;
@@ -342,25 +340,23 @@ h1 {
             display: block;
             .font-weight-bold;
             font-size: 1.0em;
-            color: #888;
+            color: #bbb;
           }
 
           &:hover {
             a {
-              color: @teal;
+              color: white;
             }
-            background: #f6f6f6;
+            background: #444;
           }
 
           &.active {
             a {
-              color: @teal;
+              color: white;
               padding-left: 26px;
             }
-            border-left: 4px solid @green;
-            background: #f7f7f7;
+            border-left: 5px solid lighten(@teal, 5%);
             .font-weight-bold;
-            color: teal;
           }
         }
 
@@ -386,19 +382,19 @@ h1 {
   }
 
   h1.hero {
-    color: @teal;
+    background: @teal;
     font-size: 2.5em;
     .font-weight-light;
     text-align: center;
     margin: 0;
     padding: 20px;
-    background: #fafafa;
+    color: #eee;
   }
 }
 
 .content-container {
   margin:20px auto;
-  width: 800px;
+  width: 840px;
   background: #fefefe;
   position: relative;
   .box-shadow(0px 1px 2px #aaa);
@@ -642,6 +638,7 @@ table#timeRecordTable {
   padding: 5px 10px;
   background: #f9f9f9;
   button {
+    width: 200px;
     padding: 5px 10px;
     background: @green;
     color: white;

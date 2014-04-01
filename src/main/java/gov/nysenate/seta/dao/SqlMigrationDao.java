@@ -1,7 +1,8 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
-import gov.nysenate.seta.util.OutputUtils;
+import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;

@@ -1,9 +1,8 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.TimeRecord;
-import gov.nysenate.seta.model.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

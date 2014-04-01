@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.SupervisorException;
 
 import java.util.Date;
 
@@ -10,9 +11,9 @@ import java.util.Date;
 public interface SupervisorDao extends BaseDao
 {
     /**
-     * Retrieves a Supervisor object for the given supId.
+     * Retrieves a Supervisor object for the given supervisor id.
      * @param supId int - employee id for supervisor
-     * * @return Supervisor for matching supId
+     * @return Supervisor for matching supId
      * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
      */
     public Supervisor getSupervisor(int supId) throws SupervisorException;
@@ -23,7 +24,7 @@ public interface SupervisorDao extends BaseDao
      * @param start Date - start of date range
      * @param end Date - end of date range
      * @return boolean - true if 'empId' had subordinates during the date range and was thus
-     *                   a supervisor.
+     *                   a supervisor, false otherwise.
      */
     public boolean isSupervisor(int empId, Date start, Date end);
 
@@ -37,13 +38,15 @@ public interface SupervisorDao extends BaseDao
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException;
 
     /**
-     * Computes and returns the SupervisorChain for the given supId during the specified date.
-     * @param supId int - Supervisor id
+     * Computes and returns a listing of the hierarchy of supervisors starting from the given empId
+     * during the specified date.
+     * @param empId int - Employee id
      * @param date Date - Date to compute the supervisor chain for
-     * @return SupervisorChain for matching supId
-     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
+     * @return SupervisorChain for matching empId
+     * @throws SupervisorException - SupervisorNotFoundEx if a supervisor could not be found for any
+     *                                                    employee that is encountered in the chain.
      */
-    public SupervisorChain getSupervisorChain(int supId, Date date) throws SupervisorException;
+    public SupervisorChain getSupervisorChain(int empId, Date date) throws SupervisorException;
 
     /**
      * Retrieves the collection of employees that are managed by the given supervisor between the start and
@@ -56,4 +59,16 @@ public interface SupervisorDao extends BaseDao
      * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
      */
     public SupervisorEmpGroup getSupervisorEmpGroup(int supId, Date start, Date end) throws SupervisorException;
+
+    /**
+     * Sets an override so that 'ovrSupId' can have access to the primary employees of 'supId' during the
+     * given date range.
+     * @param supId int - The supervisor granting the override.
+     * @param ovrSupId int - The supervisor receiving the override.
+     * @param start Date - The start date, set to null if override is effective immediately.
+     * @param end Date - The end date, set to null if override is effective permanently.
+     * @throws SupervisorException - SupervisorNotFoundEx if either supervisor could not be found
+     *                               SupervisorNotInChainEx if 'ovrSupId' is not in 'supId's' chain
+     */
+    public void setSupervisorOverride(int supId, int ovrSupId, Date start, Date end) throws SupervisorException;
 }

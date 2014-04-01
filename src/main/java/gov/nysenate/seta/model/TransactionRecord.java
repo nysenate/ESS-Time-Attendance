@@ -20,6 +20,8 @@ public class TransactionRecord
         return valueMap != null && !valueMap.isEmpty();
     }
 
+    /** Basic Getters/Setters */
+
     public int getEmployeeId() {
         return employeeId;
     }

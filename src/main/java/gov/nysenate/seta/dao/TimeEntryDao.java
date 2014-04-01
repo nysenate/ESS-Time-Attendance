@@ -1,8 +1,8 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.TimeEntry;
-import gov.nysenate.seta.model.TimeEntryNotFoundEx;
-import gov.nysenate.seta.model.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;

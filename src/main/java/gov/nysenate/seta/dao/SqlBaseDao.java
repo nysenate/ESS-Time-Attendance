@@ -21,20 +21,34 @@ public abstract class SqlBaseDao
     @Resource(name = "remoteNamedJdbcTemplate")
     protected NamedParameterJdbcTemplate remoteNamedJdbc;
 
+    /**
+     * For use in queries where we don't care about the start date.
+     * @return Date
+     */
     public static Date getBeginningOfTime() {
         return new DateTime(0, 1, 1, 0, 0, 0).toDate();
     }
 
-    public static Date getEpoch() {
-        return new DateTime((long) 0).toDate();
-    }
-
-    public static char getStatusCode(Boolean status){
+    /**
+     * Converts true to 'A' and false to 'I'
+     * @param status Boolean
+     * @return char
+     */
+    public static char getStatusCode(Boolean status) {
         if (status != null && status.equals(true)) {
             return 'A';
         }
         else {
             return 'I';
         }
+    }
+
+    /**
+     * Interpret 'A' as true and everything else as false.
+     * @param code String
+     * @return boolean
+     */
+    public static boolean getStatusFromCode(String code) {
+        return code != null && code.equals("A");
     }
 }

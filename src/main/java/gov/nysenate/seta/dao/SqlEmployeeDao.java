@@ -1,9 +1,12 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.EmployeeRowMapper;
 import gov.nysenate.seta.model.*;
 
 import static gov.nysenate.seta.model.TransactionType.*;
 
+import gov.nysenate.seta.model.exception.EmployeeException;
+import gov.nysenate.seta.model.exception.EmployeeNotFoundEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
