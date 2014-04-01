@@ -1,7 +1,5 @@
 package gov.nysenate.seta.dao.mapper;
 
-import gov.nysenate.seta.dao.LocationRowMapper;
-import gov.nysenate.seta.dao.RespCenterRowMapper;
 import gov.nysenate.seta.model.*;
 import org.springframework.jdbc.core.RowMapper;
 

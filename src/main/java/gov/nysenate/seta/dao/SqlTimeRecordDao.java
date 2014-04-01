@@ -1,14 +1,13 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.TimeRecord;
-import gov.nysenate.seta.model.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

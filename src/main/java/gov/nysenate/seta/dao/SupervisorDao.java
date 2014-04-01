@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.SupervisorException;
 
 import java.util.Date;
 
@@ -37,13 +38,15 @@ public interface SupervisorDao extends BaseDao
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException;
 
     /**
-     * Computes and returns the SupervisorChain for the given supId during the specified date.
-     * @param supId int - Supervisor id
+     * Computes and returns a listing of the hierarchy of supervisors starting from the given empId
+     * during the specified date.
+     * @param empId int - Employee id
      * @param date Date - Date to compute the supervisor chain for
-     * @return SupervisorChain for matching supId
-     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
+     * @return SupervisorChain for matching empId
+     * @throws SupervisorException - SupervisorNotFoundEx if a supervisor could not be found for any
+     *                                                    employee that is encountered in the chain.
      */
-    public SupervisorChain getSupervisorChain(int supId, Date date) throws SupervisorException;
+    public SupervisorChain getSupervisorChain(int empId, Date date) throws SupervisorException;
 
     /**
      * Retrieves the collection of employees that are managed by the given supervisor between the start and

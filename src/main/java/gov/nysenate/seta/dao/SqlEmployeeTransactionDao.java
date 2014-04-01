@@ -1,6 +1,9 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.TransactionRecordRowMapper;
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.TransRecordException;
+import gov.nysenate.seta.model.exception.TransRecordNotFoundEx;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;

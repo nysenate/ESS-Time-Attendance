@@ -1,8 +1,7 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.Employee;
-import gov.nysenate.seta.model.EmployeeException;
-import gov.nysenate.seta.model.EmployeeNotFoundEx;
+import gov.nysenate.seta.model.exception.EmployeeException;
 
 import java.util.Date;
 import java.util.List;

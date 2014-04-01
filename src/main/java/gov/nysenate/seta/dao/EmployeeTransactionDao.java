@@ -1,6 +1,6 @@
 package gov.nysenate.seta.dao;
 
-import gov.nysenate.seta.model.TransRecordException;
+import gov.nysenate.seta.model.exception.TransRecordException;
 import gov.nysenate.seta.model.TransactionHistory;
 import gov.nysenate.seta.model.TransactionRecord;
 import gov.nysenate.seta.model.TransactionType;

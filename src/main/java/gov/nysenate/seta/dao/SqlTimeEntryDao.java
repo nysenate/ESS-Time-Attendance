@@ -1,9 +1,10 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -59,7 +60,7 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao{
     }
 
     @Override
-    public Map<Integer, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException{
+    public Map<Integer, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
 
         List<TimeRecord> timeRecords;
         Map<Integer, List<TimeEntry>> timeEntryList = null;

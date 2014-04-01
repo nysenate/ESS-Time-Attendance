@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.PayPeriodRowMapper;
 import gov.nysenate.seta.model.PayPeriod;
 import gov.nysenate.seta.model.PayPeriodType;
 import gov.nysenate.seta.model.exception.PayPeriodException;
@@ -7,12 +8,9 @@ import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 

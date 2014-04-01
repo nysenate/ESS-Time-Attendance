@@ -7,14 +7,18 @@ import gov.nysenate.seta.model.exception.PayPeriodException;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Data access layer for providing basic pay period information.
+ */
 public interface PayPeriodDao extends BaseDao
 {
     /**
-     *
-     * @param type
-     * @param date
-     * @return
-     * @throws PayPeriodException
+     * Retrieve the pay period of the given type that has a date range that either ends on or
+     * contains the given 'date'.
+     * @param type PayPeriodType - The type of pay period.
+     * @param date Date
+     * @return PayPeriod
+     * @throws PayPeriodException - PayPeriodNotFoundEx if no matches were found.
      */
     public PayPeriod getPayPeriod(PayPeriodType type, Date date) throws PayPeriodException;
 
@@ -38,5 +42,4 @@ public interface PayPeriodDao extends BaseDao
      * @return List<PayPeriod> - Ordered by most recent pay periods first.
      */
     public List<PayPeriod> getOpenAttendancePayPeriods(int empId, Date endDate);
-
 }

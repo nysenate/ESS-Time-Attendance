@@ -1,11 +1,11 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +17,7 @@ public interface MigrationDao extends BaseDao {
      * Retrieve Time Records using LastRecordId / Starting from previous Ending.
      * @param lastRecordId - Last updated record of table
      * @return List of Time Record Objects otherwise throws TimeRecordNotFoundException
-     * @throws TimeRecordNotFoundException
+     * @throws gov.nysenate.seta.model.exception.TimeRecordNotFoundException
      */
     public List<TimeRecord> getRemoteTimeRecord(BigInteger lastRecordId) throws TimeRecordNotFoundException;
 
@@ -25,7 +25,7 @@ public interface MigrationDao extends BaseDao {
      * Retrieve Time Entries using timeRecordId
      * @param timeRecordId - Time Record If for Time Entries
      * @return List of Time Entries Objects otherwise throws TimeEntryNotFoundException
-     * @throws TimeEntryNotFoundEx
+     * @throws gov.nysenate.seta.model.exception.TimeEntryNotFoundEx
      */
     public List<TimeEntry> getRemoteTimeEntry(BigInteger timeRecordId) throws TimeEntryNotFoundEx;
 

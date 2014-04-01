@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
