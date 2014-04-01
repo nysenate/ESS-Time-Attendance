@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by riken on 3/11/14.
@@ -15,31 +16,31 @@ public interface MigrationDao extends BaseDao {
 
     /**
      * Retrieve Time Records using LastRecordId / Starting from previous Ending.
-     * @param lastRecordId - Last updated record of table
+     * @param rowNumber - First entry number.
+     * @param threshold - Number of last entry to be retrieved
      * @return List of Time Record Objects otherwise throws TimeRecordNotFoundException
      * @throws TimeRecordNotFoundException
      */
-    public List<TimeRecord> getRemoteTimeRecord(BigInteger lastRecordId) throws TimeRecordNotFoundException;
+    public List<TimeRecord> getRemoteTimeRecord(int rowNumber, int threshold) throws TimeRecordNotFoundException;
 
     /**
      * Retrieve Time Entries using timeRecordId
-     * @param timeRecordId - Time Record If for Time Entries
-     * @return List of Time Entries Objects otherwise throws TimeEntryNotFoundException
+     *
+     * @param rowNumber - First entry number.
+     * @param threshold - Number of last entry to be retrieved
      * @throws TimeEntryNotFoundEx
      */
-    public List<TimeEntry> getRemoteTimeEntry(BigInteger timeRecordId) throws TimeEntryNotFoundEx;
+    public List<TimeEntry> getRemoteTimeEntry(int rowNumber, int threshold) throws TimeEntryNotFoundEx;
 
     /**
-     * Retrieve Last Updated DataId using DataType from TempDataStore Table
-     * @param dataType - char - Type of Data Entry to be retrieved with Date as addition parameter
-     * @return Unique id of data using DataType otherwise throws TimeRecordNotFoundException
-     * @throws TimeRecordNotFoundException
-    */
-    public BigInteger getLastRecordId(char dataType, Timestamp lastDate) throws TimeRecordNotFoundException;
-
-    /**
-     * Insert LastRecord Data into TempDataStore Table
-     * @param tempDataStore - TempDataStore - Object containing data to be inserted
+     * Retrieve and Update Time Records Method
      */
-    public void setLastRecordId(TempDataStore tempDataStore);
+    public void MigrateTimeRecord() throws TimeRecordNotFoundException;
+
+    /**
+     * Retrieve and Update Time Entry Method
+     */
+    public void MigrateTimeEntry() throws TimeEntryNotFoundEx;
+
+
 }

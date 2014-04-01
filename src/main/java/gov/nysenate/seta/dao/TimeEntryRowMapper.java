@@ -24,26 +24,26 @@ public class TimeEntryRowMapper implements RowMapper<TimeEntry> {
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeEntry entry = new TimeEntry();
-        entry.settDayId(rs.getInt(pfx + "TSDayId"));
-        entry.setTimesheetId(rs.getInt(pfx + "TimesheetId"));
-        entry.setEmpId(rs.getInt(pfx + "EmpId"));
-        entry.setDate(rs.getDate(pfx + "DayDate"));
-        entry.setWorkHours(rs.getBigDecimal(pfx + "WorkHR"));
-        entry.setTravelHours(rs.getBigDecimal(pfx + "TravelHR"));
-        entry.setHolidayHours(rs.getBigDecimal(pfx + "HolidayHR"));
-        entry.setSickEmpHours(rs.getBigDecimal(pfx + "SickEmpHR"));
-        entry.setSickFamHours(rs.getBigDecimal(pfx + "SickFamHR"));
-        entry.setMiscHours(rs.getBigDecimal(pfx + "MiscHR"));
-        entry.setMiscType(MiscLeaveType.valueOf(rs.getString(pfx + "MiscTypeId")));
-        entry.settOriginalUserId(rs.getInt(pfx + "TOriginalUserId"));
-        entry.settUpdateUserId(rs.getInt(pfx + "TUpdateUserId"));
-        entry.settOriginalDate(rs.getTimestamp(pfx + "TOriginalDate"));
-        entry.settUpdateDate(rs.getTimestamp(pfx + "TUpdateDate"));
-        entry.setActive(rs.getString(pfx + "Status").equals("A"));
-        entry.setEmpComment(rs.getString(pfx + "EmpComment"));
-        entry.setPayType(PayType.valueOf(rs.getString(pfx + "PayType")));
-        entry.setVacationHours(rs.getBigDecimal(pfx + "VacationHR"));
-        entry.setPersonalHours(rs.getBigDecimal(pfx + "PersonalHR"));
+        entry.settDayId(rs.getBigDecimal(pfx + "ts_day_id"));
+        entry.setTimesheetId(rs.getBigDecimal(pfx + "timesheet_id"));
+        entry.setEmpId(rs.getBigDecimal(pfx + "emp_id"));
+        entry.setDate(rs.getDate(pfx + "day_date"));
+        entry.setWorkHours(rs.getBigDecimal(pfx + "work_hr"));
+        entry.setTravelHours(rs.getBigDecimal(pfx + "travel_hr"));
+        entry.setHolidayHours(rs.getBigDecimal(pfx + "holiday_hr"));
+        entry.setSickEmpHours(rs.getBigDecimal(pfx + "sick_emp_hr"));
+        entry.setSickFamHours(rs.getBigDecimal(pfx + "sick_family_hr"));
+        entry.setMiscHours(rs.getBigDecimal(pfx + "misc_hr"));
+        if (rs.getString(pfx + "misc_type") != null) entry.setMiscType(MiscLeaveType.valueOf(rs.getString(pfx + "misc_type")));
+        entry.settOriginalUserId(rs.getString(pfx + "t_original_user"));
+        entry.settUpdateUserId(rs.getString(pfx + "t_update_user"));
+        entry.settOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
+        entry.settUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
+        entry.setActive(rs.getString(pfx + "status").equals("A"));
+        entry.setEmpComment(rs.getString(pfx + "emp_comment"));
+        entry.setPayType(PayType.valueOf(rs.getString(pfx + "pay_type")));
+        entry.setVacationHours(rs.getBigDecimal(pfx + "vacation_hr"));
+        entry.setPersonalHours(rs.getBigDecimal(pfx + "personal_hr"));
 
         return entry;
     }

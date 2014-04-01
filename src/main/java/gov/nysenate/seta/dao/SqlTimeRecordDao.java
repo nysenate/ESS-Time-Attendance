@@ -19,28 +19,27 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
     private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
 
     protected static final String GET_TIME_REC_SQL_TMPL =
-        "SELECT \n" +
-            "ts.*, \n" +
-            "FROM \n" +
-            "Timesheet ts \n" +
-            "WHERE ts.Status = 'A' AND %s \n";
+        "SELECT * " +
+                "FROM " +
+                "ts.timesheet" +
+                " WHERE status = 'A' AND %s ";
 
-    protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts.EmpId = :empId");
-    protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts.DateBegin = :startDate AND ts.DateEnd = :endDate");
-    protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts.TSStatusId = :tSStatusId AND ts.EmpId = :empId AND ts.DateBegin = :startDate AND ts.DateEnd = :endDate");
+    protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "emp_id = :empId");
+    protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "date_begin = :startDate AND date_end = :endDate");
+    protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts_status_id = :tSStatusId AND emp_id = :empId AND date_begin = :startDate AND date_end = :endDate");
 
 
     protected static final String SET_TIME_REC_SQL =
         "INSERT \n" +
-            "INTO Timesheet ts \n" +
-            "(TimesheetId , EmpId, TOriginalUserId, TUpdateUserId, TOriginalDate, TUpdateDate, Status, TSStatusId, BeginDate, EndDate, PayType, Remarks, SupervisorId, ExcDetails, ProcDate) \n" +
-            "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :payType, :remarks, :supervisorId, :excDetails, :procDate) \n";
+            "INTO ts.timesheet \n" +
+            "(timesheet_id , emp_id, t_original_user, t_update_user, t_original_date, t_update_date, status, ts_status_id, begin_date, end_date, remarks, supervisor_id, exc_details, proc_date) \n" +
+            "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n";
 
     protected static final String UPDATE_TIME_REC_SQL =
-        "UPDATE Timesheet \n" +
+        "UPDATE ts.timesheet \n" +
             "SET \n" +
-            "(EmpId = :empId, TOriginalUserId = :tOriginalUserId, TUpdateUserId = :tUpdateUserId, TOriginalDate = :tOriginalDate, TUpdateDate = :tUpdateDate, Status = :status, TSStatusId = :tSStatusId, BeginDate = :beginDate, EndDate = :endDate, PayType = :payType, Remarks = :remarks, SupervisorId = :supervisorId, ExcDetails = :excDetails, ProcDate = :procDate) \n" +
-            "WHERE TimesheetId = :timesheetId";
+            "(empId = :empId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, ts_status_id = :tSStatusId, begin_date = :beginDate, end_date = :endDate, remarks = :remarks, supervisor_id = :supervisorId, exc_details = :excDetails, proc_date = :procDate) \n" +
+            "WHERE timesheet_id = :timesheetId";
 
 
     @Override
@@ -134,10 +133,9 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("tUpdateDate", tr.gettUpdateDate());
         if(tr.isActive()==true){params.addValue("status", "A");}
         else{ params.addValue("status", "I");}
-        params.addValue("tSStatusId", tr.getRecordStatus());
+        params.addValue("tSStatusId", tr.getRecordStatus().getCode());
         params.addValue("beginDate", tr.getBeginDate());
         params.addValue("endDate", tr.getEndDate());
-        params.addValue("payType", tr.getPayType().name());
         params.addValue("remarks", tr.getRemarks());
         params.addValue("supervisorId", tr.getSupervisorId());
         params.addValue("excDetails", tr.getExeDetails());
@@ -160,10 +158,9 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("tOriginalDate", tr.gettOriginalDate());
         params.addValue("tUpdateDate", tr.gettUpdateDate());
         params.addValue("status", getStatusCode(tr.isActive()));
-        params.addValue("tSStatusId", tr.getRecordStatus());
+        params.addValue("tSStatusId", tr.getRecordStatus().getCode());
         params.addValue("beginDate", tr.getBeginDate());
         params.addValue("endDate", tr.getEndDate());
-        params.addValue("payType", tr.getPayType().name());
         params.addValue("remarks", tr.getRemarks());
         params.addValue("supervisorId", tr.getSupervisorId());
         params.addValue("excDetails", tr.getExeDetails());

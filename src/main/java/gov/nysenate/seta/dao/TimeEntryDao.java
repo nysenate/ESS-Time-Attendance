@@ -4,6 +4,7 @@ import gov.nysenate.seta.model.TimeEntry;
 import gov.nysenate.seta.model.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.TimeRecordNotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +23,12 @@ public interface TimeEntryDao extends BaseDao {
 
     /**
      * Retrieve all time etries using particular empId mapped with TimesheetId
+     *
      * @param empId - int Employee ID
      * @return Mapped List of Entry objects otherwise TimeEntryNotFoundException
      * @throws TimeEntryNotFoundEx
      */
-    public Map<Integer,List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,TimeRecordNotFoundException;
+    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,TimeRecordNotFoundException;
 
     /**
      * Insert time entry using TimeEntry Object

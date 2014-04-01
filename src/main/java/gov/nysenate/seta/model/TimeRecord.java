@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -8,53 +9,52 @@ import java.util.Date;
  */
 public class TimeRecord {
 
-    protected int timesheetId;
-    protected int employeeId;
-    protected int tOriginalUserId;
-    protected int tUpdateUserId;
+    protected BigDecimal timesheetId;
+    protected BigDecimal employeeId;
+    protected String tOriginalUserId;
+    protected String tUpdateUserId;
     protected Timestamp tOriginalDate;
     protected Timestamp tUpdateDate;
-    protected int supervisorId;
+    protected BigDecimal supervisorId;
     protected boolean active;
     protected Date beginDate;
     protected Date endDate;
     protected String remarks;
     protected String exeDetails;
     protected Date proDate;
-    protected PayType payType;
     protected TimeRecordStatus recordStatus;
 
     /** Getters and Setters **/
 
-    public int getTimesheetId() {
+    public BigDecimal getTimesheetId() {
         return timesheetId;
     }
 
-    public void setTimesheetId(int timesheetId) {
+    public void setTimesheetId(BigDecimal timesheetId) {
         this.timesheetId = timesheetId;
     }
 
-    public int getEmployeeId() {
+    public BigDecimal getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(int employeeId) {
+    public void setEmployeeId(BigDecimal employeeId) {
         this.employeeId = employeeId;
     }
 
-    public int gettOriginalUserId() {
+    public String gettOriginalUserId() {
         return tOriginalUserId;
     }
 
-    public void settOriginalUserId(int tOriginalUserId) {
+    public void settOriginalUserId(String tOriginalUserId) {
         this.tOriginalUserId = tOriginalUserId;
     }
 
-    public int gettUpdateUserId() {
+    public String gettUpdateUserId() {
         return tUpdateUserId;
     }
 
-    public void settUpdateUserId(int tUpdateUserId) {
+    public void settUpdateUserId(String tUpdateUserId) {
         this.tUpdateUserId = tUpdateUserId;
     }
 
@@ -74,11 +74,11 @@ public class TimeRecord {
         this.tUpdateDate = tUpdateDate;
     }
 
-    public int getSupervisorId() {
+    public BigDecimal getSupervisorId() {
         return supervisorId;
     }
 
-    public void setSupervisorId(int supervisorId) {
+    public void setSupervisorId(BigDecimal supervisorId) {
         this.supervisorId = supervisorId;
     }
 
@@ -138,11 +138,4 @@ public class TimeRecord {
         this.recordStatus = recordStatus;
     }
 
-    public PayType getPayType() {
-        return payType;
-    }
-
-    public void setPayType(PayType payType) {
-        this.payType = payType;
-    }
 }

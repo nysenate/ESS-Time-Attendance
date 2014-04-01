@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -21,22 +22,22 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
     protected static final String GET_TIME_ENTRY_SQL_TMPL =
         "SELECT \n" +
-            "tsd.* \n" +
-            "FROM TimesheetByDay tsd\n" +
-            "Where tsd.Status = 'A' AND %s";
+            "* \n" +
+            "FROM ts.timesheet_by_day \n" +
+            "Where status = 'A' AND %s";
 
-    protected static final String GET_ENTRY_BY_TIMESHEETID = String.format(GET_TIME_ENTRY_SQL_TMPL,"tsd.TimesheetId = :timesheetId");
-    protected static final String GET_ENTRY_BY_EMPID = String.format(GET_TIME_ENTRY_SQL_TMPL,"tsd.EmpId = :empId AND tsd.TimesheetId = :timesheetId");
+    protected static final String GET_ENTRY_BY_TIMESHEETID = String.format(GET_TIME_ENTRY_SQL_TMPL,"timesheet_id = :timesheetId");
+    protected static final String GET_ENTRY_BY_EMPID = String.format(GET_TIME_ENTRY_SQL_TMPL,"emp_id = :empId AND timesheet_id = :timesheetId");
 
     protected static final String SET_ENTRY_SQL =
         "INSERT \n" +
-        "INTO (TSDayId, TimesheetId, EmpId, DayDate, WorkHR, TravelHR, HolidayHR, SickEmpHR, SickFamilyHR, MiscHR, MiscTypeId, TOriginalUserId, TUpdateUserId, TOriginalDate, TUpdateDate, Status, EmpComment, PayType, VacationHR, PersonalHR) \n" +
+        "INTO (ts_day_id, timesheet_id, emp_id, day_date, work_hr, travel_hr, holiday_hr, sick_emp_hr, sick_family_hr, misc_hr, misc_type, t_original_user, t_update_user, t_original_date, t_update_date, status, emp_comment, pay_type, vacation_hr, personal_hr) \n" +
         "VALUES (:tSDayId, :timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :empComment, :payType, :vacationHR, :personalHR)";
 
     protected static final String UPDATE_ENTRY_SQL =
-        "UPDATE TimesheetByDay \n" +
+        "UPDATE timesheet_by_day \n" +
         "SET \n" +
-        "(TimesheetId = :timesheetId, EmpId = :empId, DayDate = :dayDate, WorkHR = :workHR, TravelHR = :travelHR, HolidayHR = :holidayHR, SickEmpHR = :sickEmpHR, SickFamilyHR = :sickFamilyHR, MiscHR = :miscHR, MiscTypeId = :miscTypeId, TOriginalUserId = :tOriginalUserId, TUpdateUserId = :tUpdateUserId, TOriginalDate = :tOriginalDate, TUpdateDate = :tUpdateDate, Status = :status, EmpComment = :empComment, PayType = :payType, VacationHR = :vacationHR, PersonalHR = :personalHR) \n" +
+        "(timesheet_id = :timesheetId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type_id = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
         "WHERE TSDayId = :tSDayId";
 
     @Override
@@ -58,10 +59,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
     }
 
     @Override
-    public Map<Integer, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException{
+    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException{
 
         List<TimeRecord> timeRecords;
-        Map<Integer, List<TimeEntry>> timeEntryList = null;
+        Map<BigDecimal, List<TimeEntry>> timeEntryList = null;
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         timeRecords = timeRecordDao.getRecordByEmployeeId(empId);

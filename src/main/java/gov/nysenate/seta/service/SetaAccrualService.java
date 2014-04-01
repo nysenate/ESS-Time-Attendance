@@ -13,9 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class SetaAccrualService implements AccrualService
 {
-    @Autowired
-    private AccrualDao accrualDao;
-
     /** {@inheritDoc} */
     @Override
     public AccrualInfo getCurrentAccruals(int employeeId) {
