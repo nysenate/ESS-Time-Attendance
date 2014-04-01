@@ -3,7 +3,6 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -13,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao{
+public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
     @Resource(name = "localTimeRecord")
     private TimeRecordDao timeRecordDao;
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlTimeEntryDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlLocalEntryDao.class);
 
     protected static final String GET_TIME_ENTRY_SQL_TMPL =
         "SELECT \n" +

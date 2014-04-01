@@ -9,9 +9,9 @@ import java.util.Date;
  */
 public class TimeEntry
 {
-    protected int tDayId;
-    protected int timesheetId;
-    protected int empId;
+    protected BigDecimal tDayId;
+    protected BigDecimal timesheetId;
+    protected BigDecimal empId;
     protected Date date;
     protected BigDecimal workHours;
     protected BigDecimal travelHours;
@@ -25,8 +25,8 @@ public class TimeEntry
     protected boolean active;
     protected String empComment;
     protected PayType payType;
-    protected int tOriginalUserId;
-    protected int tUpdateUserId;
+    protected String tOriginalUserId;
+    protected String tUpdateUserId;
     protected Timestamp tOriginalDate;
     protected Timestamp tUpdateDate;
 
@@ -50,27 +50,27 @@ public class TimeEntry
 
    /** Basic Getters/Setters */
 
-    public int gettDayId() {
+    public BigDecimal gettDayId() {
         return tDayId;
     }
 
-    public void settDayId(int tDayId) {
+    public void settDayId(BigDecimal tDayId) {
         this.tDayId = tDayId;
     }
 
-    public int getTimesheetId() {
+    public BigDecimal getTimesheetId() {
         return timesheetId;
     }
 
-    public void setTimesheetId(int timesheetId) {
+    public void setTimesheetId(BigDecimal timesheetId) {
         this.timesheetId = timesheetId;
     }
 
-    public int getEmpId() {
+    public BigDecimal getEmpId() {
         return empId;
     }
 
-    public void setEmpId(int empId) {
+    public void setEmpId(BigDecimal empId) {
         this.empId = empId;
     }
 
@@ -178,19 +178,19 @@ public class TimeEntry
         this.payType = payType;
     }
 
-    public int gettOriginalUserId() {
+    public String gettOriginalUserId() {
         return tOriginalUserId;
     }
 
-    public void settOriginalUserId(int tOriginalUserId) {
+    public void settOriginalUserId(String tOriginalUserId) {
         this.tOriginalUserId = tOriginalUserId;
     }
 
-    public int gettUpdateUserId() {
+    public String gettUpdateUserId() {
         return tUpdateUserId;
     }
 
-    public void settUpdateUserId(int tUpdateUserId) {
+    public void settUpdateUserId(String tUpdateUserId) {
         this.tUpdateUserId = tUpdateUserId;
     }
 
