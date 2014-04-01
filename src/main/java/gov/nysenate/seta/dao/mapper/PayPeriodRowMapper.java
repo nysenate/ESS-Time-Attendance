@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao;
+package gov.nysenate.seta.dao.mapper;
 
 import gov.nysenate.seta.model.PayPeriod;
 import gov.nysenate.seta.model.PayPeriodType;

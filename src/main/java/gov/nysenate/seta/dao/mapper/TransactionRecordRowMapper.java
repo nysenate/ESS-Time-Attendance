@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao;
+package gov.nysenate.seta.dao.mapper;
 
 import gov.nysenate.seta.model.TransactionRecord;
 import gov.nysenate.seta.model.TransactionType;
@@ -34,9 +34,16 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
         transRec.setOriginalDate(rs.getDate(pfx + "DTTXNORIGIN"));
         transRec.setUpdateDate(rs.getDate(pfx + "DTTXNUPDATE"));
         transRec.setEffectDate(rs.getDate(pfx + "DTEFFECT"));
+
+        /**
+         * The value map will contain the column -> value mappings for the db columns associated with the
+         * transaction type. The appointment transactions (APP/RTP) will have value maps containing every column
+         * since they represent the initial snapshot of the data.
+         */
         TransactionType type = transRec.getTransType();
+        boolean isAppointment = type.equals(TransactionType.APP) || type.equals(TransactionType.RTP);
         Map<String, String> valueMap = new HashMap<>();
-        for (String col : type.getDbColumnList()) {
+        for (String col : ((isAppointment) ? TransactionType.getAllDbColumnsList() : type.getDbColumnList())) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
         }
         transRec.setValueMap(valueMap);

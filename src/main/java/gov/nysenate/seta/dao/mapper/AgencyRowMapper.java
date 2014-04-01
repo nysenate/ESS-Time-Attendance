@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao;
+package gov.nysenate.seta.dao.mapper;
 
 import gov.nysenate.seta.model.Agency;
 import org.springframework.jdbc.core.RowMapper;
