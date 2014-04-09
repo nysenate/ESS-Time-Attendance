@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao;
+package gov.nysenate.seta.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -7,6 +7,8 @@ import java.util.Date;
  * Helper class to represent annual accrual summaries. This model is intended to be used
  * within the dao layer. The AccuralInfo model should be used to represent end-user accrual
  * summaries.
+ *
+ * @see gov.nysenate.seta.model.AccrualInfo
  */
 public class AnnualAccrualRecord
 {
