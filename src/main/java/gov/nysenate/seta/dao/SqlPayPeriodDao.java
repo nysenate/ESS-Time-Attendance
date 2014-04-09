@@ -20,17 +20,17 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
     private static final Logger logger = LoggerFactory.getLogger(SqlPayPeriodDao.class);
 
     protected static final String GET_PAY_PERIOD_SQL =
-        "SELECT * FROM SL16PERIOD WHERE CDPERIOD = :periodType AND :date BETWEEN DTBEGIN AND DTEND";
+        "SELECT * FROM SL16PERIOD WHERE CDPERIOD = :periodType AND TRUNC(:date) BETWEEN DTBEGIN AND DTEND";
 
     protected static final String GET_PAY_PERIODS_IN_RANGE_SQL =
         "SELECT * FROM SL16PERIOD\n" +
-        "WHERE CDPERIOD = :periodType AND (DTBEGIN >= :startDate OR :startDate BETWEEN DTBEGIN AND DTEND)\n" +
-        "                             AND (DTEND <= :endDate OR :endDate BETWEEN DTBEGIN AND DTEND)\n" +
+        "WHERE CDPERIOD = :periodType AND (DTBEGIN >= TRUNC(:startDate) OR TRUNC(:startDate) BETWEEN DTBEGIN AND DTEND)\n" +
+        "                             AND (DTEND <= TRUNC(:endDate) OR TRUNC(:endDate) BETWEEN DTBEGIN AND DTEND)\n" +
         "ORDER BY DTBEGIN DESC";
 
     protected static final String GET_OPEN_ATTEND_PERIODS_SQL =
         "SELECT * FROM SL16PERIOD \n" +
-        "WHERE (DTEND <= :endDate OR :endDate BETWEEN DTBEGIN AND DTEND) \n" +
+        "WHERE (DTEND <= TRUNC(:endDate) OR TRUNC(:endDate) BETWEEN DTBEGIN AND DTEND) \n" +
         "AND CDPERIOD = 'AF' AND DTPERIODYEAR > (\n" +
         "  SELECT DISTINCT MAX(DTPERIODYEAR) OVER (PARTITION BY NUXREFEM) \n" +
         "  FROM PM23ATTEND WHERE NUXREFEM = :empId AND DTCLOSE IS NOT NULL\n" +
