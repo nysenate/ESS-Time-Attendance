@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao;
+package gov.nysenate.seta.dao.mapper;
 
 import gov.nysenate.seta.model.MiscLeaveType;
 import gov.nysenate.seta.model.PayType;
@@ -12,11 +12,11 @@ import java.sql.SQLException;
 /**
  * Created by riken on 3/11/14.
  */
-public class TimeEntryRowMapper implements RowMapper<TimeEntry> {
+public class LocalEntryRowMapper implements RowMapper<TimeEntry> {
 
     private String pfx="";
 
-    public TimeEntryRowMapper(String pfx){
+    public LocalEntryRowMapper(String pfx){
         this.pfx = pfx;
     }
 
@@ -24,8 +24,8 @@ public class TimeEntryRowMapper implements RowMapper<TimeEntry> {
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeEntry entry = new TimeEntry();
-        entry.settDayId(rs.getBigDecimal(pfx + "ts_day_id"));
-        entry.setTimesheetId(rs.getBigDecimal(pfx + "timesheet_id"));
+        entry.settDayId(rs.getBigDecimal(pfx + "time_entry_id"));
+        entry.setTimesheetId(rs.getBigDecimal(pfx + "time_record_id"));
         entry.setEmpId(rs.getBigDecimal(pfx + "emp_id"));
         entry.setDate(rs.getDate(pfx + "day_date"));
         entry.setWorkHours(rs.getBigDecimal(pfx + "work_hr"));

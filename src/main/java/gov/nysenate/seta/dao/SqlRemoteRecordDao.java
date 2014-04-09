@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.RemoteRecordRowMapper;
 import gov.nysenate.seta.model.TimeRecord;
 import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 import org.slf4j.Logger;
@@ -8,37 +9,38 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Repository("localTimeRecord")
-public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
+@Repository("remoteTimeRecord")
+public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao{
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlRemoteRecordDao.class);
 
     protected static final String GET_TIME_REC_SQL_TMPL =
-        "SELECT * " +
-                "FROM " +
-                "ts.timesheet" +
-                " WHERE status = 'A' AND %s ";
+            "SELECT * " +
+                    "FROM " +
+                    "PM23TIMESHEET" +
+                    "WHERE CDSTATUS = 'A' AND %s ";
 
-    protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "emp_id = :empId");
-    protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "date_begin = :startDate AND date_end = :endDate");
-    protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts_status_id = :tSStatusId AND emp_id = :empId AND date_begin = :startDate AND date_end = :endDate");
+    protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "NUXREFEM = :empId");
+    protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "DTBEGIN = :startDate AND DTEND = :endDate");
+    protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "CDTSSTAT = :tSStatusId AND NUXREFEM = :empId AND DTBEGIN = :startDate AND DTEND = :endDate");
 
 
     protected static final String SET_TIME_REC_SQL =
-        "INSERT \n" +
-            "INTO ts.timesheet \n" +
-            "(timesheet_id , emp_id, t_original_user, t_update_user, t_original_date, t_update_date, status, ts_status_id, begin_date, end_date, remarks, supervisor_id, exc_details, proc_date) \n" +
-            "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n";
+            "INSERT \n" +
+                    "INTO PM23TIMESHEET \n" +
+                    "(NUXRTIMESHEET , NUXREFEM, NATXNORGUSER, NATXNUPDUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS, CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS) \n" +
+                    "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n";
 
     protected static final String UPDATE_TIME_REC_SQL =
-        "UPDATE ts.timesheet \n" +
-            "SET \n" +
-            "(empId = :empId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, ts_status_id = :tSStatusId, begin_date = :beginDate, end_date = :endDate, remarks = :remarks, supervisor_id = :supervisorId, exc_details = :excDetails, proc_date = :procDate) \n" +
-            "WHERE timesheet_id = :timesheetId";
+            "UPDATE ts.timesheet \n" +
+                    "SET \n" +
+                    "(NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId, DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId, DEEXCEPTION = :excDetails, DTPROCESS = :procDate) \n" +
+                    "WHERE timesheet_id = :timesheetId";
 
 
     @Override
@@ -49,8 +51,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("empId",empId);
 
         try{
-            timeRecordList = localNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params,
-                                            new TimeRecordRowMapper(""));
+            timeRecordList = remoteNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params,
+                    new RemoteRecordRowMapper());
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records for employee id: " + empId);
@@ -71,7 +73,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
 
             try{
 
-                 trs.put(empId, localNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params, new TimeRecordRowMapper("")));
+                trs.put(empId, remoteNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params, new RemoteRecordRowMapper()));
 
             }catch (DataRetrievalFailureException ex){
                 logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
@@ -92,8 +94,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("endDate", endDate);
 
         try{
-            timeRecordList = localNamedJdbc.query(GET_TREC_BY_DATE_SQL, params,
-                    new TimeRecordRowMapper(""));
+            timeRecordList = remoteNamedJdbc.query(GET_TREC_BY_DATE_SQL, params,
+                    new RemoteRecordRowMapper());
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records between Dates {} And {} error: {}", startDate, endDate, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records between Dates: " + startDate +"  And  "+ endDate);
@@ -110,8 +112,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("tSStatusId",tSStatusId);
 
         try{
-            timeRecordList = localNamedJdbc.query(GET_TREC_BY_RECSTATUS_SQL, params,
-                    new TimeRecordRowMapper(""));
+            timeRecordList = remoteNamedJdbc.query(GET_TREC_BY_RECSTATUS_SQL, params,
+                    new RemoteRecordRowMapper());
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records where Status : {} error: {}", tSStatusId, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records for Status Id : " + tSStatusId);
@@ -140,7 +142,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("excDetails", tr.getExeDetails());
         params.addValue("procDate", tr.getProDate());
 
-        if (localNamedJdbc.update(SET_TIME_REC_SQL, params)==1) {    return true;}
+        if (remoteNamedJdbc.update(SET_TIME_REC_SQL, params)==1) {    return true;}
         else{   return false;}
 
     }
@@ -165,11 +167,17 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("excDetails", tr.getExeDetails());
         params.addValue("procDate", tr.getProDate());
 
-        if (localNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
+        if (remoteNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
         else return false;
 
     }
 
-
+    @Override
+    public int getTimeRecordCount(BigDecimal timesheetId) throws TimeRecordNotFoundException {
+        return 0;
+    }
 
 }
+
+
+

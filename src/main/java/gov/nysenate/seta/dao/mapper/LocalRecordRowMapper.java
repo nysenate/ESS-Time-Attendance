@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao;
+package gov.nysenate.seta.dao.mapper;
 
 import gov.nysenate.seta.model.PayType;
 import gov.nysenate.seta.model.TimeRecord;
@@ -11,18 +11,18 @@ import java.sql.SQLException;
 /**
  * Created by riken on 3/4/14.
  */
-public class TimeRecordRowMapper implements RowMapper<TimeRecord>
+public class LocalRecordRowMapper implements RowMapper<TimeRecord>
 {
     private String pfx="";
 
-    public TimeRecordRowMapper(String pfx){
+    public LocalRecordRowMapper(String pfx){
         this.pfx = pfx;
     }
 
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord trec = new TimeRecord();
-        trec.setTimesheetId(rs.getBigDecimal(pfx + "timesheet_id"));
+        trec.setTimesheetId(rs.getBigDecimal(pfx + "time_record_id"));
         trec.setEmployeeId(rs.getBigDecimal(pfx + "emp_id"));
         trec.settOriginalUserId(rs.getString(pfx + "t_original_user"));
         trec.settUpdateUserId(rs.getString(pfx + "t_update_user"));
