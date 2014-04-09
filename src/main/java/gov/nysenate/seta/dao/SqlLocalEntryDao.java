@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.LocalEntryRowMapper;
 import gov.nysenate.seta.model.*;
 import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
@@ -14,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Repository("localTimeEntry")
 public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
     @Resource(name = "localTimeRecord")
@@ -25,21 +26,21 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
     protected static final String GET_TIME_ENTRY_SQL_TMPL =
             "SELECT \n" +
                     "* \n" +
-                    "FROM ts.timesheet_by_day \n" +
-                    "Where status = 'A' AND %s";
+                    "FROM ts.time_entry \n" +
+                    "WHERE status = 'A' AND %s";
 
     protected static final String GET_ENTRY_BY_TIMESHEETID = String.format(GET_TIME_ENTRY_SQL_TMPL,"timesheet_id = :timesheetId");
     protected static final String GET_ENTRY_BY_EMPID = String.format(GET_TIME_ENTRY_SQL_TMPL,"emp_id = :empId AND timesheet_id = :timesheetId");
 
     protected static final String SET_ENTRY_SQL =
             "INSERT \n" +
-                    "INTO (ts_day_id, timesheet_id, emp_id, day_date, work_hr, travel_hr, holiday_hr, sick_emp_hr, sick_family_hr, misc_hr, misc_type, t_original_user, t_update_user, t_original_date, t_update_date, status, emp_comment, pay_type, vacation_hr, personal_hr) \n" +
+                    "INTO ts.time_entry (time_entry_id, time_record_id, emp_id, day_date, work_hr, travel_hr, holiday_hr, sick_emp_hr, sick_family_hr, misc_hr, misc_type, t_original_user, t_update_user, t_original_date, t_update_date, status, emp_comment, pay_type, vacation_hr, personal_hr) \n" +
                     "VALUES (:tSDayId, :timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :empComment, :payType, :vacationHR, :personalHR)";
 
     protected static final String UPDATE_ENTRY_SQL =
-            "UPDATE timesheet_by_day \n" +
+            "UPDATE ts.time_entry \n" +
                     "SET \n" +
-                    "(timesheet_id = :timesheetId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type_id = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
+                    "(time_record_id = :timesheetId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
                     "WHERE TSDayId = :tSDayId";
 
     @Override
@@ -51,7 +52,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
         try{
             timeEntryList = localNamedJdbc.query(GET_ENTRY_BY_TIMESHEETID, params,
-                    new TimeEntryRowMapper(""));
+                    new LocalEntryRowMapper(""));
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Entries of {} error: {}", timesheetId, ex.getMessage());
             throw new TimeEntryNotFoundEx("No matching Time Entries for Timesheet id: " + timesheetId);
@@ -76,7 +77,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
             try{
                 timeEntryList.put(tr.getTimesheetId(), localNamedJdbc.query(GET_ENTRY_BY_EMPID, params,
-                        new TimeEntryRowMapper("")));
+                        new LocalEntryRowMapper("")));
             }catch (DataRetrievalFailureException ex){
                 logger.warn("Retrieve Time Entries of {} error: {}", empId, ex.getMessage());
                 throw new TimeEntryNotFoundEx("No matching Time Entries for Employee id: " + empId);
@@ -101,7 +102,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         param.addValue("sickEmpHR", tsd.getSickEmpHours());
         param.addValue("sickFamilyHR", tsd.getSickFamHours());
         param.addValue("miscHR", tsd.getMiscHours());
-        param.addValue("miscTypeId", tsd.getMiscType().getCode());
+        param.addValue("miscTypeId", tsd.getMiscType()!= null ? tsd.getMiscType().getCode():null);
         param.addValue("tOriginalUserId", tsd.gettOriginalUserId());
         param.addValue("tUpdateUserId", tsd.gettUpdateUserId());
         param.addValue("tOriginalDate", tsd.gettOriginalDate());

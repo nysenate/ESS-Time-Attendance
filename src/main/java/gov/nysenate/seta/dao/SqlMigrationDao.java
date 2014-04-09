@@ -1,10 +1,13 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.RemoteEntryRowMapper;
+import gov.nysenate.seta.dao.mapper.RemoteRecordRowMapper;
 import gov.nysenate.seta.model.*;
 import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,23 +21,28 @@ import java.util.List;
 @Repository
 public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
 
-    @Resource
-    private TimeRecordDao timeRecordDao;
+    @Resource(name = "localTimeRecord")
+    private TimeRecordDao localRecordDao;
 
-    @Resource
-    private TimeEntryDao timeEntryDao;
+    @Resource(name = "localTimeEntry")
+    private TimeEntryDao localEntryDao;
+
+
+    @Autowired
+    private SyncCheckDao syncCheckDao;
 
 
     private static final Logger logger = LoggerFactory.getLogger(SqlMigrationDao.class);
 
-    public static final String GET_REMOTE_TIME_RECORD =
+    public static final String GET_REMOTE_TIME_RECORD_AUDIT =
             "SELECT * " +
                 "FROM " +
-                    "(SELECT rownum as RN, t1.* " +
+                    "( SELECT rownum as RN, t1.* " +
                          "FROM " +
-                             "(SELECT t.* " +
-                                  "FROM " +
-                                      "PM23TIMESHEET t ORDER BY t.DTTXNORIGIN " +
+                             "( SELECT x1.NUXRTSAUD, x1.DTTSINSAUD, x1.NATSINSAUD, x2.* " +
+                                  "FROM TS_OWNER.PM23TIMESHTAUD x1 " +
+                                    "RIGHT JOIN TS_OWNER.PM23TIMESHEET x2 ON x1.NUXRTIMESHEET = x2.NUXRTIMESHEET " +
+                                      "ORDER BY x1.DTTXNORIGIN, x2.DTTXNUPDATE " +
                              ") t1 " +
                     ") "+
                 "WHERE RN > :rowNumber AND RN <= :threshold";
@@ -44,43 +52,36 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
                 "FROM " +
                     "(SELECT rownum as RN, t1.* " +
                          "FROM " +
-                             "(SELECT t.* " +
+                             "(SELECT t.* , m.CDMISCLV " +
                                   "FROM " +
-                                      "PD23TIMESHEET t ORDER BY t.DTTXNORIGIN " +
+                                        "PD23TIMESHEET t " +
+                                            "LEFT JOIN PL23MISCLV m ON t.NUXRMISC = m.NUXRMISC " +
+                                                "ORDER BY t.DTTXNORIGIN " +
                              ") t1 " +
                     ") "+
                 "WHERE RN > :rowNumber AND RN <= :threshold";
 
 
     @Override
-    public List<TimeRecord> getRemoteTimeRecord(int rowNumber, int threshold) throws TimeRecordNotFoundException {
+    public List<TimeRecordAudit> getRemoteTimeRecordAudit(int rowNumber, int threshold) throws TimeRecordNotFoundException {
 
-        List<TimeRecord> timeRecordList = null;
+        List<TimeRecordAudit> timeRecordAuditList = null;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("rowNumber", rowNumber);
         params.addValue("threshold", threshold);
 
         try {
-            timeRecordList = remoteNamedJdbc.query(GET_REMOTE_TIME_RECORD, params, new RowMapper<TimeRecord>() {
+            timeRecordAuditList = remoteNamedJdbc.query(GET_REMOTE_TIME_RECORD_AUDIT, params, new RowMapper<TimeRecordAudit>() {
                 @Override
-                public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    TimeRecord tr = new TimeRecord();
-                    tr.setTimesheetId(rs.getBigDecimal("NUXRTIMESHEET"));
-                    tr.setEmployeeId(rs.getBigDecimal("NUXREFEM"));
-                    tr.settOriginalUserId(rs.getString("NATXNORGUSER"));
-                    tr.settUpdateUserId(rs.getString("NATXNUPDUSER"));
-                    tr.settOriginalDate(rs.getTimestamp("DTTXNORIGIN"));
-                    tr.settUpdateDate(rs.getTimestamp("DTTXNUPDATE"));
-                    tr.setActive(rs.getString("CDSTATUS").equals("A"));
-                    tr.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString("CDTSSTAT")));
-                    tr.setBeginDate(rs.getDate("DTBEGIN"));
-                    tr.setEndDate(rs.getDate("DTEND"));
-                    tr.setRemarks(rs.getString("DEREMARKS"));
-                    tr.setSupervisorId(rs.getBigDecimal("NUXREFSV"));
-                    tr.setExeDetails(rs.getString("DEEXCEPTION"));
-                    tr.setProDate(rs.getDate("DTPROCESS"));
+                public TimeRecordAudit mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    TimeRecordAudit rau = new TimeRecordAudit();
+                    RemoteRecordRowMapper remoteRecordRowMapper = new RemoteRecordRowMapper();
+                    rau.setAuditName(rs.getString("NATSINSAUD"));
+                    rau.setAuditDate(rs.getTimestamp("DTTSINSAUD"));
+                    rau.setAuditId(rs.getBigDecimal("NUXRTSAUD"));
+                    rau.setTimeRecord(remoteRecordRowMapper.mapRow(rs, rowNum));
 
-                    return tr;
+                    return rau;
                 }
             });
         }catch (DataRetrievalFailureException ex){
@@ -88,7 +89,7 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
             throw new TimeRecordNotFoundException("No matching Time Records for Row Number Range : " + rowNumber + "-" + threshold);
         }
 
-        return timeRecordList;
+        return timeRecordAuditList;
     }
 
     @Override
@@ -100,34 +101,7 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
         params.addValue("threshold", threshold);
 
         try {
-            timeEntryList = remoteNamedJdbc.query(GET_REMOTE_TIME_ENTRY, params, new RowMapper<TimeEntry>() {
-                @Override
-                public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    TimeEntry te = new TimeEntry();
-                    te.settDayId(rs.getBigDecimal("NUXRDAY"));
-                    te.setTimesheetId(rs.getBigDecimal("NUXRTIMESHEET"));
-                    te.setEmpId(rs.getBigDecimal("NUXREFEM"));
-                    te.setDate(rs.getDate("DTDay"));
-                    te.setWorkHours(rs.getBigDecimal("NUWORK"));
-                    te.setTravelHours(rs.getBigDecimal("NUTRAVEL"));
-                    te.setHolidayHours(rs.getBigDecimal("NUHOLIDAY"));
-                    te.setVacationHours(rs.getBigDecimal("NUVACATION"));
-                    te.setPersonalHours(rs.getBigDecimal("NUPERSONAL"));
-                    te.setSickEmpHours(rs.getBigDecimal("NUSICKEMP"));
-                    te.setSickFamHours(rs.getBigDecimal("NUSICKFAM"));
-                    te.setMiscHours(rs.getBigDecimal("NUMISC"));
-                    if (rs.getString("NUXRMISC") != null) te.setMiscType(MiscLeaveType.valueOf(rs.getString("NUXRMISC")));
-                    te.settOriginalUserId(rs.getString("NATXNORGUSER"));
-                    te.settUpdateUserId(rs.getString("NATXNUPDUSER"));
-                    te.settOriginalDate(rs.getTimestamp("DTTXNORIGIN"));
-                    te.settUpdateDate(rs.getTimestamp("DTTXNUPDATE"));
-                    te.setActive(rs.getString("CDSTATUS").equals("A"));
-                    te.setEmpComment(rs.getString("DECOMMENTS"));
-                    te.setPayType(PayType.valueOf(rs.getString("CDPAYTYPE")));
-
-                    return te;
-                }
-            });
+            timeEntryList = remoteNamedJdbc.query(GET_REMOTE_TIME_ENTRY, params, new RemoteEntryRowMapper());
 
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Entries where rownumber : {} error: {}", rowNumber, ex.getMessage());
@@ -142,18 +116,40 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
 
         int threshold = 1000 ;
         int rowNum = 0 ;
-        List<TimeRecord> timeRecordList;
+        List<TimeRecordAudit> timeRecordAuditList;
 
         while(true)
         {
-            timeRecordList=getRemoteTimeRecord(rowNum,rowNum+threshold);
+            timeRecordAuditList=getRemoteTimeRecordAudit(rowNum, rowNum + threshold);
 
-            for(TimeRecord tr : timeRecordList)
+            for(TimeRecordAudit rau : timeRecordAuditList)
             {
-                timeRecordDao.setRecord(tr);
+                TimeRecord tr = rau.getTimeRecord();
+
+                if(timeRecordAuditList.indexOf(rau) == (timeRecordAuditList.size()-1))
+                {
+                    SyncCheck sc = new SyncCheck();
+                    sc.setDate(rau.getAuditDate());
+                    sc.setDataId(rau.getAuditId());
+                    sc.setDataType("TimeRecord");
+                    sc.setDataSide("Remote");
+
+                    syncCheckDao.setSyncData(sc);
+                }
+
+                if(localRecordDao.getTimeRecordCount(tr.getTimesheetId())==0)
+                {
+                    localRecordDao.setRecord(tr);
+                }
+                else
+                {
+                    localRecordDao.updateRecord(tr);
+                }
+
+
             }
 
-            if(timeRecordList.size()==threshold)
+            if(timeRecordAuditList.size()==threshold)
             {
 
                 rowNum = rowNum + threshold;
@@ -176,16 +172,28 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
 
         while(true)
         {
-            timeEntryList=getRemoteTimeEntry(rowNum,rowNum+threshold);
+            timeEntryList=getRemoteTimeEntry(rowNum, rowNum + threshold);
 
             for(TimeEntry te : timeEntryList)
             {
-                timeEntryDao.setTimeEntry(te);
+                if(timeEntryList.indexOf(te) == (timeEntryList.size()-1))
+                {
+                    SyncCheck sc = new SyncCheck();
+                    sc.setDate(te.gettOriginalDate());
+                    sc.setDataId(te.gettDayId());
+                    sc.setDataType("TimeEntry");
+                    sc.setDataSide("Remote");
+
+                    syncCheckDao.setSyncData(sc);
+                }
+
+                localEntryDao.setTimeEntry(te);
             }
 
             if(timeEntryList.size()==threshold)
             {
                 rowNum = rowNum + threshold;
+                break;
             }
             else
             {

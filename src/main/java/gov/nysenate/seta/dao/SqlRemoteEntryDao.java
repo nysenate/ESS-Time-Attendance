@@ -16,16 +16,17 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Repository("remoteTimeEntry")
 public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao{
 
-    @Autowired
+    @Resource(name = "localTimeRecord")
     TimeRecordDao timeRecordDao;
 
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteEntryDao.class);
@@ -110,7 +111,7 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao{
         param.addValue("sickEmpHR", tsd.getSickEmpHours());
         param.addValue("sickFamilyHR", tsd.getSickFamHours());
         param.addValue("miscHR", tsd.getMiscHours());
-        param.addValue("miscTypeId", tsd.getMiscType().getCode());
+        param.addValue("miscTypeId", (tsd.getMiscType() != null) ? tsd.getMiscType().getCode() : null);
         param.addValue("tOriginalUserId", tsd.gettOriginalUserId());
         param.addValue("tUpdateUserId", tsd.gettUpdateUserId());
         param.addValue("tOriginalDate", tsd.gettOriginalDate());

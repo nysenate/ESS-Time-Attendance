@@ -28,7 +28,7 @@ public class RemoteEntryRowMapper implements RowMapper<TimeEntry> {
         te.setSickEmpHours(rs.getBigDecimal("NUSICKEMP"));
         te.setSickFamHours(rs.getBigDecimal("NUSICKFAM"));
         te.setMiscHours(rs.getBigDecimal("NUMISC"));
-        if (rs.getString("NUXRMISC") != null) te.setMiscType(MiscLeaveType.valueOf(rs.getString("NUXRMISC")));
+        if (rs.getString("NUXRMISC") != null) te.setMiscType(MiscLeaveType.valueOfCode(rs.getString("NUXRMISC")));
         te.settOriginalUserId(rs.getString("NATXNORGUSER"));
         te.settUpdateUserId(rs.getString("NATXNUPDUSER"));
         te.settOriginalDate(rs.getTimestamp("DTTXNORIGIN"));

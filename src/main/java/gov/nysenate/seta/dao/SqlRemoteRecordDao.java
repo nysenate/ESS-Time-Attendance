@@ -9,11 +9,12 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Repository("RemoteTimeRecord")
+@Repository("remoteTimeRecord")
 public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao{
 
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteRecordDao.class);
@@ -169,6 +170,11 @@ public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao{
         if (remoteNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
         else return false;
 
+    }
+
+    @Override
+    public int getTimeRecordCount(BigDecimal timesheetId) throws TimeRecordNotFoundException {
+        return 0;
     }
 
 }

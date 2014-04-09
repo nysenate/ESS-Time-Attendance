@@ -23,7 +23,7 @@ public interface MigrationDao extends BaseDao {
      * @return List of Time Record Objects otherwise throws TimeRecordNotFoundException
      * @throws TimeRecordNotFoundException
      */
-    public List<TimeRecord> getRemoteTimeRecord(int rowNumber, int threshold) throws TimeRecordNotFoundException;
+    public List<TimeRecordAudit> getRemoteTimeRecordAudit(int rowNumber, int threshold) throws TimeRecordNotFoundException;
 
     /**
      * Retrieve Time Entries using timeRecordId

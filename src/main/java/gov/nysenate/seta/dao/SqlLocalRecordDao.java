@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.seta.dao.mapper.LocalRecordRowMapper;
 import gov.nysenate.seta.model.TimeRecord;
 import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -15,30 +17,30 @@ import java.util.Map;
 @Repository("localTimeRecord")
 public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlLocalRecordDao.class);
 
     protected static final String GET_TIME_REC_SQL_TMPL =
         "SELECT * " +
                 "FROM " +
-                "ts.timesheet" +
+                "ts.time_record" +
                 " WHERE status = 'A' AND %s ";
 
     protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "emp_id = :empId");
     protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "date_begin = :startDate AND date_end = :endDate");
     protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "ts_status_id = :tSStatusId AND emp_id = :empId AND date_begin = :startDate AND date_end = :endDate");
-
+    protected static final String GET_TIME_RECORD_COUNT_SQL = "SELECT COUNT(*) FROM ts.time_record WHERE time_record_id = :time_record_id";
 
     protected static final String SET_TIME_REC_SQL =
         "INSERT \n" +
-            "INTO ts.timesheet \n" +
-            "(timesheet_id , emp_id, t_original_user, t_update_user, t_original_date, t_update_date, status, ts_status_id, begin_date, end_date, remarks, supervisor_id, exc_details, proc_date) \n" +
+            "INTO ts.time_record \n" +
+            "(time_record_id , emp_id, t_original_user, t_update_user, t_original_date, t_update_date, status, ts_status_id, begin_date, end_date, remarks, supervisor_id, exc_details, proc_date) \n" +
             "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n";
 
     protected static final String UPDATE_TIME_REC_SQL =
-        "UPDATE ts.timesheet \n" +
-            "SET \n" +
-            "(empId = :empId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, ts_status_id = :tSStatusId, begin_date = :beginDate, end_date = :endDate, remarks = :remarks, supervisor_id = :supervisorId, exc_details = :excDetails, proc_date = :procDate) \n" +
-            "WHERE timesheet_id = :timesheetId";
+        "UPDATE ts.time_record " +
+            "SET " +
+            "emp_id = :empId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, ts_status_id = :tSStatusId, begin_date = :beginDate, end_date = :endDate, remarks = :remarks, supervisor_id = :supervisorId, exc_details = :excDetails, proc_date = :procDate " +
+            "WHERE time_record_id = :timesheetId";
 
 
     @Override
@@ -50,7 +52,7 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
         try{
             timeRecordList = localNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params,
-                                            new TimeRecordRowMapper(""));
+                                            new LocalRecordRowMapper(""));
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records for employee id: " + empId);
@@ -71,7 +73,7 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
             try{
 
-                 trs.put(empId, localNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params, new TimeRecordRowMapper("")));
+                 trs.put(empId, localNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params, new LocalRecordRowMapper("")));
 
             }catch (DataRetrievalFailureException ex){
                 logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
@@ -93,7 +95,7 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
         try{
             timeRecordList = localNamedJdbc.query(GET_TREC_BY_DATE_SQL, params,
-                    new TimeRecordRowMapper(""));
+                    new LocalRecordRowMapper(""));
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records between Dates {} And {} error: {}", startDate, endDate, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records between Dates: " + startDate +"  And  "+ endDate);
@@ -111,12 +113,28 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
         try{
             timeRecordList = localNamedJdbc.query(GET_TREC_BY_RECSTATUS_SQL, params,
-                    new TimeRecordRowMapper(""));
+                    new LocalRecordRowMapper(""));
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records where Status : {} error: {}", tSStatusId, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records for Status Id : " + tSStatusId);
         }
         return  timeRecordList;
+    }
+
+
+    public int getTimeRecordCount(BigDecimal time_record_id) throws TimeRecordNotFoundException {
+
+        int count = 0 ;
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("time_record_id",time_record_id);
+
+        try{
+            count = localNamedJdbc.queryForObject(GET_TIME_RECORD_COUNT_SQL, params, Integer.class);
+        }catch (DataRetrievalFailureException ex){
+            logger.warn("Retrieve Time Record Count : {} error: {}", time_record_id, ex.getMessage());
+            throw new TimeRecordNotFoundException("No matching Time Records for time record Id : " + time_record_id);
+        }
+        return  count;
     }
 
     @Override
@@ -150,13 +168,14 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        params.addValue("timesheetId", tr.getTimesheetId());
+
         params.addValue("empId", tr.getEmployeeId());
         params.addValue("tOriginalUserId", tr.gettOriginalUserId());
         params.addValue("tUpdateUserId", tr.gettUpdateUserId());
         params.addValue("tOriginalDate", tr.gettOriginalDate());
         params.addValue("tUpdateDate", tr.gettUpdateDate());
-        params.addValue("status", getStatusCode(tr.isActive()));
+        if(tr.isActive()==true){params.addValue("status", "A");}
+        else{ params.addValue("status", "I");}
         params.addValue("tSStatusId", tr.getRecordStatus().getCode());
         params.addValue("beginDate", tr.getBeginDate());
         params.addValue("endDate", tr.getEndDate());
@@ -164,12 +183,12 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("supervisorId", tr.getSupervisorId());
         params.addValue("excDetails", tr.getExeDetails());
         params.addValue("procDate", tr.getProDate());
+        params.addValue("timesheetId", tr.getTimesheetId());
 
         if (localNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
         else return false;
 
     }
-
 
 
 }

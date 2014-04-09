@@ -3,6 +3,7 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.model.TimeRecord;
 import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -63,4 +64,11 @@ public interface TimeRecordDao extends BaseDao {
      * @return Boolean value, true if data successfully updated else false.
      */
     public boolean updateRecord(TimeRecord tr);
+
+    /**
+     * Get Count of TimeRecord using timesheetId
+     * @param timesheetId - Id of Timesheet
+     * @return number of counts
+     */
+    public int getTimeRecordCount(BigDecimal timesheetId) throws TimeRecordNotFoundException;
 }
