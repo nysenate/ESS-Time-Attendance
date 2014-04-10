@@ -1,6 +1,6 @@
 package gov.nysenate.seta.service.ldap;
 
-import gov.nysenate.seta.dao.LdapAuthDao;
+import gov.nysenate.seta.dao.personnel.LdapAuthDao;
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
 import gov.nysenate.seta.model.ldap.LdapAuthStatus;
 import org.slf4j.Logger;

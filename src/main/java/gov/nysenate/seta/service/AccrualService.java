@@ -1,8 +1,8 @@
 package gov.nysenate.seta.service;
 
-import gov.nysenate.seta.model.AccrualInfo;
-import gov.nysenate.seta.model.Employee;
-import gov.nysenate.seta.model.PayPeriod;
+import gov.nysenate.seta.model.accrual.AccrualInfo;
+import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.personnel.Employee;
 
 /**
  * Service interface to provide accrual related functionality.

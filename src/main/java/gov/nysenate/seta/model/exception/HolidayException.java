@@ -1,7 +1,5 @@
 package gov.nysenate.seta.model.exception;
 
-import java.util.Date;
-
 public class HolidayException extends Exception
 {
     public HolidayException() {

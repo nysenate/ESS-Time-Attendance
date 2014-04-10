@@ -1,10 +1,8 @@
 package gov.nysenate.seta.service;
 
-import gov.nysenate.seta.dao.AccrualDao;
-import gov.nysenate.seta.model.AccrualInfo;
-import gov.nysenate.seta.model.Employee;
-import gov.nysenate.seta.model.PayPeriod;
-import org.springframework.beans.factory.annotation.Autowired;
+import gov.nysenate.seta.model.accrual.AccrualInfo;
+import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.personnel.Employee;
 import org.springframework.stereotype.Service;
 
 /**

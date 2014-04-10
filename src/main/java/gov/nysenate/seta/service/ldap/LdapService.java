@@ -1,9 +1,6 @@
 package gov.nysenate.seta.service.ldap;
 
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
-import gov.nysenate.seta.model.ldap.SenateLdapPerson;
-
-import javax.naming.Name;
 
 public interface LdapService
 {
