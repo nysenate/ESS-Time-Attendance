@@ -1,6 +1,8 @@
 package gov.nysenate.seta.model.accrual;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,5 +40,27 @@ public enum AccrualRate
         if (payPeriods >= 27 && payPeriods <= 52) return accRates.get(3);
         if (payPeriods >= 53 && payPeriods <= 78) return accRates.get(4);
         else return accRates.get(5);
+    }
+
+    /**
+     * Retrieves the rate using a prorated percentage (occurs when one does not
+     * work 1820 hours and accrue at a rate proportional to the number of hours
+     * they are expected to work in a year).
+     * @param payPeriods int
+     * @param proratePercentage BigDecimal (percentage e.g 0.5)
+     * @return BigDecimal with prorated accrual rate to the nearest .25.
+     */
+    public BigDecimal getRate(int payPeriods, BigDecimal proratePercentage) {
+        return roundToNearestQuarter(getRate(payPeriods).multiply(proratePercentage));
+    }
+
+    /**
+     * Rounds the given BigDecimal to the nearest .25 increment.
+     * @param num BigDecimal
+     * @return BigDecimal with rounded value
+     */
+    private BigDecimal roundToNearestQuarter(BigDecimal num) {
+        BigDecimal four = new BigDecimal(4);
+        return num.multiply(four).setScale(0, RoundingMode.HALF_UP).divide(four);
     }
 }

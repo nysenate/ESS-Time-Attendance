@@ -10,7 +10,7 @@ import java.util.Date;
  *
  * @see gov.nysenate.seta.model.accrual.AccrualInfo
  */
-public class AnnualAccrualRecord
+public class AnnualAccrualSummary
 {
     int year;
     Date endDate;
