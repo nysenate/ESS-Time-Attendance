@@ -20,19 +20,6 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeTransactionDao.class);
 
-    protected static final String GET_LAST_TRANS_REC_SQL =
-        "SELECT * FROM (\n" +
-        "   SELECT aud.NUXREFEM, ptx.CDSTATUS, ptx.CDTRANS, ptx.CDTRANSTYP, ptx.NUCHANGE, ptx.DTTXNORIGIN, ptx.DTTXNUPDATE,\n" +
-        "          ptx.DTEFFECT, MAX(ptx.DTEFFECT) OVER (PARTITION BY ptx.CDTRANS) AS LATEST_DTEFFECT,\n" +
-        "          MAX(ptx.DTTXNORIGIN) OVER (PARTITION BY ptx.CDTRANS) AS LATEST_DTTXNORIGIN\n" +
-        "          ${audColumns}\n" +
-        "   FROM PM21PERAUDIT aud\n" +
-        "   JOIN PD21PTXNCODE ptx ON aud.NUCHANGE  = ptx.NUCHANGE\n" +
-        "   WHERE aud.NUXREFEM = :empId AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
-        "   AND ptx.CDTRANS IN (:transCodes)\n" +
-        ")\n" +
-        "WHERE DTEFFECT = LATEST_DTEFFECT AND DTTXNORIGIN = LATEST_DTTXNORIGIN";
-
     protected static final String GET_TRANS_HISTORY_SQL =
         "SELECT aud.NUXREFEM, ptx.CDSTATUS, ptx.CDTRANS, ptx.CDTRANSTYP, ptx.NUCHANGE, ptx.DTTXNORIGIN, ptx.DTTXNUPDATE,\n" +
         "       ptx.DTEFFECT ${audColumns}\n" +
@@ -42,65 +29,6 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         "WHERE aud.NUXREFEM = :empId AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
         "AND ptx.CDTRANS IN (:transCodes)\n" +
         "ORDER BY ptx.DTEFFECT DESC, ptx.DTTXNORIGIN DESC";
-
-    /** {@inheritDoc} */
-    @Override
-    public TransactionRecord getLastTransRecord(int empId, TransactionType type) throws TransRecordException {
-        return getLastTransRecord(empId, type, getBeginningOfTime(), new Date());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public TransactionRecord getLastTransRecord(int empId, TransactionType type, Date end) throws TransRecordException {
-        return getLastTransRecord(empId, type, getBeginningOfTime(), end);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public TransactionRecord getLastTransRecord(int empId, TransactionType type, Date start, Date end) throws TransRecordException {
-        Set<TransactionType> types = new HashSet<>(Arrays.asList(type));
-        Map<TransactionType, TransactionRecord> res = getLastTransRecords(empId, types, start, end);
-        if (res.size() == 1 && res.containsKey(type)) {
-            return res.get(type);
-        }
-        throw new TransRecordNotFoundEx(
-            "No matching transaction of type " + type + " for empId " + empId + " between " + start + " - " + end);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Map<TransactionType, TransactionRecord> getLastTransRecords(int empId, Set<TransactionType> types) {
-        return getLastTransRecords(empId, types, new Date());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Map<TransactionType, TransactionRecord> getLastTransRecords(int empId, Set<TransactionType> types, Date end) {
-        return getLastTransRecords(empId, types, getBeginningOfTime(), end);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Map<TransactionType, TransactionRecord> getLastTransRecords(int empId, Set<TransactionType> types, Date start, Date end) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
-        params.addValue("dateStart", start);
-        params.addValue("dateEnd", end);
-        params.addValue("transCodes", getTransCodesFromSet(types));
-
-        String sql = applyAuditColumnsInSelectSql(GET_LAST_TRANS_REC_SQL, "audColumns", "", types);
-        List<TransactionRecord> transRecordList =
-                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", types));
-
-        Map<TransactionType, TransactionRecord> transRecordMap = new HashMap<>();
-        for (TransactionRecord tr : transRecordList) {
-            if (transRecordMap.containsKey(tr.getTransType())) {
-                logger.warn("Multiple latest records for a single transaction were returned!");
-            }
-            transRecordMap.put(tr.getTransType(), tr);
-        }
-        return transRecordMap;
-    }
 
     /** {@inheritDoc} */
     @Override

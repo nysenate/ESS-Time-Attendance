@@ -124,17 +124,16 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     @Override
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
         Set<TransactionType> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
-        Map<TransactionType, TransactionRecord> transMap =
-                empTransactionDao.getLastTransRecords(empId, transTypes, date);
+        TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transTypes, date);
 
         /** The RTP/APP should have a supervisor id to use as the base */
         int supId = -1;
         TransactionRecord originalTrans = null;
-        if (transMap.containsKey(RTP)) {
-            originalTrans = transMap.get(RTP);
+        if (transHistory.hasRecords(RTP)) {
+            originalTrans = transHistory.getTransRecords(RTP).getFirst();
         }
-        else if (transMap.containsKey(APP)) {
-            originalTrans = transMap.get(APP);
+        else if (transHistory.hasRecords(APP)) {
+            originalTrans = transHistory.getTransRecords(APP).getFirst();
         }
 
         if (originalTrans != null) {
@@ -145,8 +144,8 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         }
 
         /** The SUP transaction should occur after any RTP in order to take precedence */
-        if (transMap.containsKey(SUP)) {
-            TransactionRecord supTrans = transMap.get(SUP);
+        if (transHistory.hasRecords(SUP)) {
+            TransactionRecord supTrans = transHistory.getTransRecords(SUP).getFirst();
             if (originalTrans == null || supTrans.getEffectDate().compareTo(originalTrans.getEffectDate()) >= 0) {
                 String supIdStr = supTrans.getValueMap().get("NUXREFSV");
                 if (StringUtils.isNumeric(supIdStr)) {
@@ -208,7 +207,6 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
     /**{@inheritDoc} */
     @Override
-    @Cacheable(value = "supervisorEmps")
     public SupervisorEmpGroup getSupervisorEmpGroup(int supId, Date start, Date end) throws SupervisorException {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("supId", supId);
