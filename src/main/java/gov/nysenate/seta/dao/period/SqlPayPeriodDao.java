@@ -5,6 +5,7 @@ import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -12,7 +13,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
@@ -26,7 +29,7 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
         "SELECT * FROM SL16PERIOD\n" +
         "WHERE CDPERIOD = :periodType AND (DTBEGIN >= TRUNC(:startDate) OR TRUNC(:startDate) BETWEEN DTBEGIN AND DTEND)\n" +
         "                             AND (DTEND <= TRUNC(:endDate) OR TRUNC(:endDate) BETWEEN DTBEGIN AND DTEND)\n" +
-        "ORDER BY DTBEGIN DESC";
+        "ORDER BY DTBEGIN ${order}";
 
     protected static final String GET_OPEN_ATTEND_PERIODS_SQL =
         "SELECT * FROM SL16PERIOD \n" +
@@ -35,7 +38,7 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
         "  SELECT DISTINCT MAX(DTPERIODYEAR) OVER (PARTITION BY NUXREFEM) \n" +
         "  FROM PM23ATTEND WHERE NUXREFEM = :empId AND DTCLOSE IS NOT NULL\n" +
         ")\n" +
-        "ORDER BY DTBEGIN DESC";
+        "ORDER BY DTBEGIN ${order}";
 
     /** {@inheritDoc} */
     @Override
@@ -56,24 +59,27 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
 
     /** {@inheritDoc} */
     @Override
-    public List<PayPeriod> getPayPeriods(PayPeriodType type, Date startDate, Date endDate) {
+    public List<PayPeriod> getPayPeriods(PayPeriodType type, Date startDate, Date endDate, boolean orderByAsc) {
         List<PayPeriod> payPeriods;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("periodType", type.getCode());
         params.addValue("startDate", startDate);
         params.addValue("endDate", endDate);
-        payPeriods = remoteNamedJdbc.query(GET_PAY_PERIODS_IN_RANGE_SQL, params, new PayPeriodRowMapper(""));
+        String sql = setOrderByClause(orderByAsc, GET_PAY_PERIODS_IN_RANGE_SQL);
+        payPeriods = remoteNamedJdbc.query(sql, params, new PayPeriodRowMapper(""));
         return payPeriods;
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<PayPeriod> getOpenAttendancePayPeriods(int empId, Date endDate) {
+    public List<PayPeriod> getOpenAttendancePayPeriods(int empId, Date endDate, boolean orderByAsc) {
         List<PayPeriod> payPeriods;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("endDate", endDate);
-        payPeriods = remoteNamedJdbc.query(GET_OPEN_ATTEND_PERIODS_SQL, params, new PayPeriodRowMapper(""));
+        params.addValue("order", (orderByAsc) ? "ASC" : "DESC");
+        String sql = setOrderByClause(orderByAsc, GET_OPEN_ATTEND_PERIODS_SQL);
+        payPeriods = remoteNamedJdbc.query(sql, params, new PayPeriodRowMapper(""));
         return payPeriods;
     }
 }

@@ -1,11 +1,14 @@
 package gov.nysenate.seta.dao.base;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class SqlBaseDao
 {
@@ -50,5 +53,18 @@ public abstract class SqlBaseDao
      */
     public static boolean getStatusFromCode(String code) {
         return code != null && code.equals("A");
+    }
+
+    /**
+     * Replaces ${order} with either ASC or DESC.
+     * @param orderByAsc boolean - if true, set as ASC, otherwise DESC.
+     * @param sql String - The sql to replace
+     * @return String - The new sql string
+     */
+    public static String setOrderByClause(boolean orderByAsc, String sql) {
+        Map<String, String> replaceMap = new HashMap<>();
+        replaceMap.put("order", (orderByAsc) ? "ASC" : "DESC");
+        StrSubstitutor strSub = new StrSubstitutor(replaceMap);
+        return strSub.replace(sql);
     }
 }

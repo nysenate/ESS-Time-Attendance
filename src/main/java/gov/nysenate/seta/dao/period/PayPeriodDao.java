@@ -27,11 +27,13 @@ public interface PayPeriodDao extends BaseDao
      * Retrieves the pay periods of the given type that are either between or include the start
      * and end date range.
      * @param type PayPeriodType - The type of pay period.
-     * @param startDate Date
-     * @param endDate Date
+     * @param startDate Date - Start of date range
+     * @param endDate Date - End of date range
+     * @param orderByAsc boolean - If true results are ordered by earliest pay period first.
+     *                             Otherwise results are ordered by most recent first.
      * @return List<PayPeriod>
      */
-    public List<PayPeriod> getPayPeriods(PayPeriodType type, Date startDate, Date endDate);
+    public List<PayPeriod> getPayPeriods(PayPeriodType type, Date startDate, Date endDate, boolean orderByAsc);
 
     /**
      * Attendance years are closed out and finalized at some point after the year has ended. The pay periods
@@ -40,7 +42,9 @@ public interface PayPeriodDao extends BaseDao
      * required.
      * @param empId int - Employee id
      * @param endDate Date - The retrieved pay periods will have a range before or during this date.
-     * @return List<PayPeriod> - Ordered by most recent pay periods first.
+     * @param orderByAsc boolean - If true results are ordered by earliest pay period first.
+     *                             Otherwise results are ordered by most recent first.
+     * @return List<PayPeriod>
      */
-    public List<PayPeriod> getOpenAttendancePayPeriods(int empId, Date endDate);
+    public List<PayPeriod> getOpenAttendancePayPeriods(int empId, Date endDate, boolean orderByAsc);
 }
