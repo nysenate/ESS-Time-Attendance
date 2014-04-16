@@ -155,7 +155,7 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
             {
 
                 rowNum = rowNum + threshold;
-                break;
+
             }
             else
             {
@@ -194,8 +194,9 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
 
             if(timeEntryList.size()==threshold)
             {
+
                 rowNum = rowNum + threshold;
-                break;
+
             }
             else
             {
