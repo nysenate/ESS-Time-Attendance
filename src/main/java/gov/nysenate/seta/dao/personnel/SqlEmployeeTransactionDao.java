@@ -1,8 +1,7 @@
 package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.model.exception.TransRecordException;
-import gov.nysenate.seta.model.exception.TransRecordNotFoundEx;
+import gov.nysenate.seta.dao.personnel.mapper.TransactionRecordRowMapper;
 import gov.nysenate.seta.model.personnel.TransactionHistory;
 import gov.nysenate.seta.model.personnel.TransactionRecord;
 import gov.nysenate.seta.model.personnel.TransactionType;

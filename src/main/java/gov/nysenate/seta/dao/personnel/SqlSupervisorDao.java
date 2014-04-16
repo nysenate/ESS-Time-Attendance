@@ -126,31 +126,12 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         Set<TransactionType> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
         TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transTypes, date);
 
-        /** The RTP/APP should have a supervisor id to use as the base */
         int supId = -1;
-        TransactionRecord originalTrans = null;
-        if (transHistory.hasRecords(RTP)) {
-            originalTrans = transHistory.getTransRecords(RTP).getFirst();
-        }
-        else if (transHistory.hasRecords(APP)) {
-            originalTrans = transHistory.getTransRecords(APP).getFirst();
-        }
-
-        if (originalTrans != null) {
-            String supIdStr = originalTrans.getValueMap().get("NUXREFSV");
+        if (transHistory.hasRecords()) {
+            TransactionRecord latestSupRec = transHistory.getAllTransRecords(false).getFirst();
+            String supIdStr = latestSupRec.getValueMap().get("NUXREFSV");
             if (StringUtils.isNumeric(supIdStr)) {
                 supId = Integer.parseInt(supIdStr);
-            }
-        }
-
-        /** The SUP transaction should occur after any RTP in order to take precedence */
-        if (transHistory.hasRecords(SUP)) {
-            TransactionRecord supTrans = transHistory.getTransRecords(SUP).getFirst();
-            if (originalTrans == null || supTrans.getEffectDate().compareTo(originalTrans.getEffectDate()) >= 0) {
-                String supIdStr = supTrans.getValueMap().get("NUXREFSV");
-                if (StringUtils.isNumeric(supIdStr)) {
-                    supId = Integer.parseInt(supIdStr);
-                }
             }
         }
 

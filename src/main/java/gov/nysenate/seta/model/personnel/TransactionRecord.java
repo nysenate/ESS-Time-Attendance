@@ -20,6 +20,33 @@ public class TransactionRecord
         return valueMap != null && !valueMap.isEmpty();
     }
 
+    /** Functional Getters/Setters */
+
+    /**
+     * Delegate to retrieve the value associated with the given column name.
+     * @param colName String
+     * @return String if value exists, null if it doesn't or is set as null,
+     *         or throws IllegalStateException if the value map was not initialized.
+     */
+    public String getValue(String colName) {
+        if (valueMap != null) {
+            return valueMap.get(colName);
+        }
+        throw new IllegalStateException("The value map for the transaction record was not set.");
+    }
+
+    /**
+     * Checks if the map has a non null value for the given column name.
+     * @param colName String
+     * @return boolean
+     */
+    public boolean hasNonNullValue(String colName) {
+        if (valueMap != null) {
+            return (valueMap.containsKey(colName) && valueMap.get(colName) != null);
+        }
+        throw new IllegalStateException("The value map for the transaction record was not set.");
+    }
+
     /** Basic Getters/Setters */
 
     public int getEmployeeId() {

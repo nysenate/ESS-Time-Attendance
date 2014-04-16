@@ -17,6 +17,14 @@ public class TransactionHistory
     }
 
     /**
+     * Returns true if any records exist in the history.
+     * @return boolean
+     */
+    public boolean hasRecords() {
+        return !recordHistory.isEmpty();
+    }
+
+    /**
      * Returns true if records exist for a given type of transaction.
      * @param type TransactionType
      * @return boolean
@@ -93,25 +101,28 @@ public class TransactionHistory
     }
 
     /**
-     * Returns a single ordered LinkedList containing all the transaction records. This is useful if
-     * you need all the transaction records to be ordered into a single collection.
-     * @return LinkedList<TransactionRecord>
-     */
-    public LinkedList<TransactionRecord> getAllTransRecords() {
-        PriorityQueue<TransactionRecord> allRecords = createPriorityQueue();
-        for (TransactionType type : recordHistory.keySet()) {
-            allRecords.addAll(recordHistory.get(type));
-        }
-        return getListFromPriorityQueue(allRecords);
-    }
-
-    /**
-     * See overloaded method. This provides the option to change the sort order for the returned list of records.
-     * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
+     * See overloaded method. Shorthand method to retrieve every transaction type.
      * @return LinkedList<TransactionRecord>
      */
     public LinkedList<TransactionRecord> getAllTransRecords(boolean sortByDateAsc) {
-        LinkedList<TransactionRecord> records = getAllTransRecords();
+        return getAllTransRecords(recordHistory.keySet(), sortByDateAsc);
+    }
+
+    /**
+     * Returns a single ordered LinkedList containing all the transaction records. This is useful if
+     * you need all the transaction records to be ordered into a single collection.
+     * @param transTypes Set<TransactionType> - The set of types to return in the list
+     * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
+     * @return LinkedList<TransactionRecord>
+     */
+    public LinkedList<TransactionRecord> getAllTransRecords(Set<TransactionType> transTypes, boolean sortByDateAsc) {
+        PriorityQueue<TransactionRecord> allRecords = createPriorityQueue();
+        for (TransactionType type : recordHistory.keySet()) {
+            if (transTypes.contains(type)) {
+                allRecords.addAll(recordHistory.get(type));
+            }
+        }
+        LinkedList<TransactionRecord> records = getListFromPriorityQueue(allRecords);
         if (sortByDateAsc) {
             Collections.reverse(records);
         }

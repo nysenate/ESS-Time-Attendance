@@ -1,11 +1,11 @@
 package gov.nysenate.seta.dao.period;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
+import gov.nysenate.seta.dao.period.mapper.PayPeriodRowMapper;
 import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -13,9 +13,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao

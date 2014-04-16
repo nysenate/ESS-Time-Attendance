@@ -1,6 +1,5 @@
 package gov.nysenate.seta.dao.personnel.mapper;
 
-import gov.nysenate.seta.dao.personnel.RespCenterRowMapper;
 import gov.nysenate.seta.dao.unit.AddressRowMapper;
 import gov.nysenate.seta.dao.unit.LocationRowMapper;
 import gov.nysenate.seta.model.payroll.PayType;

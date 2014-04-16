@@ -18,7 +18,7 @@ public class PayPeriod
 
     public PayPeriod() {}
 
-    /** Functional Getters/Setters */
+    /** --- Functional Getters/Setters --- */
 
     /**
      * Returns the number of days in the pay period.
@@ -42,7 +42,33 @@ public class PayPeriod
                                         "Cannot compute number of pay period days");
     }
 
-    /** Basic Getters/Setters */
+    /** --- Overrides --- */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PayPeriod payPeriod = (PayPeriod) o;
+        if (active != payPeriod.active) return false;
+        if (payPeriodNum != payPeriod.payPeriodNum) return false;
+        if (!endDate.equals(payPeriod.endDate)) return false;
+        if (!startDate.equals(payPeriod.startDate)) return false;
+        if (type != payPeriod.type) return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + startDate.hashCode();
+        result = 31 * result + endDate.hashCode();
+        result = 31 * result + payPeriodNum;
+        result = 31 * result + (active ? 1 : 0);
+        return result;
+    }
+
+    /** --- Basic Getters/Setters --- */
 
     public PayPeriodType getType() {
         return type;
