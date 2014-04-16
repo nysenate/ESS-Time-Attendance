@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.personnel.mapper;
 
 import gov.nysenate.seta.model.personnel.ResponsibilityHead;
 import org.springframework.jdbc.core.RowMapper;

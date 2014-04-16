@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.personnel.mapper;
 
 import gov.nysenate.seta.model.personnel.TransactionRecord;
 import gov.nysenate.seta.model.personnel.TransactionType;
