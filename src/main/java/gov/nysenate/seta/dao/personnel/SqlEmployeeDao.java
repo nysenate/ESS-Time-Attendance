@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
+import gov.nysenate.seta.dao.personnel.mapper.EmployeeRowMapper;
 import gov.nysenate.seta.model.exception.EmployeeException;
 import gov.nysenate.seta.model.exception.EmployeeNotFoundEx;
 import gov.nysenate.seta.model.payroll.PayType;

@@ -1,23 +1,35 @@
 package gov.nysenate.seta.dao.attendance;
 
+import gov.nysenate.seta.dao.accrual.mapper.AccrualUsageRowMapper;
+import gov.nysenate.seta.dao.accrual.mapper.LocalAccrualUsageRowMapper;
+import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
+import gov.nysenate.seta.dao.period.PayPeriodDao;
+import gov.nysenate.seta.model.accrual.AccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccrualUsage;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.*;
+import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.period.PayPeriodType;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
+import sun.security.util.BigInt;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +65,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
     protected static final String GET_SUM_OF_HOURS =
             "SELECT " +
+                    "te.emp_id as t_emp_id, " +
                     "SUM(te.work_hr) as t_work, " +
                     "SUM(te.travel_hr) as t_travel, " +
                     "SUM(te.holiday_hr) as t_holiday, " +
@@ -65,11 +78,8 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
                         "ts.time_entry te LEFT JOIN ts.time_record tr ON te.time_record_id = tr.time_record_id " +
                     "WHERE " +
                         "te.emp_id = :empId AND " +
-                        "tr.begin_date = :startDate AND " +
-                        "tr.end_date = :endDate";
-
-
-
+                        "te.day_date BETWEEN  :startDate AND :endDate" +
+                    "GROUP BY te.emp_id";
 
     @Override
     public List<TimeEntry> getTimeEntryByTimesheet(int timesheetId) throws TimeEntryNotFoundEx {
@@ -176,29 +186,47 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         else return false;
     }
 
-    public PeriodAccrualUsage getSumOfHours(BigDecimal empId, Date startDate, Date endDate) throws TimeEntryNotFoundEx {
-        MapSqlParameterSource param = new MapSqlParameterSource();
+    public List<PeriodAccrualUsage> getLocalPeriodAccrualUsage(int empId, List<PayPeriod> payPeriodList) throws TimeEntryNotFoundEx {
 
-        param.addValue("empId",empId);
-        param.addValue("startDate", startDate);
-        param.addValue("endDate", endDate);
-        PeriodAccrualUsage pau;
+        AccrualUsage au = null;
+        List<PeriodAccrualUsage> pauList = null;
+        PeriodAccrualUsage pau = null;
+
 
 
         try{
-            pau = (PeriodAccrualUsage) localNamedJdbc.query(GET_SUM_OF_HOURS, param, new RowMapper<PeriodAccrualUsage>() {
-                @Override
-                public PeriodAccrualUsage mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    PeriodAccrualUsage pau = new PeriodAccrualUsage();
 
-                return pau;
-                }
-            });
+            for(PayPeriod pp : payPeriodList)
+            {
+                MapSqlParameterSource param = new MapSqlParameterSource();
+
+                param.addValue("empId",empId);
+                param.addValue("startDate", pp.getStartDate());
+                param.addValue("endDate", pp.getEndDate());
+
+                au = localNamedJdbc.queryForObject(GET_SUM_OF_HOURS, param, new LocalAccrualUsageRowMapper());
+
+                pau.setPayPeriod(pp);
+                pau.setYear(new DateTime(pp.getEndDate()).getYear());
+                pau.setEmpId(au.getEmpId());
+                pau.setEmpHoursUsed(au.getWorkHours());
+                pau.setTravelHoursUsed(au.getTravelHoursUsed());
+                pau.setHolHoursUsed(au.getHolHoursUsed());
+                pau.setVacHoursUsed(au.getVacHoursUsed());
+                pau.setEmpHoursUsed(au.getEmpHoursUsed());
+                pau.setFamHoursUsed(au.getFamHoursUsed());
+                pau.setMiscHoursUsed(au.getMiscHoursUsed());
+                pau.setPerHoursUsed(au.getPerHoursUsed());
+
+                pauList.add(pau);
+            }
+
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Total hours of {} error: {}", empId, ex.getMessage());
             throw new TimeEntryNotFoundEx("No matching Time Entries for Emp id: " + empId);
         }
-        return  pau;
-    }
+        return  pauList;
 
+
+    }
 }

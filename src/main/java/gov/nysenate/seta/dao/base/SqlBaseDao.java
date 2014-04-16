@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.base;
 
+import gov.nysenate.seta.model.period.PayPeriod;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class SqlBaseDao
@@ -67,4 +69,6 @@ public abstract class SqlBaseDao
         StrSubstitutor strSub = new StrSubstitutor(replaceMap);
         return strSub.replace(sql);
     }
+
+
 }
