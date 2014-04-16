@@ -2,8 +2,7 @@ package gov.nysenate.seta.dao.accrual;
 
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.accrual.AccrualException;
-import gov.nysenate.seta.model.accrual.AccrualHistory;
-import gov.nysenate.seta.model.accrual.AccrualInfo;
+import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
 import gov.nysenate.seta.model.period.PayPeriod;
 
 import java.util.List;
@@ -15,21 +14,20 @@ import java.util.List;
 public interface AccrualDao extends BaseDao
 {
     /**
-     * Retrieve accrual usage info for the given employee id and a specific date.
+     * Retrieve accruals information for the given employee id and a specific pay period.
      * @param empId int - Employee id
      * @param payPeriod Date - Pay period to get accrual for
-     * @return AccrualInfo if found, throws AccrualException otherwise.
+     * @return PeriodAccrualSummary if found, throws AccrualException otherwise.
      * @throws  AccrualException
      */
-    public AccrualInfo getAccuralInfo(int empId, PayPeriod payPeriod) throws AccrualException;
+    public PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod) throws AccrualException;
 
     /**
-     * Retrieve a history of accruals for the given employee and the list of dates.
+     * Retrieve a history of accruals for the given employee and the list of pay periods.
      * @param empId int - Employee id
      * @param payPeriods List<PayPeriod> - Attendance pay period dates to build history from
-     * @return AccrualHistory
+     * @return PeriodAccrualSummary
      * @throws AccrualException
      */
-    public AccrualHistory getAccrualHistory(int empId, List<PayPeriod> payPeriods) throws AccrualException;
-
+    public List<PeriodAccrualSummary> getAccrualSummaries(int empId, List<PayPeriod> payPeriods) throws AccrualException;
 }

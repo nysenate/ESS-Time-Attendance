@@ -1,6 +1,6 @@
 package gov.nysenate.seta.dao.accrual.mapper;
 
-import gov.nysenate.seta.dao.period.PayPeriodRowMapper;
+import gov.nysenate.seta.dao.period.mapper.PayPeriodRowMapper;
 import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
 import org.springframework.jdbc.core.RowMapper;
 
