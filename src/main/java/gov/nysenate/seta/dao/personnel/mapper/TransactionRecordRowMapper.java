@@ -31,8 +31,8 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
         transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
         transRec.setTransType(TransactionType.valueOf(rs.getString(pfx + "CDTRANS")));
-        transRec.setOriginalDate(rs.getDate(pfx + "DTTXNORIGIN"));
-        transRec.setUpdateDate(rs.getDate(pfx + "DTTXNUPDATE"));
+        transRec.setOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
+        transRec.setUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
         transRec.setEffectDate(rs.getDate(pfx + "DTEFFECT"));
 
         /**
