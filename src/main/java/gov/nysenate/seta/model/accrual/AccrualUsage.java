@@ -27,6 +27,20 @@ public class AccrualUsage
                         .add(famHoursUsed).add(holHoursUsed).add(miscHoursUsed);
     }
 
+    /** --- Copy Constructor --- */
+
+    public AccrualUsage(AccrualUsage s) {
+        this.setEmpId(s.getEmpId());
+        this.setEmpHoursUsed(s.getEmpHoursUsed());
+        this.setFamHoursUsed(s.getFamHoursUsed());
+        this.setHolHoursUsed(s.getHolHoursUsed());
+        this.setMiscHoursUsed(s.getMiscHoursUsed());
+        this.setPerHoursUsed(s.getPerHoursUsed());
+        this.setTravelHoursUsed(s.getTravelHoursUsed());
+        this.setVacHoursUsed(s.getVacHoursUsed());
+        this.setWorkHours(s.getWorkHours());
+    }
+
     /** --- Basic Getters/Setters --- */
 
     public int getEmpId() {

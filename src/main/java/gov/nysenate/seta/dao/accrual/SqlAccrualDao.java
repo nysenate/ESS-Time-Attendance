@@ -10,6 +10,7 @@ import gov.nysenate.seta.dao.payroll.HolidayDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.personnel.EmployeeTransactionDao;
 import gov.nysenate.seta.model.accrual.*;
+import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
@@ -18,6 +19,7 @@ import gov.nysenate.seta.model.personnel.TransactionRecord;
 import gov.nysenate.seta.model.personnel.TransactionType;
 import gov.nysenate.seta.util.OutputUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +58,16 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     @Autowired
     protected HolidayDao holidayDao;
 
-    protected static final Set<TransactionType> PAY_CODE_TYPES = new HashSet<>(Arrays.asList(APP, RTP, TYP));
-    protected static final Set<TransactionType> MIN_HOUR_TYPES = new HashSet<>(Arrays.asList(APP, RTP, MIN));
+    protected static final Set<TransactionType> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
+    protected static final Set<TransactionType> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
+
+    protected static final Set<TransactionType> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
+    protected static final Set<TransactionType> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
+    protected static final Set<TransactionType> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     /** --- SQL Queries --- */
 
-    protected static String LATEST_USAGE_SUMS =
+    protected static final String LATEST_USAGE_SUMS =
         "SELECT \n" +
         "    MAX(DTBEGIN) AS LATEST_DTBEGIN, MAX(DTEND) AS LATEST_DTEND, " +
         "    SUM(NUWORKHRS) AS WORK_HRS, SUM(NUTRVHRS) AS TRV_HRS_USED, SUM(NUHOLHRS) AS HOL_HRS_USED, \n" +
@@ -71,10 +77,10 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         "WHERE NUXREFEM = :empId AND CDSTATUS = 'A'\n" +
         "AND DTBEGIN >= :startDate";
 
-    protected static String GET_ANNUAL_ACCRUAL_SUMMARIES_SQL =
+    protected static final String GET_ANNUAL_ACCRUAL_SUMMARIES_SQL =
         "SELECT \n" +
-        "    NUXREFEM, DTPERIODYEAR AS YEAR, DTCLOSE AS CLOSE_DATE, DTPERLSTPOST DTEND, " +
-        "    NUWORKHRSTOT AS WORK_HRS, NUTRVHRSTOT AS TRV_HRS_USED, \n" +
+        "    NUXREFEM, DTPERIODYEAR AS YEAR, DTCLOSE AS CLOSE_DATE, DTPERLSTPOST AS DTEND, " +
+        "    DTCONTSERV AS CONT_SERVICE_DATE, NUWORKHRSTOT AS WORK_HRS, NUTRVHRSTOT AS TRV_HRS_USED, \n" +
         "    NUVACHRSTOT AS VAC_HRS_USED, NUVACHRSYTD AS VAC_HRS_ACCRUED, NUVACHRSBSD AS VAC_HRS_BANKED,\n" +
         "    NUPERHRSTOT AS PER_HRS_USED, NUPERHRSYTD AS PER_HRS_ACCRUED,\n" +
         "    NUEMPHRSTOT AS EMP_HRS_USED, NUFAMHRSTOT AS FAM_HRS_USED, NUEMPHRSYTD AS EMP_HRS_ACCRUED, \n" +
@@ -82,7 +88,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         "    NUPAYCTRYTD AS PAY_PERIODS_YTD, NUPAYCTRBSD AS PAY_PERIODS_BANKED\n" +
         "FROM PM23ATTEND WHERE NUXREFEM = :empId AND DTPERIODYEAR <= :endYear";
 
-    protected static String GET_PERIOD_ACCRUAL_SUMMARY_SQL =
+    protected static final String GET_PERIOD_ACCRUAL_SUMMARY_SQL =
         "SELECT \n" +
         "    NUXREFEM, acc.DTPERIODYEAR AS YEAR, NUTOTHRSLAST AS PREV_TOTAL_HRS," +
         "    NUHRSEXPECT AS EXPECTED_TOTAL_HRS, NUVACHRSUSE AS VAC_HRS_USED, NUPERHRSUSE AS PER_HRS_USED, " +
@@ -97,7 +103,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         "WHERE acc.NUXREFEM = :empId AND acc.DTPERIODYEAR >= :prevYear AND acc.DTEND < :beforeDate\n" +
         "ORDER BY acc.DTEND DESC";
 
-    protected static String GET_PERIOD_ACCRUAL_USAGE_SQL =
+    protected static final String GET_PERIOD_ACCRUAL_USAGE_SQL =
         "SELECT \n" +
         "    NUXREFEM, NUWORKHRS AS WORK_HRS, NUTRVHRS AS TRV_HRS_USED, NUHOLHRS AS HOL_HRS_USED, NUPERHRS AS PER_HRS_USED,\n" +
         "    NUEMPHRS AS EMP_HRS_USED, NUFAMHRS AS FAM_HRS_USED, NUVACHRS AS VAC_HRS_USED,\n" +
@@ -122,7 +128,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
         Date startDate = payPeriod.getStartDate();
         Date endDate = payPeriod.getEndDate();
-        int year = new DateTime(endDate).getYear();
+        int year = new LocalDate(endDate).getYear();
 
         Map<Integer, AnnualAccrualSummary> annualSummaries = getAnnualAccrualSummaries(empId, year);
         LinkedList<PeriodAccrualSummary> periodSummaries = getPeriodAccrualSummaries(empId, year, startDate);
@@ -143,167 +149,165 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
                                                    LinkedList<PeriodAccrualSummary> periodSummaries) throws AccrualException {
 
         Date payPeriodEndDate = payPeriod.getEndDate();
-        int year = new DateTime(payPeriodEndDate).getYear();
+        Date prevPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
+        int year = new LocalDate(payPeriodEndDate).getYear();
 
+        /** We first check to see if there is a period summary for the previous pay period. If it's available
+         *  then we can simply return the summary and we're done. */
         PeriodAccrualSummary latestPeriodSum = periodSummaries.poll();
         if (periodSummaryIsCurrent(latestPeriodSum, payPeriod)) {
             latestPeriodSum.setPayPeriod(payPeriod);
             //return latestPeriodSum;
         }
 
-        AnnualAccrualSummary activeAnnualSummary = getActiveAnnualSummaryInList(annualSummaries, payPeriodEndDate);
+        logger.debug("Period Accrual Summary not found for empId: {} and end date: {}", empId, prevPeriodEndDate);
 
-        Date gapStartDate = new DateTime(activeAnnualSummary.getEndDate()).plusDays(1).toDate();
-        Date gapEndDate = new DateTime(payPeriod.getStartDate()).minusDays(1).toDate();
+        /** Since we didn't have a matching period summary record, the accruals must be rebuilt up to the given
+         *  pay period. We look for an annual summary record because those have counts of how many pay periods
+         *  were worked and are initially created by personnel. */
+        AnnualAccrualSummary activeAnnualSummary = getActiveAnnualSummaryFromList(annualSummaries, payPeriodEndDate);
 
-        TransactionHistory transHistDuringGap = getAccrualRelatedTransactions(empId, gapStartDate, gapEndDate);
-        LinkedList<TransactionRecord> transRecsDuringGap = transHistDuringGap.getAllTransRecords(true);
-        LinkedList<PeriodAccrualUsage> periodUsageRecs = getPeriodAccrualUsageRecords(empId, gapStartDate, gapEndDate);
-
-        PayType basePayType = getLatestPayTypeForEmp(empId, activeAnnualSummary.getEndDate());
-        BigDecimal baseMinHours = getLatestMinHoursForEmp(empId, activeAnnualSummary.getEndDate());
-
-        logger.debug("!! Period Accrual Summary : {}", OutputUtils.toJson(latestPeriodSum));
-        logger.debug("!! Annual Accrual Summary : {}", OutputUtils.toJson(activeAnnualSummary));
-        logger.debug("!! Period Accrual Usage: {}", OutputUtils.toJson(periodUsageRecs));
-        logger.debug("!! Base Pay Type: {}", basePayType);
-        logger.debug("!! Base Min Hours: {}", baseMinHours);
-        logger.debug("!! Pay Ctr as of {}: {}", activeAnnualSummary.getEndDate(), activeAnnualSummary.getPayPeriodsBanked());
-
-        List<PayPeriod> gapPeriods = payPeriodDao.getPayPeriods(PayPeriodType.AF, gapStartDate, gapEndDate, true);
-        Iterator<PayPeriod> gapPeriodIterator = gapPeriods.iterator();
-
-        int payPeriodCounter = activeAnnualSummary.getPayPeriodsBanked();
-        BigDecimal proratePercentage = baseMinHours.divide(new BigDecimal(1820));
-        BigDecimal vacAccRate = AccrualRate.VACATION.getRate(payPeriodCounter, proratePercentage);
-        BigDecimal sickAccRate = AccrualRate.SICK.getRate(payPeriodCounter, proratePercentage);
-        BigDecimal sickAccrued = BigDecimal.ZERO;
-        BigDecimal vacAccrued = BigDecimal.ZERO;
-
-        Date minHourEffectDate = activeAnnualSummary.getEndDate();
-        BigDecimal minHours = baseMinHours;
-
-        TransactionRecord gapTransRecord = transRecsDuringGap.poll();
-        PeriodAccrualUsage periodUsageRec = periodUsageRecs.poll();
-        while (gapPeriodIterator.hasNext()) {
-            PayPeriod gapPeriod = gapPeriodIterator.next();
-            logger.debug("Iterating pay period: {}", OutputUtils.toJson(gapPeriod));
-
-            while (gapTransRecord != null && gapTransRecord.getEffectDate().compareTo(gapPeriod.getEndDate()) <= 0) {
-                if (MIN_HOUR_TYPES.contains(gapTransRecord.getTransType())) {
-                    if (gapTransRecord.hasNonNullValue("NUMINTOTHRS")) {
-                        minHourEffectDate = gapTransRecord.getEffectDate();
-                        minHours = new BigDecimal(gapTransRecord.getValue("NUMINTOTHRS"));
-                        logger.debug("!! Found new min hour type during {}: setting to: {}", minHourEffectDate, minHours);
-                    }
-                }
-                gapTransRecord = transRecsDuringGap.poll();
-            }
-
-
-            if (periodUsageRec != null) {
-                if (gapPeriod.equals(periodUsageRec.getPayPeriod())) {
-                    logger.debug("Found usage rec!");
-                    periodUsageRec = periodUsageRecs.poll();
-                }
-            }
-
-            payPeriodCounter++;
-            proratePercentage = minHours.divide(new BigDecimal(1820));
-            vacAccRate = AccrualRate.VACATION.getRate(payPeriodCounter, proratePercentage);
-            sickAccRate = AccrualRate.SICK.getRate(payPeriodCounter, proratePercentage);
-
-            logger.debug("Prorate percentage: {} Curr Vac rate {} Curr Sick Rate {}", proratePercentage, vacAccRate, sickAccRate);
-
-            sickAccrued = sickAccrued.add(sickAccRate);
-            vacAccrued = vacAccrued.add(vacAccRate);
-
-            logger.debug("Pay periods worked {} Vac accrued: {} Sick accrued {}", payPeriodCounter, vacAccrued, sickAccrued);
-
+        /** If there are no annual summary records to work with we don't have enough information to reliably
+         *  construct a period accrual summary. We can throw an error instead. */
+        if (activeAnnualSummary == null) {
+            logger.warn("Annual Accrual Summary could not be found for any given year for empId: {}", empId);
+            throw new AccrualException(empId, AccrualExceptionType.NO_ACTIVE_ANNUAL_RECORD_FOUND);
         }
 
-        /*if (activeAccSum != null) {
-            logger.debug("Base record date: {} type: {}", activeAccEndDate, activeAccSum.getClass());
-            HashSet<TransactionType> types = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
+        //Date activeAnnualStartDate = new LocalDate(activeAnnualSummary.getYear(), 1, 1).toDate();
+        Date activeAnnualEndDate = activeAnnualSummary.getEndDate();
 
-            if (annualAccSum != null) {
-                int payPeriodsWorked = annualAccSum.getPayPeriodsBanked();
-                DateTime startFrom = new DateTime(annualAccSum.getEndDate()).plusDays(1);
-                TransactionHistory transHist = empTransactionDao.getTransHistory(empId, types, annualAccSum.getEndDate());
-                PayType basePayType = null;
-                int baseMinHours;
-                LinkedList<TransactionRecord> payRecs = transHist.getAllTransRecords(PAY_CODE_TYPES, false);
-                basePayType = PayType.valueOf(payRecs.getFirst().getValueMap().get("CDPAYTYPE"));
-                LinkedList<TransactionRecord> minHrsRecs = transHist.getAllTransRecords(MIN_HOUR_TYPES, false);
-                baseMinHours = Integer.parseInt(minHrsRecs.getFirst().getValueMap().get("NUMINTOTHRS"));
-                logger.info("Base pay type: {} min hours {} pay periods worked {}", basePayType, baseMinHours, payPeriodsWorked);
+        /** The annual summary will likely not be current if the period summary wasn't, but check anyways. */
+        if (annualSummaryIsCurrent(activeAnnualSummary, payPeriod)) {
+            logger.debug("Annual Accrual Summary is current, yet the Period Summary is not.");
+            // calculate expected hours and return
+            return null;
+        }
 
-                TransactionHistory betweenHist = empTransactionDao.getTransHistory(empId, types, startFrom.toDate(), endDate);
-                LinkedList<TransactionRecord> betweenRecs = betweenHist.getAllTransRecords(true);
-                logger.info("Between recs: {}", OutputUtils.toJson(betweenRecs));
+        /** A missing end date from the annual summary indicates that no pay periods have been processed for
+         *  the summary. This usually occurs for (re)appointed employee's, temps, and those on unpaid leave. */
+        if (activeAnnualSummary.getEndDate() == null) {
+            activeAnnualEndDate = getActiveDateForSummaryMissingEndDate(empId, payPeriodEndDate, activeAnnualSummary);
+            if (activeAnnualEndDate == null) {
+            //    activeAnnualStartDate = new LocalDate(activeAnnualSummary.getYear() - 1, 1, 1).toDate();
+                activeAnnualEndDate = new LocalDate(activeAnnualSummary.getYear() - 1, 12, 31).toDate();
+            }
+            logger.debug("Setting annual summary end date to {}", activeAnnualEndDate);
+        }
 
-                TreeMap<Date, PayType> payTypeChanges = new TreeMap<>();
-                TreeMap<Date, Integer> minHourChanges = new TreeMap<>();
+        /** Get the transactions that occurred before/on the end date of the annual summary. */
+        TransactionHistory historyBeforeSummary = getAccrualTransactions(empId, getBeginningOfTime(), activeAnnualEndDate);
 
-                for (TransactionRecord rec : betweenRecs) {
-                    if (PAY_CODE_TYPES.contains(rec.getTransType()) && rec.getValue("CDPAYTYPE") != null) {
-                        payTypeChanges.put(rec.getEffectDate(), PayType.valueOf(rec.getValue("CDPAYTYPE")));
-                    }
-                    else if (MIN_HOUR_TYPES.contains(rec.getTransType()) && rec.getValue("NUMINTOTHRS") != null) {
-                        minHourChanges.put(rec.getEffectDate(), Integer.parseInt(rec.getValue("NUMINTOTHRS")));
-                    }
-                }
+        /** Establish the initial state based on the transaction records. */
+        AccrualState accrualState = getInitialAccrualState(activeAnnualSummary, activeAnnualEndDate, historyBeforeSummary);
 
-                logger.debug("pay type changes: {}", OutputUtils.toJson(payTypeChanges));
-                logger.debug("min hour changes: {}", OutputUtils.toJson(minHourChanges));
+        logger.debug("Initial accrual state: {}", OutputUtils.toJson(accrualState));
 
-                LinkedList<PeriodAccrualUsage> accUsageRecords = getPeriodAccrualUsageRecords(empId, startFrom.toDate(), endDate);
-                logger.debug("!! Period acc usage recs: {}", OutputUtils.toJson(accUsageRecords));
+        /** The gap is the date range for which we want to compute accruals for as well as determine how many
+         *  hours were used (period usage records from PD23ATTEND or the local time sheet database. */
+        Date gapStartDate = new LocalDate(activeAnnualEndDate).plusDays(1).toDate();
+        Date gapEndDate = prevPeriodEndDate;
+        AccrualGap accrualGap = new AccrualGap(empId, gapStartDate, gapEndDate);
 
-                if (!accUsageRecords.isEmpty()) {
-                    DateTime lastAnnualSumDate = new DateTime(annualAccSum.getEndDate());
-                    DateTime firstPeriodUsageDate = new DateTime(accUsageRecords.getFirst().getPayPeriod().getStartDate());
-                    Duration yearAfter = new Duration(lastAnnualSumDate, lastAnnualSumDate.plusYears(1));
-                    Duration timeBetween = new Duration(lastAnnualSumDate, firstPeriodUsageDate);
-                    if (timeBetween.isLongerThan(yearAfter)) {
-                        payPeriodsWorked = 0;
-                    }
-                }
+        logger.debug("Determining accruals between {} and {}", gapStartDate, gapEndDate);
 
-                boolean isSplit = false;
-                for (PeriodAccrualUsage accUsage : accUsageRecords) {
-                    logger.debug("!! Period acc usage rec for date {}: {}", accUsage.getPayPeriod().getEndDate(), accUsage);
-                    PayPeriod period = accUsage.getPayPeriod();
-                    if (period.getNumDays() == 14) {
-                        payPeriodsWorked++;
-                    }
-                    else {
-                        if (isSplit) {
-                            isSplit = false;
-                        }
-                        else {
-                            isSplit = true;
-                        }
-                    }
+        TransactionHistory historyDuringGap = getAccrualTransactions(empId, accrualGap.getStartDate(), accrualGap.getEndDate());
+        accrualGap.setGapPeriods(payPeriodDao.getPayPeriods(PayPeriodType.AF, gapStartDate, gapEndDate, true));
+        accrualGap.setRecordsDuringGap(historyDuringGap.getAllTransRecords(false));
+        accrualGap.setPeriodUsageRecs(getPeriodAccrualUsageRecords(empId, gapStartDate, gapEndDate));
+
+        Iterator<PayPeriod> gapPeriodIterator = accrualGap.getGapPeriods().iterator();
+
+        AccrualUsage usageDuringGap = new AccrualUsage();
+        while (gapPeriodIterator.hasNext()) {
+            PayPeriod gapPeriod = gapPeriodIterator.next();
+
+            /** Look through the transactions that occur before or on the end date of the pay period */
+            LinkedList<TransactionRecord> recordsInPeriod = accrualGap.getTransRecsDuringPeriod(gapPeriod);
+
+            /** Also check if any usage records (PD23ATTEND) exist for the current gap period */
+            PeriodAccrualUsage periodUsage = accrualGap.getUsageRecDuringPeriod(gapPeriod);
+
+            /** If the employee is set as terminated we want to skip accruals until they are reappointed */
+            if (accrualState.isTerminated()) {
+                if (!isEmployeeAppointed(recordsInPeriod)) {
+                    continue;
                 }
             }
-        }  */
-        return null;
 
+            if (isEmployeeAppointed(recordsInPeriod)) {
+                logger.debug("Employee has been (re)appointed this period.");
+            }
+
+            /** If the year has rolled over, reset the accrual state. */
+            if (new LocalDate(accrualState.getEndDate()).getYear() != new LocalDate(gapPeriod.getEndDate()).getYear()) {
+                accrualState.applyYearRollover();
+            }
+
+            logger.debug("Computing accruals for pay period: {}", gapPeriod);
+
+            BigDecimal minTotalHours = getMinTotalHours(recordsInPeriod);
+            BigDecimal minEndHours = getMinEndHours(recordsInPeriod);
+            PayType payType = getPayType(recordsInPeriod);
+            accrualState.setTerminated(isEmployeeTerminated(recordsInPeriod));
+
+            if (minTotalHours != null) {
+                accrualState.setMinTotalHours(minTotalHours);
+            }
+            if (minEndHours != null) {
+                accrualState.setMinHoursToEnd(minEndHours);
+            }
+            if (payType != null) {
+                accrualState.setPayType(payType);
+            }
+
+            accrualState.setEndDate(gapPeriod.getEndDate());
+            accrualState.setPeriodCounter(accrualState.getPeriodCounter() + 1);
+
+            accrualState.setVacRate(AccrualRate.VACATION.getRate(accrualState.getPeriodCounter(), accrualState.getProratePercentage()));
+            accrualState.setSickRate(AccrualRate.SICK.getRate(accrualState.getPeriodCounter(), accrualState.getProratePercentage()));
+            accrualState.incrementAccrualsEarned();
+
+            if (periodUsage != null) {
+                accrualState.applyUsage(periodUsage);
+            }
+
+            logger.debug("Current accrual state: {}", OutputUtils.toJson(accrualState));
+        }
+
+        return null;
+    }
+
+    protected AccrualState getInitialAccrualState(AnnualAccrualSummary annSummary, Date endDate, TransactionHistory transHistory)
+              throws AccrualException {
+        LinkedList<TransactionRecord> empRecords = getEmpRecordsFromHistory(transHistory, false);
+        LinkedList<TransactionRecord> minRecords = getMinRecordsFromHistory(transHistory, false);
+        LinkedList<TransactionRecord> payTypeRecords = getPayTypeRecordsFromHistory(transHistory, false);
+
+        AccrualState accState = new AccrualState(annSummary);
+        accState.setEndDate(endDate);
+        accState.setPeriodCounter(annSummary.getPayPeriodsBanked());
+        accState.setTerminated(isEmployeeTerminated(empRecords));
+        accState.setPayType(getPayType(payTypeRecords));
+        accState.setMinTotalHours(getMinTotalHours(minRecords));
+        accState.setMinHoursToEnd(getMinEndHours(minRecords));
+
+        /** TODO: Throw errors if null */
+
+        return accState;
     }
 
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
-     * This is because
      */
-    private AnnualAccrualSummary getActiveAnnualSummaryInList(Map<Integer, AnnualAccrualSummary> annualSummaries,
-                                                              Date payPeriodEndDate) {
+    private AnnualAccrualSummary getActiveAnnualSummaryFromList(Map<Integer, AnnualAccrualSummary> annualSummaries,
+                                                                Date payPeriodEndDate) {
         AnnualAccrualSummary annualAccSum = null;
         if (!annualSummaries.isEmpty()) {
             Iterator<Integer> yearIterator = new TreeSet<>(annualSummaries.keySet()).descendingIterator();
             while (yearIterator.hasNext()) {
                 annualAccSum = annualSummaries.get(yearIterator.next());
-                if (annualAccSum.getEndDate().before(payPeriodEndDate)) {
+                if (annualAccSum.getEndDate() == null || annualAccSum.getEndDate().before(payPeriodEndDate)) {
                     break;
                 }
             }
@@ -312,54 +316,145 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     }
 
     /**
-     * Checks if the period summary record has all the current information for the given pay period.
+     * Get the end date of the previous pay period. Assumes pay period is contiguous.
+     */
+    private Date getPrevPayPeriodEndDate(PayPeriod payPeriod) {
+        return new LocalDate(payPeriod.getStartDate()).minusDays(1).toDate();
+    }
+
+    /**
+     * Checks if the period summary record has an end date that matches the period preceding the
+     * given 'payPeriod'. This indicates it's current because since accruals are applied after a
+     * period elapses and a summary record represents the state of a period after it's elapsed, a
+     * pay period's available hours is essentially determined from the previous pay period's totals.
      */
     private boolean periodSummaryIsCurrent(PeriodAccrualSummary periodSummary, PayPeriod payPeriod) {
-        Date prevPayPeriodEndDate = new DateTime(payPeriod.getStartDate()).minusDays(1).toDate();
+        Date prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
         return (periodSummary != null && periodSummary.getEndDate().compareTo(prevPayPeriodEndDate) == 0);
+    }
+
+    /**
+     * Similar to 'periodSummaryIsCurrent' but for annual accrual summary.
+     */
+    private boolean annualSummaryIsCurrent(AnnualAccrualSummary annualSummary, PayPeriod payPeriod) {
+        //logger.debug(OutputUtils.toJson(annualSummary));
+        Date prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
+        return (annualSummary != null && annualSummary.getEndDate() != null &&
+                annualSummary.getEndDate().compareTo(prevPayPeriodEndDate) == 0);
     }
 
     /**
      * Get a TransactionHistory for an employee that contains any transactions relevant to accrual
      * processing logic.
      */
-    private TransactionHistory getAccrualRelatedTransactions(int empId, Date startDate, Date endDate) {
+    private TransactionHistory getAccrualTransactions(int empId, Date startDate, Date endDate) {
         Set<TransactionType> types = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
         return empTransactionDao.getTransHistory(empId, types, startDate, endDate);
     }
 
     /**
-     * Looks up the employee's pay type before or on 'latestDate'.
+     * Attempts to handle the most likely cases when the end date is missing from the annual accrual summary.
+     *
      */
-    private PayType getLatestPayTypeForEmp(int empId, Date latestDate) throws AccrualException {
-        Set<TransactionType> type = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
-        TransactionHistory transHist = empTransactionDao.getTransHistory(empId, type, latestDate);
-        LinkedList<TransactionRecord> recs = transHist.getAllTransRecords(false);
-        while (transHist.hasRecords()) {
-            TransactionRecord rec = recs.poll();
-            if (rec.getValue("CDPAYTYPE") != null) {
-                return PayType.valueOf(rec.getValue("CDPAYTYPE"));
+    private Date getActiveDateForSummaryMissingEndDate(int empId, Date payPeriodEndDate, AnnualAccrualSummary activeAnnualSummary)
+                                                       throws AccrualException {
+        Date startOfSummaryYear = new LocalDate(activeAnnualSummary.getYear(), 1, 1).toDate();
+        TransactionHistory historyDuringYear = getAccrualTransactions(empId, startOfSummaryYear, payPeriodEndDate);
+        TransactionRecord rec = historyDuringYear.getTransRecords(APP_RTP_TYPES, false).getFirst();
+        if (rec != null) {
+            try {
+                PayPeriod appointedPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, rec.getEffectDate());
+                return getPrevPayPeriodEndDate(appointedPeriod);
+            }
+            catch (PayPeriodException ex) {
+                logger.warn("Pay period during {} could not be found.", rec.getEffectDate());
             }
         }
-        throw new AccrualException("Employee " + empId + " has no transactions that indicate their pay type " +
-                                   "before or on " + latestDate);
+        return null;
     }
 
     /**
-     * Looks up the employee's min hours before or on 'latestDate'.
+     * Returns true if the first item in the list of trans records indicates that the employee was terminated.
      */
-    private BigDecimal getLatestMinHoursForEmp(int empId, Date latestDate) throws AccrualException {
-        Set<TransactionType> type = new LinkedHashSet<>(Arrays.asList(MIN, RTP, APP));
-        TransactionHistory transHist = empTransactionDao.getTransHistory(empId, type, latestDate);
-        LinkedList<TransactionRecord> recs = transHist.getAllTransRecords(false);
-        while (!recs.isEmpty()) {
-            TransactionRecord rec = recs.poll();
-            if (rec.getValue("NUMINTOTHRS") != null) {
+    private boolean isEmployeeTerminated(LinkedList<TransactionRecord> empRecords) {
+        for (TransactionRecord rec : empRecords) {
+            if (APP_RTP_TYPES.contains(rec.getTransType())) {
+                return false;
+            }
+            else if (EMP_TYPE.contains(rec.getTransType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEmployeeAppointed(LinkedList<TransactionRecord> empRecords) {
+        for (TransactionRecord rec : empRecords) {
+            if (APP_RTP_TYPES.contains(rec.getTransType())) {
+                return true;
+            }
+            else if (EMP_TYPE.contains(rec.getTransType())) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Looks up the first non null min pay type value in the given list of trans recs.
+     * Returns null if nothing found.
+     */
+    private PayType getPayType(LinkedList<TransactionRecord> payTypeRecs) throws AccrualException {
+        for (TransactionRecord rec : payTypeRecs) {
+            if (PAY_TYPES.contains(rec.getTransType()) && rec.hasNonNullValue("CDPAYTYPE")) {
+                return PayType.valueOf(rec.getValue("CDPAYTYPE"));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Looks up the first non null min hours value in the given list of trans recs.
+     * Returns null if nothing found.
+     */
+    private BigDecimal getMinTotalHours(LinkedList<TransactionRecord> minHourRecs) {
+        for (TransactionRecord rec : minHourRecs) {
+            if (MIN_TYPES.contains(rec.getTransType()) && rec.getValue("NUMINTOTHRS") != null) {
                 return new BigDecimal(rec.getValue("NUMINTOTHRS"));
             }
         }
-        throw new AccrualException("Employee " + empId + " has no transactions that indicate their minimum hours " +
-                                   "before or on " + latestDate);
+        return null;
+    }
+
+    /**
+     * Looks up the first non null 'min hours until end of year' value in the given list of trans recs.
+     * Retursn null if nothing found.
+     */
+    private BigDecimal getMinEndHours(LinkedList<TransactionRecord> minHourRecs) throws AccrualException {
+        for (TransactionRecord rec : minHourRecs) {
+            if (MIN_TYPES.contains(rec.getTransType()) && rec.getValue("NUMINTOTEND") != null) {
+                return new BigDecimal(rec.getValue("NUMINTOTEND"));
+            }
+        }
+        return null;
+    }
+
+    /** Returns a list of just min type transactions from the given history */
+    private LinkedList<TransactionRecord> getMinRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
+        Set<TransactionType> types = new LinkedHashSet<>(Arrays.asList(MIN, RTP, APP));
+        return transHistory.getTransRecords(types, orderByAsc);
+    }
+
+    /** Returns a list of just employee status transactions from the given history */
+    private LinkedList<TransactionRecord> getEmpRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
+        Set<TransactionType> types = new LinkedHashSet<>(Arrays.asList(RTP, EMP, APP));
+        return transHistory.getTransRecords(types, orderByAsc);
+    }
+
+    /** Returns a list of just pay type transactions from the given history */
+    private LinkedList<TransactionRecord> getPayTypeRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
+        Set<TransactionType> types = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
+        return transHistory.getTransRecords(types, orderByAsc);
     }
 
     /** --- Data Retrieval Methods -- */
@@ -437,7 +532,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     protected AnnualAccrualUsage getLatestAccUsageForYear(int empId, int year) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
-        params.addValue("startDate", new DateTime(year, 1, 1, 0, 0, 0).toDate());
+        params.addValue("startDate", new LocalDate(year, 1, 1).toDate());
         AnnualAccrualUsage annAccUsage = null;
         try {
             annAccUsage = remoteNamedJdbc.queryForObject(LATEST_USAGE_SUMS, params, new AnnualAccrualUsageRowMapper());

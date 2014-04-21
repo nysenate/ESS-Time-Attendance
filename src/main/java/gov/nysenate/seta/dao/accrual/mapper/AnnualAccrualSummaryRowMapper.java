@@ -14,6 +14,7 @@ public class AnnualAccrualSummaryRowMapper implements RowMapper<AnnualAccrualSum
         annAccRec.setYear(rs.getInt("YEAR"));
         annAccRec.setCloseDate(rs.getDate("CLOSE_DATE"));
         annAccRec.setEndDate(rs.getDate("DTEND"));
+        annAccRec.setContServiceDate(rs.getDate("CONT_SERVICE_DATE"));
         annAccRec.setPayPeriodsYtd(rs.getInt("PAY_PERIODS_YTD"));
         annAccRec.setPayPeriodsBanked(rs.getInt("PAY_PERIODS_BANKED"));
         AccrualSummaryRowMapper.mapRow(rs, annAccRec);

@@ -2,20 +2,20 @@ package gov.nysenate.seta.model.accrual;
 
 public class AccrualException extends Exception
 {
-    protected AccrualType accrualType;
+    protected int empId;
+    protected AccrualExceptionType errorType;
 
-    public AccrualException(){}
-
-    public AccrualException(AccrualType accrualType) {
-        this.accrualType = accrualType;
+    public AccrualException(int empId, AccrualExceptionType errorType) {
+        super(errorType.message);
+        this.errorType = errorType;
+        this.empId = empId;
     }
 
-    public AccrualException(String message) {
-        super(message);
+    public int getEmpId() {
+        return empId;
     }
 
-    public AccrualException(String message, Throwable cause) {
-        super(message, cause);
+    public AccrualExceptionType getErrorType() {
+        return errorType;
     }
-
 }

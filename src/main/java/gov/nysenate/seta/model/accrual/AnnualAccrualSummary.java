@@ -10,6 +10,7 @@ public class AnnualAccrualSummary extends AccrualSummary
     int year;
     Date endDate;
     Date closeDate;
+    Date contServiceDate;
     int payPeriodsYtd;
     int payPeriodsBanked;
 
@@ -37,6 +38,14 @@ public class AnnualAccrualSummary extends AccrualSummary
 
     public void setCloseDate(Date closeDate) {
         this.closeDate = closeDate;
+    }
+
+    public Date getContServiceDate() {
+        return contServiceDate;
+    }
+
+    public void setContServiceDate(Date contServiceDate) {
+        this.contServiceDate = contServiceDate;
     }
 
     public int getPayPeriodsYtd() {
