@@ -20,6 +20,7 @@ public class AccrualState extends AccrualSummary
     protected BigDecimal minHoursToEnd;
     protected BigDecimal sickRate;
     protected BigDecimal vacRate;
+    protected BigDecimal ytdHoursExpected;
     int periodCounter = 0;
 
     public AccrualState(AccrualSummary summary) {
@@ -40,6 +41,15 @@ public class AccrualState extends AccrualSummary
     public void incrementAccrualsEarned() {
         this.setVacHoursAccrued(this.getVacHoursAccrued().add(this.vacRate));
         this.setEmpHoursAccrued(this.getEmpHoursAccrued().add(this.sickRate));
+    }
+
+    public void incrementYtdHoursExpected(BigDecimal expectedDaysInPeriod, BigDecimal totalDaysInPeriod) {
+        BigDecimal daysPercentage = expectedDaysInPeriod.divide(totalDaysInPeriod);
+        BigDecimal hoursExpectedInPeriod = getProratePercentage().multiply(new BigDecimal(70)).multiply(daysPercentage);
+        if (ytdHoursExpected == null) {
+            throw new IllegalStateException("YtdHoursExpected needs to be initialized before incrementing it.");
+        }
+        this.setYtdHoursExpected(this.getYtdHoursExpected().add(hoursExpectedInPeriod));
     }
 
     public void applyYearRollover() {
@@ -134,5 +144,13 @@ public class AccrualState extends AccrualSummary
 
     public void setPeriodCounter(int periodCounter) {
         this.periodCounter = periodCounter;
+    }
+
+    public BigDecimal getYtdHoursExpected() {
+        return ytdHoursExpected;
+    }
+
+    public void setYtdHoursExpected(BigDecimal ytdHoursExpected) {
+        this.ytdHoursExpected = ytdHoursExpected;
     }
 }
