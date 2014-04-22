@@ -8,6 +8,9 @@ import java.math.BigDecimal;
  */
 public class AccrualSummary extends AccrualUsage
 {
+    protected static final BigDecimal MAX_VAC_ACCRUED = new BigDecimal(210);
+    protected static final BigDecimal MAX_EMP_ACCRUED = new BigDecimal(1400);
+
     BigDecimal vacHoursAccrued;
     BigDecimal vacHoursBanked;
     BigDecimal perHoursAccrued;
@@ -19,7 +22,7 @@ public class AccrualSummary extends AccrualUsage
     /** --- Functional Getters/Setters --- */
 
     public BigDecimal getVacHoursRemaining() {
-        return vacHoursBanked.add(vacHoursAccrued).subtract(vacHoursUsed);
+        return getTotalVacHoursAccrued().subtract(vacHoursUsed);
     }
 
     public BigDecimal getPerHoursRemaining() {
@@ -27,7 +30,17 @@ public class AccrualSummary extends AccrualUsage
     }
 
     public BigDecimal getEmpHoursRemaining() {
-        return empHoursBanked.add(empHoursAccrued).subtract(empHoursUsed).subtract(famHoursUsed);
+        return getTotalEmpHoursAccrued().subtract(empHoursUsed).subtract(famHoursUsed);
+    }
+
+    public BigDecimal getTotalVacHoursAccrued() {
+        BigDecimal hrs = vacHoursBanked.add(vacHoursAccrued);
+        return (hrs.compareTo(MAX_VAC_ACCRUED) <= 0) ? hrs : MAX_VAC_ACCRUED;
+    }
+
+    public BigDecimal getTotalEmpHoursAccrued() {
+        BigDecimal hrs = empHoursBanked.add(empHoursAccrued);
+        return (hrs.compareTo(MAX_EMP_ACCRUED) <= 0) ? hrs : MAX_EMP_ACCRUED;
     }
 
     /** --- Copy Constructor --- */

@@ -3,6 +3,7 @@ package gov.nysenate.seta.model.accrual;
 import gov.nysenate.seta.model.payroll.PayType;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
 public class AccrualState extends AccrualSummary
 {
     protected Date endDate;
-    protected boolean isTerminated;
+    protected boolean employeeActive;
     protected PayType payType;
     protected BigDecimal minTotalHours;
     protected BigDecimal minHoursToEnd;
@@ -27,9 +28,11 @@ public class AccrualState extends AccrualSummary
 
     /** --- Functional Getters/Setters --- */
 
+    private static MathContext FOUR_DIGITS_MAX = new MathContext(4);
+
     public BigDecimal getProratePercentage() {
         if (this.minTotalHours != null) {
-            return this.minTotalHours.divide(new BigDecimal(1820));
+            return this.minTotalHours.divide(new BigDecimal(1820), FOUR_DIGITS_MAX);
         }
         return BigDecimal.ZERO;
     }
@@ -77,12 +80,12 @@ public class AccrualState extends AccrualSummary
         this.endDate = endDate;
     }
 
-    public boolean isTerminated() {
-        return isTerminated;
+    public boolean isEmployeeActive() {
+        return employeeActive;
     }
 
-    public void setTerminated(boolean isTerminated) {
-        this.isTerminated = isTerminated;
+    public void setEmployeeActive(boolean isTerminated) {
+        this.employeeActive = isTerminated;
     }
 
     public PayType getPayType() {

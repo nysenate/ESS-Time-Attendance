@@ -34,6 +34,10 @@ public class PeriodAccrualSummary extends AccrualSummary
 
     public PeriodAccrualSummary() {}
 
+    public PeriodAccrualSummary(AccrualSummary summary) {
+        super(summary);
+    }
+
     /** --- Functional Getters/Setters --- */
 
     public Date getEndDate() {
