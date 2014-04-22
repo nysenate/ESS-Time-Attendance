@@ -7,7 +7,7 @@ import java.math.MathContext;
 import java.util.Date;
 
 /**
- * This class was intended for use within the accrual dao layer. It contains the necessary information
+ * This class is intended for use within the accrual dao layer. It contains the necessary information
  * needed to compute accruals for a given pay period and provides methods to transfer data to/from other
  * accrual related classes.
  */

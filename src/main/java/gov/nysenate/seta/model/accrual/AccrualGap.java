@@ -7,6 +7,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class is intended to be used within the accrual dao layer. It's purpose is to hold relevant data
+ * when computing accruals for a time period in which summary records in the database don't exist.
+ */
 public class AccrualGap
 {
     protected int empId;
@@ -25,6 +29,10 @@ public class AccrualGap
 
     /** --- Functional Getters/Setters --- */
 
+    /**
+     * Filter transaction records such that only those that occur in the given pay period will be
+     * returned. The order is maintained.
+     */
     public LinkedList<TransactionRecord> getTransRecsDuringPeriod(PayPeriod payPeriod) {
         LinkedList<TransactionRecord> recs = new LinkedList<>();
         for (TransactionRecord rec : recordsDuringGap) {
@@ -39,6 +47,10 @@ public class AccrualGap
         return recs;
     }
 
+    /**
+     * Filters the usage record list such that either the ones that occur in the given pay period
+     * are returned or else null is returned.
+     */
     public PeriodAccrualUsage getUsageRecDuringPeriod(PayPeriod payPeriod) {
         for (PeriodAccrualUsage rec : periodUsageRecs) {
             if (rec.getPayPeriod().equals(payPeriod)) {

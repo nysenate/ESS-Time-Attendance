@@ -1,7 +1,6 @@
 package gov.nysenate.seta.dao.accrual;
 
 import gov.nysenate.seta.dao.accrual.mapper.AnnualAccrualSummaryRowMapper;
-import gov.nysenate.seta.dao.accrual.mapper.AnnualAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.attendance.TimeEntryDao;
@@ -10,7 +9,6 @@ import gov.nysenate.seta.dao.payroll.HolidayDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.personnel.EmployeeTransactionDao;
 import gov.nysenate.seta.model.accrual.*;
-import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
@@ -22,7 +20,6 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
@@ -146,7 +143,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         PeriodAccrualSummary latestPeriodSum = periodSummaries.poll();
         if (periodSummaryIsCurrent(latestPeriodSum, payPeriod)) {
             latestPeriodSum.setPayPeriod(payPeriod);
-            //return latestPeriodSum;
+            return latestPeriodSum;
         }
 
         logger.debug("Period Accrual Summary not found for empId: {} and end date: {}", empId, prevPeriodEndDate);
@@ -263,6 +260,9 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         return null;
     }
 
+    /**
+     * Initializes an AccrualState object with information from the annual summary.
+     */
     protected AccrualState getInitialAccrualState(AnnualAccrualSummary annSummary, Date endDate,
                                                   TransactionHistory transHistory, boolean hasEndDate) throws AccrualException {
         LinkedList<TransactionRecord> empRecords = getEmpRecordsFromHistory(transHistory, false);

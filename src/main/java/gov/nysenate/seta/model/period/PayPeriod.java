@@ -2,6 +2,7 @@ package gov.nysenate.seta.model.period;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.LocalDate;
 
 import java.util.Date;
 
@@ -42,6 +43,14 @@ public class PayPeriod
                                         "Cannot compute number of pay period days");
     }
 
+    /**
+     * Indicates if pay period is the split that sometimes occurs at the end of the year.
+     */
+    public boolean isEndOfYearSplit() {
+        LocalDate localDate = new LocalDate(endDate);
+        return localDate.getMonthOfYear() == 12 && localDate.getDayOfMonth() == 31 && getNumDays() != 14;
+    }
+
     /** --- Overrides --- */
 
     @Override
@@ -66,6 +75,12 @@ public class PayPeriod
         result = 31 * result + payPeriodNum;
         result = 31 * result + (active ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "PayPeriod{" + "type=" + type + ", startDate=" + startDate + ", endDate=" + endDate + ", payPeriodNum=" +
+                payPeriodNum + ", active=" + active + '}';
     }
 
     /** --- Basic Getters/Setters --- */
