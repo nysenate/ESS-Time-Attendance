@@ -14,14 +14,6 @@ import java.util.Date;
 public interface SupervisorDao extends BaseDao
 {
     /**
-     * Retrieves a Supervisor object for the given supervisor id.
-     * @param supId int - employee id for supervisor
-     * @return Supervisor for matching supId
-     * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
-     */
-    public Supervisor getSupervisor(int supId) throws SupervisorException;
-
-    /**
      * Indicates whether the given supId is/was a T&A supervisor during the given dates.
      * @param empId int - employee id
      * @param start Date - start of date range

@@ -2,10 +2,9 @@
     <section class="left-header-area">
         <div class="nysslogo"></div>
         <section id="logoTextSection">
-            <span id="logoTextCondensed">NYSS ESS</span>
             <div id="logoText">
                 <span id="subLogoText">NYSS </span>
-                <span>Employee Self Service</span>
+                <span>ESS</span>
             </div>
         </section>
     </section>
@@ -14,7 +13,7 @@
             <div id="headerProfileSquare">
                 <div id="headerProfileImg"></div>
             </div>
-            <span id="headerProfileName">Ashfaqul Islam</span>
+            <span id="headerProfileName">Demo User</span>
         </section>
         <section id="logoutSection">
             <a href="${ctxPath}/logout">

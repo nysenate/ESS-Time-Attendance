@@ -82,23 +82,6 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     protected static final String GET_SUP_CHAIN_EXCEPTIONS =
         "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM PM23SPCHNEX WHERE CDSTATUS = 'A' AND NUXREFEM = :empId";
 
-    /**{@inheritDoc} */
-    @Override
-    public Supervisor getSupervisor(int supId) throws SupervisorException {
-        Supervisor sup;
-        try {
-            Employee emp = employeeDao.getEmployeeById(supId);
-            sup = new Supervisor(emp);
-        }
-        catch (EmployeeNotFoundEx ex) {
-            throw new SupervisorNotFoundEx("Supervisor with id: " + supId + " not found.");
-        }
-        catch (EmployeeException ex) {
-            throw new SupervisorException("Encountered error while retrieving supervisor with id: " + supId, ex);
-        }
-        return sup;
-    }
-
     /**{@inheritDoc}
      *
      * We determine this by simply checking if the empId managed any employees during the
