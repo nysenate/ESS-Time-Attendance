@@ -7,14 +7,28 @@
                 <span>ESS</span>
             </div>
         </section>
+        <ul id="topNavList">
+            <li id="dashboardLink" class="main-topic">
+                <a><img class="nav-icon" src="${ctxPath}/assets/img/user.png"/>My Info</a>
+            </li>
+            <li id="timeAttendanceLink" class="main-topic active">
+                <a><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/clock.png"/>Time</a>
+            </li>
+            <li id="payrollLink" class="main-topic">
+                <a><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/dollar.png"/>Payroll</a>
+            </li>
+            <li id="helpLink" class="main-topic">
+                <a><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/question.png"/>Help</a>
+            </li>
+        </ul>
     </section>
     <section class="right-header-area">
-        <section id="profileSection">
+        <!--<section id="profileSection">
             <div id="headerProfileSquare">
                 <div id="headerProfileImg"></div>
             </div>
             <span id="headerProfileName">Demo User</span>
-        </section>
+        </section>-->
         <section id="logoutSection">
             <a href="${ctxPath}/logout">
                 <div class="logout-icon"></div>Sign Out

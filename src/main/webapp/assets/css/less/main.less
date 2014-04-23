@@ -22,7 +22,7 @@ html, body {
   padding: 0;
   .open-sans;
   font-size: 13px;
-  background: #eee;
+  background: #fafafa;
 }
 
 a:hover, a:active, a:focus {
@@ -128,45 +128,39 @@ h1 {
   .bold-text;
 }
 
+#wrapper {
+  background: #ddd;
+}
+
 /** Home Page
 ---------------*/
 .ess-top-header {
   position: fixed;
   width: 100%;
-  background: #fafafa;
-  border-bottom: 1px solid #e5e5e5;
+  //background: #fafafa;
+  background: #3d3d3d;
+  border-bottom: 1px solid #222;
   height:50px;
   z-index: 100;
+  color: white;
+  overflow: hidden;
 
   .left-header-area {
+    display: inline-block;
+
     .nysslogo {
-      .nysslogo(40px);
+      .nysslogo(35px);
       float: left;
-      margin-top: 4px;
+      margin-top: 8px;
       margin-left: 10px;
     }
 
     #logoTextSection {
       padding: 0;
       margin-top: 0px;
-      float: left;
-
-      #logoTextCondensed {
-        .font-weight-normal;
-        color: @teal;
-        display: none;
-        font-size: 1.6em;
-        line-height: 50px;
-        margin-left: 10px;
-        @media @tiny-width, @small-width {
-          display: inline-block;
-        }
-      }
+      display: inline-block;
 
       #logoText {
-        @media @tiny-width, @small-width {
-          display: none;
-        }
         .font-weight-light;
         font-size: 1.6em;
         line-height: 50px;
@@ -174,7 +168,6 @@ h1 {
 
         #subLogoText {
           .font-weight-normal;
-          color: @teal;
         }
       }
     }
@@ -182,7 +175,10 @@ h1 {
   }
 
   .right-header-area {
-    float: right;
+    display: inline-block;
+    vertical-align: top;
+    position: absolute;
+    right: 0;
 
     #profileSection {
       float:left;
@@ -191,18 +187,13 @@ h1 {
       line-height: 43px;
 
       &:hover {
-        .highlight-eee;
-      }
-
-      @media @tiny-width {
-        display: none;
+        background: lighten(#323232, 5%);
       }
 
       #headerProfileSquare {
         .profile-square(40px);
-
         .transform(rotateY(0deg));
-        background-color: #ddd;
+        background-color: #555;
         padding: 6px 0px 0px 3px;
         float: left;
         #headerProfileImg {
@@ -211,8 +202,7 @@ h1 {
       }
 
       #headerProfileName {
-        font-size: 1.1em;
-        .font-weight-light;
+        font-size: 1em;
         margin-left: 10px;
       }
     }
@@ -220,12 +210,11 @@ h1 {
     #logoutSection {
       float:left;
       font-size: 1.1em;
-      .font-weight-light;
       width: 120px;
-      border-left: 1px solid #e1e1e1;
+      border-left: 1px solid #222;
 
       &:hover {
-        .highlight-eee;
+        background: lighten(#323232, 10%);
         a .logout-icon {
           .transform(rotateY(-40deg));
         }
@@ -235,7 +224,7 @@ h1 {
         padding: 15px;
         display: block;
         text-decoration: none !important;
-        color: #333;
+        color: white;
 
         .logout-icon {
           .transform-origin(0 0);
@@ -250,6 +239,66 @@ h1 {
   }
 }
 
+#topNavList {
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 20px;
+
+  li {
+    display: inline;
+    line-height:50px;
+    padding: 10px 20px;
+    margin-right: 7px;
+    cursor: pointer;
+
+    &.active {
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      margin-right:5px;
+      vertical-align: middle;
+      height: 16px;
+      position: relative;
+      top: -1px;
+    }
+
+    &#dashboardLink {
+      &:hover {
+        background: fade(@orange, 40%);
+      }
+      border-bottom: 1px solid @orange;
+    }
+
+    &#timeAttendanceLink {
+      &:hover {
+        background: fade(@light-teal, 40%);
+      }
+      border-bottom: 1px solid @light-teal;
+    }
+
+    &#payrollLink {
+      &:hover {
+        background: fade(@green, 40%);
+      }
+      border-bottom: 1px solid @green;
+    }
+
+    &#helpLink {
+      &:hover {
+        background: fade(#aaa, 40%);
+      }
+      border-bottom: 1px solid #aaa;
+    }
+
+    a {
+      font-size: 1.1em;
+    }
+  }
+}
+
 /** Profile Square */
 .profile-square(@size:40px) {
   width: @size;
@@ -258,7 +307,41 @@ h1 {
 
 /** Left Navigation
 --------------------- */
+.left-nav {
+  background:#f1f1f1;
+  width:250px;
+  position: fixed;
+  height: 100%;
+
+  .main-topic {
+    color: #333;
+    margin-left: 20px;
+    width: 200px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    padding: 5px 5px 5px 20px;
+  }
+
+  a {
+    color: teal;
+    text-decoration: none;
+    &:hover {
+      color: #012B48;
+    }
+  }
+}
+
 #leftNav {
+  display:none;
   position:fixed;
   top: 40px;
   height: 100%;
@@ -266,10 +349,6 @@ h1 {
   margin-right: 20px;
   width: @nav-width;
   background: #333;
-
-  @media @small-width, @medium-width {
-    left: (@nav-width * -1) + @docked-nav-width;
-  }
 
   #mainNavList {
     padding: 0;
@@ -367,37 +446,44 @@ h1 {
     }
   }
 }
-
-/** Time Record Entry Page
------------------------------*/
 .content-wrapper {
-  margin-left: @nav-width;
+ // margin-left: @nav-width;
   padding-top: 50px;
-  padding-bottom: 10px;
-  background: #eee;
-  .box-shadow(inset 2px 0px 20px #ccc);
+  padding-bottom: 40px;
+  background: #fafafa;
+  width: 1150px;
+  margin: auto;
+}
 
-  @media @small-width, @medium-width {
-    margin-left: @docked-nav-width;
-  }
-
-  h1.hero {
+.section-title-container, .bread-crumb-container {
+  &.teal {
     background: @teal;
-    font-size: 2.5em;
-    .font-weight-light;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-    color: #eee;
   }
+  color: #eee;
+  font-size: 1.1em;
+  margin: 0;
+  padding: 10px 15px;
+}
+
+.section-title-container {
+  &.teal {
+    background: darken(@teal, 5%);
+  }
+  position: fixed;
+  width: 250px;
+  .font-weight-bold;
+}
+
+.bread-crumb-container {
+  margin-left: 250px;
 }
 
 .content-container {
-  margin:20px auto;
+  margin:20px 0 0 260px;
   width: 840px;
   background: #fefefe;
   position: relative;
-  .box-shadow(0px 1px 2px #aaa);
+  .box-shadow(0px 1px 10px #eee);
 
   h1 {
     font-size:1.3em;
@@ -440,45 +526,10 @@ h1 {
   }
 }
 
-#timeRecordViewToggle {
-  width: 155px;
-  position: absolute;
-  top: 0;
-  right: 10px;
 
-  .calendar-icon {
-    background-image: url('../../img/20px-555555/calendar.png');
-    .image-size(18px);
-    position: relative;
-    top: 11px;
-    margin-right: 5px;
-    float: left;
-  }
 
-  a {
-    padding: 0 5px;
-    border-right: 1px solid #ddd;
-    &:last-of-type {
-      border:none;
-    }
-    &.active {
-      .font-weight-bold;
-      color: @teal;
-    }
-    &.disabled {
-      color: #ccc !important;
-    }
-
-    color: #444;
-    line-height: 40px;
-    cursor: pointer;
-
-    &:hover {
-      color: @teal !important;
-    }
-  }
-}
-
+/** Time Record Entry Page
+-----------------------------*/
 table#timeRecordTable {
   thead {
     tr {
@@ -490,6 +541,8 @@ table#timeRecordTable {
 
   tbody {
     tr {
+      height: 35px;
+
       &.time-record-row {
         td {
           &:nth-child(1) {
@@ -519,10 +572,10 @@ table#timeRecordTable {
 
       td {
         text-align: center;
-        border-right: 1px solid #bbb;
+        border-right: 1px solid #dedede;
         input[type="text"], input[type="number"] {
           width: 55px;
-          height: 36px;
+          height: 35px;
           font-size: 1.1em;
           text-align: center;
           border: 0;
@@ -559,7 +612,7 @@ table#timeRecordTable {
 }
 
 #hourlyAccrualContainer {
-  width: 600px;
+  width: 650px;
   margin: auto;
   text-align: center;
   padding-bottom: 10px;
@@ -570,42 +623,33 @@ table#timeRecordTable {
     float: left;
     text-align: center;
 
-    &:last-of-type {
-      border:none !important;
-    }
-
-    .hour-square {
-      width: 70px;
-      height: 40px;
-      border: 1px solid @light-teal;
-      margin: 5px auto;
-      font-size: 1.2em;
-      line-height: 40px;
-      color: @navy;
-      font-weight: 600;
-    }
-
     .captioned-hour-square {
-      width: 33%;
+      width: 105px;
       height: 40px;
       margin: 5px auto;
       padding: 0 10px;
+
       .hours-caption {
         font-size: 1em;
         border-bottom: 1px solid #bbb;
         line-height: 17px;
       }
+
       .hours-display {
-        font-size: 1em;
+        font-size: 1.2em;
         .font-weight-bold;
-        line-height: 23px;
+        line-height: 30px;
         font-weight: 600;
         color: @navy;
       }
     }
 
     .hour-label {
-      font-size: 1.1em;
+      color: #333;
+      padding: 0px;
+      margin: 10px auto;
+      font-size: 1em;
+      .font-weight-normal;
     }
 
     &:nth-child(1), &:nth-child(2), &:nth-child(3) {
@@ -618,27 +662,27 @@ table#timeRecordTable {
 }
 
 #remarksRecordContainer {
-  background: #f5f5f5;
-  border-bottom: 1px solid #ccc;
+  float: left;
 
   label {
     .font-weight-bold;
-    margin: 0 10px 0 17px;
+    margin: 0 10px 0 10px;
     line-height: 55px;
   }
   #remarksTextArea {
     margin: 5px 0;
     height: 45px;
-    width: 660px;
+    width: 450px;
     border: 1px solid #ccc;
   }
 }
 
 #saveRecordContainer {
-  padding: 5px 10px;
+  padding: 10px;
   background: #f9f9f9;
-  button {
-    width: 200px;
+  input[type="button"] {
+    margin-top: 10px;
+    width: 230px;
     padding: 5px 10px;
     background: @green;
     color: white;
@@ -646,8 +690,12 @@ table#timeRecordTable {
     border-style: none none solid none;
     border-bottom: 3px solid darken(@green, 10%);
 
-    &:active {
-      .transform(translateY(3px));
+    &.inactive {
+      background: none;
+      color: #333;
+      &:hover {
+        background: #eee;
+      }
     }
 
     &:hover {
@@ -662,12 +710,13 @@ table#timeRecordTable {
 }
 
 .view-animate.ng-enter {
-  .transform(translateY(20px));
+  //.transform(translateY(20px));
   opacity: 0;
 }
 .view-animate.ng-enter.ng-enter-active {
   opacity: 1;
-  .transform(translateY(0px));
+
+  //.transform(translateY(0px));
 }
 .view-animate.ng-leave.ng-leave-active {
   display: none;

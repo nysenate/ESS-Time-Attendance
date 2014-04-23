@@ -41,7 +41,6 @@ table.ess-table.no-focus tbody tr:hover {
 }
 table.ess-table tbody tr {
   border-bottom: 1px solid #bbb;
-  height: 40px;
 }
 table.ess-table tbody tr td {
   text-align: center;
@@ -81,10 +80,9 @@ table.ess-table tbody tr.active td:nth-child(1) {
   left: 0;
   bottom: 0;
   right: 0;
-  width: 810px;
-  height: 300px;
+  width: 780px;
+  height: 322px;
   margin: auto;
-  padding: 10px 20px;
   background: #fdfdfd;
   border-bottom: 4px solid #006b80;
   -webkit-box-shadow: 0px 0px 20px #d1d1d1;
@@ -97,57 +95,49 @@ table.ess-table tbody tr.active td:nth-child(1) {
   border-radius: 2px;
   background-clip: padding-box;
 }
+.login-container #loginHeader {
+  background: #006b80;
+  color: white;
+  font-size: 1.2em;
+  text-align: center;
+  height: 48px;
+  line-height: 48px;
+}
+.login-container #loginHeader p {
+  margin: 0;
+}
+.login-container .login-message {
+  font-size: 1.2em;
+  font-weight: 400;
+  color: #333;
+  text-align: center;
+  position: absolute;
+  top: -50px;
+  margin: auto;
+  width: 100%;
+  background: #FFFEF5;
+  padding: 10px;
+}
 .login-container .login-info-container,
 .login-container .login-form-container {
   height: 100%;
 }
 .login-container .login-info-container {
   float: left;
-  border-right: 1px dotted #ddd;
-  padding-right: 20px;
-  padding-top: 70px;
   width: 400px;
-}
-.login-container .login-info-container .nysslogo {
-  background: url('/timesheets/assets/img/nysslogo.png');
-  height: 100px;
-  width: 100px;
-  background-size: 100px;
-  background-repeat: no-repeat;
-  float: left;
-  margin-right: 20px;
-  margin-top: 2px;
-}
-.login-container .login-info-container .heading-container h1 {
-  font-size: 2.5em;
-  font-weight: 400;
-  margin: 0;
-  color: #163c61;
-}
-.login-container .login-info-container .heading-container h2 {
-  font-weight: 400;
-  margin-top: 0;
-}
-.login-container .login-info-container .heading-container h3 {
-  font-weight: 400;
-  margin-left: 120px;
 }
 .login-container .login-form-container {
   display: inline-block;
-  padding-top: 20px;
-  padding-left: 40px;
+  padding: 10px 0 20px 40px;
 }
 .login-container .login-form-container .login-error-container {
   position: absolute;
-  top: 0;
+  bottom: 12px;
   right: 0;
-  background: #B90504;
-  width: 391px;
+  color: #B90504;
+  width: 380px;
   min-height: 40px;
   line-height: 40px;
-  padding-left: 10px;
-  color: white;
-  border-bottom: 1px solid #ddd;
   padding-left: 40px;
   opacity: 0;
   -webkit-transform: rotateX(-90deg);
@@ -306,7 +296,6 @@ table.ess-table.no-focus tbody tr:hover {
 }
 table.ess-table tbody tr {
   border-bottom: 1px solid #bbb;
-  height: 40px;
 }
 table.ess-table tbody tr td {
   text-align: center;
@@ -338,7 +327,7 @@ body {
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 13px;
-  background: #eee;
+  background: #fafafa;
 }
 a:hover,
 a:active,
@@ -448,43 +437,38 @@ h1 {
   margin: 0;
   font-weight: 600;
 }
+#wrapper {
+  background: #ddd;
+}
 /** Home Page
 ---------------*/
 .ess-top-header {
   position: fixed;
   width: 100%;
-  background: #fafafa;
-  border-bottom: 1px solid #e5e5e5;
+  background: #3d3d3d;
+  border-bottom: 1px solid #222;
   height: 50px;
   z-index: 100;
+  color: white;
+  overflow: hidden;
+}
+.ess-top-header .left-header-area {
+  display: inline-block;
 }
 .ess-top-header .left-header-area .nysslogo {
   background: url('/timesheets/assets/img/nysslogo.png');
-  height: 40px;
-  width: 40px;
-  background-size: 40px;
+  height: 35px;
+  width: 35px;
+  background-size: 35px;
   background-repeat: no-repeat;
   float: left;
-  margin-top: 4px;
+  margin-top: 8px;
   margin-left: 10px;
 }
 .ess-top-header .left-header-area #logoTextSection {
   padding: 0;
   margin-top: 0px;
-  float: left;
-}
-.ess-top-header .left-header-area #logoTextSection #logoTextCondensed {
-  font-weight: 400;
-  color: #006b80;
-  display: none;
-  font-size: 1.6em;
-  line-height: 50px;
-  margin-left: 10px;
-}
-@media only screen and (min-width: 0px) and (max-width: 519px), only screen and (min-width: 520px) and (max-width: 719px) {
-  .ess-top-header .left-header-area #logoTextSection #logoTextCondensed {
-    display: inline-block;
-  }
+  display: inline-block;
 }
 .ess-top-header .left-header-area #logoTextSection #logoText {
   font-weight: 300;
@@ -492,17 +476,14 @@ h1 {
   line-height: 50px;
   margin-left: 10px;
 }
-@media only screen and (min-width: 0px) and (max-width: 519px), only screen and (min-width: 520px) and (max-width: 719px) {
-  .ess-top-header .left-header-area #logoTextSection #logoText {
-    display: none;
-  }
-}
 .ess-top-header .left-header-area #logoTextSection #logoText #subLogoText {
   font-weight: 400;
-  color: #006b80;
 }
 .ess-top-header .right-header-area {
-  float: right;
+  display: inline-block;
+  vertical-align: top;
+  position: absolute;
+  right: 0;
 }
 .ess-top-header .right-header-area #profileSection {
   float: left;
@@ -511,13 +492,7 @@ h1 {
   line-height: 43px;
 }
 .ess-top-header .right-header-area #profileSection:hover {
-  background: #eee;
-  cursor: pointer;
-}
-@media only screen and (min-width: 0px) and (max-width: 519px) {
-  .ess-top-header .right-header-area #profileSection {
-    display: none;
-  }
+  background: #3f3f3f;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare {
   width: 40px;
@@ -527,7 +502,7 @@ h1 {
   -o-transform: rotateY(0deg);
   -ms-transform: rotateY(0deg);
   transform: rotateY(0deg);
-  background-color: #ddd;
+  background-color: #555;
   padding: 6px 0px 0px 3px;
   float: left;
 }
@@ -539,20 +514,17 @@ h1 {
   background-repeat: no-repeat;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileName {
-  font-size: 1.1em;
-  font-weight: 300;
+  font-size: 1em;
   margin-left: 10px;
 }
 .ess-top-header .right-header-area #logoutSection {
   float: left;
   font-size: 1.1em;
-  font-weight: 300;
   width: 120px;
-  border-left: 1px solid #e1e1e1;
+  border-left: 1px solid #222;
 }
 .ess-top-header .right-header-area #logoutSection:hover {
-  background: #eee;
-  cursor: pointer;
+  background: #4c4c4c;
 }
 .ess-top-header .right-header-area #logoutSection:hover a .logout-icon {
   -webkit-transform: rotateY(-40deg);
@@ -565,7 +537,7 @@ h1 {
   padding: 15px;
   display: block;
   text-decoration: none !important;
-  color: #333;
+  color: white;
 }
 .ess-top-header .right-header-area #logoutSection a .logout-icon {
   -webkit-transform-origin: 0 0;
@@ -585,10 +557,90 @@ h1 {
   background-size: 20px;
   background-repeat: no-repeat;
 }
+#topNavList {
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 20px;
+}
+#topNavList li {
+  display: inline;
+  line-height: 50px;
+  padding: 10px 20px;
+  margin-right: 7px;
+  cursor: pointer;
+}
+#topNavList li.active {
+  font-weight: 600;
+}
+#topNavList li .nav-icon {
+  margin-right: 5px;
+  vertical-align: middle;
+  height: 16px;
+  position: relative;
+  top: -1px;
+}
+#topNavList li#dashboardLink {
+  border-bottom: 1px solid #d19525;
+}
+#topNavList li#dashboardLink:hover {
+  background: rgba(209, 149, 37, 0.4);
+}
+#topNavList li#timeAttendanceLink {
+  border-bottom: 1px solid #4196a7;
+}
+#topNavList li#timeAttendanceLink:hover {
+  background: rgba(65, 150, 167, 0.4);
+}
+#topNavList li#payrollLink {
+  border-bottom: 1px solid #799933;
+}
+#topNavList li#payrollLink:hover {
+  background: rgba(121, 153, 51, 0.4);
+}
+#topNavList li#helpLink {
+  border-bottom: 1px solid #aaa;
+}
+#topNavList li#helpLink:hover {
+  background: rgba(170, 170, 170, 0.4);
+}
+#topNavList li a {
+  font-size: 1.1em;
+}
 /** Profile Square */
 /** Left Navigation
 --------------------- */
+.left-nav {
+  background: #f1f1f1;
+  width: 250px;
+  position: fixed;
+  height: 100%;
+}
+.left-nav .main-topic {
+  color: #333;
+  margin-left: 20px;
+  width: 200px;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+}
+.left-nav ul {
+  padding: 0;
+  margin: 0;
+}
+.left-nav li {
+  padding: 5px 5px 5px 20px;
+}
+.left-nav a {
+  color: teal;
+  text-decoration: none;
+}
+.left-nav a:hover {
+  color: #012B48;
+}
 #leftNav {
+  display: none;
   position: fixed;
   top: 40px;
   height: 100%;
@@ -596,11 +648,6 @@ h1 {
   margin-right: 20px;
   width: 225px;
   background: #333;
-}
-@media only screen and (min-width: 520px) and (max-width: 719px), only screen and (min-width: 720px) and (max-width: 959px) {
-  #leftNav {
-    left: -175px;
-  }
 }
 #leftNav #mainNavList {
   padding: 0;
@@ -689,39 +736,43 @@ h1 {
 #leftNav #mainNavList li .sub-topic-list.active {
   display: block;
 }
-/** Time Record Entry Page
------------------------------*/
 .content-wrapper {
-  margin-left: 225px;
   padding-top: 50px;
-  padding-bottom: 10px;
-  background: #eee;
-  -webkit-box-shadow: inset 2px 0px 20px #cccccc;
-  -moz-box-shadow: inset 2px 0px 20px #cccccc;
-  box-shadow: inset 2px 0px 20px #cccccc;
+  padding-bottom: 40px;
+  background: #fafafa;
+  width: 1150px;
+  margin: auto;
 }
-@media only screen and (min-width: 520px) and (max-width: 719px), only screen and (min-width: 720px) and (max-width: 959px) {
-  .content-wrapper {
-    margin-left: 50px;
-  }
-}
-.content-wrapper h1.hero {
-  background: #006b80;
-  font-size: 2.5em;
-  font-weight: 300;
-  text-align: center;
-  margin: 0;
-  padding: 20px;
+.section-title-container,
+.bread-crumb-container {
   color: #eee;
+  font-size: 1.1em;
+  margin: 0;
+  padding: 10px 15px;
+}
+.section-title-container.teal,
+.bread-crumb-container.teal {
+  background: #006b80;
+}
+.section-title-container {
+  position: fixed;
+  width: 250px;
+  font-weight: 600;
+}
+.section-title-container.teal {
+  background: #005667;
+}
+.bread-crumb-container {
+  margin-left: 250px;
 }
 .content-container {
-  margin: 20px auto;
+  margin: 20px 0 0 260px;
   width: 840px;
   background: #fefefe;
   position: relative;
-  -webkit-box-shadow: 0px 1px 2px #aaaaaa;
-  -moz-box-shadow: 0px 1px 2px #aaaaaa;
-  box-shadow: 0px 1px 2px #aaaaaa;
+  -webkit-box-shadow: 0px 1px 10px #eeeeee;
+  -moz-box-shadow: 0px 1px 10px #eeeeee;
+  box-shadow: 0px 1px 10px #eeeeee;
 }
 .content-container h1 {
   font-size: 1.3em;
@@ -759,45 +810,13 @@ h1 {
 .content-container.dual section.right-container h1 {
   border-bottom: 4px solid #808d0a;
 }
-#timeRecordViewToggle {
-  width: 155px;
-  position: absolute;
-  top: 0;
-  right: 10px;
-}
-#timeRecordViewToggle .calendar-icon {
-  background-image: url('../../img/20px-555555/calendar.png');
-  height: 18px;
-  width: 18px;
-  background-size: 18px;
-  background-repeat: no-repeat;
-  position: relative;
-  top: 11px;
-  margin-right: 5px;
-  float: left;
-}
-#timeRecordViewToggle a {
-  padding: 0 5px;
-  border-right: 1px solid #ddd;
-  color: #444;
-  line-height: 40px;
-  cursor: pointer;
-}
-#timeRecordViewToggle a:last-of-type {
-  border: none;
-}
-#timeRecordViewToggle a.active {
-  font-weight: 600;
-  color: #006b80;
-}
-#timeRecordViewToggle a.disabled {
-  color: #ccc !important;
-}
-#timeRecordViewToggle a:hover {
-  color: #006b80 !important;
-}
+/** Time Record Entry Page
+-----------------------------*/
 table#timeRecordTable thead tr th {
   width: 65px;
+}
+table#timeRecordTable tbody tr {
+  height: 35px;
 }
 table#timeRecordTable tbody tr.time-record-row td:nth-child(1) {
   width: 150px;
@@ -817,12 +836,12 @@ table#timeRecordTable tbody tr.weekend {
 }
 table#timeRecordTable tbody tr td {
   text-align: center;
-  border-right: 1px solid #bbb;
+  border-right: 1px solid #dedede;
 }
 table#timeRecordTable tbody tr td input[type="text"],
 table#timeRecordTable tbody tr td input[type="number"] {
   width: 55px;
-  height: 36px;
+  height: 35px;
   font-size: 1.1em;
   text-align: center;
   border: 0;
@@ -851,7 +870,7 @@ table#timeRecordTable tbody tr td.today {
   padding: 5px;
 }
 #hourlyAccrualContainer {
-  width: 600px;
+  width: 650px;
   margin: auto;
   text-align: center;
   padding-bottom: 10px;
@@ -860,21 +879,8 @@ table#timeRecordTable tbody tr td.today {
   float: left;
   text-align: center;
 }
-#accrualsListing div.accrual-component:last-of-type {
-  border: none !important;
-}
-#accrualsListing div.accrual-component .hour-square {
-  width: 70px;
-  height: 40px;
-  border: 1px solid #4196a7;
-  margin: 5px auto;
-  font-size: 1.2em;
-  line-height: 40px;
-  color: #0e4e5a;
-  font-weight: 600;
-}
 #accrualsListing div.accrual-component .captioned-hour-square {
-  width: 33%;
+  width: 105px;
   height: 40px;
   margin: 5px auto;
   padding: 0 10px;
@@ -885,13 +891,17 @@ table#timeRecordTable tbody tr td.today {
   line-height: 17px;
 }
 #accrualsListing div.accrual-component .captioned-hour-square .hours-display {
-  font-size: 1em;
-  line-height: 23px;
+  font-size: 1.2em;
+  line-height: 30px;
   font-weight: 600;
   color: #0e4e5a;
 }
 #accrualsListing div.accrual-component .hour-label {
-  font-size: 1.1em;
+  color: #333;
+  padding: 0px;
+  margin: 10px auto;
+  font-size: 1em;
+  font-weight: 400;
 }
 #accrualsListing div.accrual-component:nth-child(1),
 #accrualsListing div.accrual-component:nth-child(2),
@@ -902,26 +912,26 @@ table#timeRecordTable tbody tr td.today {
   width: 55%;
 }
 #remarksRecordContainer {
-  background: #f5f5f5;
-  border-bottom: 1px solid #ccc;
+  float: left;
 }
 #remarksRecordContainer label {
   font-weight: 600;
-  margin: 0 10px 0 17px;
+  margin: 0 10px 0 10px;
   line-height: 55px;
 }
 #remarksRecordContainer #remarksTextArea {
   margin: 5px 0;
   height: 45px;
-  width: 660px;
+  width: 450px;
   border: 1px solid #ccc;
 }
 #saveRecordContainer {
-  padding: 5px 10px;
+  padding: 10px;
   background: #f9f9f9;
 }
-#saveRecordContainer button {
-  width: 200px;
+#saveRecordContainer input[type="button"] {
+  margin-top: 10px;
+  width: 230px;
   padding: 5px 10px;
   background: #799933;
   color: white;
@@ -929,14 +939,14 @@ table#timeRecordTable tbody tr td.today {
   border-style: none none solid none;
   border-bottom: 3px solid #5b7326;
 }
-#saveRecordContainer button:active {
-  -webkit-transform: translateY(3px);
-  -moz-transform: translateY(3px);
-  -o-transform: translateY(3px);
-  -ms-transform: translateY(3px);
-  transform: translateY(3px);
+#saveRecordContainer input[type="button"].inactive {
+  background: none;
+  color: #333;
 }
-#saveRecordContainer button:hover {
+#saveRecordContainer input[type="button"].inactive:hover {
+  background: #eee;
+}
+#saveRecordContainer input[type="button"]:hover {
   background: #81ad1f;
 }
 .view-animate.ng-enter,
@@ -945,20 +955,10 @@ table#timeRecordTable tbody tr td.today {
   transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
 }
 .view-animate.ng-enter {
-  -webkit-transform: translateY(20px);
-  -moz-transform: translateY(20px);
-  -o-transform: translateY(20px);
-  -ms-transform: translateY(20px);
-  transform: translateY(20px);
   opacity: 0;
 }
 .view-animate.ng-enter.ng-enter-active {
   opacity: 1;
-  -webkit-transform: translateY(0px);
-  -moz-transform: translateY(0px);
-  -o-transform: translateY(0px);
-  -ms-transform: translateY(0px);
-  transform: translateY(0px);
 }
 .view-animate.ng-leave.ng-leave-active {
   display: none;

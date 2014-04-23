@@ -21,7 +21,7 @@
 <ess-layout:body>
     <jsp:body>
         <base href="/" />
-        <ess-component:header/>
+        <ess-component:top-nav/>
         <ess-component:left-nav/>
 
         <section class="content-wrapper" ng-controller="MainCtrl as main">

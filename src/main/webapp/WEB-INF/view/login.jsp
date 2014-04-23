@@ -15,13 +15,12 @@
 <ess-layout:body>
     <jsp:body>
         <section id="loginContainer" class="login-container">
-            <div id="loginInfoContainer" class="login-info-container">
-                <div class="nysslogo"></div>
-                <div class="heading-container">
-                    <h1>NY State Senate</h1>
-                    <h2>Employee Self-Service</h2>
-                    <h3>Time and Attendance Login</h3>
-                </div>
+            <p style="display:none" class="login-message">You have been logged out.</p>
+            <div id="loginHeader">
+                <p>New York State Senate Employee Self Service</p>
+            </div>
+            <div id="photoContainer" class="login-info-container">
+                <img src="${ctxPath}/assets/img/capital-exterior.jpg" width="400px"/>
             </div>
             <div ng-controller="LoginController" id="loginFormContainer" class="login-form-container">
                 <div class="login-error-container" ng-class="{'show-error': showError}">
