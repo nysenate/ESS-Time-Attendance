@@ -20,7 +20,9 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeTransactionDao.class);
 
     protected static final String GET_TRANS_HISTORY_SQL =
-        "SELECT aud.NUXREFEM, ptx.CDSTATUS, ptx.CDTRANS, ptx.CDTRANSTYP, ptx.NUCHANGE, ptx.DTTXNORIGIN, ptx.DTTXNUPDATE,\n" +
+        "SELECT aud.NUXREFEM, ptx.CDSTATUS, ptx.CDTRANS, ptx.CDTRANSTYP, ptx.NUCHANGE, " +
+        "       CAST (ptx.DTTXNORIGIN AS TIMESTAMP) AS DTTXNORIGIN, " +
+        "       CAST (ptx.DTTXNUPDATE AS TIMESTAMP) AS DTTXNUPDATE,\n" +
         "       ptx.DTEFFECT ${audColumns}\n" +
         "FROM PM21PERAUDIT aud\n" +
         "LEFT JOIN PD21PTXNCODE ptx ON aud.NUCHANGE = ptx.NUCHANGE\n" +
