@@ -13,7 +13,9 @@
     "modernizr": "2.7.1",
     "underscore": "1.5.2",
     "lesshat": "2.0.15",
-    "highcharts.com": "~3.0.9"
+    "highcharts.com": "~3.0.9",
+    "jquery-ui": "1.10.4",
+    "odometer": "0.4.6"
   },
   "devDependencies": {
     "json2": "*"

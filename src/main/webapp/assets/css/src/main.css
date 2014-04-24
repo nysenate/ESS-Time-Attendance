@@ -51,6 +51,316 @@ table.ess-table tbody tr.active {
 table.ess-table tbody tr.active td:nth-child(1) {
   border-left: 3px solid #006b80;
 }
+/*!
+* jQuery UI Button 1.10.4
+* http://jqueryui.com
+*
+* Copyright 2014 jQuery Foundation and other contributors
+* Released under the MIT license.
+* http://jquery.org/license
+*
+* http://api.jqueryui.com/button/#theming
+*/
+/*!
+ * Style sheet modified for ESS
+ */
+.ui-button {
+  display: inline-block;
+  position: relative;
+  padding: 0;
+  line-height: normal;
+  margin-right: .1em;
+  cursor: pointer;
+  vertical-align: middle;
+  text-align: center;
+  overflow: visible;
+  /* removes extra width in IE */
+}
+.ui-button,
+.ui-button:link,
+.ui-button:visited,
+.ui-button:hover,
+.ui-button:active {
+  text-decoration: none;
+}
+/* to make room for the icon, a width needs to be set here */
+.ui-button-icon-only {
+  width: 2.2em;
+}
+/* button elements seem to need a little more width */
+button.ui-button-icon-only {
+  width: 2.4em;
+}
+.ui-button-icons-only {
+  width: 3.4em;
+}
+button.ui-button-icons-only {
+  width: 3.7em;
+}
+/* button text element */
+.ui-button .ui-button-text {
+  display: block;
+  line-height: normal;
+  color: #444;
+  font-weight: normal;
+}
+.ui-button-text-only .ui-button-text {
+  padding: .4em 1em;
+}
+.ui-button-icon-only .ui-button-text,
+.ui-button-icons-only .ui-button-text {
+  padding: .4em;
+  text-indent: -9999999px;
+}
+.ui-button-text-icon-primary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+  padding: .4em 1em .4em 2.1em;
+}
+.ui-button-text-icon-secondary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+  padding: .4em 2.1em .4em 1em;
+}
+.ui-button-text-icons .ui-button-text {
+  padding-left: 2.1em;
+  padding-right: 2.1em;
+}
+/* no icon support for input elements, provide padding by default */
+input.ui-button {
+  padding: .4em 1em;
+}
+/* button icon element(s) */
+.ui-button-icon-only .ui-icon,
+.ui-button-text-icon-primary .ui-icon,
+.ui-button-text-icon-secondary .ui-icon,
+.ui-button-text-icons .ui-icon,
+.ui-button-icons-only .ui-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-button-icon-only .ui-icon {
+  left: 50%;
+  margin-left: -8px;
+}
+.ui-button-text-icon-primary .ui-button-icon-primary,
+.ui-button-text-icons .ui-button-icon-primary,
+.ui-button-icons-only .ui-button-icon-primary {
+  left: .5em;
+}
+.ui-button-text-icon-secondary .ui-button-icon-secondary,
+.ui-button-text-icons .ui-button-icon-secondary,
+.ui-button-icons-only .ui-button-icon-secondary {
+  right: .5em;
+}
+/* button sets */
+.ui-buttonset {
+  margin-right: 7px;
+}
+.ui-buttonset .ui-button {
+  margin-left: 0;
+  margin-right: -0.3em;
+  font-weight: normal;
+  border: 1px solid #999;
+}
+.ui-buttonset .ui-button.ui-state-hover .ui-button-text,
+.ui-buttonset .ui-button.ui-state-active .ui-button-text {
+  color: teal;
+}
+.ui-buttonset .ui-button.ui-state-active {
+  background: #eee;
+}
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+input.ui-button::-moz-focus-inner,
+button.ui-button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+/*!
+ * jQuery UI Datepicker 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/datepicker/#theming
+ */
+/*!
+ * Style sheet modified for ESS
+ */
+.ui-datepicker {
+  width: 17em;
+  padding: .2em .2em 0;
+  display: none;
+  background: white;
+  opacity: 0.95;
+  -webkit-box-shadow: 0 0 10px #cccccc;
+  -moz-box-shadow: 0 0 10px #cccccc;
+  box-shadow: 0 0 10px #cccccc;
+}
+.ui-datepicker .ui-datepicker-header {
+  position: relative;
+  padding: .2em 0;
+}
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+  position: absolute;
+  top: 2px;
+  width: 1.8em;
+  height: 1.8em;
+}
+.ui-datepicker .ui-datepicker-prev-hover,
+.ui-datepicker .ui-datepicker-next-hover {
+  top: 1px;
+}
+.ui-datepicker .ui-datepicker-prev {
+  left: 2px;
+}
+.ui-datepicker .ui-datepicker-next {
+  right: 2px;
+}
+.ui-datepicker .ui-datepicker-prev-hover {
+  left: 1px;
+}
+.ui-datepicker .ui-datepicker-next-hover {
+  right: 1px;
+}
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+  display: block;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-title {
+  margin: 0 2.3em;
+  line-height: 1.8em;
+  text-align: center;
+}
+.ui-datepicker .ui-datepicker-title select {
+  font-size: 1em;
+  margin: 1px 0;
+}
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+  width: 49%;
+}
+.ui-datepicker table {
+  width: 100%;
+  font-size: .9em;
+  border-collapse: collapse;
+  margin: 0 0 .4em;
+}
+.ui-datepicker th {
+  padding: .7em .3em;
+  text-align: center;
+  font-weight: bold;
+  border: 0;
+}
+.ui-datepicker td {
+  border: 0;
+  padding: 1px;
+  text-align: center;
+}
+.ui-datepicker td.ui-datepicker-current-day {
+  background: #edf7a4;
+}
+.ui-datepicker td span,
+.ui-datepicker td a {
+  display: block;
+  padding: .2em;
+  text-decoration: none;
+  color: #006b80;
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+  background-image: none;
+  margin: .7em 0 0 0;
+  padding: 0 .2em;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.ui-datepicker .ui-datepicker-buttonpane button {
+  float: right;
+  margin: .5em .2em .4em;
+  cursor: pointer;
+  padding: .2em .6em .3em .6em;
+  width: auto;
+  overflow: visible;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+  float: left;
+}
+/* with multiple calendars */
+.ui-datepicker.ui-datepicker-multi {
+  width: auto;
+}
+.ui-datepicker-multi .ui-datepicker-group {
+  float: left;
+}
+.ui-datepicker-multi .ui-datepicker-group table {
+  width: 95%;
+  margin: 0 auto .4em;
+}
+.ui-datepicker-multi-2 .ui-datepicker-group {
+  width: 50%;
+}
+.ui-datepicker-multi-3 .ui-datepicker-group {
+  width: 33.3%;
+}
+.ui-datepicker-multi-4 .ui-datepicker-group {
+  width: 25%;
+}
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
+  border-left-width: 0;
+}
+.ui-datepicker-multi .ui-datepicker-buttonpane {
+  clear: left;
+}
+.ui-datepicker-row-break {
+  clear: both;
+  width: 100%;
+  font-size: 0;
+}
+/* RTL support */
+.ui-datepicker-rtl {
+  direction: rtl;
+}
+.ui-datepicker-rtl .ui-datepicker-prev {
+  right: 2px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next {
+  left: 2px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-prev:hover {
+  right: 1px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next:hover {
+  left: 1px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane {
+  clear: right;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button {
+  float: left;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current,
+.ui-datepicker-rtl .ui-datepicker-group {
+  float: right;
+}
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
+  border-right-width: 0;
+  border-left-width: 1px;
+}
 /** Media Queries */
 /** Login Page
 ----------------*/
@@ -306,6 +616,316 @@ table.ess-table tbody tr.active {
 table.ess-table tbody tr.active td:nth-child(1) {
   border-left: 3px solid #006b80;
 }
+/*!
+* jQuery UI Button 1.10.4
+* http://jqueryui.com
+*
+* Copyright 2014 jQuery Foundation and other contributors
+* Released under the MIT license.
+* http://jquery.org/license
+*
+* http://api.jqueryui.com/button/#theming
+*/
+/*!
+ * Style sheet modified for ESS
+ */
+.ui-button {
+  display: inline-block;
+  position: relative;
+  padding: 0;
+  line-height: normal;
+  margin-right: .1em;
+  cursor: pointer;
+  vertical-align: middle;
+  text-align: center;
+  overflow: visible;
+  /* removes extra width in IE */
+}
+.ui-button,
+.ui-button:link,
+.ui-button:visited,
+.ui-button:hover,
+.ui-button:active {
+  text-decoration: none;
+}
+/* to make room for the icon, a width needs to be set here */
+.ui-button-icon-only {
+  width: 2.2em;
+}
+/* button elements seem to need a little more width */
+button.ui-button-icon-only {
+  width: 2.4em;
+}
+.ui-button-icons-only {
+  width: 3.4em;
+}
+button.ui-button-icons-only {
+  width: 3.7em;
+}
+/* button text element */
+.ui-button .ui-button-text {
+  display: block;
+  line-height: normal;
+  color: #444;
+  font-weight: normal;
+}
+.ui-button-text-only .ui-button-text {
+  padding: .4em 1em;
+}
+.ui-button-icon-only .ui-button-text,
+.ui-button-icons-only .ui-button-text {
+  padding: .4em;
+  text-indent: -9999999px;
+}
+.ui-button-text-icon-primary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+  padding: .4em 1em .4em 2.1em;
+}
+.ui-button-text-icon-secondary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+  padding: .4em 2.1em .4em 1em;
+}
+.ui-button-text-icons .ui-button-text {
+  padding-left: 2.1em;
+  padding-right: 2.1em;
+}
+/* no icon support for input elements, provide padding by default */
+input.ui-button {
+  padding: .4em 1em;
+}
+/* button icon element(s) */
+.ui-button-icon-only .ui-icon,
+.ui-button-text-icon-primary .ui-icon,
+.ui-button-text-icon-secondary .ui-icon,
+.ui-button-text-icons .ui-icon,
+.ui-button-icons-only .ui-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-button-icon-only .ui-icon {
+  left: 50%;
+  margin-left: -8px;
+}
+.ui-button-text-icon-primary .ui-button-icon-primary,
+.ui-button-text-icons .ui-button-icon-primary,
+.ui-button-icons-only .ui-button-icon-primary {
+  left: .5em;
+}
+.ui-button-text-icon-secondary .ui-button-icon-secondary,
+.ui-button-text-icons .ui-button-icon-secondary,
+.ui-button-icons-only .ui-button-icon-secondary {
+  right: .5em;
+}
+/* button sets */
+.ui-buttonset {
+  margin-right: 7px;
+}
+.ui-buttonset .ui-button {
+  margin-left: 0;
+  margin-right: -0.3em;
+  font-weight: normal;
+  border: 1px solid #999;
+}
+.ui-buttonset .ui-button.ui-state-hover .ui-button-text,
+.ui-buttonset .ui-button.ui-state-active .ui-button-text {
+  color: teal;
+}
+.ui-buttonset .ui-button.ui-state-active {
+  background: #eee;
+}
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+input.ui-button::-moz-focus-inner,
+button.ui-button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+/*!
+ * jQuery UI Datepicker 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/datepicker/#theming
+ */
+/*!
+ * Style sheet modified for ESS
+ */
+.ui-datepicker {
+  width: 17em;
+  padding: .2em .2em 0;
+  display: none;
+  background: white;
+  opacity: 0.95;
+  -webkit-box-shadow: 0 0 10px #cccccc;
+  -moz-box-shadow: 0 0 10px #cccccc;
+  box-shadow: 0 0 10px #cccccc;
+}
+.ui-datepicker .ui-datepicker-header {
+  position: relative;
+  padding: .2em 0;
+}
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+  position: absolute;
+  top: 2px;
+  width: 1.8em;
+  height: 1.8em;
+}
+.ui-datepicker .ui-datepicker-prev-hover,
+.ui-datepicker .ui-datepicker-next-hover {
+  top: 1px;
+}
+.ui-datepicker .ui-datepicker-prev {
+  left: 2px;
+}
+.ui-datepicker .ui-datepicker-next {
+  right: 2px;
+}
+.ui-datepicker .ui-datepicker-prev-hover {
+  left: 1px;
+}
+.ui-datepicker .ui-datepicker-next-hover {
+  right: 1px;
+}
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+  display: block;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-title {
+  margin: 0 2.3em;
+  line-height: 1.8em;
+  text-align: center;
+}
+.ui-datepicker .ui-datepicker-title select {
+  font-size: 1em;
+  margin: 1px 0;
+}
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+  width: 49%;
+}
+.ui-datepicker table {
+  width: 100%;
+  font-size: .9em;
+  border-collapse: collapse;
+  margin: 0 0 .4em;
+}
+.ui-datepicker th {
+  padding: .7em .3em;
+  text-align: center;
+  font-weight: bold;
+  border: 0;
+}
+.ui-datepicker td {
+  border: 0;
+  padding: 1px;
+  text-align: center;
+}
+.ui-datepicker td.ui-datepicker-current-day {
+  background: #edf7a4;
+}
+.ui-datepicker td span,
+.ui-datepicker td a {
+  display: block;
+  padding: .2em;
+  text-decoration: none;
+  color: #006b80;
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+  background-image: none;
+  margin: .7em 0 0 0;
+  padding: 0 .2em;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.ui-datepicker .ui-datepicker-buttonpane button {
+  float: right;
+  margin: .5em .2em .4em;
+  cursor: pointer;
+  padding: .2em .6em .3em .6em;
+  width: auto;
+  overflow: visible;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+  float: left;
+}
+/* with multiple calendars */
+.ui-datepicker.ui-datepicker-multi {
+  width: auto;
+}
+.ui-datepicker-multi .ui-datepicker-group {
+  float: left;
+}
+.ui-datepicker-multi .ui-datepicker-group table {
+  width: 95%;
+  margin: 0 auto .4em;
+}
+.ui-datepicker-multi-2 .ui-datepicker-group {
+  width: 50%;
+}
+.ui-datepicker-multi-3 .ui-datepicker-group {
+  width: 33.3%;
+}
+.ui-datepicker-multi-4 .ui-datepicker-group {
+  width: 25%;
+}
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
+  border-left-width: 0;
+}
+.ui-datepicker-multi .ui-datepicker-buttonpane {
+  clear: left;
+}
+.ui-datepicker-row-break {
+  clear: both;
+  width: 100%;
+  font-size: 0;
+}
+/* RTL support */
+.ui-datepicker-rtl {
+  direction: rtl;
+}
+.ui-datepicker-rtl .ui-datepicker-prev {
+  right: 2px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next {
+  left: 2px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-prev:hover {
+  right: 1px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next:hover {
+  left: 1px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane {
+  clear: right;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button {
+  float: left;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current,
+.ui-datepicker-rtl .ui-datepicker-group {
+  float: right;
+}
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
+  border-right-width: 0;
+  border-left-width: 1px;
+}
 /** Media Queries */
 /** Sizes */
 .highlight-eee {
@@ -327,7 +947,11 @@ body {
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 13px;
-  background: #fafafa;
+  background: #ddd;
+  height: 100%;
+}
+body {
+  overflow-y: scroll;
 }
 a:hover,
 a:active,
@@ -343,19 +967,40 @@ label {
   font-weight: 300;
 }
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="number"] {
   border: 1px solid #ccc;
   outline: 0;
   background: #fafafa;
-  padding: 2px;
+  padding: .3em;
 }
 input[type="text"].error,
-input[type="password"].error {
+input[type="password"].error,
+input[type="number"].error {
   border-color: #b90504;
 }
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="number"]:focus {
   border-color: #999;
+}
+input[type="button"].submit-button {
+  padding: 5px 10px;
+  background: #799933;
+  color: white;
+  font-weight: 600;
+  border-style: none none solid none;
+  border-bottom: 3px solid #5b7326;
+}
+input[type="button"].submit-button.inactive {
+  background: none;
+  color: #333;
+}
+input[type="button"].submit-button.inactive:hover {
+  background: #eee;
+}
+input[type="button"].submit-button:hover {
+  background: #81ad1f;
 }
 /** Remove the number spinners in chrome */
 input[type=number]::-webkit-inner-spin-button,
@@ -400,6 +1045,14 @@ button:hover {
   -o-transition-duration: 0.5s;
   transition-duration: 0.5s;
 }
+select {
+  padding: .3em;
+  background: white;
+  border: 1px solid #999;
+}
+textarea {
+  border: 1px solid #999;
+}
 /** Header Tags */
 h1 {
   color: #333;
@@ -438,7 +1091,7 @@ h1 {
   font-weight: 600;
 }
 #wrapper {
-  background: #ddd;
+  height: 100%;
 }
 /** Home Page
 ---------------*/
@@ -487,14 +1140,15 @@ h1 {
 }
 .ess-top-header .right-header-area #profileSection {
   float: left;
-  min-width: 220px;
-  padding: 4px 5px 0px 5px;
+  padding: 0;
   line-height: 43px;
 }
 .ess-top-header .right-header-area #profileSection:hover {
   background: #3f3f3f;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare {
+  margin-right: 5px;
+  margin-top: 5px;
   width: 40px;
   height: 40px;
   -webkit-transform: rotateY(0deg);
@@ -502,15 +1156,13 @@ h1 {
   -o-transform: rotateY(0deg);
   -ms-transform: rotateY(0deg);
   transform: rotateY(0deg);
-  background-color: #555;
-  padding: 6px 0px 0px 3px;
   float: left;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare #headerProfileImg {
-  background: url('/timesheets/assets/img/user.png');
-  height: 35px;
-  width: 35px;
-  background-size: 35px;
+  background: url("http://img2.wikia.nocookie.net/__cb20100906190014/uncyclopedia/images/2/28/Dancing_cartoon_cat.gif");
+  height: 40px;
+  width: 40px;
+  background-size: 40px;
   background-repeat: no-repeat;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileName {
@@ -632,109 +1284,20 @@ h1 {
 .left-nav li {
   padding: 5px 5px 5px 20px;
 }
+.left-nav li.sub-topic.active {
+  border-left: 4px solid teal;
+  padding-left: 16px;
+}
+.left-nav li.sub-topic.active a {
+  font-weight: 600;
+  color: #004d4d;
+}
 .left-nav a {
   color: teal;
   text-decoration: none;
 }
 .left-nav a:hover {
-  color: #012B48;
-}
-#leftNav {
-  display: none;
-  position: fixed;
-  top: 40px;
-  height: 100%;
-  padding-top: 20px;
-  margin-right: 20px;
-  width: 225px;
-  background: #333;
-}
-#leftNav #mainNavList {
-  padding: 0;
-  margin: 0;
-}
-#leftNav #mainNavList li.main-topic {
-  color: white;
-  font-weight: 300;
-  font-size: 1.2em;
-  margin: 0;
-  padding: 10px 0;
-  cursor: pointer;
-}
-#leftNav #mainNavList li.main-topic#timeAttendanceLink .nav-icon {
-  background: url('../../img/20px-ffffff/clock.png');
-  float: left;
-  height: 15px;
-  width: 15px;
-  background-size: 15px;
-  background-repeat: no-repeat;
-  margin: 3px 7px 0px 5px;
-}
-#leftNav #mainNavList li.main-topic#dashboardLink .nav-icon {
-  background: url('../../img/20px-ffffff/house.png');
-  float: left;
-  height: 15px;
-  width: 15px;
-  background-size: 15px;
-  background-repeat: no-repeat;
-  margin: 3px 7px 0px 5px;
-}
-#leftNav #mainNavList li.main-topic#productivityLink .nav-icon {
-  background: url('../../img/20px-ffffff/gauge.png');
-  float: left;
-  height: 15px;
-  width: 15px;
-  background-size: 15px;
-  background-repeat: no-repeat;
-  margin: 3px 7px 0px 5px;
-}
-#leftNav #mainNavList li.main-topic#helpLink .nav-icon {
-  background: url('../../img/20px-ffffff/question.png');
-  float: left;
-  height: 15px;
-  width: 15px;
-  background-size: 15px;
-  background-repeat: no-repeat;
-  margin: 3px 7px 0px 5px;
-}
-#leftNav #mainNavList li.main-topic:hover {
-  background: #555;
-}
-#leftNav #mainNavList li.main-topic.active {
-  border-bottom: 1px solid #555;
-  background: #00809a;
-}
-#leftNav #mainNavList li .sub-topic-list {
-  padding: 0;
-  display: none;
-  cursor: pointer;
-  margin-top: 5px;
-}
-#leftNav #mainNavList li .sub-topic-list .sub-topic a {
-  padding-left: 30px;
-  text-decoration: none;
-  line-height: 40px;
-  display: block;
-  font-weight: 600;
-  font-size: 1.0em;
-  color: #bbb;
-}
-#leftNav #mainNavList li .sub-topic-list .sub-topic:hover {
-  background: #444;
-}
-#leftNav #mainNavList li .sub-topic-list .sub-topic:hover a {
-  color: white;
-}
-#leftNav #mainNavList li .sub-topic-list .sub-topic.active {
-  border-left: 5px solid #00809a;
-  font-weight: 600;
-}
-#leftNav #mainNavList li .sub-topic-list .sub-topic.active a {
-  color: white;
-  padding-left: 26px;
-}
-#leftNav #mainNavList li .sub-topic-list.active {
-  display: block;
+  color: #004d4d;
 }
 .content-wrapper {
   padding-top: 50px;
@@ -742,6 +1305,7 @@ h1 {
   background: #fafafa;
   width: 1150px;
   margin: auto;
+  min-height: 100%;
 }
 .section-title-container,
 .bread-crumb-container {
@@ -775,15 +1339,16 @@ h1 {
   box-shadow: 0px 1px 10px #eeeeee;
 }
 .content-container h1 {
-  font-size: 1.3em;
+  font-size: 1.1em;
   margin: 0;
   text-align: center;
   padding: 5px 10px;
-  border-width: 2px;
+  border-width: 1px;
   border-style: none none solid none;
-  border-color: #006b80;
+  border-color: rgba(0, 107, 128, 0.55);
   color: #333;
   line-height: 30px;
+  font-weight: 600;
 }
 .content-container h1.olive {
   border-color: #799933;
@@ -809,6 +1374,13 @@ h1 {
 .content-container.dual div.right-container h1,
 .content-container.dual section.right-container h1 {
   border-bottom: 4px solid #808d0a;
+}
+p.content-info {
+  background: rgba(236, 237, 238, 0.33);
+  margin-top: 0;
+  padding: 10px;
+  color: #222;
+  text-align: center;
 }
 /** Time Record Entry Page
 -----------------------------*/
@@ -875,41 +1447,41 @@ table#timeRecordTable tbody tr td.today {
   text-align: center;
   padding-bottom: 10px;
 }
-#accrualsListing div.accrual-component {
-  float: left;
+.accrual-component {
+  display: inline-block;
   text-align: center;
 }
-#accrualsListing div.accrual-component .captioned-hour-square {
+.accrual-component .captioned-hour-square {
   width: 105px;
   height: 40px;
   margin: 5px auto;
   padding: 0 10px;
 }
-#accrualsListing div.accrual-component .captioned-hour-square .hours-caption {
+.accrual-component .captioned-hour-square .hours-caption {
   font-size: 1em;
   border-bottom: 1px solid #bbb;
   line-height: 17px;
 }
-#accrualsListing div.accrual-component .captioned-hour-square .hours-display {
+.accrual-component .captioned-hour-square .hours-display {
   font-size: 1.2em;
   line-height: 30px;
   font-weight: 600;
   color: #0e4e5a;
 }
-#accrualsListing div.accrual-component .hour-label {
+.accrual-component .hour-label {
   color: #333;
   padding: 0px;
   margin: 10px auto;
   font-size: 1em;
   font-weight: 400;
 }
-#accrualsListing div.accrual-component:nth-child(1),
-#accrualsListing div.accrual-component:nth-child(2),
-#accrualsListing div.accrual-component:nth-child(3) {
+.accrual-component:nth-child(1),
+.accrual-component:nth-child(2),
+.accrual-component:nth-child(3) {
   width: 15%;
 }
-#accrualsListing div.accrual-component:nth-child(4) {
-  width: 55%;
+.accrual-component:nth-child(4) {
+  width: 50%;
 }
 #remarksRecordContainer {
   float: left;
@@ -932,34 +1504,58 @@ table#timeRecordTable tbody tr td.today {
 #saveRecordContainer input[type="button"] {
   margin-top: 10px;
   width: 230px;
-  padding: 5px 10px;
-  background: #799933;
-  color: white;
-  font-weight: 600;
-  border-style: none none solid none;
-  border-bottom: 3px solid #5b7326;
 }
-#saveRecordContainer input[type="button"].inactive {
-  background: none;
+/*
+  --- Request Time Off Page ---
+*/
+.timeoff-request-accrual-container {
+  width: 600px;
+  text-align: center;
+  margin: auto;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+.timeoff-request-accrual-container .accrual-section-title {
   color: #333;
 }
-#saveRecordContainer input[type="button"].inactive:hover {
-  background: #eee;
+.timeoff-request-accrual-container .accrual-section {
+  margin-top: 10px;
 }
-#saveRecordContainer input[type="button"]:hover {
-  background: #81ad1f;
+.timeoff-request-accrual-container .accrual-section .accrual-component {
+  width: 100px;
 }
-.view-animate.ng-enter,
-.view-animate.ng-leave {
-  -webkit-transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
-  transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+.timeoff-request-form-container {
+  width: 400px;
+  display: inline-block;
+  vertical-align: top;
 }
-.view-animate.ng-enter {
-  opacity: 0;
+.timeoff-request-form-container .label-container,
+.timeoff-request-form-container .input-container {
+  display: inline-block;
+  margin-bottom: 10px;
 }
-.view-animate.ng-enter.ng-enter-active {
-  opacity: 1;
+.timeoff-request-form-container .label-container {
+  width: 90px;
+  padding-right: 20px;
+  text-align: right;
 }
-.view-animate.ng-leave.ng-leave-active {
-  display: none;
+.timeoff-request-form-container .input-container {
+  width: 300px;
+}
+.timeoff-request-form-container .input-container .date-input {
+  width: 220px;
+  background: url(../../img/20px-999999/calendar.png);
+  background-repeat: no-repeat;
+  background-position: 195px 2px;
+  background-size: 18px;
+}
+.timeoff-request-form-container #number-hours-requested {
+  width: 40px;
+}
+.timeoff-request-form-container #reason-textarea {
+  resize: none;
+  width: 290px;
+  padding: 5px;
+  height: 67px;
 }

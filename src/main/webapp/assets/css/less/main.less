@@ -1,6 +1,6 @@
 /*! main */
 @import "lesshat";
-@import "./common/common";
+@import "./common/include";
 
 /** Sizes */
 @nav-width: 225px;
@@ -22,7 +22,12 @@ html, body {
   padding: 0;
   .open-sans;
   font-size: 13px;
-  background: #fafafa;
+  background: #ddd;
+  height: 100%;
+}
+
+body {
+  overflow-y: scroll;
 }
 
 a:hover, a:active, a:focus {
@@ -39,16 +44,37 @@ label {
   .font-weight-light;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], input[type="number"] {
   border: 1px solid #ccc;
   outline: 0;
   background: #fafafa;
-  padding: 2px;
+  padding: .3em;
   &.error {
     border-color: @dark-red;
   }
   &:focus {
     border-color: #999;
+  }
+}
+
+input[type="button"].submit-button {
+  padding: 5px 10px;
+  background: @green;
+  color: white;
+  .font-weight-bold;
+  border-style: none none solid none;
+  border-bottom: 3px solid darken(@green, 10%);
+
+  &.inactive {
+    background: none;
+    color: #333;
+    &:hover {
+      background: #eee;
+    }
+  }
+
+  &:hover {
+    background: saturate(@green, 20%);
   }
 }
 
@@ -93,6 +119,17 @@ button {
     .transition-duration(.5s);
   }
 }
+
+select {
+  padding: .3em;
+  background: white;
+  border: 1px solid #999;
+}
+
+textarea {
+  border: 1px solid #999;
+}
+
 /** Header Tags */
 h1 {
   color: #333;
@@ -129,7 +166,7 @@ h1 {
 }
 
 #wrapper {
-  background: #ddd;
+  height: 100%;
 }
 
 /** Home Page
@@ -182,8 +219,7 @@ h1 {
 
     #profileSection {
       float:left;
-      min-width: @profile-tab-width;
-      padding: 4px 5px 0px 5px;
+      padding: 0;
       line-height: 43px;
 
       &:hover {
@@ -191,13 +227,14 @@ h1 {
       }
 
       #headerProfileSquare {
+        margin-right: 5px;
+        margin-top: 5px;
         .profile-square(40px);
         .transform(rotateY(0deg));
-        background-color: #555;
-        padding: 6px 0px 0px 3px;
         float: left;
         #headerProfileImg {
-          .user-default-icon(35px);
+          background: url("http://img2.wikia.nocookie.net/__cb20100906190014/uncyclopedia/images/2/28/Dancing_cartoon_cat.gif");
+          .image-size(40px);
         }
       }
 
@@ -329,123 +366,25 @@ h1 {
 
   li {
     padding: 5px 5px 5px 20px;
+    &.sub-topic.active {
+      border-left: 4px solid teal;
+      padding-left: 16px;
+      a {
+        .font-weight-bold;
+        color: darken(teal, 10%);
+      }
+    }
   }
 
   a {
     color: teal;
     text-decoration: none;
     &:hover {
-      color: #012B48;
+      color: darken(teal, 10%);
     }
   }
 }
 
-#leftNav {
-  display:none;
-  position:fixed;
-  top: 40px;
-  height: 100%;
-  padding-top: 20px;
-  margin-right: 20px;
-  width: @nav-width;
-  background: #333;
-
-  #mainNavList {
-    padding: 0;
-    margin: 0;
-
-    .nav-link-icon(@url) {
-      background: url(@url);
-      float: left;
-      .image-size(15px);
-      margin: 3px 7px 0px 5px;
-    }
-
-    li {
-      &.main-topic {
-        color: white;
-        .font-weight-light;
-        font-size: 1.2em;
-        margin: 0;
-        padding: 10px 0;
-        cursor: pointer;
-
-        &#timeAttendanceLink {
-          .nav-icon {
-            .nav-link-icon('../../img/20px-ffffff/clock.png');
-          }
-        }
-
-        &#dashboardLink {
-          .nav-icon {
-            .nav-link-icon('../../img/20px-ffffff/house.png');
-          }
-        }
-
-        &#productivityLink {
-          .nav-icon {
-            .nav-link-icon('../../img/20px-ffffff/gauge.png');
-          }
-        }
-
-        &#helpLink {
-          .nav-icon {
-            .nav-link-icon('../../img/20px-ffffff/question.png');
-          }
-        }
-
-        &:hover {
-          background: #555;
-        }
-
-        &.active {
-          border-bottom: 1px solid #555;
-          background: #00809a;
-        }
-      }
-
-      .sub-topic-list {
-        padding: 0;
-        display: none;
-        cursor: pointer;
-        margin-top: 5px;
-
-        .sub-topic {
-
-          a {
-            padding-left: 30px;
-            text-decoration: none;
-            line-height: 40px;
-            display: block;
-            .font-weight-bold;
-            font-size: 1.0em;
-            color: #bbb;
-          }
-
-          &:hover {
-            a {
-              color: white;
-            }
-            background: #444;
-          }
-
-          &.active {
-            a {
-              color: white;
-              padding-left: 26px;
-            }
-            border-left: 5px solid lighten(@teal, 5%);
-            .font-weight-bold;
-          }
-        }
-
-        &.active {
-          display: block;
-        }
-      }
-    }
-  }
-}
 .content-wrapper {
  // margin-left: @nav-width;
   padding-top: 50px;
@@ -453,6 +392,7 @@ h1 {
   background: #fafafa;
   width: 1150px;
   margin: auto;
+  min-height: 100%;
 }
 
 .section-title-container, .bread-crumb-container {
@@ -486,15 +426,16 @@ h1 {
   .box-shadow(0px 1px 10px #eee);
 
   h1 {
-    font-size:1.3em;
+    font-size:1.1em;
     margin:0;
     text-align: center;
     padding: 5px 10px;
-    border-width: 2px;
+    border-width: 1px;
     border-style: none none solid none;
-    border-color: @teal;
+    border-color: fade(@teal, 55%);
     color: #333;
     line-height: 30px;
+    .font-weight-bold;
 
     &.olive {
       border-color: @green;
@@ -526,7 +467,13 @@ h1 {
   }
 }
 
-
+p.content-info {
+  background: rgba(236, 237, 238, 0.33);
+  margin-top: 0;
+  padding: 10px;
+  color: #222;
+  text-align: center;
+}
 
 /** Time Record Entry Page
 -----------------------------*/
@@ -618,46 +565,44 @@ table#timeRecordTable {
   padding-bottom: 10px;
 }
 
-#accrualsListing {
-  div.accrual-component {
-    float: left;
-    text-align: center;
+.accrual-component {
+  display: inline-block;
+  text-align: center;
 
-    .captioned-hour-square {
-      width: 105px;
-      height: 40px;
-      margin: 5px auto;
-      padding: 0 10px;
+  .captioned-hour-square {
+    width: 105px;
+    height: 40px;
+    margin: 5px auto;
+    padding: 0 10px;
 
-      .hours-caption {
-        font-size: 1em;
-        border-bottom: 1px solid #bbb;
-        line-height: 17px;
-      }
-
-      .hours-display {
-        font-size: 1.2em;
-        .font-weight-bold;
-        line-height: 30px;
-        font-weight: 600;
-        color: @navy;
-      }
-    }
-
-    .hour-label {
-      color: #333;
-      padding: 0px;
-      margin: 10px auto;
+    .hours-caption {
       font-size: 1em;
-      .font-weight-normal;
+      border-bottom: 1px solid #bbb;
+      line-height: 17px;
     }
 
-    &:nth-child(1), &:nth-child(2), &:nth-child(3) {
-      width: 15%;
+    .hours-display {
+      font-size: 1.2em;
+      .font-weight-bold;
+      line-height: 30px;
+      font-weight: 600;
+      color: @navy;
     }
-    &:nth-child(4) {
-      width: 55%;
-    }
+  }
+
+  .hour-label {
+    color: #333;
+    padding: 0px;
+    margin: 10px auto;
+    font-size: 1em;
+    .font-weight-normal;
+  }
+
+  &:nth-child(1), &:nth-child(2), &:nth-child(3) {
+    width: 15%;
+  }
+  &:nth-child(4) {
+    width: 50%;
   }
 }
 
@@ -683,42 +628,71 @@ table#timeRecordTable {
   input[type="button"] {
     margin-top: 10px;
     width: 230px;
-    padding: 5px 10px;
-    background: @green;
-    color: white;
-    .font-weight-bold;
-    border-style: none none solid none;
-    border-bottom: 3px solid darken(@green, 10%);
+  }
+}
 
-    &.inactive {
-      background: none;
-      color: #333;
-      &:hover {
-        background: #eee;
-      }
-    }
+/*
+  --- Request Time Off Page ---
+*/
 
-    &:hover {
-      background: saturate(@green, 20%);
+.timeoff-request-accrual-container {
+  width: 600px;
+  text-align: center;
+  margin: auto;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+
+  .accrual-section-title {
+    color: #333;
+  }
+
+  .accrual-section {
+    margin-top: 10px;
+    .accrual-component {
+      width: 100px;
     }
   }
 }
 
-.view-animate.ng-enter, .view-animate.ng-leave {
-  -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) .1s;
-  transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) .1s;
+.timeoff-request-form-container {
+  width: 400px;
+  display: inline-block;
+  vertical-align: top;
+
+  .label-container, .input-container {
+    display: inline-block;
+    margin-bottom:10px;
+  }
+
+  .label-container {
+    width: 90px;
+    padding-right: 20px;
+    text-align: right;
+  }
+
+  .input-container {
+    width: 300px;
+
+    .date-input {
+      width: 220px;
+      background: url(../../img/20px-999999/calendar.png);
+      background-repeat: no-repeat;
+      background-position: 195px 2px;
+      background-size: 18px;
+    }
+  }
+
+  #number-hours-requested {
+    width: 40px;
+  }
+
+  #reason-textarea {
+    resize: none;
+    width:290px;
+    padding: 5px;
+    height: 67px;
+  }
 }
 
-.view-animate.ng-enter {
-  //.transform(translateY(20px));
-  opacity: 0;
-}
-.view-animate.ng-enter.ng-enter-active {
-  opacity: 1;
-
-  //.transform(translateY(0px));
-}
-.view-animate.ng-leave.ng-leave-active {
-  display: none;
-}
 

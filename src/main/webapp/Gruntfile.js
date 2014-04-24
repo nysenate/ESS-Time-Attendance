@@ -40,9 +40,14 @@ module.exports = function(grunt) {
                 files: {
                     '<%= jsDest %>/timesheets-vendor.min.js':
                         ['<%= jsVendor %>/jquery.min.js',
+                         '<%= jsVendor %>/jquery.ui.core.min.js',
+                         '<%= jsVendor %>/jquery.ui.datepicker.min.js',
+                         '<%= jsVendor %>/jquery.ui.widget.min.js',
+                         '<%= jsVendor %>/jquery.ui.button.min.js',
                          '<%= jsVendor %>/angular.min.js',
                          '<%= jsVendor %>/angular-route.min.js',
                          '<%= jsVendor %>/angular-animate.min.js',
+                         //'<%= jsVendor %>/odometer.min.js',
                          '<%= jsVendor %>/highcharts.js'
                         ],
                     '<%= jsDest %>/timesheets-vendor-ie.min.js':

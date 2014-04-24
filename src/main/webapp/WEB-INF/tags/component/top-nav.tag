@@ -23,12 +23,11 @@
         </ul>
     </section>
     <section class="right-header-area">
-        <!--<section id="profileSection">
+        <section id="profileSection">
             <div id="headerProfileSquare">
                 <div id="headerProfileImg"></div>
             </div>
-            <span id="headerProfileName">Demo User</span>
-        </section>-->
+        </section>
         <section id="logoutSection">
             <a href="${ctxPath}/logout">
                 <div class="logout-icon"></div>Sign Out

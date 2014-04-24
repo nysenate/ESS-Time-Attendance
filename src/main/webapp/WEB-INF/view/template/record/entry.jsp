@@ -1,40 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<section class="section-title-container teal">
-    <span>Time and Attendance</span>
-</section>
-<section class="bread-crumb-container teal">
-    <span>Time Record Entry</span>
-</section>
-
-<section class="left-nav" style="">
-    <h3 class="main-topic">Home</h3>
-    <ul>
-        <li><a href="${ctxPath}/ui/record/entry">Time Dashboard</a></li>
-    </ul>
-    <h3 class="main-topic">My Attendance</h3>
-    <ul>
-        <li><a href="${ctxPath}/ui/record/entry">Enter Time Record</a></li>
-        <li><a href="${ctxPath}/ui/record/timeoff">Request Time Off</a></li>
-        <li><a href="">View Attendance History</a></li>
-        <li><a href="">View Attendance Periods</a></li>
-    </ul>
-    <h3 class="main-topic">Manage Employees</h3>
-    <ul>
-        <li><a href="${ctxPath}/ui/record/manage">Review Time Records</a></li>
-        <li><a href="">Review Time Off Requests</a></li>
-    </ul>
-    <h3 class="main-topic">Preferences</h3>
-    <ul>
-        <li><a href="${ctxPath}/ui/time/emailprefs">Email Reminders</a></li>
-    </ul>
-
-
-</section>
 
 <section class="content-container">
     <h1 class="teal">Active Pay Periods</h1>
     <div id="payPeriodListContainer">
-        <p>You have multiple pay period records to submit. Please select one from the listing to edit it.</p>
+        <p class="content-info">You have multiple pay period records to submit. Please select one from the listing to edit it.</p>
         <p></p>
         <table>
             <thead>
@@ -72,15 +41,15 @@
 <section ng-controller="RecordEntryController">
     <section class="content-container">
         <h1 class="teal">Time Record Details for 1/30 - 2/12</h1>
+        <p class="content-info">The following accruals are available for use as of this pay period.<br/>
+            <strong>Note:</strong> All hours available need approval from your appointing authority.
+        </p>
         <div id="hourlyAccrualContainer">
-            <p style="">The following accruals are available for use as of this pay period.<br/>
-                <strong>Note:</strong> All hours available need approval from your appointing authority.
-            </p>
             <section id="accrualsListing">
                 <div class="accrual-component">
                     <div class="captioned-hour-square" style="float:left;">
                         <div class="hours-caption">Sick</div>
-                        <div class="hours-display">98.5</div>
+                        <div class="odometer hours-display">232</div>
                     </div>
                 </div>
                 <div class="accrual-component">
@@ -171,7 +140,7 @@
                         <textarea id="remarksTextArea"></textarea>
                     </div>
                     <div class="float-right">
-                        <input type="button" value="Save Record"/>
+                        <input class="submit-button" type="button" value="Save Record"/>
                     </div>
                     <div class="clearfix"></div>
                 </div>
