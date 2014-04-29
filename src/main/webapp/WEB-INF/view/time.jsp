@@ -10,11 +10,22 @@
         <ess:ts-assets/>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/ess-nav.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/ess-routes.js"></script>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/record/record-entry-ctrl.js"></script>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/record/record-directives.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-entry-ctrl.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-directives.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/home.js"></script>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ess-charts.js"></script>
+
+        <!-- Common Directives -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/highcharts-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ess-notifications.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/odometer-directive.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/datepicker-directive.js"></script>
+
+        <!-- Time Off Requests -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/timeoff/new-request-ctrl.js"></script>
+
+        <!-- Pay Period Viewer -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/period/pay-period-view-ctrl.js"></script>
+
     </jsp:body>
 </ess-layout:head>
 

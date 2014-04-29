@@ -47,7 +47,7 @@ module.exports = function(grunt) {
                          '<%= jsVendor %>/angular.min.js',
                          '<%= jsVendor %>/angular-route.min.js',
                          '<%= jsVendor %>/angular-animate.min.js',
-                         //'<%= jsVendor %>/odometer.min.js',
+                         '<%= jsVendor %>/odometer.min.js',
                          '<%= jsVendor %>/highcharts.js'
                         ],
                     '<%= jsDest %>/timesheets-vendor-ie.min.js':

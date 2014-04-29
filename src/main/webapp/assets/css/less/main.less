@@ -695,4 +695,113 @@ table#timeRecordTable {
   }
 }
 
+/**
+  --- View Pay Period Calendar Page ---
+*/
+
+.pay-period-cal-container {
+  .legend-container {
+    margin-left:80px;
+    color:#777;
+
+    .legend-block {
+      margin-left:20px;
+      display:inline-block;
+      width:25px;
+      height:20px;
+      margin-right:10px;
+    }
+  }
+
+  .pay-period-cal {
+    width: 730px;
+    margin: auto;
+
+    .pay-period-month {
+      display: inline-block;
+      margin: 10px;
+
+      .ui-datepicker {
+        .box-shadow(none);
+
+        .ui-datepicker-current-day {
+          background: none;
+        }
+
+        /** Highlighted dates */
+
+        .current-date {
+          span {
+            .font-weight-bold;
+            border: 1px dashed @orange;
+          }
+        }
+        .weekend-date {
+          span {
+            color: #aaa;
+          }
+        }
+
+        .holiday-date {
+          span {
+            background: #d4ff60;
+          }
+        }
+
+        .holiday-and-pay-period-date {
+          span {
+            background: #d4ff60; /* Old browsers */
+            background: -moz-linear-gradient(45deg,  #d4ff60 49%, #B8E3EB 52%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left bottom, right top, color-stop(49%,#d4ff60), color-stop(52%,#B8E3EB)); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(45deg,  #d4ff60 49%,#B8E3EB 52%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(45deg,  #d4ff60 49%,#B8E3EB 52%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(45deg,  #d4ff60 49%,#B8E3EB 52%); /* IE10+ */
+            background: linear-gradient(45deg,  #d4ff60 49%,#B8E3EB 52%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4ff60', endColorstr='#B8E3EB',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+          }
+        }
+
+        .pay-period-end-date {
+          span {
+            background: #B8E3EB;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+  --- Accrual History Page ---
+*/
+
+#detail-acc-history-table {
+  width: 100%;
+  thead {
+    tr {
+      border-bottom: 1px solid #ddd;
+      th {
+        border-right: 1px solid #ddd;
+        padding: .3em 0;
+      }
+      &:last-of-type {
+        border-bottom: 1px solid @teal;
+      }
+    }
+  }
+  tbody {
+    tr {
+      td {
+        border-bottom: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        text-align: center;
+        padding: .4em 0;
+      }
+    }
+  }
+}
+
+
+
+
 

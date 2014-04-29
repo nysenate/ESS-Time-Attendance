@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/")
-public class HomePageCtrl {
+public class TimePageCtrl {
 
-    private static final Logger logger = LoggerFactory.getLogger(HomePageCtrl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TimePageCtrl.class);
 
     @RequestMapping(method = RequestMethod.GET)
     public String printWelcome(ModelMap modelMap, HttpServletRequest request) {

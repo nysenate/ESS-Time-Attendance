@@ -12,7 +12,7 @@ var essApp = angular.module('ess');
 essApp.config(function($routeProvider, $locationProvider) {
     var ctxPath = globalProps.ctxPath;
 
-    /** Dashboard */
+    /** My Info */
     $routeProvider.when(ctxPath + '/ui/dashboard/profile', {
         templateUrl: ctxPath + '/template/dashboard/profile',
         controller: 'TestCtrl'
@@ -23,24 +23,34 @@ essApp.config(function($routeProvider, $locationProvider) {
         controller: 'TestCtrl'
     });
 
-    /** Time Record */
-    $routeProvider.when(ctxPath + '/ui/record/entry', {
-        templateUrl: ctxPath + '/template/record/entry',
+    /** Time and Attendance */
+    $routeProvider.when(ctxPath + '/time/record/entry', {
+        templateUrl: ctxPath + '/template/time/record/entry',
         controller: 'TestCtrl'
     });
 
-    $routeProvider.when(ctxPath + '/ui/record/history', {
-        templateUrl: ctxPath + '/template/record/history',
+    $routeProvider.when(ctxPath + '/time/record/history', {
+        templateUrl: ctxPath + '/template/time/record/history',
         controller: 'TestCtrl'
     });
 
-    $routeProvider.when(ctxPath + '/ui/record/timeoff', {
-        templateUrl: ctxPath + '/template/record/timeoff',
+    $routeProvider.when(ctxPath + '/time/timeoff/request', {
+        templateUrl: ctxPath + '/template/time/timeoff/request',
         controller: 'TestCtrl'
     });
 
-    $routeProvider.when(ctxPath + '/ui/record/manage', {
-        templateUrl: ctxPath + '/template/record/manage',
+    $routeProvider.when(ctxPath + '/time/record/manage', {
+        templateUrl: ctxPath + '/template/time/record/manage',
+        controller: 'TestCtrl'
+    });
+
+    $routeProvider.when(ctxPath + '/time/period/calendar', {
+        templateUrl: ctxPath + '/template/time/period/calendar',
+        controller: 'TestCtrl'
+    });
+
+    $routeProvider.when(ctxPath + '/time/accrual/history', {
+        templateUrl: ctxPath + '/template/time/accrual/history',
         controller: 'TestCtrl'
     });
 

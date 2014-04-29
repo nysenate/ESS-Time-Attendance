@@ -13,9 +13,9 @@ essApp.directive('essNavigation', ['$route', '$routeParams', '$location',
             element.on("click", "ul li.main-topic", function(event) {
                 if (!$(this).hasClass("active")) {
                     element.find(".main-topic.active").removeClass("active");
-                    element.find(".sub-topic-list.active").slideUp(100).removeClass("active");
+                    element.find(".sub-topic-list.active").removeClass("active");
                     $(this).addClass("active");
-                    $(this).next("li").children("ul.sub-topic-list").slideDown(100).addClass("active");
+                    $(this).next("li").children("ul.sub-topic-list").addClass("active");
                 }
             });
 
