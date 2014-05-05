@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<section class="content-container">
+<section class="content-container content-controls">
     <p class="content-info">Display accrual information for year &nbsp;
     <select>
         <option selected="selected">2014</option>
@@ -151,29 +151,28 @@
 </script>
 
 <section class="content-container">
-    <h1 class="teal">Detailed Accrual History</h1>
+    <h1 class="teal">Accrual Summary By Period</h1>
     <p class="content-info">The hours accrued, used, and remaining per pay period are listed in the table below.</p>
     <table id="detail-acc-history-table">
         <thead>
             <tr>
                 <th colspan="2">Period</th>
-                <th colspan="2">Rates</th>
-                <th colspan="3" style="background:#006B80;color:white;">Personal</th>
-                <th colspan="3" style="background:#799933;color:white;">Vacation</th>
-                <th colspan="3" style="background:#ab7b1e;color:white;">Sick</th>
-                <th colspan="1" style="background:#e64727;color:white;">Misc</th>
+                <th colspan="3" style="background:#006B80;color:white;border-right:none;">Personal</th>
+                <th colspan="4" style="background:#799933;color:white;border-right:none;">Vacation</th>
+                <th colspan="4" style="background:#ab7b1e;color:white;border-right:none;">Sick</th>
+                <th colspan="1" style="background:#e64727;color:white;border-right:none;">Misc</th>
             </tr>
             <tr>
                 <th>Dates</th>
                 <th>Number</th>
-                <th>Vac</th>
-                <th>Sick</th>
                 <th>Acc</th>
                 <th>Used</th>
                 <th>Rem</th>
+                <th>Rate</th>
                 <th>Acc</th>
                 <th>Used</th>
                 <th>Rem</th>
+                <th>Rate</th>
                 <th>Acc</th>
                 <th>Used</th>
                 <th>Rem</th>
@@ -210,5 +209,42 @@
             </tr>
         </tbody>
     </table>
+</section>
 
+<section class="content-container">
+    <h1 class="teal">Accrual Usage Details</h1>
+    <p class="content-info">Dates during which accruals were used are listed in the table below.</p>
+    <table id="accrual-usage-details-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Pay Period</th>
+                <th>Work Hours</th>
+                <th style="background:#006B80;color:white;border-right:none;">Personal</th>
+                <th style="background:#799933;color:white;border-right:none;">Vacation</th>
+                <th style="background:#ab7b1e;color:white;border-right:none;">Sick Emp</th>
+                <th style="background:#ab7b1e;color:white;border-right:none;">Sick Fam</th>
+                <th style="background:#e64727;color:white;border-right:none;">Misc</th>
+                <th>Holiday</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Fri 1/12/14</td><td>2</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7</td>
+            </tr>
+            <tr>
+                <td>Tue 2/2/14</td><td>2</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7</td>
+            </tr>
+            <tr>
+                <td>Thu 4/13/14</td><td>2</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7</td>
+            </tr>
+            <tr>
+                <td>Mon 5/1/14</td><td>2</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7</td>
+            </tr>
+            <tr>
+                <td>Wed 6/12/14</td><td>2</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>7</td>
+            </tr>
+        </tbody>
+    </table>
 </section>

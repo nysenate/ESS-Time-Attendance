@@ -1,16 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-<section ng-controller="PayPeriodViewCtrl" class="content-container pay-period-cal-container">
-    <h1 class="teal">Pay Period Calendar</h1>
+<section class="content-container content-controls">
     <p class="content-info">
-        Payroll Year &nbsp;
+        Display calendar for year &nbsp;
         <select>
             <option>2015</option>
             <option selected="selected">2014</option>
             <option>2013</option>
         </select>
     </p>
-    <div class="legend-container">
+</section>
+
+<section ng-controller="PayPeriodViewCtrl" class="content-container pay-period-cal-container">
+    <h1 class="teal">Pay Period Calendar 2014</h1>
+    <div class="content-info legend-container">
+        <div class="legend-block" style="border: 2px solid #006b80;">&nbsp;</div>Current Day
         <div class="legend-block" style="background:#B8E3EB;">&nbsp;</div>Pay Period End Date
         <div class="legend-block" style="background:#d4ff60;">&nbsp;</div>Holiday
     </div>

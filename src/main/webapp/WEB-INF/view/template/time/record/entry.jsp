@@ -1,57 +1,44 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-<section class="content-container">
-    <h1 class="teal">Active Pay Periods</h1>
-    <div id="payPeriodListContainer">
-        <p class="content-info">You have multiple pay period records to submit. Please select one from the listing to edit it.</p>
-        <p></p>
-        <table>
-            <thead>
-            <tr>
-                <th>Edit</th>
-                <th>Pay Period</th>
-                <th>Days Remaining</th>
-                <th>Status</th>
-                <th>Supervisor</th>
-                <th>Last Updated</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="active">
-                <td><input checked="checked" name="activePayPeriod" type="radio"/></td>
-                <td>1/30/2014 - 2/12/2014</td>
-                <td style="color:#B90504;">Due</td>
-                <td>Not Submitted</td>
-                <td>Kenneth J. Zalewski</td>
-                <td>1/31/2014 3:04 PM</td>
-            </tr>
-            <tr>
-                <td><input name="activePayPeriod" type="radio"/></td>
-                <td>2/13/2014 - 2/27/2014</td>
-                <td>11</td>
-                <td>Not Due Yet</td>
-                <td>Kenneth J. Zalewski</td>
-                <td>12/20/2014 3:04 PM</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
+<!--
+Toggle this for temporary emps.
+<div class="content-container content-controls">
+    <p class="content-info">Enter attendance record for pay period &nbsp;
+        <select>
+            <option>04/24/14 - 05/07/14</option>
+            <option>05/08/14 - 05/21/14</option>
+        </select>
+    </p>
+</div>  -->
 
 <section ng-controller="RecordEntryController">
     <section class="content-container">
-        <h1 class="teal">Time Record Details for 1/30 - 2/12</h1>
-        <p class="content-info">The following accruals are available for use as of this pay period.<br/>
-            <strong>Note:</strong> All hours available need approval from your appointing authority.
-        </p>
-        <div id="hourlyAccrualContainer">
+        <h1 class="teal">Time and Attendance Record Entry</h1>
+        <div id="record-selection-container" class="content-info">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Edit</th>
+                        <th>Pay Period</th>
+                        <th>Supervisor</th>
+                        <th>Days Remaining</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="radio" checked="checked"/></td>
+                        <td>04/24/2014 - 5/7/2014</td>
+                        <td>Kenneth J. Zalewski</td>
+                        <td>5</td>
+                        <td>In Progress</td>
+                        <td>04/24/2014 3:04 PM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="hourlyAccrualContainer" style="margin-top:5px;">
             <section id="accrualsListing">
-                <div class="accrual-component">
-                    <div class="captioned-hour-square" style="float:left;">
-                        <div class="hours-caption">Sick</div>
-                        <div class="odometer hours-display">232</div>
-                    </div>
-                </div>
                 <div class="accrual-component">
                     <div class="captioned-hour-square" style="float:left;">
                         <div class="hours-caption">Personal</div>
@@ -62,6 +49,12 @@
                     <div class="captioned-hour-square" style="float:left;">
                         <div class="hours-caption">Vacation</div>
                         <div class="hours-display">34</div>
+                    </div>
+                </div>
+                <div class="accrual-component">
+                    <div class="captioned-hour-square" style="float:left;">
+                        <div class="hours-caption">Sick</div>
+                        <div class="odometer hours-display">232</div>
                     </div>
                 </div>
                 <div class="accrual-component">
@@ -91,16 +84,17 @@
                         <th>Holiday</th>
                         <th>Vacation</th>
                         <th>Personal</th>
-                        <th>Sick Employee</th>
-                        <th>Sick Family</th>
-                        <th>Misc Hours</th>
+                        <th>Sick Emp</th>
+                        <th>Sick Fam</th>
+                        <th>Misc</th>
                         <th>Misc Type</th>
-                        <th>Daily Total</th>
+                        <th>Total</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-class="{'weekend': $index%6 == 0 || $index%7 == 0}" class="time-record-row" ng-repeat="item in [0,1,2,3,4,5,6,7,8,9,10,12,13,14]">
-                        <td ng-class="{'today' : $index==4}">Fri 12/{{$index}}/2014</td>
+                    <tr ng-class="{'weekend': date.getDay() == 0 || date.getDay() == 6}" class="time-record-row"
+                        ng-repeat="date in dates">
+                        <td style="text-align: right;padding-right:20px;" ng-class="">{{date.toDateString()}}</td>
                         <td><input time-record-input tabindex="{{$index+1}}" class="hours-input" placeholder="--" type="text" min="0" max="24" step=".5" name="numWorkHours"/></td>
                         <td><input time-record-input class="hours-input" disabled placeholder="--" type="text" min="0" max="7" step=".5" name="numHolidayHours"/></td>
                         <td><input time-record-input tabindex="{{$index+15}}" class="hours-input" placeholder="--" type="text" min="0" max="7" step=".5" name="numVacationHours"/></td>
@@ -109,7 +103,7 @@
                         <td><input time-record-input class="hours-input" placeholder="--" type="text" min="0" max="7" step=".5" name="numSickFamHours"/></td>
                         <td><input time-record-input class="hours-input" placeholder="--" type="text" min="0" max="7" step=".5" name="numMiscHours"/></td>
                         <td>
-                            <select style="font-size:.9em;margin:5px;" name="miscHourType">
+                            <select style="font-size:.9em;" name="miscHourType">
                                 <option>No Misc Hours</option>
                                 <option>Bereavement Leave</option>
                                 <option>Blood Donation</option>

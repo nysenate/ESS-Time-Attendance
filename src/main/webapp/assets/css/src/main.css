@@ -51,6 +51,7 @@ table.ess-table tbody tr.active {
 table.ess-table tbody tr.active td:nth-child(1) {
   border-left: 3px solid #006b80;
 }
+/** JQuery UI css */
 /*!
 * jQuery UI Button 1.10.4
 * http://jqueryui.com
@@ -360,6 +361,159 @@ button.ui-button::-moz-focus-inner {
 .ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
   border-right-width: 0;
   border-left-width: 1px;
+}
+/*!
+ * jQuery UI Dialog 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/dialog/#theming
+ */
+.ui-dialog {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  outline: 0;
+  border: 1px solid #999;
+  background: white;
+  -webkit-box-shadow: 0 0 60px #999999;
+  -moz-box-shadow: 0 0 60px #999999;
+  box-shadow: 0 0 60px #999999;
+}
+.ui-dialog .ui-dialog-titlebar {
+  padding: .7em 1em;
+  position: relative;
+  text-align: center;
+  border-bottom: 1px solid teal;
+}
+.ui-dialog .ui-dialog-title {
+  font-size: 1.1em;
+  margin: .1em 0;
+  white-space: nowrap;
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+  position: absolute;
+  right: .3em;
+  top: 50%;
+  width: 20px;
+  margin: -10px 0 0 0;
+  padding: 1px;
+  height: 20px;
+}
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  overflow: auto;
+}
+.ui-dialog .ui-dialog-buttonpane {
+  text-align: left;
+  border-width: 1px 0 0 0;
+  background-image: none;
+  padding: .3em 1em .5em .4em;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+  float: right;
+}
+.ui-dialog .ui-dialog-buttonpane button {
+  margin: .5em .4em .5em 0;
+  cursor: pointer;
+}
+.ui-dialog .ui-resizable-se {
+  width: 12px;
+  height: 12px;
+  right: -5px;
+  bottom: -5px;
+  background-position: 16px 16px;
+}
+.ui-draggable .ui-dialog-titlebar {
+  cursor: move;
+}
+/*!
+ * jQuery UI Resizable 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ */
+.ui-resizable {
+  position: relative;
+}
+.ui-resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+}
+.ui-resizable-disabled .ui-resizable-handle,
+.ui-resizable-autohide .ui-resizable-handle {
+  display: none;
+}
+.ui-resizable-n {
+  cursor: n-resize;
+  height: 7px;
+  width: 100%;
+  top: -5px;
+  left: 0;
+}
+.ui-resizable-s {
+  cursor: s-resize;
+  height: 7px;
+  width: 100%;
+  bottom: -5px;
+  left: 0;
+}
+.ui-resizable-e {
+  cursor: e-resize;
+  width: 7px;
+  right: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-w {
+  cursor: w-resize;
+  width: 7px;
+  left: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-se {
+  cursor: se-resize;
+  width: 12px;
+  height: 12px;
+  right: 1px;
+  bottom: 1px;
+}
+.ui-resizable-sw {
+  cursor: sw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  bottom: -5px;
+}
+.ui-resizable-nw {
+  cursor: nw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  top: -5px;
+}
+.ui-resizable-ne {
+  cursor: ne-resize;
+  width: 9px;
+  height: 9px;
+  right: -5px;
+  top: -5px;
 }
 /** Media Queries */
 /** Login Page
@@ -616,6 +770,7 @@ table.ess-table tbody tr.active {
 table.ess-table tbody tr.active td:nth-child(1) {
   border-left: 3px solid #006b80;
 }
+/** JQuery UI css */
 /*!
 * jQuery UI Button 1.10.4
 * http://jqueryui.com
@@ -926,6 +1081,159 @@ button.ui-button::-moz-focus-inner {
   border-right-width: 0;
   border-left-width: 1px;
 }
+/*!
+ * jQuery UI Dialog 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/dialog/#theming
+ */
+.ui-dialog {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  outline: 0;
+  border: 1px solid #999;
+  background: white;
+  -webkit-box-shadow: 0 0 60px #999999;
+  -moz-box-shadow: 0 0 60px #999999;
+  box-shadow: 0 0 60px #999999;
+}
+.ui-dialog .ui-dialog-titlebar {
+  padding: .7em 1em;
+  position: relative;
+  text-align: center;
+  border-bottom: 1px solid teal;
+}
+.ui-dialog .ui-dialog-title {
+  font-size: 1.1em;
+  margin: .1em 0;
+  white-space: nowrap;
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+  position: absolute;
+  right: .3em;
+  top: 50%;
+  width: 20px;
+  margin: -10px 0 0 0;
+  padding: 1px;
+  height: 20px;
+}
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  overflow: auto;
+}
+.ui-dialog .ui-dialog-buttonpane {
+  text-align: left;
+  border-width: 1px 0 0 0;
+  background-image: none;
+  padding: .3em 1em .5em .4em;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+  float: right;
+}
+.ui-dialog .ui-dialog-buttonpane button {
+  margin: .5em .4em .5em 0;
+  cursor: pointer;
+}
+.ui-dialog .ui-resizable-se {
+  width: 12px;
+  height: 12px;
+  right: -5px;
+  bottom: -5px;
+  background-position: 16px 16px;
+}
+.ui-draggable .ui-dialog-titlebar {
+  cursor: move;
+}
+/*!
+ * jQuery UI Resizable 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ */
+.ui-resizable {
+  position: relative;
+}
+.ui-resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+}
+.ui-resizable-disabled .ui-resizable-handle,
+.ui-resizable-autohide .ui-resizable-handle {
+  display: none;
+}
+.ui-resizable-n {
+  cursor: n-resize;
+  height: 7px;
+  width: 100%;
+  top: -5px;
+  left: 0;
+}
+.ui-resizable-s {
+  cursor: s-resize;
+  height: 7px;
+  width: 100%;
+  bottom: -5px;
+  left: 0;
+}
+.ui-resizable-e {
+  cursor: e-resize;
+  width: 7px;
+  right: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-w {
+  cursor: w-resize;
+  width: 7px;
+  left: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-se {
+  cursor: se-resize;
+  width: 12px;
+  height: 12px;
+  right: 1px;
+  bottom: 1px;
+}
+.ui-resizable-sw {
+  cursor: sw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  bottom: -5px;
+}
+.ui-resizable-nw {
+  cursor: nw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  top: -5px;
+}
+.ui-resizable-ne {
+  cursor: ne-resize;
+  width: 9px;
+  height: 9px;
+  right: -5px;
+  top: -5px;
+}
 /** Media Queries */
 /** Sizes */
 .highlight-eee {
@@ -962,6 +1270,10 @@ a:focus {
 ul {
   list-style: none;
 }
+ol.horizontal li,
+ul.horizontal li {
+  display: inline-block;
+}
 label {
   color: #111;
   font-weight: 300;
@@ -987,10 +1299,11 @@ input[type="number"]:focus {
 input[type="button"].submit-button {
   padding: 5px 10px;
   background: #799933;
-  color: white;
+  color: #ffffff;
   font-weight: 600;
   border-style: none none solid none;
-  border-bottom: 3px solid #5b7326;
+  border-width: 2px;
+  border-color: #5b7326;
 }
 input[type="button"].submit-button.inactive {
   background: none;
@@ -1001,6 +1314,44 @@ input[type="button"].submit-button.inactive:hover {
 }
 input[type="button"].submit-button:hover {
   background: #81ad1f;
+}
+input[type="button"].reject-button {
+  padding: 5px 10px;
+  background: #e64727;
+  color: #ffffff;
+  font-weight: 600;
+  border-style: none none solid none;
+  border-width: 2px;
+  border-color: #c33417;
+}
+input[type="button"].reject-button.inactive {
+  background: none;
+  color: #333;
+}
+input[type="button"].reject-button.inactive:hover {
+  background: #eee;
+}
+input[type="button"].reject-button:hover {
+  background: #fe370f;
+}
+input[type="button"].neutral-button {
+  padding: 5px 10px;
+  background: #006b80;
+  color: #ffffff;
+  font-weight: 600;
+  border-style: none none solid none;
+  border-width: 2px;
+  border-color: #00404d;
+}
+input[type="button"].neutral-button.inactive {
+  background: none;
+  color: #333;
+}
+input[type="button"].neutral-button.inactive:hover {
+  background: #eee;
+}
+input[type="button"].neutral-button:hover {
+  background: #006b80;
 }
 /** Remove the number spinners in chrome */
 input[type=number]::-webkit-inner-spin-button,
@@ -1027,6 +1378,9 @@ hr {
 .clearfix {
   clear: both;
 }
+.hidden {
+  display: none;
+}
 button {
   border: 1px solid #aaa;
   background: #eee;
@@ -1046,7 +1400,7 @@ button:hover {
   transition-duration: 0.5s;
 }
 select {
-  padding: .3em;
+  padding: .3em .5em;
   background: white;
   border: 1px solid #999;
 }
@@ -1056,6 +1410,14 @@ textarea {
 /** Header Tags */
 h1 {
   color: #333;
+}
+a {
+  color: teal;
+  text-decoration: none;
+}
+a:hover {
+  cursor: pointer;
+  color: #004d4d;
 }
 .bold-text {
   padding: 10px;
@@ -1100,7 +1462,7 @@ h1 {
   width: 100%;
   background: #3d3d3d;
   border-bottom: 1px solid #222;
-  height: 50px;
+  height: 45px;
   z-index: 100;
   color: white;
   overflow: hidden;
@@ -1115,7 +1477,7 @@ h1 {
   background-size: 35px;
   background-repeat: no-repeat;
   float: left;
-  margin-top: 8px;
+  margin-top: 5px;
   margin-left: 10px;
 }
 .ess-top-header .left-header-area #logoTextSection {
@@ -1126,7 +1488,7 @@ h1 {
 .ess-top-header .left-header-area #logoTextSection #logoText {
   font-weight: 300;
   font-size: 1.6em;
-  line-height: 50px;
+  line-height: 45px;
   margin-left: 10px;
 }
 .ess-top-header .left-header-area #logoTextSection #logoText #subLogoText {
@@ -1141,14 +1503,14 @@ h1 {
 .ess-top-header .right-header-area #profileSection {
   float: left;
   padding: 0;
-  line-height: 43px;
+  line-height: 45px;
 }
 .ess-top-header .right-header-area #profileSection:hover {
   background: #3f3f3f;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare {
   margin-right: 5px;
-  margin-top: 5px;
+  margin-top: 3px;
   width: 40px;
   height: 40px;
   -webkit-transform: rotateY(0deg);
@@ -1159,7 +1521,7 @@ h1 {
   float: left;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare #headerProfileImg {
-  background: url("http://img2.wikia.nocookie.net/__cb20100906190014/uncyclopedia/images/2/28/Dancing_cartoon_cat.gif");
+  background: url("https://avatars0.githubusercontent.com/u/2687188?s=140");
   height: 40px;
   width: 40px;
   background-size: 40px;
@@ -1186,7 +1548,7 @@ h1 {
   transform: rotateY(-40deg);
 }
 .ess-top-header .right-header-area #logoutSection a {
-  padding: 15px;
+  padding: 13px;
   display: block;
   text-decoration: none !important;
   color: white;
@@ -1218,13 +1580,14 @@ h1 {
 }
 #topNavList li {
   display: inline;
-  line-height: 50px;
+  line-height: 45px;
   padding: 10px 20px;
   margin-right: 7px;
   cursor: pointer;
 }
 #topNavList li.active {
   font-weight: 600;
+  background: rgba(65, 150, 167, 0.4);
 }
 #topNavList li .nav-icon {
   margin-right: 5px;
@@ -1233,32 +1596,15 @@ h1 {
   position: relative;
   top: -1px;
 }
-#topNavList li#dashboardLink {
-  border-bottom: 1px solid #d19525;
-}
-#topNavList li#dashboardLink:hover {
-  background: rgba(209, 149, 37, 0.4);
-}
-#topNavList li#timeAttendanceLink {
-  border-bottom: 1px solid #4196a7;
-}
-#topNavList li#timeAttendanceLink:hover {
+#topNavList li:hover {
   background: rgba(65, 150, 167, 0.4);
 }
-#topNavList li#payrollLink {
-  border-bottom: 1px solid #799933;
-}
-#topNavList li#payrollLink:hover {
-  background: rgba(121, 153, 51, 0.4);
-}
-#topNavList li#helpLink {
-  border-bottom: 1px solid #aaa;
-}
-#topNavList li#helpLink:hover {
-  background: rgba(170, 170, 170, 0.4);
-}
 #topNavList li a {
+  color: white;
   font-size: 1.1em;
+}
+#topNavList li a:hover {
+  color: white;
 }
 /** Profile Square */
 /** Left Navigation
@@ -1292,15 +1638,8 @@ h1 {
   font-weight: 600;
   color: #004d4d;
 }
-.left-nav a {
-  color: teal;
-  text-decoration: none;
-}
-.left-nav a:hover {
-  color: #004d4d;
-}
 .content-wrapper {
-  padding-top: 50px;
+  padding-top: 45px;
   padding-bottom: 40px;
   background: #fafafa;
   width: 1150px;
@@ -1331,7 +1670,7 @@ h1 {
 }
 .content-container {
   margin: 20px 0 0 260px;
-  width: 840px;
+  width: 880px;
   background: #fefefe;
   position: relative;
   -webkit-box-shadow: 0px 1px 10px #eeeeee;
@@ -1367,28 +1706,35 @@ h1 {
   width: 400px;
   padding-bottom: 10px;
 }
-.content-container.dual div.left-container h1,
-.content-container.dual section.left-container h1 {
-  border-bottom: 4px solid #d19525;
+.content-controls {
+  margin-top: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  text-align: center;
 }
-.content-container.dual div.right-container h1,
-.content-container.dual section.right-container h1 {
-  border-bottom: 4px solid #808d0a;
+.content-controls p {
+  font-weight: 600;
+  color: #006b80;
 }
-p.content-info {
+.content-info {
   background: rgba(236, 237, 238, 0.33);
   margin-top: 0;
   padding: 10px;
   color: #222;
   text-align: center;
 }
-/** Time Record Entry Page
------------------------------*/
+.content-info.no-bottom-margin {
+  margin-bottom: 0;
+}
+/*
+  --- Time Record Entry Page ---
+*/
 table#timeRecordTable thead tr th {
   width: 65px;
 }
 table#timeRecordTable tbody tr {
-  height: 35px;
+  height: 32px;
 }
 table#timeRecordTable tbody tr.time-record-row td:nth-child(1) {
   width: 150px;
@@ -1398,8 +1744,6 @@ table#timeRecordTable tbody tr.time-totals-row td:first-child {
   font-weight: 600;
 }
 table#timeRecordTable tbody tr.time-totals-row td:last-child {
-  background: #006b80;
-  color: white;
   font-size: 1.1em;
   font-weight: 600;
 }
@@ -1413,7 +1757,7 @@ table#timeRecordTable tbody tr td {
 table#timeRecordTable tbody tr td input[type="text"],
 table#timeRecordTable tbody tr td input[type="number"] {
   width: 55px;
-  height: 35px;
+  height: 32px;
   font-size: 1.1em;
   text-align: center;
   border: 0;
@@ -1422,23 +1766,24 @@ table#timeRecordTable tbody tr td input[type="number"] {
 table#timeRecordTable tbody tr td.today {
   border-left: 3px solid #799933;
 }
-#payPeriodListContainer {
+#record-selection-container {
   text-align: center;
   padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 107, 128, 0.55);
 }
-#payPeriodListContainer table {
+#record-selection-container table {
   text-align: center;
   width: 90%;
   margin: auto;
 }
-#payPeriodListContainer table tr.active {
+#record-selection-container table tr.active {
   background: #e7e9f6;
 }
-#payPeriodListContainer table th {
+#record-selection-container table th {
   border-bottom: 1px solid #ccc;
 }
-#payPeriodListContainer table th,
-#payPeriodListContainer table td {
+#record-selection-container table th,
+#record-selection-container table td {
   padding: 5px;
 }
 #hourlyAccrualContainer {
@@ -1459,8 +1804,19 @@ table#timeRecordTable tbody tr td.today {
 }
 .accrual-component .captioned-hour-square .hours-caption {
   font-size: 1em;
-  border-bottom: 1px solid #bbb;
-  line-height: 17px;
+  line-height: 20px;
+}
+.accrual-component .captioned-hour-square .hours-caption.sick {
+  background: #d19525;
+  color: white;
+}
+.accrual-component .captioned-hour-square .hours-caption.personal {
+  background: #006b80;
+  color: white;
+}
+.accrual-component .captioned-hour-square .hours-caption.vacation {
+  background: #799933;
+  color: white;
 }
 .accrual-component .captioned-hour-square .hours-display {
   font-size: 1.2em;
@@ -1503,7 +1859,45 @@ table#timeRecordTable tbody tr td.today {
 }
 #saveRecordContainer input[type="button"] {
   margin-top: 10px;
-  width: 230px;
+  width: 100px;
+}
+/*
+  --- Attendance History Page ---
+*/
+.attendance-listing-table tbody tr {
+  border-bottom: 1px solid #eee !important;
+}
+.attendance-listing-table tbody tr:hover {
+  background: rgba(0, 107, 128, 0.05);
+}
+.attendance-listing-table tbody tr:nth-child(even) {
+  background: rgba(51, 51, 51, 0.05);
+}
+.attendance-listing-table tbody tr td {
+  padding: .5em;
+  border-right: 1px solid #eee;
+}
+.attendance-listing-table tbody tr td .action-link {
+  font-size: .9em;
+}
+table.attendance-entry-sub-table {
+  width: 100%;
+  font-size: 1em;
+  border-left: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+table.attendance-entry-sub-table tbody tr {
+  border-bottom: none !important;
+}
+table.attendance-entry-sub-table tbody tr:nth-child(odd) {
+  background: rgba(51, 51, 51, 0.05);
+}
+table.attendance-entry-sub-table tbody tr td {
+  padding: .4em !important;
+  border-right: 1px solid #ddd;
+}
+table.attendance-entry-sub-table.small-text tbody tr td {
+  font-size: 0.9em !important;
 }
 /*
   --- Request Time Off Page ---
@@ -1563,7 +1957,6 @@ table#timeRecordTable tbody tr td.today {
   --- View Pay Period Calendar Page ---
 */
 .pay-period-cal-container .legend-container {
-  margin-left: 80px;
   color: #777;
 }
 .pay-period-cal-container .legend-container .legend-block {
@@ -1592,7 +1985,7 @@ table#timeRecordTable tbody tr td.today {
 }
 .pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .current-date span {
   font-weight: 600;
-  border: 1px dashed #d19525;
+  border: 2px solid #006b80;
 }
 .pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .weekend-date span {
   color: #aaa;
@@ -1624,22 +2017,44 @@ table#timeRecordTable tbody tr td.today {
 /**
   --- Accrual History Page ---
 */
-#detail-acc-history-table {
+#detail-acc-history-table,
+#accrual-usage-details-table {
   width: 100%;
 }
-#detail-acc-history-table thead tr {
+#detail-acc-history-table thead tr,
+#accrual-usage-details-table thead tr {
   border-bottom: 1px solid #ddd;
 }
-#detail-acc-history-table thead tr th {
+#detail-acc-history-table thead tr th,
+#accrual-usage-details-table thead tr th {
   border-right: 1px solid #ddd;
   padding: .3em 0;
 }
-#detail-acc-history-table thead tr:last-of-type {
+#detail-acc-history-table thead tr:last-of-type,
+#accrual-usage-details-table thead tr:last-of-type {
   border-bottom: 1px solid #006b80;
 }
-#detail-acc-history-table tbody tr td {
+#detail-acc-history-table tbody tr:nth-child(even),
+#accrual-usage-details-table tbody tr:nth-child(even) {
+  background: rgba(51, 51, 51, 0.05);
+}
+#detail-acc-history-table tbody tr td,
+#accrual-usage-details-table tbody tr td {
   border-bottom: 1px solid #ddd;
   border-right: 1px solid #ddd;
   text-align: center;
   padding: .4em 0;
+}
+/**
+  --- Manage Employee Records Page ---
+*/
+table.approve-attendance-rec-table tbody td {
+  padding: .5em;
+}
+.small-employee-profile-pic {
+  height: 30px;
+  width: 30px;
+  background-size: 30px;
+  background-repeat: no-repeat;
+  background-image: url("http://strangebeaver.com/wp-content/uploads/2011/01/fb/16.jpg");
 }

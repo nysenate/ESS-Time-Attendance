@@ -36,7 +36,7 @@
 
         <section class="content-wrapper" ng-controller="MainCtrl as main">
 
-            <ess-component-nav:nav-header topicTitle="Time And Attendance" pageTitle="Time Record Entry"/>
+            <ess-component-nav:nav-header topicTitle="Time And Attendance" pageTitle="Current page name"/>
             <ess-component-nav:time-nav/>
 
             <div class="view-animate-container">

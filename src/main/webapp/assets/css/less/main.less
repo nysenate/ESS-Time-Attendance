@@ -39,6 +39,12 @@ ul {
   list-style: none;
 }
 
+ol.horizontal, ul.horizontal {
+  li {
+    display: inline-block;
+  }
+}
+
 label {
   color: #111;
   .font-weight-light;
@@ -58,12 +64,25 @@ input[type="text"], input[type="password"], input[type="number"] {
 }
 
 input[type="button"].submit-button {
+  .styled-button(@green, white);
+}
+
+input[type="button"].reject-button {
+  .styled-button(@redorange, white);
+}
+
+input[type="button"].neutral-button {
+  .styled-button(@teal, white);
+}
+
+.styled-button(@bgColor, @textColor) {
   padding: 5px 10px;
-  background: @green;
-  color: white;
+  background: @bgColor;
+  color: @textColor;
   .font-weight-bold;
   border-style: none none solid none;
-  border-bottom: 3px solid darken(@green, 10%);
+  border-width: 2px;
+  border-color: darken(@bgColor, 10%);
 
   &.inactive {
     background: none;
@@ -74,7 +93,7 @@ input[type="button"].submit-button {
   }
 
   &:hover {
-    background: saturate(@green, 20%);
+    background: saturate(@bgColor, 20%);
   }
 }
 
@@ -108,6 +127,10 @@ hr {
   clear: both;
 }
 
+.hidden {
+  display: none;
+}
+
 button {
   border: 1px solid #aaa;
   background: #eee;
@@ -121,7 +144,7 @@ button {
 }
 
 select {
-  padding: .3em;
+  padding: .3em .5em;
   background: white;
   border: 1px solid #999;
 }
@@ -133,6 +156,15 @@ textarea {
 /** Header Tags */
 h1 {
   color: #333;
+}
+
+a {
+  color: teal;
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+    color: darken(teal, 10%);
+  }
 }
 
 .bold-text {
@@ -177,7 +209,7 @@ h1 {
   //background: #fafafa;
   background: #3d3d3d;
   border-bottom: 1px solid #222;
-  height:50px;
+  height:45px;
   z-index: 100;
   color: white;
   overflow: hidden;
@@ -188,7 +220,7 @@ h1 {
     .nysslogo {
       .nysslogo(35px);
       float: left;
-      margin-top: 8px;
+      margin-top: 5px;
       margin-left: 10px;
     }
 
@@ -200,7 +232,7 @@ h1 {
       #logoText {
         .font-weight-light;
         font-size: 1.6em;
-        line-height: 50px;
+        line-height: 45px;
         margin-left: 10px;
 
         #subLogoText {
@@ -220,7 +252,7 @@ h1 {
     #profileSection {
       float:left;
       padding: 0;
-      line-height: 43px;
+      line-height: 45px;
 
       &:hover {
         background: lighten(#323232, 5%);
@@ -228,12 +260,12 @@ h1 {
 
       #headerProfileSquare {
         margin-right: 5px;
-        margin-top: 5px;
+        margin-top: 3px;
         .profile-square(40px);
         .transform(rotateY(0deg));
         float: left;
         #headerProfileImg {
-          background: url("http://img2.wikia.nocookie.net/__cb20100906190014/uncyclopedia/images/2/28/Dancing_cartoon_cat.gif");
+          background: url("https://avatars0.githubusercontent.com/u/2687188?s=140");
           .image-size(40px);
         }
       }
@@ -258,7 +290,7 @@ h1 {
       }
 
       a {
-        padding: 15px;
+        padding: 13px;
         display: block;
         text-decoration: none !important;
         color: white;
@@ -285,13 +317,14 @@ h1 {
 
   li {
     display: inline;
-    line-height:50px;
+    line-height:45px;
     padding: 10px 20px;
     margin-right: 7px;
     cursor: pointer;
 
     &.active {
       font-weight: 600;
+      background: fade(@light-teal, 40%);
     }
 
     .nav-icon {
@@ -302,36 +335,16 @@ h1 {
       top: -1px;
     }
 
-    &#dashboardLink {
-      &:hover {
-        background: fade(@orange, 40%);
-      }
-      border-bottom: 1px solid @orange;
-    }
-
-    &#timeAttendanceLink {
-      &:hover {
-        background: fade(@light-teal, 40%);
-      }
-      border-bottom: 1px solid @light-teal;
-    }
-
-    &#payrollLink {
-      &:hover {
-        background: fade(@green, 40%);
-      }
-      border-bottom: 1px solid @green;
-    }
-
-    &#helpLink {
-      &:hover {
-        background: fade(#aaa, 40%);
-      }
-      border-bottom: 1px solid #aaa;
+    &:hover {
+      background: fade(@light-teal, 40%);
     }
 
     a {
+      color: white;
       font-size: 1.1em;
+      &:hover {
+        color: white;
+      }
     }
   }
 }
@@ -375,19 +388,11 @@ h1 {
       }
     }
   }
-
-  a {
-    color: teal;
-    text-decoration: none;
-    &:hover {
-      color: darken(teal, 10%);
-    }
-  }
 }
 
 .content-wrapper {
  // margin-left: @nav-width;
-  padding-top: 50px;
+  padding-top: 45px;
   padding-bottom: 40px;
   background: #fafafa;
   width: 1150px;
@@ -420,7 +425,7 @@ h1 {
 
 .content-container {
   margin:20px 0 0 260px;
-  width: 840px;
+  width: 880px;
   background: #fefefe;
   position: relative;
   .box-shadow(0px 1px 10px #eee);
@@ -453,30 +458,35 @@ h1 {
         width: 400px;
         padding-bottom: 10px;
       }
-      &.left-container {
-        h1 {
-          border-bottom: 4px solid @orange;
-        }
-      }
-      &.right-container {
-        h1 {
-          border-bottom: 4px solid @olive;
-        }
-      }
     }
   }
 }
 
-p.content-info {
+.content-controls {
+  margin-top: 0;
+  .box-shadow(none);
+  text-align: center;
+  p {
+    .font-weight-bold;
+    color: @teal;
+  }
+}
+
+.content-info {
   background: rgba(236, 237, 238, 0.33);
   margin-top: 0;
   padding: 10px;
   color: #222;
   text-align: center;
+  &.no-bottom-margin {
+    margin-bottom: 0;
+  }
 }
 
-/** Time Record Entry Page
------------------------------*/
+/*
+  --- Time Record Entry Page ---
+*/
+
 table#timeRecordTable {
   thead {
     tr {
@@ -488,7 +498,7 @@ table#timeRecordTable {
 
   tbody {
     tr {
-      height: 35px;
+      height: 32px;
 
       &.time-record-row {
         td {
@@ -505,8 +515,6 @@ table#timeRecordTable {
             .font-weight-bold;
           }
           &:last-child {
-            background: @teal;
-            color: white;
             font-size: 1.1em;
             .font-weight-bold;
           }
@@ -522,7 +530,7 @@ table#timeRecordTable {
         border-right: 1px solid #dedede;
         input[type="text"], input[type="number"] {
           width: 55px;
-          height: 35px;
+          height: 32px;
           font-size: 1.1em;
           text-align: center;
           border: 0;
@@ -537,9 +545,10 @@ table#timeRecordTable {
   }
 }
 
-#payPeriodListContainer {
+#record-selection-container {
   text-align: center;
   padding-bottom: 10px;
+  border-bottom: 1px solid fade(@teal, 55%);
   table {
     text-align: center;
     width: 90%;
@@ -577,8 +586,22 @@ table#timeRecordTable {
 
     .hours-caption {
       font-size: 1em;
-      border-bottom: 1px solid #bbb;
-      line-height: 17px;
+      line-height: 20px;
+
+      &.sick {
+        background: #d19525;
+        color: white;
+      }
+
+      &.personal {
+        background: @teal;
+        color: white;
+      }
+
+      &.vacation {
+        background: #799933;
+        color: white;
+      }
     }
 
     .hours-display {
@@ -627,9 +650,72 @@ table#timeRecordTable {
   background: #f9f9f9;
   input[type="button"] {
     margin-top: 10px;
-    width: 230px;
+    width: 100px;
   }
 }
+
+/*
+  --- Attendance History Page ---
+*/
+
+.attendance-listing-table {
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee !important;
+
+      &:hover {
+        background: fade(@teal, 5%);
+      }
+
+      &:nth-child(even) {
+        background: fade(#333, 5%);
+      }
+
+      td {
+        padding: .5em;
+        border-right: 1px solid #eee;
+
+        .action-link {
+          font-size: .9em;
+        }
+      }
+    }
+  }
+}
+
+table.attendance-entry-sub-table {
+  width:100%;
+  font-size:1em;
+  border-left:1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  thead {
+    tr {
+
+    }
+  }
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        background: fade(#333, 5%);
+      }
+      border-bottom: none !important;
+      td {
+        padding: .4em !important;
+        border-right: 1px solid #ddd;
+      }
+    }
+  }
+  &.small-text {
+    tbody {
+      tr {
+        td {
+          font-size: 0.9em !important;
+        }
+      }
+    }
+  }
+}
+
 
 /*
   --- Request Time Off Page ---
@@ -701,7 +787,6 @@ table#timeRecordTable {
 
 .pay-period-cal-container {
   .legend-container {
-    margin-left:80px;
     color:#777;
 
     .legend-block {
@@ -733,7 +818,7 @@ table#timeRecordTable {
         .current-date {
           span {
             .font-weight-bold;
-            border: 1px dashed @orange;
+            border: 2px solid @teal;
           }
         }
         .weekend-date {
@@ -775,7 +860,7 @@ table#timeRecordTable {
   --- Accrual History Page ---
 */
 
-#detail-acc-history-table {
+#detail-acc-history-table, #accrual-usage-details-table {
   width: 100%;
   thead {
     tr {
@@ -791,6 +876,9 @@ table#timeRecordTable {
   }
   tbody {
     tr {
+      &:nth-child(even) {
+        background: fade(#333, 5%);
+      }
       td {
         border-bottom: 1px solid #ddd;
         border-right: 1px solid #ddd;
@@ -799,6 +887,23 @@ table#timeRecordTable {
       }
     }
   }
+}
+
+/**
+  --- Manage Employee Records Page ---
+*/
+
+table.approve-attendance-rec-table {
+  tbody {
+    td {
+      padding: .5em;
+    }
+  }
+}
+
+.small-employee-profile-pic {
+  .image-size(30px);
+  background-image: url("http://strangebeaver.com/wp-content/uploads/2011/01/fb/16.jpg");
 }
 
 

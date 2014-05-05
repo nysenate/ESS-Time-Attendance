@@ -11,12 +11,6 @@
             <div class="accrual-section">
                 <div class="accrual-component">
                     <div class="captioned-hour-square">
-                        <div class="hours-caption">Sick</div>
-                        <div class="hours-display">{{sick}}</div>
-                    </div>
-                </div>
-                <div class="accrual-component">
-                    <div class="captioned-hour-square">
                         <div class="hours-caption">Personal</div>
                         <div class="hours-display">{{personal}}</div>
                     </div>
@@ -25,6 +19,12 @@
                     <div class="captioned-hour-square">
                         <div class="hours-caption">Vacation</div>
                         <div class="odometer hours-display">{{vac}}</div>
+                    </div>
+                </div>
+                <div class="accrual-component">
+                    <div class="captioned-hour-square">
+                        <div class="hours-caption">Sick</div>
+                        <div class="hours-display">{{sick}}</div>
                     </div>
                 </div>
             </div>

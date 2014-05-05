@@ -1,2 +1,2 @@
-var essApp = angular.module('ess');
+var essTime = angular.module('essTime');
 
