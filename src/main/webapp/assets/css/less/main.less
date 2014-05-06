@@ -197,6 +197,19 @@ a {
   .bold-text;
 }
 
+/**
+  --- Icons ---
+*/
+.close-red {
+  .icon-image('20px-e74c3c', 'cross.png');
+  .image-size(20px);
+  cursor: pointer;
+
+  &:hover {
+    .icon-image('20px-ff5544', 'cross.png');
+  }
+}
+
 #wrapper {
   height: 100%;
 }
@@ -300,7 +313,7 @@ a {
           .transition(.3s);
           margin-right: 5px;
           float: left;
-          background: url('../../img/logout.png');
+          .icon-image('20px-ffffff', 'logout.png');
           .image-size(20px);
         }
       }
@@ -466,9 +479,14 @@ a {
   margin-top: 0;
   .box-shadow(none);
   text-align: center;
+
   p {
     .font-weight-bold;
     color: @teal;
+  }
+
+  .content-info {
+    border-bottom: none;
   }
 }
 
@@ -478,8 +496,10 @@ a {
   padding: 10px;
   color: #222;
   text-align: center;
+  border-bottom: 1px solid fade(@teal, 55%);
   &.no-bottom-margin {
     margin-bottom: 0;
+    border-bottom: none;
   }
 }
 
@@ -860,7 +880,7 @@ table.attendance-entry-sub-table {
   --- Accrual History Page ---
 */
 
-#detail-acc-history-table, #accrual-usage-details-table {
+.accruals-table, #detail-acc-history-table, #accrual-usage-details-table {
   width: 100%;
   thead {
     tr {
@@ -905,6 +925,72 @@ table.approve-attendance-rec-table {
   .image-size(30px);
   background-image: url("http://strangebeaver.com/wp-content/uploads/2011/01/fb/16.jpg");
 }
+
+#review-records-modal {
+  #record-selection-pane {
+    display:inline-block;
+    height:515px;
+    width:400px;
+    margin:0;
+    vertical-align: top;
+    border-right: 1px solid #ccc;
+    background: #f5f5f5;
+
+    #record-selection-table {
+      background:white;
+      tbody {
+        tr {
+          &:hover {
+            background: rgba(255, 255, 182, 0.77);
+            cursor: pointer;
+          }
+          &.active {
+            background: rgb(255, 255, 182);
+          }
+          &.approved {
+            background:rgb(207, 252, 158);
+          }
+          &.rejected {
+            background: @redorange;
+          }
+
+          td {
+            &.name-column {
+              text-align:left;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #record-details-view {
+    display: inline-block;
+    width: 670px;
+    margin: 0;
+
+    #remarks-container {
+      padding: .3em;
+      text-align: center;
+    }
+
+    #action-container {
+      text-align: center;
+      margin: 0.4em 0;
+      background: #f1f1f1;
+      padding: .5em;
+    }
+  }
+
+  .pane-title {
+    text-align: center;
+    margin: 0;
+    padding: .4em;
+    font-weight: 600;
+    background: white;
+  }
+}
+
 
 
 

@@ -34,13 +34,17 @@ essApp.config(function($routeProvider, $locationProvider) {
         controller: 'TestCtrl'
     });
 
-    $routeProvider.when(ctxPath + '/time/timeoff/request', {
-        templateUrl: ctxPath + '/template/time/timeoff/request',
+    $routeProvider.when(ctxPath + '/time/record/manage', {
+        templateUrl: ctxPath + '/template/time/record/manage',
         controller: 'TestCtrl'
     });
 
-    $routeProvider.when(ctxPath + '/time/record/manage', {
-        templateUrl: ctxPath + '/template/time/record/manage',
+    $routeProvider.when(ctxPath + '/time/record/grant', {
+        templateUrl: ctxPath + '/template/time/record/grant'
+    });
+
+    $routeProvider.when(ctxPath + '/time/timeoff/request', {
+        templateUrl: ctxPath + '/template/time/timeoff/request',
         controller: 'TestCtrl'
     });
 
@@ -51,6 +55,11 @@ essApp.config(function($routeProvider, $locationProvider) {
 
     $routeProvider.when(ctxPath + '/time/accrual/history', {
         templateUrl: ctxPath + '/template/time/accrual/history',
+        controller: 'TestCtrl'
+    });
+
+    $routeProvider.when(ctxPath + '/time/accrual/projections', {
+        templateUrl: ctxPath + '/template/time/accrual/projections',
         controller: 'TestCtrl'
     });
 

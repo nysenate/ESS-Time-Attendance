@@ -12,6 +12,10 @@
   .image-size(@size);
 }
 
+.icon-image(@dir, @name) {
+  background: url('@{root-path}/@{dir}/@{name}');
+}
+
 .user-default-icon (@size: 20px) {
   background: url('@{root-path}/user.png');
   .image-size(@size);

@@ -29,7 +29,7 @@
             </div>
         </section>
         <section id="logoutSection">
-            <a href="${ctxPath}/logout">
+            <a target="_self" href="${ctxPath}/logout">
                 <div class="logout-icon"></div>Sign Out
             </a>
         </section>

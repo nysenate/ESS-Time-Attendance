@@ -26,7 +26,6 @@ table.ess-table {
 table.ess-table thead tr {
   background: #2f8697;
   color: white;
-  border-bottom: 1px solid #006b80;
   font-size: .9em;
 }
 table.ess-table thead tr th {
@@ -381,15 +380,17 @@ button.ui-button::-moz-focus-inner {
   outline: 0;
   border: 1px solid #999;
   background: white;
-  -webkit-box-shadow: 0 0 60px #999999;
-  -moz-box-shadow: 0 0 60px #999999;
-  box-shadow: 0 0 60px #999999;
+  -webkit-box-shadow: 0 0 60px #777777;
+  -moz-box-shadow: 0 0 60px #777777;
+  box-shadow: 0 0 60px #777777;
 }
 .ui-dialog .ui-dialog-titlebar {
   padding: .7em 1em;
   position: relative;
   text-align: center;
   border-bottom: 1px solid teal;
+  background: #006b80;
+  color: white;
 }
 .ui-dialog .ui-dialog-title {
   font-size: 1.1em;
@@ -404,10 +405,21 @@ button.ui-button::-moz-focus-inner {
   position: absolute;
   right: .3em;
   top: 50%;
-  width: 20px;
   margin: -10px 0 0 0;
   padding: 1px;
+  background: url('/timesheets/assets/img/20px-ffffff/cross.png');
   height: 20px;
+  width: 20px;
+  background-size: 20px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  border: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.ui-dialog .ui-dialog-titlebar-close:hover {
+  background-color: #ff5544;
 }
 .ui-dialog .ui-dialog-content {
   position: relative;
@@ -745,7 +757,6 @@ table.ess-table {
 table.ess-table thead tr {
   background: #2f8697;
   color: white;
-  border-bottom: 1px solid #006b80;
   font-size: .9em;
 }
 table.ess-table thead tr th {
@@ -1100,15 +1111,17 @@ button.ui-button::-moz-focus-inner {
   outline: 0;
   border: 1px solid #999;
   background: white;
-  -webkit-box-shadow: 0 0 60px #999999;
-  -moz-box-shadow: 0 0 60px #999999;
-  box-shadow: 0 0 60px #999999;
+  -webkit-box-shadow: 0 0 60px #777777;
+  -moz-box-shadow: 0 0 60px #777777;
+  box-shadow: 0 0 60px #777777;
 }
 .ui-dialog .ui-dialog-titlebar {
   padding: .7em 1em;
   position: relative;
   text-align: center;
   border-bottom: 1px solid teal;
+  background: #006b80;
+  color: white;
 }
 .ui-dialog .ui-dialog-title {
   font-size: 1.1em;
@@ -1123,10 +1136,21 @@ button.ui-button::-moz-focus-inner {
   position: absolute;
   right: .3em;
   top: 50%;
-  width: 20px;
   margin: -10px 0 0 0;
   padding: 1px;
+  background: url('/timesheets/assets/img/20px-ffffff/cross.png');
   height: 20px;
+  width: 20px;
+  background-size: 20px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  border: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.ui-dialog .ui-dialog-titlebar-close:hover {
+  background-color: #ff5544;
 }
 .ui-dialog .ui-dialog-content {
   position: relative;
@@ -1452,6 +1476,20 @@ a:hover {
   margin: 0;
   font-weight: 600;
 }
+/**
+  --- Icons ---
+*/
+.close-red {
+  background: url('/timesheets/assets/img/20px-e74c3c/cross.png');
+  height: 20px;
+  width: 20px;
+  background-size: 20px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.close-red:hover {
+  background: url('/timesheets/assets/img/20px-ff5544/cross.png');
+}
 #wrapper {
   height: 100%;
 }
@@ -1565,7 +1603,7 @@ a:hover {
   transition: 0.3s;
   margin-right: 5px;
   float: left;
-  background: url('../../img/logout.png');
+  background: url('/timesheets/assets/img/20px-ffffff/logout.png');
   height: 20px;
   width: 20px;
   background-size: 20px;
@@ -1717,15 +1755,20 @@ a:hover {
   font-weight: 600;
   color: #006b80;
 }
+.content-controls .content-info {
+  border-bottom: none;
+}
 .content-info {
   background: rgba(236, 237, 238, 0.33);
   margin-top: 0;
   padding: 10px;
   color: #222;
   text-align: center;
+  border-bottom: 1px solid rgba(0, 107, 128, 0.55);
 }
 .content-info.no-bottom-margin {
   margin-bottom: 0;
+  border-bottom: none;
 }
 /*
   --- Time Record Entry Page ---
@@ -2017,27 +2060,33 @@ table.attendance-entry-sub-table.small-text tbody tr td {
 /**
   --- Accrual History Page ---
 */
+.accruals-table,
 #detail-acc-history-table,
 #accrual-usage-details-table {
   width: 100%;
 }
+.accruals-table thead tr,
 #detail-acc-history-table thead tr,
 #accrual-usage-details-table thead tr {
   border-bottom: 1px solid #ddd;
 }
+.accruals-table thead tr th,
 #detail-acc-history-table thead tr th,
 #accrual-usage-details-table thead tr th {
   border-right: 1px solid #ddd;
   padding: .3em 0;
 }
+.accruals-table thead tr:last-of-type,
 #detail-acc-history-table thead tr:last-of-type,
 #accrual-usage-details-table thead tr:last-of-type {
   border-bottom: 1px solid #006b80;
 }
+.accruals-table tbody tr:nth-child(even),
 #detail-acc-history-table tbody tr:nth-child(even),
 #accrual-usage-details-table tbody tr:nth-child(even) {
   background: rgba(51, 51, 51, 0.05);
 }
+.accruals-table tbody tr td,
 #detail-acc-history-table tbody tr td,
 #accrual-usage-details-table tbody tr td {
   border-bottom: 1px solid #ddd;
@@ -2057,4 +2106,54 @@ table.approve-attendance-rec-table tbody td {
   background-size: 30px;
   background-repeat: no-repeat;
   background-image: url("http://strangebeaver.com/wp-content/uploads/2011/01/fb/16.jpg");
+}
+#review-records-modal #record-selection-pane {
+  display: inline-block;
+  height: 515px;
+  width: 400px;
+  margin: 0;
+  vertical-align: top;
+  border-right: 1px solid #ccc;
+  background: #f5f5f5;
+}
+#review-records-modal #record-selection-pane #record-selection-table {
+  background: white;
+}
+#review-records-modal #record-selection-pane #record-selection-table tbody tr:hover {
+  background: rgba(255, 255, 182, 0.77);
+  cursor: pointer;
+}
+#review-records-modal #record-selection-pane #record-selection-table tbody tr.active {
+  background: #ffffb6;
+}
+#review-records-modal #record-selection-pane #record-selection-table tbody tr.approved {
+  background: #cffc9e;
+}
+#review-records-modal #record-selection-pane #record-selection-table tbody tr.rejected {
+  background: #e64727;
+}
+#review-records-modal #record-selection-pane #record-selection-table tbody tr td.name-column {
+  text-align: left;
+}
+#review-records-modal #record-details-view {
+  display: inline-block;
+  width: 670px;
+  margin: 0;
+}
+#review-records-modal #record-details-view #remarks-container {
+  padding: .3em;
+  text-align: center;
+}
+#review-records-modal #record-details-view #action-container {
+  text-align: center;
+  margin: 0.4em 0;
+  background: #f1f1f1;
+  padding: .5em;
+}
+#review-records-modal .pane-title {
+  text-align: center;
+  margin: 0;
+  padding: .4em;
+  font-weight: 600;
+  background: white;
 }

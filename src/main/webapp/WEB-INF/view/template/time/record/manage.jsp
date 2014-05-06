@@ -65,11 +65,14 @@
 
 <section id="review-records-modal" class="" title="Review and Approve Records">
     <p class="content-info no-bottom-margin">
-        Click a record on the left hand side to review the detailed data blah. You can then either Approve
-        or Reject the record using the buttons below.
+        Click a record from the Employee Record List on the left hand side to review the time record. You can then either Approve
+        or Reject the record.
     </p>
-    <div style="display:inline-block;height:450px;width:400px;margin:5px 0 0 10px;vertical-align: top;">
-        <table class="ess-table approve-attendance-rec-table" style="border-right: 1px solid #ddd;">
+    <div id="record-selection-pane">
+        <div class="pane-title">
+            <span>Employee Record List</span>
+        </div>
+        <table id="record-selection-table" class="ess-table approve-attendance-rec-table">
             <thead>
                 <tr>
                     <th colspan="2">Employee</th>
@@ -78,46 +81,31 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="background:rgb(207, 252, 158);">
+                <tr class="active">
                     <td><div style="background:url('https://avatars0.githubusercontent.com/u/2687188?s=30')" class="small-employee-profile-pic">&nbsp;</div></td>
-                    <td style="text-align:left;">A. Islam</td>
+                    <td class="name-column">A. Islam</td>
                     <td>04/24/14 - 05/07/14</td>
-                    <td>Approved</td>
+                    <td>Pending</td>
                 </tr>
-                <tr style="background:rgb(255, 255, 182);border-right:3px solid teal;">
+                <tr>
                     <td><div style="background:url('https://avatars0.githubusercontent.com/u/330720?s=30')" class="small-employee-profile-pic">&nbsp;</div></td>
-                    <td style="text-align:left;">S. Crain</td>
+                    <td class="name-column">S. Crain</td>
                     <td>04/24/14 - 05/07/14</td>
                     <td>Pending</td>
                 </tr>
                 <tr>
                     <td><div style="background:url('https://avatars2.githubusercontent.com/u/94740?s=30')" class="small-employee-profile-pic">&nbsp;</div></td>
-                    <td style="text-align:left;">K. Zalewski</td>
-                    <td>04/24/14 - 05/07/14</td>
-                    <td>Pending</td>
-                </tr>
-                <tr>
-                    <td><div class="small-employee-profile-pic">&nbsp;</div></td>
-                    <td style="text-align:left;">P. Emp</td>
-                    <td>04/24/14 - 05/07/14</td>
-                    <td>Approved</td>
-                </tr>
-                <tr>
-                    <td><div class="small-employee-profile-pic">&nbsp;</div></td>
-                    <td style="text-align:left;">P. Emp 2</td>
-                    <td>04/24/14 - 05/07/14</td>
-                    <td>Pending</td>
-                </tr>
-                <tr>
-                    <td><div class="small-employee-profile-pic">&nbsp;</div></td>
-                    <td style="text-align:left;">P. Emp 3</td>
+                    <td class="name-column">K. Zalewski</td>
                     <td>04/24/14 - 05/07/14</td>
                     <td>Pending</td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div style="display:inline-block;width:670px;margin:5px 0 0 10px;">
+    <div id="record-details-view">
+        <div class="pane-title">
+            <span>Record for A. Islam - 04/24/14 - 05/07/14</span>
+        </div>
         <table class="attendance-entry-sub-table ess-table small-text">
             <thead>
             <tr>
@@ -153,17 +141,82 @@
             </tbody>
         </table>
         <div>
-            <div style="padding:.3em;text-align: center;">
+            <div id="remarks-container">
                 <label>Remarks: </label>
                 <span>Any remarks made by the employee will be displayed here.</span><br/>
             </div>
-            <div style="text-align: center;margin: 0.4em 0;background: #f1f1f1;padding: .5em;">
-                <input class="reject-button" type="button" value="Reject Record"/>
+            <div id="action-container">
+                <input onclick="$('#rejection-dialog').dialog('open');" class="reject-button" type="button" value="Reject Record"/>
                 <input class="submit-button" type="button" value="Approve Record"/>
                 <input style="float:right;" onclick="$('#review-records-modal').dialog('close');" class="neutral-button" type="button" value="Close"/>
             </div>
         </div>
     </div>
+</section>
+
+<section class="content-container">
+    <h1>T&A Records Awaiting Correction By Employee</h1>
+    <p class="content-info">The following records have been rejected and are pending correction by the employee.<br/>
+        Once the employee resubmits the record it will appear in the 'Records Needing Approval' section.</p>
+    <table class="ess-table approve-attendance-rec-table">
+        <thead>
+        <tr>
+            <th>Details</th>
+            <th colspan="2">Employee</th>
+            <th>Pay Period</th>
+            <th>Approval Date</th>
+            <th>Work</th>
+            <th>Holiday</th>
+            <th>Vacation</th>
+            <th>Personal</th>
+            <th>Sick</th>
+            <th>Misc</th>
+            <th>Total Hours</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><a href="">Show</a></td>
+            <td><div class="small-employee-profile-pic">&nbsp;</div></td>
+            <td class="name-column">Rejected Employee</td>
+            <td>04/24/14 - 05/07/14</td>
+            <td>05/05/14 3:34 PM</td>
+            <td>70</td><td>70</td><td>0</td><td>0</td><td>0</td><td>0</td><td>70</td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="content-container">
+    <h1>T&A Records Pending Approval By Personnel</h1>
+    <p class="content-info">The following records have been recently approved and are awaiting approval by personnel.</p>
+    <table class="ess-table approve-attendance-rec-table">
+        <thead>
+        <tr>
+            <th>Details</th>
+            <th colspan="2">Employee</th>
+            <th>Pay Period</th>
+            <th>Approval Date</th>
+            <th>Work</th>
+            <th>Holiday</th>
+            <th>Vacation</th>
+            <th>Personal</th>
+            <th>Sick</th>
+            <th>Misc</th>
+            <th>Total Hours</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><a href="">Show</a></td>
+            <td><div style="background:url('https://avatars0.githubusercontent.com/u/2687188?s=30')" class="small-employee-profile-pic">&nbsp;</div></td>
+            <td class="name-column">A. Islam</td>
+            <td>04/24/14 - 05/07/14</td>
+            <td>05/05/14 3:34 PM</td>
+            <td>70</td><td>70</td><td>0</td><td>0</td><td>0</td><td>0</td><td>70</td>
+        </tr>
+        </tbody>
+    </table>
 </section>
 
 <section class="content-container">
@@ -173,7 +226,7 @@
     <table class="ess-table approve-attendance-rec-table">
         <thead>
         <tr>
-            <th>Preview</th>
+            <th>Details</th>
             <th colspan="2">Employee</th>
             <th>Pay Period</th>
             <th>Work</th>
@@ -188,7 +241,7 @@
         <tbody>
         <tr>
             <td><a>Show</a></td>
-            <td><div style="background:url('https://avatars0.githubusercontent.com/u/2687188?s=30')" class="small-employee-profile-pic">&nbsp;</div></td>
+            <td><div class="small-employee-profile-pic">&nbsp;</div></td>
             <td>Employee 1 Fullname</td>
             <td>04/24/14 - 05/07/14</td>
             <td>70</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>70</td>
@@ -225,11 +278,26 @@
     </table>
 </section>
 
+<section id="rejection-dialog" title="Reject Time Record">
+    <p class="content-info no-bottom-margin">Explain the reason for rejecting the time record.</p>
+    <textarea style="resize:none;margin:10px;width:375px;height:100px;" placeholder="Reason for rejection"></textarea>
+    <div style="padding:.4em;background:#eee;text-align: center;">
+        <input class="reject-button" type="button" value="Reject Record"/>
+        <input style="float:right;" onclick="$('#rejection-dialog').dialog('close');" class="neutral-button" type="button" value="Cancel"/>
+    </div>
+</section>
+
 <script>
     $("#review-records-modal").dialog({
         width: 1100,
         modal: true,
         autoOpen: false
+    });
+
+    $("#rejection-dialog").dialog({
+        modal: true,
+        autoOpen: false,
+        width: 400
     });
 
     $("#review-sel-records-btn").click(function(){
