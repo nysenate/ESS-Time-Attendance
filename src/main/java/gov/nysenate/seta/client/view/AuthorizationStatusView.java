@@ -1,6 +1,6 @@
 package gov.nysenate.seta.client.view;
 
-import gov.nysenate.seta.security.AuthorizationStatus;
+import gov.nysenate.seta.model.auth.AuthorizationStatus;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

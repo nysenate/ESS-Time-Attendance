@@ -1,7 +1,7 @@
 package gov.nysenate.seta.security.filter;
 
 import gov.nysenate.seta.client.response.auth.AuthenticationResponse;
-import gov.nysenate.seta.security.AuthenticationStatus;
+import gov.nysenate.seta.model.auth.AuthenticationStatus;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import gov.nysenate.seta.util.HttpResponseUtils;
 import org.apache.shiro.authc.*;
@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ *
+ */
 public class EssAuthenticationFilter extends AuthenticationFilter
 {
     private static final Logger logger = LoggerFactory.getLogger(EssAuthenticationFilter.class);
@@ -34,8 +37,7 @@ public class EssAuthenticationFilter extends AuthenticationFilter
     @Resource(name = "xsrfValidator", description = "Generates/Validates XSRF Tokens")
     private XsrfValidator xsrfValidator;
 
-    /** Overrides
-     * -----------*/
+    /** --- Overrides --- */
 
     /**
      * Overrides functionality so that login page requests are redirected back to the previous url if
@@ -77,8 +79,7 @@ public class EssAuthenticationFilter extends AuthenticationFilter
         return authenticated && !loginRequest;
     }
 
-    /** Internals
-     * ------------*/
+    /** --- Internals --- */
 
     protected String applyXsrfToken(ServletRequest request, ServletResponse response) {
         Subject subject = getSubject(request, response);

@@ -1,14 +1,13 @@
 package gov.nysenate.seta.config;
 
 import gov.nysenate.seta.security.filter.EssAuthenticationFilter;
-import gov.nysenate.seta.security.realm.SenateLdapRealm;
+import gov.nysenate.seta.security.realm.EssLdapRealm;
 import gov.nysenate.seta.security.xsrf.XsrfTokenValidator;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
-import org.apache.shiro.authz.SimpleRole;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
-import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
@@ -19,12 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 
-import javax.annotation.Resource;
 import javax.servlet.Filter;
 
 /**
@@ -41,6 +37,9 @@ public class SecurityConfig
     @Value("${login.url:/login}") private String loginUrl;
     @Value("${login.success.url:/}") private String loginSuccessUrl;
     @Value("${xsrf.token.bytes:128}") private int xsrfBytesSize;
+
+    @Autowired
+    private EssLdapRealm essLdapRealm;
 
     /**
      * Shiro Filter factory that sets up the url authentication mechanism and applies the security
@@ -62,7 +61,7 @@ public class SecurityConfig
     @Bean(name = "securityManager")
     public WebSecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(senateLdapRealm());
+        securityManager.setRealm(essLdapRealm);
         return securityManager;
     }
 
@@ -73,8 +72,7 @@ public class SecurityConfig
      */
     @Bean(name = "essAuthc")
     public Filter essAuthenticationFilter() {
-        Filter essAuth = new EssAuthenticationFilter();
-        return essAuth;
+        return new EssAuthenticationFilter();
     }
 
     /**
@@ -89,17 +87,8 @@ public class SecurityConfig
      * Exposes the shiro.ini configuration file as an Ini instance that is consumed by the
      * security filter manager when setting up the filter chains.
      */
-    @Bean(name = "shiroIniConfig")
     public Ini shiroIniConfig() {
         return Ini.fromResourcePath("classpath:shiro.ini");
-    }
-
-    /**
-     * Provides a SenateLdapRealm instance that handles LDAP based authentication.
-     */
-    @Bean(name = "senateLdapRealm")
-    public Realm senateLdapRealm() {
-        return new SenateLdapRealm();
     }
 
     /**

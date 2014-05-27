@@ -1,7 +1,7 @@
 package gov.nysenate.seta.controller.rest;
 
 import gov.nysenate.seta.client.response.auth.AuthorizationResponse;
-import gov.nysenate.seta.security.AuthorizationStatus;
+import gov.nysenate.seta.model.auth.AuthorizationStatus;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.subject.Subject;

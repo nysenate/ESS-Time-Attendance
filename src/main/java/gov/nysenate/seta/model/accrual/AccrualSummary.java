@@ -33,6 +33,7 @@ public class AccrualSummary extends AccrualUsage
         return getTotalEmpHoursAccrued().subtract(empHoursUsed).subtract(famHoursUsed);
     }
 
+    /** TODO: The max limit might not make sense. Learn the rules for this */
     public BigDecimal getTotalVacHoursAccrued() {
         BigDecimal hrs = vacHoursBanked.add(vacHoursAccrued);
         return (hrs.compareTo(MAX_VAC_ACCRUED) <= 0) ? hrs : MAX_VAC_ACCRUED;

@@ -2,11 +2,9 @@ package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.personnel.mapper.EmployeeRowMapper;
-import gov.nysenate.seta.model.exception.EmployeeException;
-import gov.nysenate.seta.model.exception.EmployeeNotFoundEx;
-import gov.nysenate.seta.model.payroll.PayType;
+import gov.nysenate.seta.model.personnel.EmployeeException;
+import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
 import gov.nysenate.seta.model.personnel.*;
-import gov.nysenate.seta.model.unit.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static gov.nysenate.seta.model.personnel.TransactionType.*;
 
 @Repository
 public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
@@ -60,13 +55,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     protected static final String GET_EMP_BY_ID_SQL = String.format(GET_EMP_SQL_TMPL, "per.NUXREFEM = :empId");
     protected static final String GET_EMP_BY_EMAIL_SQL = String.format(GET_EMP_SQL_TMPL, "per.NAEMAIL = :email");
     protected static final String GET_ACTIVE_EMPS_SQL = String.format(GET_EMP_SQL_TMPL, "per.CDEMPSTATUS = 'A'");
-
-    /** Set of TransactionTypes that involve data used to construct an Employee. */
-    protected static Set<TransactionType> effectiveTransTypes = new HashSet<>();
-    static {
-        effectiveTransTypes.addAll(
-                Arrays.asList(APP, AGY, EMP, LEG, LOC, MAR, NAM, NAT, PHO, RTP, SEX, SUP, TLE, TYP));
-    }
+    protected static final String GET_EMPS_BY_IDS_SQL = String.format(GET_EMP_SQL_TMPL, "per.NUXREFEM IN :empIdSet");
 
     /** {@inheritDoc} */
     @Cacheable(value = "employees")
@@ -76,8 +65,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         try {
-            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_ID_SQL, params,
-                    new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
+            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_ID_SQL, params, getEmployeeRowMapper());
         }
         catch (DataRetrievalFailureException ex) {
             logger.warn("Retrieve employee {} error: {}", empId, ex.getMessage());
@@ -89,13 +77,39 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     /** {@inheritDoc} */
     @Override
     public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds) {
-        return null;
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("empIdSet", new HashSet<>(empIds));
+        return getEmployeeMap(GET_EMPS_BY_IDS_SQL, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<Integer> getActiveEmployeeIds() {
-        return null;
+    public Employee getEmployeeByEmail(String email) throws EmployeeException {
+        Employee employee;
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("email", email);
+        try {
+            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_EMAIL_SQL, params, getEmployeeRowMapper());
+        }
+        catch (DataRetrievalFailureException ex) {
+            throw new EmployeeNotFoundEx("No matching employee record for email: " + email);
+        }
+        return employee;
+    }
+
+    /**
+     * Helper method to create employee id -> Employee object mappings.
+     * @param sql String - The sql query to execute
+     * @param params MapSqlParameterSource - The parameters to supply to the sql query.
+     * @return Map(Integer, Employee)
+     */
+    private Map<Integer, Employee> getEmployeeMap(String sql, MapSqlParameterSource params) {
+        Map<Integer, Employee> employeeMap = new LinkedHashMap<>();
+        List<Employee> employees = remoteNamedJdbc.query(sql, params, getEmployeeRowMapper());
+        for (Employee emp : employees) {
+            employeeMap.put(emp.getEmployeeId(), emp);
+        }
+        return employeeMap;
     }
 
     /** {@inheritDoc} */
@@ -110,109 +124,8 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Employee getEmployeeByEmail(String email) throws EmployeeException {
-        Employee employee;
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("email", email);
-        try {
-            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_EMAIL_SQL, params,
-                    new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
-        }
-        catch (DataRetrievalFailureException ex) {
-            throw new EmployeeNotFoundEx("No matching employee record for email: " + email);
-        }
-        return employee;
-    }
-
-    /** {@inheritDoc} */
-    //@Override
-    public List<Employee> getActiveEmployees() {
-        return remoteNamedJdbc.query(GET_ACTIVE_EMPS_SQL,
-                new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_"));
-    }
-
-    /** {@inheritDoc} */
-    //@Override
-    public Map<Integer, Employee> getActiveEmployeeMap() {
-        List<Employee> activeEmployees = getActiveEmployees();
-        Map<Integer, Employee> actEmpMap = new ConcurrentHashMap<>();
-        for (Employee emp : activeEmployees) {
-            actEmpMap.put(emp.getEmployeeId(), emp);
-        }
-        return actEmpMap;
-    }
-
-    /**
-     *
-     * @param emp Employee -
-     * @param latestTransMap Map(TransactionType, TransactionRecord) -
-     * @return Employee
-     */
-    protected Employee getEmployeeSnapshot(Employee emp, Map<TransactionType, TransactionRecord> latestTransMap) {
-        if (emp != null) {
-            for (TransactionType type : latestTransMap.keySet()) {
-                Map<String, String> valueMap = latestTransMap.get(type).getValueMap();
-                switch (type) {
-                    case AGY : { /** Responsibility center. */
-                        break;
-                    }
-                    case EMP : { /** Employee status (active/inactive) */
-                        emp.setActive(valueMap.get("CDEMPSTATUS").equals("A"));
-                        break;
-                    }
-                    case LEG : { /** Home address */
-                        Address address = new Address();
-                        address.setAddr1(valueMap.get("ADSTREET1"));
-                        address.setAddr1(valueMap.get("ADSTREET2"));
-                        address.setAddr1(valueMap.get("ADCITY"));
-                        address.setAddr1(valueMap.get("ADSTATE"));
-                        address.setAddr1(valueMap.get("ADZIPCODE"));
-                        emp.setHomeAddress(address);
-                        break;
-                    }
-                    case LOC : { /** Work location */
-                        break;
-                    }
-                    case MAR : { /** Marital status */
-                        emp.setMaritalStatus(MaritalStatus.valueOfCode(valueMap.get("CDMARITAL")));
-                        break;
-                    }
-                    case NAM : { /** Employee's name */
-                        emp.setFirstName(valueMap.get("NAFIRST"));
-                        emp.setLastName(valueMap.get("NALAST"));
-                        emp.setInitial(valueMap.get("NAMIDINIT"));
-                        emp.setFullName(String.format("%s %s %s", emp.getFirstName(), emp.getInitial(), emp.getLastName()));
-                        break;
-                    }
-                    case NAT : { /** Employee's title (Mr, Ms, etc.) */
-                        emp.setTitle(valueMap.get("NATITLE"));
-                        break;
-                    }
-                    case PHO : { /** Employee's phone number */
-                        emp.setHomePhone(valueMap.get("ADPHONENUM"));
-                        emp.setWorkPhone(valueMap.get("ADPHONENUMW"));
-                        break;
-                    }
-                    case SEX : { /** Gender info */
-                        emp.setGender(Gender.valueOf(valueMap.get("CDSEX")));
-                        break;
-                    }
-                    case SUP : { /** T&A Supervisor id */
-                        emp.setSupervisorId(Integer.parseInt(valueMap.get("NUXREFSV")));
-                        break;
-                    }
-                    case TLE : { /** Job title */
-                        break;
-                    }
-                    case TYP : { /** Pay type */
-                        emp.setPayType(PayType.valueOf(valueMap.get("CDPAYTYPE")));
-                        break;
-                    }
-                }
-            }
-        }
-        return emp;
+    /** Returns a EmployeeRowMapper that's configured for use in this dao */
+    private EmployeeRowMapper getEmployeeRowMapper() {
+        return new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_");
     }
 }

@@ -4,34 +4,31 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 
-/**
- * Created by riken on 3/4/14.
- */
-public class TimeRecord {
-
-    protected BigDecimal timesheetId;
+public class TimeRecord
+{
+    protected BigDecimal timeRecordId;
     protected BigDecimal employeeId;
-    protected String tOriginalUserId;
-    protected String tUpdateUserId;
-    protected Timestamp tOriginalDate;
-    protected Timestamp tUpdateDate;
     protected BigDecimal supervisorId;
     protected boolean active;
     protected Date beginDate;
     protected Date endDate;
     protected String remarks;
-    protected String exeDetails;
-    protected Date proDate;
+    protected String exceptionDetails;
+    protected Date processedDate;
     protected TimeRecordStatus recordStatus;
+    protected String txOriginalUserId;
+    protected String txUpdateUserId;
+    protected Timestamp txOriginalDate;
+    protected Timestamp txUpdateDate;
 
-    /** Getters and Setters **/
+    /** --- Getters and Setters --- */
 
-    public BigDecimal getTimesheetId() {
-        return timesheetId;
+    public BigDecimal getTimeRecordId() {
+        return timeRecordId;
     }
 
-    public void setTimesheetId(BigDecimal timesheetId) {
-        this.timesheetId = timesheetId;
+    public void setTimeRecordId(BigDecimal timeRecordId) {
+        this.timeRecordId = timeRecordId;
     }
 
     public BigDecimal getEmployeeId() {
@@ -40,38 +37,6 @@ public class TimeRecord {
 
     public void setEmployeeId(BigDecimal employeeId) {
         this.employeeId = employeeId;
-    }
-
-    public String gettOriginalUserId() {
-        return tOriginalUserId;
-    }
-
-    public void settOriginalUserId(String tOriginalUserId) {
-        this.tOriginalUserId = tOriginalUserId;
-    }
-
-    public String gettUpdateUserId() {
-        return tUpdateUserId;
-    }
-
-    public void settUpdateUserId(String tUpdateUserId) {
-        this.tUpdateUserId = tUpdateUserId;
-    }
-
-    public Timestamp gettOriginalDate() {
-        return tOriginalDate;
-    }
-
-    public void settOriginalDate(Timestamp tOriginalDate) {
-        this.tOriginalDate = tOriginalDate;
-    }
-
-    public Timestamp gettUpdateDate() {
-        return tUpdateDate;
-    }
-
-    public void settUpdateDate(Timestamp tUpdateDate) {
-        this.tUpdateDate = tUpdateDate;
     }
 
     public BigDecimal getSupervisorId() {
@@ -114,20 +79,20 @@ public class TimeRecord {
         this.remarks = remarks;
     }
 
-    public String getExeDetails() {
-        return exeDetails;
+    public String getExceptionDetails() {
+        return exceptionDetails;
     }
 
-    public void setExeDetails(String exeDetails) {
-        this.exeDetails = exeDetails;
+    public void setExceptionDetails(String exceptionDetails) {
+        this.exceptionDetails = exceptionDetails;
     }
 
-    public Date getProDate() {
-        return proDate;
+    public Date getProcessedDate() {
+        return processedDate;
     }
 
-    public void setProDate(Date proDate) {
-        this.proDate = proDate;
+    public void setProcessedDate(Date processedDate) {
+        this.processedDate = processedDate;
     }
 
     public TimeRecordStatus getRecordStatus() {
@@ -138,4 +103,35 @@ public class TimeRecord {
         this.recordStatus = recordStatus;
     }
 
+    public String getTxOriginalUserId() {
+        return txOriginalUserId;
+    }
+
+    public void setTxOriginalUserId(String txOriginalUserId) {
+        this.txOriginalUserId = txOriginalUserId;
+    }
+
+    public String getTxUpdateUserId() {
+        return txUpdateUserId;
+    }
+
+    public void setTxUpdateUserId(String txUpdateUserId) {
+        this.txUpdateUserId = txUpdateUserId;
+    }
+
+    public Timestamp getTxOriginalDate() {
+        return txOriginalDate;
+    }
+
+    public void setTxOriginalDate(Timestamp txOriginalDate) {
+        this.txOriginalDate = txOriginalDate;
+    }
+
+    public Timestamp getTxUpdateDate() {
+        return txUpdateDate;
+    }
+
+    public void setTxUpdateDate(Timestamp txUpdateDate) {
+        this.txUpdateDate = txUpdateDate;
+    }
 }

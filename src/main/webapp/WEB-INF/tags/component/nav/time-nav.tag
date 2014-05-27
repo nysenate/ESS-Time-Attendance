@@ -1,7 +1,9 @@
 <%@tag description="Left navigation menu for Time & Attendance screens" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="ess-component-nav" tagdir="/WEB-INF/tags/component/nav" %>
 
 <section class="left-nav" ess-navigation>
+    <ess-component-nav:nav-header topicTitle="Time And Attendance Menu" colorClass="teal"/>
     <h3 class="main-topic">My Attendance</h3>
     <ul class="sub-topic-list">
         <li class="sub-topic"><a href="${ctxPath}/time/record/entry">Enter Time Record</a></li>

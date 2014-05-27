@@ -7,28 +7,25 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Created by riken on 4/2/14.
- */
-public class RemoteRecordRowMapper implements RowMapper<TimeRecord>{
-
+public class RemoteRecordRowMapper implements RowMapper<TimeRecord>
+{
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord tr = new TimeRecord();
-        tr.setTimesheetId(rs.getBigDecimal("NUXRTIMESHEET"));
+        tr.setTimeRecordId(rs.getBigDecimal("NUXRTIMESHEET"));
         tr.setEmployeeId(rs.getBigDecimal("NUXREFEM"));
-        tr.settOriginalUserId(rs.getString("NATXNORGUSER"));
-        tr.settUpdateUserId(rs.getString("NATXNUPDUSER"));
-        tr.settOriginalDate(rs.getTimestamp("DTTXNORIGIN"));
-        tr.settUpdateDate(rs.getTimestamp("DTTXNUPDATE"));
+        tr.setTxOriginalUserId(rs.getString("NATXNORGUSER"));
+        tr.setTxUpdateUserId(rs.getString("NATXNUPDUSER"));
+        tr.setTxOriginalDate(rs.getTimestamp("DTTXNORIGIN"));
+        tr.setTxUpdateDate(rs.getTimestamp("DTTXNUPDATE"));
         tr.setActive(rs.getString("CDSTATUS").equals("A"));
         tr.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString("CDTSSTAT")));
         tr.setBeginDate(rs.getDate("DTBEGIN"));
         tr.setEndDate(rs.getDate("DTEND"));
         tr.setRemarks(rs.getString("DEREMARKS"));
         tr.setSupervisorId(rs.getBigDecimal("NUXREFSV"));
-        tr.setExeDetails(rs.getString("DEEXCEPTION"));
-        tr.setProDate(rs.getDate("DTPROCESS"));
+        tr.setExceptionDetails(rs.getString("DEEXCEPTION"));
+        tr.setProcessedDate(rs.getDate("DTPROCESS"));
 
         return tr;
     }

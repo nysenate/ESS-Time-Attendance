@@ -5,8 +5,8 @@ import gov.nysenate.seta.model.attendance.SyncCheck;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordAudit;
-import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
-import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +139,7 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
                     syncCheckDao.setSyncData(sc);
                 }
 
-                if(localRecordDao.getTimeRecordCount(tr.getTimesheetId())==0)
+                if(localRecordDao.getTimeRecordCount(tr.getTimeRecordId())==0)
                 {
                     localRecordDao.setRecord(tr);
                 }

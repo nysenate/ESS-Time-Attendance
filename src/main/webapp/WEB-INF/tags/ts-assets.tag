@@ -11,6 +11,17 @@
 <c:choose>
     <c:when test="${runtimeLevel eq 'dev'}">
         <script type="text/javascript" src="${ctxPath}/assets/js/src/ess-app.js"></script>
+
+        <!-- Navigation -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/ess-nav.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/ess-routes.js"></script>
+
+        <!-- Common Directives -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/highcharts-directive.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ess-notifications.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/odometer-directive.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/datepicker-directive.js"></script>
+
     </c:when>
     <c:when test="${runtimeLevel eq 'test'}">
         <script type="text/javascript" src="${ctxPath}/assets/js/dest/timesheets.min.js"></script>

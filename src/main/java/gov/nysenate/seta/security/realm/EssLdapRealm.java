@@ -1,12 +1,10 @@
 package gov.nysenate.seta.security.realm;
 
-import gov.nysenate.seta.model.ldap.LdapAuthResult;
+import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.service.auth.LdapAuthService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.realm.AuthenticatingRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,7 @@ import org.springframework.stereotype.Component;
  * we're using Spring LDAP to handle low level LDAP operations it wasn't necessary to extend that class.
  */
 @Component
-public class EssLdapRealm extends AuthorizingRealm
+public class EssLdapRealm extends AuthenticatingRealm
 {
     private static final Logger logger = LoggerFactory.getLogger(EssLdapRealm.class);
 
@@ -35,14 +33,6 @@ public class EssLdapRealm extends AuthorizingRealm
             return queryForAuthenticationInfo((UsernamePasswordToken) token);
         }
         throw new UnsupportedTokenException("Senate LDAP Realm only supports UsernamePasswordToken");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        return null;
     }
 
     /**

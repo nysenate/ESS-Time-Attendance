@@ -222,7 +222,7 @@ a {
   //background: #fafafa;
   background: #3d3d3d;
   border-bottom: 1px solid #222;
-  height:45px;
+  height:40px;
   z-index: 100;
   color: white;
   overflow: hidden;
@@ -233,7 +233,7 @@ a {
     .nysslogo {
       .nysslogo(35px);
       float: left;
-      margin-top: 5px;
+      margin-top: 2px;
       margin-left: 10px;
     }
 
@@ -245,7 +245,7 @@ a {
       #logoText {
         .font-weight-light;
         font-size: 1.6em;
-        line-height: 45px;
+        line-height: 40px;
         margin-left: 10px;
 
         #subLogoText {
@@ -265,21 +265,21 @@ a {
     #profileSection {
       float:left;
       padding: 0;
-      line-height: 45px;
+      line-height: 40px;
 
       &:hover {
         background: lighten(#323232, 5%);
       }
 
       #headerProfileSquare {
-        margin-right: 5px;
+        margin-right: 0px;
         margin-top: 3px;
         .profile-square(40px);
         .transform(rotateY(0deg));
         float: left;
         #headerProfileImg {
           background: url("https://avatars0.githubusercontent.com/u/2687188?s=140");
-          .image-size(40px);
+          .image-size(35px);
         }
       }
 
@@ -303,7 +303,7 @@ a {
       }
 
       a {
-        padding: 13px;
+        padding: 11px;
         display: block;
         text-decoration: none !important;
         color: white;
@@ -330,14 +330,31 @@ a {
 
   li {
     display: inline;
-    line-height:45px;
+    line-height:40px;
     padding: 10px 20px;
     margin-right: 7px;
     cursor: pointer;
 
     &.active {
       font-weight: 600;
-      background: fade(@light-teal, 40%);
+    }
+
+    &.teal {
+      &.active {
+        background: fade(@light-teal, 40%);
+      }
+      &:hover {
+        background: fade(@light-teal, 20%);
+      }
+    }
+
+    &.orange {
+      &.active {
+        background: fade(@orange, 40%);
+      }
+      &:hover {
+        background: fade(@orange, 20%);
+      }
     }
 
     .nav-icon {
@@ -346,10 +363,6 @@ a {
       height: 16px;
       position: relative;
       top: -1px;
-    }
-
-    &:hover {
-      background: fade(@light-teal, 40%);
     }
 
     a {
@@ -374,7 +387,9 @@ a {
   background:#f1f1f1;
   width:250px;
   position: fixed;
-  height: 100%;
+  height: auto;
+  padding-bottom: 20px;
+  .border-radius(0 0 0 2px);
 
   .main-topic {
     color: #333;
@@ -405,53 +420,45 @@ a {
 
 .content-wrapper {
  // margin-left: @nav-width;
-  padding-top: 45px;
+  padding-top: 70px;
   padding-bottom: 40px;
-  background: #fafafa;
   width: 1150px;
   margin: auto;
   min-height: 100%;
-}
-
-.section-title-container, .bread-crumb-container {
-  &.teal {
-    background: @teal;
-  }
-  color: #eee;
-  font-size: 1.1em;
-  margin: 0;
-  padding: 10px 15px;
 }
 
 .section-title-container {
   &.teal {
     background: darken(@teal, 5%);
   }
-  position: fixed;
-  width: 250px;
+  &.orange {
+    background: darken(@orange, 10%);
+  }
+  .border-radius(2px 0 0 0);
+  color: #eee;
+  font-size: 1.1em;
+  margin: 0;
+  padding: 10px 15px;
   .font-weight-bold;
 }
 
-.bread-crumb-container {
-  margin-left: 250px;
-}
-
 .content-container {
-  margin:20px 0 0 260px;
+  margin:0 0 20px 260px;
   width: 880px;
   background: #fefefe;
   position: relative;
-  .box-shadow(0px 1px 10px #eee);
+  .box-shadow(0px 1px 10px #ccc);
 
   h1 {
     font-size:1.1em;
     margin:0;
     text-align: center;
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-width: 1px;
     border-style: none none solid none;
-    border-color: fade(@teal, 55%);
-    color: #333;
+    background: rgba(235, 238, 241, 0.93);
+    color: #00687C;
+    border-color: fade(@teal, 25%);
     line-height: 30px;
     .font-weight-bold;
 
@@ -496,7 +503,7 @@ a {
   padding: 10px;
   color: #222;
   text-align: center;
-  border-bottom: 1px solid fade(@teal, 55%);
+  border-bottom: 1px solid fade(@teal, 25%);
   &.no-bottom-margin {
     margin-bottom: 0;
     border-bottom: none;
@@ -530,6 +537,7 @@ table#timeRecordTable {
       }
 
       &.time-totals-row {
+        border-top: 2px solid teal;
         td {
           &:first-child {
             .font-weight-bold;
@@ -607,6 +615,8 @@ table#timeRecordTable {
     .hours-caption {
       font-size: 1em;
       line-height: 20px;
+      padding: .2em;
+      .font-weight-bold;
 
       &.sick {
         background: #d19525;
@@ -630,6 +640,22 @@ table#timeRecordTable {
       line-height: 30px;
       font-weight: 600;
       color: @navy;
+      border-width: 1px;
+      border-style: none solid solid solid;
+      border-color: #ddd;
+      .border-radius(0 0 2px 2px);
+
+      &.sick {
+        border-color: #d19525;
+      }
+
+      &.personal {
+        border-color: @teal;
+      }
+
+      &.vacation {
+        border-color: #799933;
+      }
     }
   }
 
@@ -990,7 +1016,6 @@ table.approve-attendance-rec-table {
     background: white;
   }
 }
-
 
 
 

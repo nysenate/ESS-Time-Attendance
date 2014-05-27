@@ -2,25 +2,23 @@ package gov.nysenate.seta.dao.attendance;
 
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeEntry;
-import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
-import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeEntryException;
+import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by riken on 3/11/14.
- */
-public interface TimeEntryDao extends BaseDao {
-
+public interface TimeEntryDao extends BaseDao
+{
     /**
-     * Retrieve all time entries using particular timesheetId
-     * @param timesheetId - int Timesheet ID
-     * @return List of Entry objects otherwise TimeEntryNotFoundException
-     * @throws TimeEntryNotFoundEx
+     * Retrieve all time entries that are assigned a particular time record id.
+     * @param timeRecordId int - Id of the parent TimeRecord
+     * @return List<TimeEntry>
+     * @throws TimeEntryException - TimeEntryNotFoundEx if no matching time entries were found
      */
-    public List<TimeEntry> getTimeEntryByTimesheet(int timesheetId) throws TimeEntryNotFoundEx;
+    public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryException;
 
     /**
      * Retrieve all time etries using particular empId mapped with TimesheetId

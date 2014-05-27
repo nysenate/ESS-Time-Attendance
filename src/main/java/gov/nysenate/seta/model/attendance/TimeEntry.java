@@ -35,7 +35,7 @@ public class TimeEntry
 
     public TimeEntry() {}
 
-    /** Functional Getters */
+    /** --- Functional Getters --- */
 
     public BigDecimal getDailyTotal() {
 
@@ -51,7 +51,7 @@ public class TimeEntry
         return result;
     }
 
-   /** Basic Getters/Setters */
+   /** --- Basic Getters/Setters --- */
 
     public BigDecimal gettDayId() {
         return tDayId;

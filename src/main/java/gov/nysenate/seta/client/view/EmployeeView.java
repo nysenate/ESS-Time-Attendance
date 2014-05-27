@@ -1,6 +1,6 @@
 package gov.nysenate.seta.client.view;
 
-import gov.nysenate.seta.model.Employee;
+import gov.nysenate.seta.model.personnel.Employee;
 
 public class EmployeeView
 {

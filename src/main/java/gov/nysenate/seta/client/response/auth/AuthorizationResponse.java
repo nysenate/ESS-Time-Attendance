@@ -1,7 +1,7 @@
 package gov.nysenate.seta.client.response.auth;
 
 import gov.nysenate.seta.client.view.AuthorizationStatusView;
-import gov.nysenate.seta.security.AuthorizationStatus;
+import gov.nysenate.seta.model.auth.AuthorizationStatus;
 import org.apache.shiro.subject.Subject;
 
 import javax.xml.bind.annotation.XmlElement;

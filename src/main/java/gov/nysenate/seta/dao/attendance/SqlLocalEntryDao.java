@@ -1,36 +1,23 @@
 package gov.nysenate.seta.dao.attendance;
 
-import gov.nysenate.seta.dao.accrual.mapper.AccrualUsageRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.LocalAccrualUsageRowMapper;
-import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.accrual.AccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccrualUsage;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.*;
-import gov.nysenate.seta.model.exception.PayPeriodException;
-import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
-import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import gov.nysenate.seta.model.period.PayPeriod;
-import gov.nysenate.seta.model.period.PayPeriodType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
-import sun.security.util.BigInt;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -82,18 +69,18 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
                     "GROUP BY te.emp_id";
 
     @Override
-    public List<TimeEntry> getTimeEntryByTimesheet(int timesheetId) throws TimeEntryNotFoundEx {
+    public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryNotFoundEx {
 
         List<TimeEntry> timeEntryList;
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("timesheetId",timesheetId);
+        params.addValue("timesheetId", timeRecordId);
 
         try{
             timeEntryList = localNamedJdbc.query(GET_ENTRY_BY_TIMESHEETID, params,
                     new LocalEntryRowMapper(""));
         }catch (DataRetrievalFailureException ex){
-            logger.warn("Retrieve Time Entries of {} error: {}", timesheetId, ex.getMessage());
-            throw new TimeEntryNotFoundEx("No matching Time Entries for Timesheet id: " + timesheetId);
+            logger.warn("Retrieve Time Entries of {} error: {}", timeRecordId, ex.getMessage());
+            throw new TimeEntryNotFoundEx("No matching Time Entries for Timesheet id: " + timeRecordId);
         }
         return  timeEntryList;
 
@@ -111,10 +98,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         for(TimeRecord tr : timeRecords)
         {
             params.addValue("empId",empId);
-            params.addValue("timesheetId",tr.getTimesheetId());
+            params.addValue("timesheetId",tr.getTimeRecordId());
 
             try{
-                timeEntryList.put(tr.getTimesheetId(), localNamedJdbc.query(GET_ENTRY_BY_EMPID, params,
+                timeEntryList.put(tr.getTimeRecordId(), localNamedJdbc.query(GET_ENTRY_BY_EMPID, params,
                         new LocalEntryRowMapper("")));
             }catch (DataRetrievalFailureException ex){
                 logger.warn("Retrieve Time Entries of {} error: {}", empId, ex.getMessage());
@@ -190,9 +177,6 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
         AccrualUsage au = null;
         List<PeriodAccrualUsage> pauList = null;
-        PeriodAccrualUsage pau = null;
-
-
 
         try{
 
@@ -206,10 +190,11 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
                 au = localNamedJdbc.queryForObject(GET_SUM_OF_HOURS, param, new LocalAccrualUsageRowMapper());
 
+                PeriodAccrualUsage pau = new PeriodAccrualUsage();
                 pau.setPayPeriod(pp);
                 pau.setYear(new DateTime(pp.getEndDate()).getYear());
                 pau.setEmpId(au.getEmpId());
-                pau.setEmpHoursUsed(au.getWorkHours());
+                pau.setWorkHours(au.getWorkHours());
                 pau.setTravelHoursUsed(au.getTravelHoursUsed());
                 pau.setHolHoursUsed(au.getHolHoursUsed());
                 pau.setVacHoursUsed(au.getVacHoursUsed());

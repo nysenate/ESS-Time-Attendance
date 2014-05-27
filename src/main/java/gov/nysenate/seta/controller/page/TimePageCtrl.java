@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Handles requests to the Time and Attendance page.
+ */
 @Controller
-@RequestMapping("/")
-public class TimePageCtrl {
-
+@RequestMapping("/time/**")
+public class TimePageCtrl
+{
     private static final Logger logger = LoggerFactory.getLogger(TimePageCtrl.class);
 
     @RequestMapping(method = RequestMethod.GET)
@@ -23,11 +26,6 @@ public class TimePageCtrl {
         if (subject.isAuthenticated()) {
             modelMap.put("principal", subject.getPrincipal().toString());
         }
-		return "home";
+		return "time";
 	}
-
-    @RequestMapping(value = "ui/**", method = RequestMethod.GET)
-    public String home() {
-        return "home";
-    }
 }

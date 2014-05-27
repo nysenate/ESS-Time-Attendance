@@ -24,12 +24,12 @@ table.ess-table {
   width: 100%;
 }
 table.ess-table thead tr {
-  background: #2f8697;
-  color: white;
+  color: #333;
   font-size: .9em;
+  border-bottom: 1px solid #155C69;
 }
 table.ess-table thead tr th {
-  padding: 5px 5px;
+  padding: 10px 5px;
 }
 table.ess-table.no-focus tbody tr:hover {
   background: #cff09e;
@@ -39,6 +39,7 @@ table.ess-table.no-focus tbody tr:hover {
   transition: 0.5s;
 }
 table.ess-table tbody tr {
+  border-top: 1px solid transparent;
   border-bottom: 1px solid #bbb;
 }
 table.ess-table tbody tr td {
@@ -755,12 +756,12 @@ table.ess-table {
   width: 100%;
 }
 table.ess-table thead tr {
-  background: #2f8697;
-  color: white;
+  color: #333;
   font-size: .9em;
+  border-bottom: 1px solid #155C69;
 }
 table.ess-table thead tr th {
-  padding: 5px 5px;
+  padding: 10px 5px;
 }
 table.ess-table.no-focus tbody tr:hover {
   background: #cff09e;
@@ -770,6 +771,7 @@ table.ess-table.no-focus tbody tr:hover {
   transition: 0.5s;
 }
 table.ess-table tbody tr {
+  border-top: 1px solid transparent;
   border-bottom: 1px solid #bbb;
 }
 table.ess-table tbody tr td {
@@ -1500,7 +1502,7 @@ a:hover {
   width: 100%;
   background: #3d3d3d;
   border-bottom: 1px solid #222;
-  height: 45px;
+  height: 40px;
   z-index: 100;
   color: white;
   overflow: hidden;
@@ -1515,7 +1517,7 @@ a:hover {
   background-size: 35px;
   background-repeat: no-repeat;
   float: left;
-  margin-top: 5px;
+  margin-top: 2px;
   margin-left: 10px;
 }
 .ess-top-header .left-header-area #logoTextSection {
@@ -1526,7 +1528,7 @@ a:hover {
 .ess-top-header .left-header-area #logoTextSection #logoText {
   font-weight: 300;
   font-size: 1.6em;
-  line-height: 45px;
+  line-height: 40px;
   margin-left: 10px;
 }
 .ess-top-header .left-header-area #logoTextSection #logoText #subLogoText {
@@ -1541,13 +1543,13 @@ a:hover {
 .ess-top-header .right-header-area #profileSection {
   float: left;
   padding: 0;
-  line-height: 45px;
+  line-height: 40px;
 }
 .ess-top-header .right-header-area #profileSection:hover {
   background: #3f3f3f;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare {
-  margin-right: 5px;
+  margin-right: 0px;
   margin-top: 3px;
   width: 40px;
   height: 40px;
@@ -1560,9 +1562,9 @@ a:hover {
 }
 .ess-top-header .right-header-area #profileSection #headerProfileSquare #headerProfileImg {
   background: url("https://avatars0.githubusercontent.com/u/2687188?s=140");
-  height: 40px;
-  width: 40px;
-  background-size: 40px;
+  height: 35px;
+  width: 35px;
+  background-size: 35px;
   background-repeat: no-repeat;
 }
 .ess-top-header .right-header-area #profileSection #headerProfileName {
@@ -1586,7 +1588,7 @@ a:hover {
   transform: rotateY(-40deg);
 }
 .ess-top-header .right-header-area #logoutSection a {
-  padding: 13px;
+  padding: 11px;
   display: block;
   text-decoration: none !important;
   color: white;
@@ -1618,14 +1620,25 @@ a:hover {
 }
 #topNavList li {
   display: inline;
-  line-height: 45px;
+  line-height: 40px;
   padding: 10px 20px;
   margin-right: 7px;
   cursor: pointer;
 }
 #topNavList li.active {
   font-weight: 600;
+}
+#topNavList li.teal.active {
   background: rgba(65, 150, 167, 0.4);
+}
+#topNavList li.teal:hover {
+  background: rgba(65, 150, 167, 0.2);
+}
+#topNavList li.orange.active {
+  background: rgba(209, 149, 37, 0.4);
+}
+#topNavList li.orange:hover {
+  background: rgba(209, 149, 37, 0.2);
 }
 #topNavList li .nav-icon {
   margin-right: 5px;
@@ -1633,9 +1646,6 @@ a:hover {
   height: 16px;
   position: relative;
   top: -1px;
-}
-#topNavList li:hover {
-  background: rgba(65, 150, 167, 0.4);
 }
 #topNavList li a {
   color: white;
@@ -1651,7 +1661,14 @@ a:hover {
   background: #f1f1f1;
   width: 250px;
   position: fixed;
-  height: 100%;
+  height: auto;
+  padding-bottom: 20px;
+  -webkit-border-radius: 0 0 0 2px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 0 0 0 2px;
+  -moz-background-clip: padding;
+  border-radius: 0 0 0 2px;
+  background-clip: padding-box;
 }
 .left-nav .main-topic {
   color: #333;
@@ -1677,53 +1694,50 @@ a:hover {
   color: #004d4d;
 }
 .content-wrapper {
-  padding-top: 45px;
+  padding-top: 70px;
   padding-bottom: 40px;
-  background: #fafafa;
   width: 1150px;
   margin: auto;
   min-height: 100%;
 }
-.section-title-container,
-.bread-crumb-container {
+.section-title-container {
+  -webkit-border-radius: 2px 0 0 0;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 2px 0 0 0;
+  -moz-background-clip: padding;
+  border-radius: 2px 0 0 0;
+  background-clip: padding-box;
   color: #eee;
   font-size: 1.1em;
   margin: 0;
   padding: 10px 15px;
-}
-.section-title-container.teal,
-.bread-crumb-container.teal {
-  background: #006b80;
-}
-.section-title-container {
-  position: fixed;
-  width: 250px;
   font-weight: 600;
 }
 .section-title-container.teal {
   background: #005667;
 }
-.bread-crumb-container {
-  margin-left: 250px;
+.section-title-container.orange {
+  background: #a6761d;
 }
 .content-container {
-  margin: 20px 0 0 260px;
+  margin: 0 0 20px 260px;
   width: 880px;
   background: #fefefe;
   position: relative;
-  -webkit-box-shadow: 0px 1px 10px #eeeeee;
-  -moz-box-shadow: 0px 1px 10px #eeeeee;
-  box-shadow: 0px 1px 10px #eeeeee;
+  -webkit-box-shadow: 0px 1px 10px #cccccc;
+  -moz-box-shadow: 0px 1px 10px #cccccc;
+  box-shadow: 0px 1px 10px #cccccc;
 }
 .content-container h1 {
   font-size: 1.1em;
   margin: 0;
   text-align: center;
-  padding: 5px 10px;
+  padding: 4px 10px;
   border-width: 1px;
   border-style: none none solid none;
-  border-color: rgba(0, 107, 128, 0.55);
-  color: #333;
+  background: rgba(235, 238, 241, 0.93);
+  color: #00687C;
+  border-color: rgba(0, 107, 128, 0.25);
   line-height: 30px;
   font-weight: 600;
 }
@@ -1764,7 +1778,7 @@ a:hover {
   padding: 10px;
   color: #222;
   text-align: center;
-  border-bottom: 1px solid rgba(0, 107, 128, 0.55);
+  border-bottom: 1px solid rgba(0, 107, 128, 0.25);
 }
 .content-info.no-bottom-margin {
   margin-bottom: 0;
@@ -1782,6 +1796,9 @@ table#timeRecordTable tbody tr {
 table#timeRecordTable tbody tr.time-record-row td:nth-child(1) {
   width: 150px;
   border-right: 1px solid #ccc;
+}
+table#timeRecordTable tbody tr.time-totals-row {
+  border-top: 2px solid teal;
 }
 table#timeRecordTable tbody tr.time-totals-row td:first-child {
   font-weight: 600;
@@ -1848,6 +1865,8 @@ table#timeRecordTable tbody tr td.today {
 .accrual-component .captioned-hour-square .hours-caption {
   font-size: 1em;
   line-height: 20px;
+  padding: .2em;
+  font-weight: 600;
 }
 .accrual-component .captioned-hour-square .hours-caption.sick {
   background: #d19525;
@@ -1866,6 +1885,24 @@ table#timeRecordTable tbody tr td.today {
   line-height: 30px;
   font-weight: 600;
   color: #0e4e5a;
+  border-width: 1px;
+  border-style: none solid solid solid;
+  border-color: #ddd;
+  -webkit-border-radius: 0 0 2px 2px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 0 0 2px 2px;
+  -moz-background-clip: padding;
+  border-radius: 0 0 2px 2px;
+  background-clip: padding-box;
+}
+.accrual-component .captioned-hour-square .hours-display.sick {
+  border-color: #d19525;
+}
+.accrual-component .captioned-hour-square .hours-display.personal {
+  border-color: #006b80;
+}
+.accrual-component .captioned-hour-square .hours-display.vacation {
+  border-color: #799933;
 }
 .accrual-component .hour-label {
   color: #333;

@@ -15,6 +15,8 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
     private static final Logger logger = LoggerFactory.getLogger(TimeTemplateCtrl.class);
     protected static final String TIME_TMPL_BASE_URL = TMPL_BASE_URL + "/time";
 
+    /** --- Records --- */
+
     @RequestMapping(value="/record/entry")
     public String entry() {
         return TIME_TMPL_BASE_URL + "/record/entry";
@@ -24,6 +26,23 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
     public String history() {
         return TIME_TMPL_BASE_URL + "/record/history";
     }
+
+    @RequestMapping(value="/record/manage")
+    public String manage() {
+        return TIME_TMPL_BASE_URL + "/record/manage";
+    }
+
+    @RequestMapping(value="/record/emphistory")
+    public String employeeHistory() {
+        return TIME_TMPL_BASE_URL + "/record/emp-history";
+    }
+
+    @RequestMapping(value="/record/grant")
+    public String grant() {
+        return TIME_TMPL_BASE_URL + "/record/grant";
+    }
+
+    /** --- Accruals --- */
 
     @RequestMapping(value="/accrual/history")
     public String accrualHistory() {
@@ -35,18 +54,17 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
         return TIME_TMPL_BASE_URL + "/accrual/projections";
     }
 
+    /** --- Time Off --- */
+
     @RequestMapping(value="/timeoff/request")
     public String timeOffRequest() {
         return TIME_TMPL_BASE_URL + "/timeoff/request";
     }
 
+    /** --- Calendar --- */
+
     @RequestMapping(value="/period/calendar")
     public String payPeriodView() {
         return TIME_TMPL_BASE_URL + "/period/calendar";
-    }
-
-    @RequestMapping(value="/manage")
-    public String manage() {
-        return TIME_TMPL_BASE_URL + "/manage";
     }
 }

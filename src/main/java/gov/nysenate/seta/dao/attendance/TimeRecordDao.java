@@ -2,25 +2,21 @@ package gov.nysenate.seta.dao.attendance;
 
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by riken on 3/4/14.
- */
-public interface TimeRecordDao extends BaseDao {
-
+public interface TimeRecordDao extends BaseDao
+{
     /**
-     * Retrieves All TimeRecords based on EmpId passed.
+     * Retrieves a list of all TimeRecords for a given employee id.
      * @param empId int - EmployeeId
      * @return List of TimeRecord Objects
      * @throws TimeRecordNotFoundException
      */
-
     public List<TimeRecord> getRecordByEmployeeId(int empId) throws TimeRecordNotFoundException;
 
     /**

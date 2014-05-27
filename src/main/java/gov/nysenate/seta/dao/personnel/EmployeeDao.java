@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.BaseDao;
-import gov.nysenate.seta.model.exception.EmployeeException;
+import gov.nysenate.seta.model.personnel.EmployeeException;
 import gov.nysenate.seta.model.personnel.Employee;
 
 import java.util.Date;
@@ -30,19 +30,12 @@ public interface EmployeeDao extends BaseDao
     public Employee getEmployeeByEmail(String email) throws EmployeeException;
 
     /**
-     * Retrieves a Map of employee id (Integer) -> Employee given a collection
-     * of employee ids to match against.
+     * Retrieves a Map of {emp id (Integer) -> Employee} given a collection of employee ids
+     * to match against.
      * @param empIds List<Integer> - List of employee ids
-     * @return Map - employee id (Integer) -> Employee, throws EmployeeNotFoundEx if an
-     *               an employee id in the list could not be matched.
+     * @return Map - {emp id (Integer) -> Employee} or empty map if no ids could be matched
      */
     public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds);
-
-    /**
-     * Return a list of all the ids for employees that are currently active.
-     * @return List<Integer> of employee ids
-     */
-    public List<Integer> getActiveEmployeeIds();
 
     /**
      * Return a list of all the ids for employees that are active during the date range.

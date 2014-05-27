@@ -7,9 +7,6 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Created by riken on 3/4/14.
- */
 public class LocalRecordRowMapper implements RowMapper<TimeRecord>
 {
     private String pfx="";
@@ -21,19 +18,19 @@ public class LocalRecordRowMapper implements RowMapper<TimeRecord>
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord trec = new TimeRecord();
-        trec.setTimesheetId(rs.getBigDecimal(pfx + "time_record_id"));
+        trec.setTimeRecordId(rs.getBigDecimal(pfx + "time_record_id"));
         trec.setEmployeeId(rs.getBigDecimal(pfx + "emp_id"));
-        trec.settOriginalUserId(rs.getString(pfx + "t_original_user"));
-        trec.settUpdateUserId(rs.getString(pfx + "t_update_user"));
-        trec.settOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
-        trec.settUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
+        trec.setTxOriginalUserId(rs.getString(pfx + "t_original_user"));
+        trec.setTxUpdateUserId(rs.getString(pfx + "t_update_user"));
+        trec.setTxOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
+        trec.setTxUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
         trec.setActive(rs.getString(pfx + "status").equals("A"));
         trec.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "ts_status_id")));
         trec.setBeginDate(rs.getDate(pfx + "begin_date"));
         trec.setEndDate(rs.getDate(pfx + "end_date"));
         trec.setRemarks(rs.getString(pfx + "remarks"));
-        trec.setExeDetails(rs.getString(pfx + "exc_details"));
-        trec.setProDate(rs.getDate(pfx + "proc_date"));
+        trec.setExceptionDetails(rs.getString(pfx + "exc_details"));
+        trec.setProcessedDate(rs.getDate(pfx + "proc_date"));
 
         return trec;
     }

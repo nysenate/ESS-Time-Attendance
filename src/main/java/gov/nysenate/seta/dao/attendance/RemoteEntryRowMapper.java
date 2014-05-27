@@ -8,10 +8,8 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Created by riken on 4/2/14.
- */
-public class RemoteEntryRowMapper implements RowMapper<TimeEntry> {
+public class RemoteEntryRowMapper implements RowMapper<TimeEntry>
+{
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeEntry te = new TimeEntry();

@@ -8,13 +8,13 @@
     </select></p>
 </section>
 
-<section class="content-container">
+<section class="content-container hidden">
     <h1>Annual Accrual Usage</h1>
     <p class="content-info">Depicts the accrual hours used during each pay period in 2014.</p>
     <div id="accrual-usage-stacked-bar-plot"></div>
 </section>
 
-<section class="content-container">
+<section class="content-container hidden">
     <h1>Personal/Vacation Hours Remaining</h1>
     <p class="content-info">Depicts the personal and vacation hours that were left over at the end of each pay period in 2014.</p>
     <div id="accrual-rem-stacked-area-plot"></div>

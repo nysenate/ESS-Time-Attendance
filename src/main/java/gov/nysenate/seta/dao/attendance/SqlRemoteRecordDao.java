@@ -2,7 +2,7 @@ package gov.nysenate.seta.dao.attendance;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -126,12 +126,12 @@ public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao{
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        params.addValue("timesheetId", tr.getTimesheetId());
+        params.addValue("timesheetId", tr.getTimeRecordId());
         params.addValue("empId", tr.getEmployeeId());
-        params.addValue("tOriginalUserId", tr.gettOriginalUserId());
-        params.addValue("tUpdateUserId", tr.gettUpdateUserId());
-        params.addValue("tOriginalDate", tr.gettOriginalDate());
-        params.addValue("tUpdateDate", tr.gettUpdateDate());
+        params.addValue("tOriginalUserId", tr.getTxOriginalUserId());
+        params.addValue("tUpdateUserId", tr.getTxUpdateUserId());
+        params.addValue("tOriginalDate", tr.getTxOriginalDate());
+        params.addValue("tUpdateDate", tr.getTxUpdateDate());
         if(tr.isActive()==true){params.addValue("status", "A");}
         else{ params.addValue("status", "I");}
         params.addValue("tSStatusId", tr.getRecordStatus().getCode());
@@ -139,8 +139,8 @@ public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao{
         params.addValue("endDate", tr.getEndDate());
         params.addValue("remarks", tr.getRemarks());
         params.addValue("supervisorId", tr.getSupervisorId());
-        params.addValue("excDetails", tr.getExeDetails());
-        params.addValue("procDate", tr.getProDate());
+        params.addValue("excDetails", tr.getExceptionDetails());
+        params.addValue("procDate", tr.getProcessedDate());
 
         if (remoteNamedJdbc.update(SET_TIME_REC_SQL, params)==1) {    return true;}
         else{   return false;}
@@ -152,20 +152,20 @@ public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao{
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        params.addValue("timesheetId", tr.getTimesheetId());
+        params.addValue("timesheetId", tr.getTimeRecordId());
         params.addValue("empId", tr.getEmployeeId());
-        params.addValue("tOriginalUserId", tr.gettOriginalUserId());
-        params.addValue("tUpdateUserId", tr.gettUpdateUserId());
-        params.addValue("tOriginalDate", tr.gettOriginalDate());
-        params.addValue("tUpdateDate", tr.gettUpdateDate());
+        params.addValue("tOriginalUserId", tr.getTxOriginalUserId());
+        params.addValue("tUpdateUserId", tr.getTxUpdateUserId());
+        params.addValue("tOriginalDate", tr.getTxOriginalDate());
+        params.addValue("tUpdateDate", tr.getTxUpdateDate());
         params.addValue("status", getStatusCode(tr.isActive()));
         params.addValue("tSStatusId", tr.getRecordStatus().getCode());
         params.addValue("beginDate", tr.getBeginDate());
         params.addValue("endDate", tr.getEndDate());
         params.addValue("remarks", tr.getRemarks());
         params.addValue("supervisorId", tr.getSupervisorId());
-        params.addValue("excDetails", tr.getExeDetails());
-        params.addValue("procDate", tr.getProDate());
+        params.addValue("excDetails", tr.getExceptionDetails());
+        params.addValue("procDate", tr.getProcessedDate());
 
         if (remoteNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
         else return false;

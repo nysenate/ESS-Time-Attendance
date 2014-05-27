@@ -1,6 +1,6 @@
 package gov.nysenate.seta.client.response.auth;
 
-import gov.nysenate.seta.security.AuthenticationStatus;
+import gov.nysenate.seta.model.auth.AuthenticationStatus;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

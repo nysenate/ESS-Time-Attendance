@@ -1,6 +1,6 @@
 package gov.nysenate.seta.dao.base;
 
-import gov.nysenate.seta.model.ldap.SenateLdapPerson;
+import gov.nysenate.seta.model.auth.SenateLdapPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;

@@ -146,7 +146,7 @@
                 <span>Any remarks made by the employee will be displayed here.</span><br/>
             </div>
             <div id="action-container">
-                <input onclick="$('#rejection-dialog').dialog('open');" class="reject-button" type="button" value="Reject Record"/>
+                <input onclick="$('#rejection-dialog').dialog('open');" class="reject-button" type="button" value="Disapprove Record"/>
                 <input class="submit-button" type="button" value="Approve Record"/>
                 <input style="float:right;" onclick="$('#review-records-modal').dialog('close');" class="neutral-button" type="button" value="Close"/>
             </div>

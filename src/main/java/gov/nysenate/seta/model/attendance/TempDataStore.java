@@ -3,9 +3,6 @@ package gov.nysenate.seta.model.attendance;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
-/**
- * Created by riken on 3/11/14.
- */
 public class TempDataStore
 {
     protected int id;

@@ -13,25 +13,23 @@ essApp.config(function($routeProvider, $locationProvider) {
     var ctxPath = globalProps.ctxPath;
 
     /** My Info */
-    $routeProvider.when(ctxPath + '/ui/dashboard/profile', {
-        templateUrl: ctxPath + '/template/dashboard/profile',
-        controller: 'TestCtrl'
-    });
-
-    $routeProvider.when(ctxPath + '/ui/dashboard/preferences', {
-        templateUrl: ctxPath + '/template/dashboard/preferences',
-        controller: 'TestCtrl'
+    $routeProvider.when(ctxPath + '/myinfo/profile/summary', {
+        templateUrl: ctxPath + '/template/myinfo/profile/summary'
     });
 
     /** Time and Attendance */
     $routeProvider.when(ctxPath + '/time/record/entry', {
         templateUrl: ctxPath + '/template/time/record/entry',
-        controller: 'TestCtrl'
+        controller: 'RecordEntryController'
     });
 
     $routeProvider.when(ctxPath + '/time/record/history', {
         templateUrl: ctxPath + '/template/time/record/history',
         controller: 'TestCtrl'
+    });
+
+    $routeProvider.when(ctxPath + '/time/record/emphistory', {
+        templateUrl: ctxPath + '/template/time/record/emphistory'
     });
 
     $routeProvider.when(ctxPath + '/time/record/manage', {

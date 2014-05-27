@@ -3,8 +3,8 @@ package gov.nysenate.seta.dao.attendance;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecordAudit;
-import gov.nysenate.seta.model.exception.TimeEntryNotFoundEx;
-import gov.nysenate.seta.model.exception.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
+import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 
 import java.util.List;
 
