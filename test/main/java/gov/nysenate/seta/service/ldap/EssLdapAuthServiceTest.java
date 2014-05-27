@@ -3,6 +3,7 @@ package gov.nysenate.seta.service.ldap;
 import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
 import gov.nysenate.seta.model.ldap.LdapAuthStatus;
+import gov.nysenate.seta.service.auth.EssLdapAuthService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,21 +11,22 @@ import org.springframework.beans.factory.annotation.Value;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SenateLdapServiceTest extends AbstractContextTests
+public class EssLdapAuthServiceTest extends AbstractContextTests
 {
     @Value("${test.ldap.valid.uid}") private String validUid;
     @Value("${test.ldap.valid.dn}") private String validDn;
     @Value("${test.ldap.valid.password}") private String validPassword;
 
     @Autowired
-    private SenateLdapService senateLdapService;
+    private EssLdapAuthService senateLdapService;
 
     @Test
     public void testAutowiredSucceeds() throws Exception {
         assertNotNull(senateLdapService);
     }
 
-    /** {@link gov.nysenate.seta.service.ldap.SenateLdapService#authenticateUserByUid(String, String)} tests
+
+    /** {@link gov.nysenate.seta.service.auth.EssLdapAuthService#authenticateUserByUid(String, String)} tests
      * ------------------------------------------------------------------------------------------------------*/
 
     @Test

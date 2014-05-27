@@ -1,4 +1,4 @@
-package gov.nysenate.seta.security;
+package gov.nysenate.seta.model.auth;
 
 public enum AuthorizationStatus
 {

@@ -1,9 +1,7 @@
 package gov.nysenate.seta.security.realm;
 
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
-import gov.nysenate.seta.model.ldap.LdapAuthStatus;
-import gov.nysenate.seta.service.ldap.LdapService;
-import gov.nysenate.seta.util.OutputUtils;
+import gov.nysenate.seta.service.auth.LdapAuthService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -12,7 +10,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * Realm implementation for providing authentication/authorization via the Senate's LDAP server.
@@ -20,12 +18,13 @@ import org.springframework.util.ObjectUtils;
  * This is similar to {@link org.apache.shiro.realm.ldap.AbstractLdapRealm AbstractLdapRealm} but since
  * we're using Spring LDAP to handle low level LDAP operations it wasn't necessary to extend that class.
  */
-public class SenateLdapRealm extends AuthorizingRealm
+@Component
+public class EssLdapRealm extends AuthorizingRealm
 {
-    private static final Logger logger = LoggerFactory.getLogger(SenateLdapRealm.class);
+    private static final Logger logger = LoggerFactory.getLogger(EssLdapRealm.class);
 
     @Autowired
-    private LdapService senateLdapService;
+    private LdapAuthService essLdapAuthService;
 
     /**
      * {@inheritDoc}
@@ -60,7 +59,7 @@ public class SenateLdapRealm extends AuthorizingRealm
         String password = new String(token.getPassword());
         logger.debug("Authenticating user {} through the Senate LDAP.", username);
 
-        LdapAuthResult authResult = senateLdapService.authenticateUserByUid(username, password);
+        LdapAuthResult authResult = essLdapAuthService.authenticateUserByUid(username, password);
         if (authResult.isAuthenticated()) {
             return new SimpleAuthenticationInfo(username, password, getName());
         }

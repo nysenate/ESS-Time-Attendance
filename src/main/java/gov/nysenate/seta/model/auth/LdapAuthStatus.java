@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model.ldap;
+package gov.nysenate.seta.model.auth;
 
 /**
  * Represents the conditions that can result after an LDAP authentication attempt.

@@ -1,4 +1,4 @@
-package gov.nysenate.seta.service.ldap;
+package gov.nysenate.seta.service.auth;
 
 import gov.nysenate.seta.dao.personnel.LdapAuthDao;
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service;
 import javax.naming.Name;
 
 /**
- * LdapService implementation that serves as the point of access for any service that requires
+ * LdapAuthService implementation that serves as the point of access for any service that requires
  * LDAP querying/authentication against the Senate LDAP server.
  */
 @Service
-public class SenateLdapService implements LdapService
+public class EssLdapAuthService implements LdapAuthService
 {
-    private static final Logger logger = LoggerFactory.getLogger(SenateLdapService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EssLdapAuthService.class);
 
     @Autowired
     private LdapAuthDao ldapAuthDao;

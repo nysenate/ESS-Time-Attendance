@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model.exception;
+package gov.nysenate.seta.model.attendance;
 
 /**
  * Created by riken on 3/4/14.

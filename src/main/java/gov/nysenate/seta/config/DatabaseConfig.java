@@ -69,6 +69,10 @@ public class DatabaseConfig
         return new DataSourceTransactionManager(remoteDataSource());
     }
 
+    /**
+     * Configures and returns the local data source.
+     * @return ComboPooledDataSource
+     */
     private ComboPooledDataSource localDataSource() {
         ComboPooledDataSource cpds = getComboPooledDataSource(dbLocalType, dbLocalHost, dbLocalName, dbLocalDriver,
                                                               dbLocalUser, dbLocalPass);
@@ -78,6 +82,10 @@ public class DatabaseConfig
         return cpds;
     }
 
+    /**
+     * Configures and returns the remote data source.
+     * @return ComboPooledDataSource
+     */
     private ComboPooledDataSource remoteDataSource() {
         ComboPooledDataSource cpds = getComboPooledDataSource(dbRemoteType, dbRemoteHost, dbRemoteName, dbRemoteDriver,
                                                               dbRemoteUser, dbRemotePass);
@@ -90,6 +98,9 @@ public class DatabaseConfig
         /** Verify connectivity before handing over the connection. */
         cpds.setTestConnectionOnCheckout(true);
         cpds.setPreferredTestQuery("SELECT 1 FROM DUAL");
+
+        /** Set max connection retry attempts */
+        cpds.setAcquireRetryAttempts(5);
 
         return cpds;
     }

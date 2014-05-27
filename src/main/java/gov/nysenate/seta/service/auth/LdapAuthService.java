@@ -1,8 +1,8 @@
-package gov.nysenate.seta.service.ldap;
+package gov.nysenate.seta.service.auth;
 
 import gov.nysenate.seta.model.ldap.LdapAuthResult;
 
-public interface LdapService
+public interface LdapAuthService
 {
     /**
      * Authenticates an LDAP user via their uid and password. The method will always return an

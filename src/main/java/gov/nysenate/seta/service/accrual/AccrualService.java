@@ -1,4 +1,4 @@
-package gov.nysenate.seta.service;
+package gov.nysenate.seta.service.accrual;
 
 /**
  * Service interface to provide accrual related functionality.

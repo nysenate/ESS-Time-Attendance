@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model.ldap;
+package gov.nysenate.seta.model.auth;
 
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.DnAttribute;

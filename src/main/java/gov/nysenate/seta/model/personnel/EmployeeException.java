@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model.exception;
+package gov.nysenate.seta.model.personnel;
 
 public class EmployeeException extends Exception
 {

@@ -1,9 +1,7 @@
-package gov.nysenate.seta.model.exception;
+package gov.nysenate.seta.model.attendance;
 
-/**
- * Created by riken on 3/11/14.
- */
-public class TimeEntryException extends Exception {
+public class TimeEntryException extends Exception
+{
     public TimeEntryException(){}
 
     public TimeEntryException(String message){

@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model.ldap;
+package gov.nysenate.seta.model.auth;
 
 import javax.naming.Name;
 
