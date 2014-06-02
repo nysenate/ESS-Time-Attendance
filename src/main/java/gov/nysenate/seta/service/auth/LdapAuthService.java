@@ -1,6 +1,6 @@
 package gov.nysenate.seta.service.auth;
 
-import gov.nysenate.seta.model.ldap.LdapAuthResult;
+import gov.nysenate.seta.model.auth.LdapAuthResult;
 
 public interface LdapAuthService
 {
