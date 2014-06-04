@@ -1,8 +1,8 @@
 package gov.nysenate.seta.service.ldap;
 
 import gov.nysenate.seta.AbstractContextTests;
-import gov.nysenate.seta.model.ldap.LdapAuthResult;
-import gov.nysenate.seta.model.ldap.LdapAuthStatus;
+import gov.nysenate.seta.model.auth.LdapAuthResult;
+import gov.nysenate.seta.model.auth.LdapAuthStatus;
 import gov.nysenate.seta.service.auth.EssLdapAuthService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

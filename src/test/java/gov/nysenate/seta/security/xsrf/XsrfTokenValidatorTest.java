@@ -2,7 +2,6 @@ package gov.nysenate.seta.security.xsrf;
 
 import gov.nysenate.seta.AbstractContextTests;
 import org.apache.shiro.codec.Base64;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;

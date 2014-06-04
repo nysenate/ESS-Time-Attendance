@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model;
 
+import gov.nysenate.seta.model.accrual.AccrualRate;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

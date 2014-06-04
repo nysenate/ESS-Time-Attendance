@@ -2,7 +2,7 @@ package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.dao.personnel.LdapAuthDao;
-import gov.nysenate.seta.model.ldap.SenateLdapPerson;
+import gov.nysenate.seta.model.auth.SenateLdapPerson;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
