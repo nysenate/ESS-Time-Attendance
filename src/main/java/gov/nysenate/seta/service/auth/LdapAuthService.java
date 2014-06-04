@@ -1,6 +1,6 @@
 package gov.nysenate.seta.service.auth;
 
-import gov.nysenate.seta.model.ldap.LdapAuthResult;
+import gov.nysenate.seta.model.auth.LdapAuthResult;
 
 public interface LdapAuthService
 {
@@ -12,5 +12,5 @@ public interface LdapAuthService
      * @param credentials String password
      * @return LdapAuthResult
      */
-    LdapAuthResult authenticateUserByUid(String uid, String credentials);
+    public LdapAuthResult authenticateUserByUid(String uid, String credentials);
 }

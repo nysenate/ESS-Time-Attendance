@@ -1,8 +1,8 @@
 package gov.nysenate.seta.service.auth;
 
 import gov.nysenate.seta.dao.personnel.LdapAuthDao;
-import gov.nysenate.seta.model.ldap.LdapAuthResult;
-import gov.nysenate.seta.model.ldap.LdapAuthStatus;
+import gov.nysenate.seta.model.auth.LdapAuthResult;
+import gov.nysenate.seta.model.auth.LdapAuthStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
