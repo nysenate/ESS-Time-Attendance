@@ -8,18 +8,13 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
-/**
- * Created by riken on 3/11/14.
- */
-public class LocalEntryRowMapper implements RowMapper<TimeEntry> {
-
+public class LocalEntryRowMapper implements RowMapper<TimeEntry>
+{
     private String pfx="";
 
     public LocalEntryRowMapper(String pfx){
         this.pfx = pfx;
     }
-
 
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {

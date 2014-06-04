@@ -27,9 +27,6 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     private static final Logger logger = LoggerFactory.getLogger(SqlSupervisorDao.class);
 
     @Autowired
-    private EmployeeDao employeeDao;
-
-    @Autowired
     private EmployeeTransactionDao empTransactionDao;
 
     /**
