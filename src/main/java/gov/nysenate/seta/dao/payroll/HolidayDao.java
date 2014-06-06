@@ -21,11 +21,22 @@ public interface HolidayDao extends BaseDao
     public Holiday getHoliday(Date date) throws HolidayNotFoundForDateEx;
 
     /**
-     * Retrieves a list of all the holidays that occur between the given dates inclusively in order
+     * Retrieves a list of all the non-questionable holidays that occur between the given dates inclusively in order
      * of earliest first.
      * @param startDate Start date range
      * @param endDate End date range
      * @return List<Holiday>
      */
     public List<Holiday> getHolidays(Date startDate, Date endDate);
+
+    /**
+     * Retrieves a list of all the holidays that occur between the given dates inclusively in order
+     * of earliest first.
+     * @param startDate Start date range
+     * @param endDate End date range
+     * @param questionableHolidays Include questionable holidays
+     * @return List<Holiday>
+     */
+    public List<Holiday> getHolidays(Date startDate, Date endDate, boolean questionableHolidays);
+
 }

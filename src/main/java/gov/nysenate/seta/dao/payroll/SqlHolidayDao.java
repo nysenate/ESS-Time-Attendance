@@ -24,6 +24,9 @@ public class SqlHolidayDao extends SqlBaseDao implements HolidayDao
     protected static final String GET_HOLIDAYS_SQL =
         "SELECT * FROM SASSHD17691 WHERE DTHOLIDAY BETWEEN :startDate AND :endDate ORDER BY DTHOLIDAY";
 
+    protected static final String GET_NON_QUESTIONABLE_HOLIDAYS_SQL =
+            "SELECT * FROM SASSHD17691 WHERE DTHOLIDAY BETWEEN :startDate AND :endDate AND cdquest = 'N' ORDER BY DTHOLIDAY";
+
     /** {@inheritDoc} */
     @Override
     public Holiday getHoliday(Date date) throws HolidayNotFoundForDateEx {
@@ -39,9 +42,20 @@ public class SqlHolidayDao extends SqlBaseDao implements HolidayDao
     /** {@inheritDoc} */
     @Override
     public List<Holiday> getHolidays(Date startDate, Date endDate) {
+            return getHolidays(startDate, endDate, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Holiday> getHolidays(Date startDate, Date endDate, boolean questionableHolidays) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("startDate", startDate);
         params.addValue("endDate", endDate);
-        return remoteNamedJdbc.query(GET_HOLIDAYS_SQL, params, new HolidayRowMapper(""));
+        if (questionableHolidays) {
+            return remoteNamedJdbc.query(GET_HOLIDAYS_SQL, params, new HolidayRowMapper(""));
+        }
+        else {
+            return remoteNamedJdbc.query(GET_NON_QUESTIONABLE_HOLIDAYS_SQL, params, new HolidayRowMapper(""));
+        }
     }
 }
