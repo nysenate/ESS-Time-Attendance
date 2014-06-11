@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.attendance;
+package gov.nysenate.seta.dao.attendance.mapper;
 
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
