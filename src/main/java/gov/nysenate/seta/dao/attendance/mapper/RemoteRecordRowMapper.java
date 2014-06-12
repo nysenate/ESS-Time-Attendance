@@ -9,24 +9,31 @@ import java.sql.SQLException;
 
 public class RemoteRecordRowMapper implements RowMapper<TimeRecord>
 {
+    private String pfx = "";
+
+    public RemoteRecordRowMapper() {}
+
+    public RemoteRecordRowMapper(String pfx) {
+        this.pfx = pfx;
+    }
+
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
-        TimeRecord tr = new TimeRecord();
-        tr.setTimeRecordId(rs.getBigDecimal("NUXRTIMESHEET"));
-        tr.setEmployeeId(rs.getBigDecimal("NUXREFEM"));
-        tr.setTxOriginalUserId(rs.getString("NATXNORGUSER"));
-        tr.setTxUpdateUserId(rs.getString("NATXNUPDUSER"));
-        tr.setTxOriginalDate(rs.getTimestamp("DTTXNORIGIN"));
-        tr.setTxUpdateDate(rs.getTimestamp("DTTXNUPDATE"));
-        tr.setActive(rs.getString("CDSTATUS").equals("A"));
-        tr.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString("CDTSSTAT")));
-        tr.setBeginDate(rs.getDate("DTBEGIN"));
-        tr.setEndDate(rs.getDate("DTEND"));
-        tr.setRemarks(rs.getString("DEREMARKS"));
-        tr.setSupervisorId(rs.getBigDecimal("NUXREFSV"));
-        tr.setExceptionDetails(rs.getString("DEEXCEPTION"));
-        tr.setProcessedDate(rs.getDate("DTPROCESS"));
-
-        return tr;
+        TimeRecord record = new TimeRecord();
+        record.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET"));
+        record.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
+        record.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
+        record.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
+        record.setTxOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
+        record.setTxUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
+        record.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
+        record.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "CDTSSTAT")));
+        record.setBeginDate(rs.getDate(pfx + "DTBEGIN"));
+        record.setEndDate(rs.getDate(pfx + "DTEND"));
+        record.setRemarks(rs.getString(pfx + "DEREMARKS"));
+        record.setSupervisorId(rs.getBigDecimal(pfx + "NUXREFSV"));
+        record.setExceptionDetails(rs.getString(pfx + "DEEXCEPTION"));
+        record.setProcessedDate(rs.getDate(pfx + "DTPROCESS"));
+        return record;
     }
 }

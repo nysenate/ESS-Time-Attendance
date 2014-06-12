@@ -1,5 +1,7 @@
 package gov.nysenate.seta.dao.attendance;
 
+import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
+import gov.nysenate.seta.dao.attendance.mapper.RemoteRecordRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.SyncCheck;
 import gov.nysenate.seta.model.attendance.TimeEntry;
@@ -23,7 +25,7 @@ import java.util.List;
 @Repository
 public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
 
-    @Resource(name = "localTimeRecord")
+    @Resource(name = "localTimeRecordDao")
     private TimeRecordDao localRecordDao;
 
     @Resource(name = "localTimeEntry")
@@ -139,14 +141,14 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
                     syncCheckDao.setSyncData(sc);
                 }
 
-                if(localRecordDao.getTimeRecordCount(tr.getTimeRecordId())==0)
-                {
-                    localRecordDao.setRecord(tr);
-                }
-                else
-                {
-                    localRecordDao.updateRecord(tr);
-                }
+              //  if(localRecordDao.getTimeRecordCount(tr.getTimeRecordId())==0)
+              //  {
+//                    localRecordDao.setRecord(tr);
+//                }
+//                else
+//                {
+//                    localRecordDao.saveRecord(tr);
+//                }
 
 
             }
@@ -182,7 +184,7 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
                 {
                     SyncCheck sc = new SyncCheck();
                     sc.setDate(te.gettOriginalDate());
-                    sc.setDataId(te.gettDayId());
+                    sc.setDataId(te.getEntryId());
                     sc.setDataType("TimeEntry");
                     sc.setDataSide("Remote");
 

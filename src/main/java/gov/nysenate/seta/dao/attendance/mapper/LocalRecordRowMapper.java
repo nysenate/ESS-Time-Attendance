@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class LocalRecordRowMapper implements RowMapper<TimeRecord>
 {
-    private String pfx="";
+    private String pfx = "";
 
     public LocalRecordRowMapper(String pfx){
         this.pfx = pfx;
@@ -17,21 +17,21 @@ public class LocalRecordRowMapper implements RowMapper<TimeRecord>
 
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
-        TimeRecord trec = new TimeRecord();
-        trec.setTimeRecordId(rs.getBigDecimal(pfx + "time_record_id"));
-        trec.setEmployeeId(rs.getBigDecimal(pfx + "emp_id"));
-        trec.setTxOriginalUserId(rs.getString(pfx + "t_original_user"));
-        trec.setTxUpdateUserId(rs.getString(pfx + "t_update_user"));
-        trec.setTxOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
-        trec.setTxUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
-        trec.setActive(rs.getString(pfx + "status").equals("A"));
-        trec.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "ts_status_id")));
-        trec.setBeginDate(rs.getDate(pfx + "begin_date"));
-        trec.setEndDate(rs.getDate(pfx + "end_date"));
-        trec.setRemarks(rs.getString(pfx + "remarks"));
-        trec.setExceptionDetails(rs.getString(pfx + "exc_details"));
-        trec.setProcessedDate(rs.getDate(pfx + "proc_date"));
+        TimeRecord record = new TimeRecord();
+        record.setTimeRecordId(rs.getBigDecimal(pfx + "time_record_id"));
+        record.setEmployeeId(rs.getInt(pfx + "emp_id"));
+        record.setTxOriginalUserId(rs.getString(pfx + "t_original_user"));
+        record.setTxUpdateUserId(rs.getString(pfx + "t_update_user"));
+        record.setTxOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
+        record.setTxUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
+        record.setActive(rs.getString(pfx + "status").equals("A"));
+        record.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "ts_status_id")));
+        record.setBeginDate(rs.getDate(pfx + "begin_date"));
+        record.setEndDate(rs.getDate(pfx + "end_date"));
+        record.setRemarks(rs.getString(pfx + "remarks"));
+        record.setExceptionDetails(rs.getString(pfx + "exc_details"));
+        record.setProcessedDate(rs.getDate(pfx + "proc_date"));
 
-        return trec;
+        return record;
     }
 }

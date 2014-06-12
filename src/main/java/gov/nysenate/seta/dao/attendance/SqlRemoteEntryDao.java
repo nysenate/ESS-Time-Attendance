@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.attendance;
 
+import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.*;
 import org.slf4j.Logger;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +22,7 @@ import java.util.Map;
 @Repository("remoteTimeEntry")
 public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
 {
-    @Resource(name = "localTimeRecord")
+    @Resource(name = "localTimeRecordDao")
     private TimeRecordDao timeRecordDao;
 
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteEntryDao.class);
@@ -71,9 +74,10 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
     @Override
     public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
         List<TimeRecord> timeRecords;
-        Map<BigDecimal, List<TimeEntry>> timeEntries = null;
+        Map<BigDecimal, List<TimeEntry>> timeEntries = new HashMap<>();
         MapSqlParameterSource params = new MapSqlParameterSource();
-        timeRecords = timeRecordDao.getRecordByEmployeeId(empId);
+//        timeRecords = timeRecordDao.getRecordByEmployeeId(empId);
+        timeRecords = new ArrayList<>(); /** FIXME */
         for(TimeRecord timeRecord : timeRecords) {
             params.addValue("empId",empId);
             params.addValue("timesheetId", timeRecord.getTimeRecordId());
@@ -94,7 +98,7 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
 
         MapSqlParameterSource param = new MapSqlParameterSource();
 
-        param.addValue("tSDayId", tsd.gettDayId());
+        param.addValue("tSDayId", tsd.getEntryId());
         param.addValue("timesheetId", tsd.getTimesheetId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());
@@ -124,7 +128,7 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
 
         MapSqlParameterSource param = new MapSqlParameterSource();
 
-        param.addValue("tSDayId", tsd.gettDayId());
+        param.addValue("tSDayId", tsd.getEntryId());
         param.addValue("timesheetId", tsd.getTimesheetId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());

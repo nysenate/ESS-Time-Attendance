@@ -35,13 +35,11 @@ public class AccrualSummary extends AccrualUsage
 
     /** TODO: The max limit might not make sense. Learn the rules for this */
     public BigDecimal getTotalVacHoursAccrued() {
-        BigDecimal hrs = vacHoursBanked.add(vacHoursAccrued);
-        return (hrs.compareTo(MAX_VAC_ACCRUED) <= 0) ? hrs : MAX_VAC_ACCRUED;
+        return vacHoursAccrued;
     }
 
     public BigDecimal getTotalEmpHoursAccrued() {
-        BigDecimal hrs = empHoursBanked.add(empHoursAccrued);
-        return (hrs.compareTo(MAX_EMP_ACCRUED) <= 0) ? hrs : MAX_EMP_ACCRUED;
+        return empHoursAccrued;
     }
 
     /** --- Copy Constructor --- */

@@ -2,12 +2,15 @@ package gov.nysenate.seta.model.attendance;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class TimeRecord
 {
     protected BigDecimal timeRecordId;
-    protected BigDecimal employeeId;
+    protected int employeeId;
     protected BigDecimal supervisorId;
     protected boolean active;
     protected Date beginDate;
@@ -20,8 +23,13 @@ public class TimeRecord
     protected String txUpdateUserId;
     protected Timestamp txOriginalDate;
     protected Timestamp txUpdateDate;
+    protected List<TimeEntry> timeEntries;
 
-    /** --- Getters and Setters --- */
+    public TimeRecord() {
+        this.timeEntries = new ArrayList<>();
+    }
+
+    /** --- Basic Getters/Setters --- */
 
     public BigDecimal getTimeRecordId() {
         return timeRecordId;
@@ -31,11 +39,11 @@ public class TimeRecord
         this.timeRecordId = timeRecordId;
     }
 
-    public BigDecimal getEmployeeId() {
+    public int getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(BigDecimal employeeId) {
+    public void setEmployeeId(int employeeId) {
         this.employeeId = employeeId;
     }
 
@@ -133,5 +141,13 @@ public class TimeRecord
 
     public void setTxUpdateDate(Timestamp txUpdateDate) {
         this.txUpdateDate = txUpdateDate;
+    }
+
+    public List<TimeEntry> getTimeEntries() {
+        return timeEntries;
+    }
+
+    public void setTimeEntries(List<TimeEntry> timeEntries) {
+        this.timeEntries = timeEntries;
     }
 }

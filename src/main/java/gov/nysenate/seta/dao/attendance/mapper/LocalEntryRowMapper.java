@@ -19,7 +19,7 @@ public class LocalEntryRowMapper implements RowMapper<TimeEntry>
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeEntry entry = new TimeEntry();
-        entry.settDayId(rs.getBigDecimal(pfx + "time_entry_id"));
+        entry.setEntryId(rs.getBigDecimal(pfx + "time_entry_id"));
         entry.setTimesheetId(rs.getBigDecimal(pfx + "time_record_id"));
         entry.setEmpId(rs.getBigDecimal(pfx + "emp_id"));
         entry.setDate(rs.getDate(pfx + "day_date"));
@@ -29,7 +29,9 @@ public class LocalEntryRowMapper implements RowMapper<TimeEntry>
         entry.setSickEmpHours(rs.getBigDecimal(pfx + "sick_emp_hr"));
         entry.setSickFamHours(rs.getBigDecimal(pfx + "sick_family_hr"));
         entry.setMiscHours(rs.getBigDecimal(pfx + "misc_hr"));
-        if (rs.getString(pfx + "misc_type") != null) entry.setMiscType(MiscLeaveType.valueOf(rs.getString(pfx + "misc_type")));
+        if (rs.getString(pfx + "misc_type") != null) {
+            entry.setMiscType(MiscLeaveType.valueOf(rs.getString(pfx + "misc_type")));
+        }
         entry.settOriginalUserId(rs.getString(pfx + "t_original_user"));
         entry.settUpdateUserId(rs.getString(pfx + "t_update_user"));
         entry.settOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
@@ -39,7 +41,6 @@ public class LocalEntryRowMapper implements RowMapper<TimeEntry>
         entry.setPayType(PayType.valueOf(rs.getString(pfx + "pay_type")));
         entry.setVacationHours(rs.getBigDecimal(pfx + "vacation_hr"));
         entry.setPersonalHours(rs.getBigDecimal(pfx + "personal_hr"));
-
         return entry;
     }
 }

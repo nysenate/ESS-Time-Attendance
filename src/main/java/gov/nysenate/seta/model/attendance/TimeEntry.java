@@ -12,7 +12,7 @@ import java.util.Date;
  */
 public class TimeEntry
 {
-    protected BigDecimal tDayId;
+    protected BigDecimal entryId;
     protected BigDecimal timesheetId;
     protected BigDecimal empId;
     protected Date date;
@@ -38,27 +38,57 @@ public class TimeEntry
     /** --- Functional Getters --- */
 
     public BigDecimal getDailyTotal() {
-
-        BigDecimal TotalHours = new BigDecimal("0.00");
-
-        BigDecimal result = TotalHours.add(getWorkHours());
-        result.add(getHolidayHours());
-        result.add(getVacationHours());
-        result.add(getPersonalHours());
-        result.add(getSickEmpHours());
-        result.add(getSickFamHours());
-        result.add(getMiscHours());
-        return result;
+        BigDecimal total = new BigDecimal(0);
+        total = total.add(getWorkHours());
+        total = total.add(getHolidayHours());
+        total = total.add(getVacationHours());
+        total = total.add(getPersonalHours());
+        total = total.add(getSickEmpHours());
+        total = total.add(getSickFamHours());
+        total = total.add(getMiscHours());
+        return total;
     }
 
-   /** --- Basic Getters/Setters --- */
-
-    public BigDecimal gettDayId() {
-        return tDayId;
+    public void setWorkHours(BigDecimal workHours) {
+        this.workHours = (workHours != null) ? workHours : BigDecimal.ZERO;
     }
 
-    public void settDayId(BigDecimal tDayId) {
-        this.tDayId = tDayId;
+    public void setTravelHours(BigDecimal travelHours) {
+        this.travelHours = (travelHours != null) ? travelHours : BigDecimal.ZERO;
+    }
+
+    public void setHolidayHours(BigDecimal holidayHours) {
+        this.holidayHours = (holidayHours != null) ? holidayHours : BigDecimal.ZERO;
+    }
+
+    public void setVacationHours(BigDecimal vacationHours) {
+        this.vacationHours = (vacationHours != null) ? vacationHours : BigDecimal.ZERO;
+    }
+
+    public void setPersonalHours(BigDecimal personalHours) {
+        this.personalHours = (personalHours != null) ? personalHours : BigDecimal.ZERO;
+    }
+
+    public void setSickEmpHours(BigDecimal sickEmpHours) {
+        this.sickEmpHours = (sickEmpHours != null) ? sickEmpHours : BigDecimal.ZERO;
+    }
+
+    public void setSickFamHours(BigDecimal sickFamHours) {
+        this.sickFamHours = (sickFamHours != null) ? sickFamHours : BigDecimal.ZERO;
+    }
+
+    public void setMiscHours(BigDecimal miscHours) {
+        this.miscHours = (miscHours != null) ? miscHours : BigDecimal.ZERO;
+    }
+
+    /** --- Basic Getters/Setters --- */
+
+    public BigDecimal getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(BigDecimal entryId) {
+        this.entryId = entryId;
     }
 
     public BigDecimal getTimesheetId() {
@@ -89,64 +119,32 @@ public class TimeEntry
         return workHours;
     }
 
-    public void setWorkHours(BigDecimal workHours) {
-        this.workHours = workHours;
-    }
-
     public BigDecimal getTravelHours() {
         return travelHours;
-    }
-
-    public void setTravelHours(BigDecimal travelHours) {
-        this.travelHours = travelHours;
     }
 
     public BigDecimal getHolidayHours() {
         return holidayHours;
     }
 
-    public void setHolidayHours(BigDecimal holidayHours) {
-        this.holidayHours = holidayHours;
-    }
-
     public BigDecimal getVacationHours() {
         return vacationHours;
-    }
-
-    public void setVacationHours(BigDecimal vacationHours) {
-        this.vacationHours = vacationHours;
     }
 
     public BigDecimal getPersonalHours() {
         return personalHours;
     }
 
-    public void setPersonalHours(BigDecimal personalHours) {
-        this.personalHours = personalHours;
-    }
-
     public BigDecimal getSickEmpHours() {
         return sickEmpHours;
-    }
-
-    public void setSickEmpHours(BigDecimal sickEmpHours) {
-        this.sickEmpHours = sickEmpHours;
     }
 
     public BigDecimal getSickFamHours() {
         return sickFamHours;
     }
 
-    public void setSickFamHours(BigDecimal sickFamHours) {
-        this.sickFamHours = sickFamHours;
-    }
-
     public BigDecimal getMiscHours() {
         return miscHours;
-    }
-
-    public void setMiscHours(BigDecimal miscHours) {
-        this.miscHours = miscHours;
     }
 
     public MiscLeaveType getMiscType() {

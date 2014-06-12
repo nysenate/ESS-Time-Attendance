@@ -8,9 +8,6 @@ import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 
 import java.util.List;
 
-/**
- * Created by riken on 3/11/14.
- */
 public interface MigrationDao extends BaseDao {
 
     /**

@@ -199,6 +199,8 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         accrualGap.setRecordsDuringGap(historyDuringGap.getAllTransRecords(false));
         accrualGap.setPeriodUsageRecs(getPeriodAccrualUsageRecords(empId, gapStartDate, gapEndDate));
 
+        /** TODO: Add local timesheet data */
+
         for (PayPeriod gapPeriod : accrualGap.getGapPeriods()) {
             accrualState.setEndDate(gapPeriod.getEndDate());
 

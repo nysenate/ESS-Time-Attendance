@@ -1,7 +1,6 @@
 package gov.nysenate.seta.web;
 
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
-import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

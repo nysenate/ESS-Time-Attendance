@@ -13,7 +13,7 @@ import java.util.Map;
 public interface TimeEntryDao extends BaseDao
 {
     /**
-     * Retrieve all time entries that are assigned a particular time record id.
+     * Retrieve all time entries that belong to a specific time record.
      * @param timeRecordId int - Id of the parent TimeRecord
      * @return List<TimeEntry>
      * @throws TimeEntryException - TimeEntryNotFoundEx if no matching time entries were found
@@ -21,25 +21,26 @@ public interface TimeEntryDao extends BaseDao
     public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryException;
 
     /**
-     * Retrieve all time etries using particular empId mapped with TimesheetId
-     *
+     * Retrieve all time entries for a given employee.     *
      * @param empId - int Employee ID
      * @return Mapped List of Entry objects otherwise TimeEntryNotFoundException
      * @throws TimeEntryNotFoundEx
+     * @throws TimeRecordNotFoundException
      */
-    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,TimeRecordNotFoundException;
+    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,
+                                                                                  TimeRecordNotFoundException;
 
     /**
-     * Insert time entry using TimeEntry Object
+     * Insert the given time entry.
      * @param tsd - TimeEntry class object containing data to be inserted
-     * @return Boolean value, true if data successfully inserted else false.
+     * @return boolean, true if data successfully inserted, otherwise false.
      */
     public boolean setTimeEntry(TimeEntry tsd);
 
     /**
      * Update time entry using TimeEntry Object
      * @param tsd - TimeEntry class object containing data to be updated
-     * @return @return Boolean value, true if data successfully updated else false.
+     * @return boolean, true if data successfully updated, otherwise false.
      */
     public boolean updateTimeEntry(TimeEntry tsd);
   }

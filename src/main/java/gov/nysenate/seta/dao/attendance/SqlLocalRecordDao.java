@@ -1,8 +1,10 @@
 package gov.nysenate.seta.dao.attendance;
 
+import gov.nysenate.seta.dao.attendance.mapper.LocalRecordRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
+import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -13,10 +15,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-@Repository("localTimeRecord")
-public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
-
+@Repository("localTimeRecordDao")
+public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao
+{
     private static final Logger logger = LoggerFactory.getLogger(SqlLocalRecordDao.class);
 
     protected static final String GET_TIME_REC_SQL_TMPL =
@@ -42,8 +45,6 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
             "emp_id = :empId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, ts_status_id = :tSStatusId, begin_date = :beginDate, end_date = :endDate, remarks = :remarks, supervisor_id = :supervisorId, exc_details = :excDetails, proc_date = :procDate " +
             "WHERE time_record_id = :timesheetId";
 
-
-    @Override
     public List<TimeRecord> getRecordByEmployeeId(int empId) throws TimeRecordNotFoundException {
 
         List<TimeRecord> timeRecordList;
@@ -61,7 +62,6 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
     }
 
-    @Override
     public Map<Integer, List<TimeRecord>> getRecordByEmployeeIdMap(List<Integer> empIds) throws TimeRecordNotFoundException {
 
         Map<Integer, List<TimeRecord>> trs = null;
@@ -85,7 +85,6 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
         return  trs;
     }
 
-    @Override
     public List<TimeRecord> getRecordByPayPeriod(Date startDate, Date endDate) throws TimeRecordNotFoundException {
 
         List<TimeRecord> timeRecordList;
@@ -104,7 +103,6 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
     }
 
-    @Override
     public List<TimeRecord> getRecordByTSStatus(String tSStatusId, int empId, Date startDate, Date endDate) throws TimeRecordNotFoundException {
 
         List<TimeRecord> timeRecordList;
@@ -137,7 +135,6 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
         return  count;
     }
 
-    @Override
     public boolean setRecord(TimeRecord tr) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -163,27 +160,51 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao{
 
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean updateRecord(TimeRecord tr) {
+    public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate, Set<TimeRecordStatus> statuses) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate, Set<TimeRecordStatus> statuses) {
+        return null;
+    }
+
+    @Override
+    public boolean saveRecord(TimeRecord record) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
 
-        params.addValue("empId", tr.getEmployeeId());
-        params.addValue("tOriginalUserId", tr.getTxOriginalUserId());
-        params.addValue("tUpdateUserId", tr.getTxUpdateUserId());
-        params.addValue("tOriginalDate", tr.getTxOriginalDate());
-        params.addValue("tUpdateDate", tr.getTxUpdateDate());
-        if(tr.isActive()==true){params.addValue("status", "A");}
+        params.addValue("empId", record.getEmployeeId());
+        params.addValue("tOriginalUserId", record.getTxOriginalUserId());
+        params.addValue("tUpdateUserId", record.getTxUpdateUserId());
+        params.addValue("tOriginalDate", record.getTxOriginalDate());
+        params.addValue("tUpdateDate", record.getTxUpdateDate());
+        if(record.isActive()==true){params.addValue("status", "A");}
         else{ params.addValue("status", "I");}
-        params.addValue("tSStatusId", tr.getRecordStatus().getCode());
-        params.addValue("beginDate", tr.getBeginDate());
-        params.addValue("endDate", tr.getEndDate());
-        params.addValue("remarks", tr.getRemarks());
-        params.addValue("supervisorId", tr.getSupervisorId());
-        params.addValue("excDetails", tr.getExceptionDetails());
-        params.addValue("procDate", tr.getProcessedDate());
-        params.addValue("timesheetId", tr.getTimeRecordId());
+        params.addValue("tSStatusId", record.getRecordStatus().getCode());
+        params.addValue("beginDate", record.getBeginDate());
+        params.addValue("endDate", record.getEndDate());
+        params.addValue("remarks", record.getRemarks());
+        params.addValue("supervisorId", record.getSupervisorId());
+        params.addValue("excDetails", record.getExceptionDetails());
+        params.addValue("procDate", record.getProcessedDate());
+        params.addValue("timesheetId", record.getTimeRecordId());
 
         if (localNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
         else return false;

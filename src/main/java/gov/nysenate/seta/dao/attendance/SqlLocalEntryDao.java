@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao.attendance;
 
 import gov.nysenate.seta.dao.accrual.mapper.LocalAccrualUsageRowMapper;
+import gov.nysenate.seta.dao.attendance.mapper.LocalEntryRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.accrual.AccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccrualUsage;
@@ -18,55 +19,56 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Repository("localTimeEntry")
 public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
-    @Resource(name = "localTimeRecord")
+    @Resource(name = "localTimeRecordDao")
     private TimeRecordDao timeRecordDao;
 
     private static final Logger logger = LoggerFactory.getLogger(SqlLocalEntryDao.class);
 
     protected static final String GET_TIME_ENTRY_SQL_TMPL =
-            "SELECT \n" +
-                    "* \n" +
-                    "FROM ts.time_entry \n" +
-                    "WHERE status = 'A' AND %s";
+        "SELECT *\n" +
+        "FROM ts.time_entry \n" +
+        "WHERE status = 'A' AND %s";
 
     protected static final String GET_ENTRY_BY_TIMESHEETID = String.format(GET_TIME_ENTRY_SQL_TMPL,"timesheet_id = :timesheetId");
     protected static final String GET_ENTRY_BY_EMPID = String.format(GET_TIME_ENTRY_SQL_TMPL,"emp_id = :empId AND timesheet_id = :timesheetId");
 
     protected static final String SET_ENTRY_SQL =
-            "INSERT \n" +
-                    "INTO ts.time_entry (time_entry_id, time_record_id, emp_id, day_date, work_hr, travel_hr, holiday_hr, sick_emp_hr, sick_family_hr, misc_hr, misc_type, t_original_user, t_update_user, t_original_date, t_update_date, status, emp_comment, pay_type, vacation_hr, personal_hr) \n" +
-                    "VALUES (:tSDayId, :timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :empComment, :payType, :vacationHR, :personalHR)";
+        "INSERT \n" +
+        "INTO ts.time_entry (time_entry_id, time_record_id, emp_id, day_date, work_hr, travel_hr, holiday_hr, " +
+        "                    sick_emp_hr, sick_family_hr, misc_hr, misc_type, t_original_user, t_update_user, " +
+        "                    t_original_date, t_update_date, status, emp_comment, pay_type, vacation_hr, personal_hr) \n" +
+        "VALUES (:tSDayId, :timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :empComment, :payType, :vacationHR, :personalHR)";
 
     protected static final String UPDATE_ENTRY_SQL =
-            "UPDATE ts.time_entry \n" +
-                    "SET \n" +
-                    "(time_record_id = :timesheetId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
-                    "WHERE TSDayId = :tSDayId";
-
+        "UPDATE ts.time_entry \n" +
+        "SET \n" +
+        "(time_record_id = :timesheetId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
+        "WHERE TSDayId = :tSDayId";
 
     protected static final String GET_SUM_OF_HOURS =
-            "SELECT " +
-                    "te.emp_id as t_emp_id, " +
-                    "SUM(te.work_hr) as t_work, " +
-                    "SUM(te.travel_hr) as t_travel, " +
-                    "SUM(te.holiday_hr) as t_holiday, " +
-                    "SUM(te.sick_emp_hr) as t_sick_emp, " +
-                    "SUM(te.sick_family_hr) as t_sick_family, " +
-                    "SUM(te.misc_hr) as t_misc, " +
-                    "SUM(te.vacation_hr) as t_vacation, " +
-                    "SUM(te.personal_hr) as t_personal " +
-                    "FROM " +
-                        "ts.time_entry te LEFT JOIN ts.time_record tr ON te.time_record_id = tr.time_record_id " +
-                    "WHERE " +
-                        "te.emp_id = :empId AND " +
-                        "te.day_date BETWEEN  :startDate AND :endDate" +
-                    "GROUP BY te.emp_id";
+        "SELECT " +
+            "te.emp_id as t_emp_id, " +
+            "SUM(te.work_hr) as t_work, " +
+            "SUM(te.travel_hr) as t_travel, " +
+            "SUM(te.holiday_hr) as t_holiday, " +
+            "SUM(te.sick_emp_hr) as t_sick_emp, " +
+            "SUM(te.sick_family_hr) as t_sick_family, " +
+            "SUM(te.misc_hr) as t_misc, " +
+            "SUM(te.vacation_hr) as t_vacation, " +
+            "SUM(te.personal_hr) as t_personal " +
+        "FROM " +
+            "ts.time_entry te LEFT JOIN ts.time_record tr ON te.time_record_id = tr.time_record_id " +
+        "WHERE " +
+            "te.emp_id = :empId AND " +
+            "te.day_date BETWEEN  :startDate AND :endDate" +
+        "GROUP BY te.emp_id";
 
     @Override
     public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryNotFoundEx {
@@ -74,11 +76,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         List<TimeEntry> timeEntryList;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("timesheetId", timeRecordId);
-
-        try{
-            timeEntryList = localNamedJdbc.query(GET_ENTRY_BY_TIMESHEETID, params,
-                    new LocalEntryRowMapper(""));
-        }catch (DataRetrievalFailureException ex){
+        try {
+            timeEntryList = localNamedJdbc.query(GET_ENTRY_BY_TIMESHEETID, params, new LocalEntryRowMapper(""));
+        }
+        catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Entries of {} error: {}", timeRecordId, ex.getMessage());
             throw new TimeEntryNotFoundEx("No matching Time Entries for Timesheet id: " + timeRecordId);
         }
@@ -93,7 +94,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         Map<BigDecimal, List<TimeEntry>> timeEntryList = null;
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        timeRecords = timeRecordDao.getRecordByEmployeeId(empId);
+        timeRecords = new ArrayList<>(); /**TODO FIX THIS *///timeRecordDao.getRecordByEmployeeId(empId);
 
         for(TimeRecord tr : timeRecords)
         {
@@ -117,7 +118,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
         MapSqlParameterSource param = new MapSqlParameterSource();
 
-        param.addValue("tSDayId", tsd.gettDayId());
+        param.addValue("tSDayId", tsd.getEntryId());
         param.addValue("timesheetId", tsd.getTimesheetId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());
@@ -148,7 +149,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
         MapSqlParameterSource param = new MapSqlParameterSource();
 
-        param.addValue("tSDayId", tsd.gettDayId());
+        param.addValue("tSDayId", tsd.getEntryId());
         param.addValue("timesheetId", tsd.getTimesheetId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());

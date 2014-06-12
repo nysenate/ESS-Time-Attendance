@@ -43,14 +43,6 @@ public class PayPeriod
                                         "Cannot compute number of pay period days");
     }
 
-    public long getNumWorkDays() {
-        return 0;
-    }
-
-    public long getNumWorkDays(Date startDate) {
-        return 0;
-    }
-
     /**
      * Indicates if pay period is the split that sometimes occurs at the end of the year.
      */

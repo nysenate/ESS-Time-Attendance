@@ -1735,8 +1735,8 @@ a:hover {
   padding: 4px 10px;
   border-width: 1px;
   border-style: none none solid none;
-  background: rgba(235, 238, 241, 0.93);
-  color: #00687C;
+  background: #598283;
+  color: white;
   border-color: rgba(0, 107, 128, 0.25);
   line-height: 30px;
   font-weight: 600;
