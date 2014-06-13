@@ -18,12 +18,12 @@ import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
 
 public class SqlAccrualHelper
 {
-    protected static final Set<TransactionCode> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
-    protected static final Set<TransactionCode> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
+    protected static final Set<TransactionCode> PAY_CODES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
+    protected static final Set<TransactionCode> MIN_CODES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
 
-    protected static final Set<TransactionCode> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
-    protected static final Set<TransactionCode> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
-    protected static final Set<TransactionCode> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+    protected static final Set<TransactionCode> APP_RTP_CODES = new HashSet<>(Arrays.asList(RTP, APP));
+    protected static final Set<TransactionCode> EMP_CODE = new HashSet<>(Arrays.asList(EMP));
+    protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
@@ -76,10 +76,10 @@ public class SqlAccrualHelper
      */
     static boolean isEmployeeTerminated(LinkedList<TransactionRecord> empRecords) {
         for (TransactionRecord rec : empRecords) {
-            if (APP_RTP_TYPES.contains(rec.getTransType())) {
+            if (APP_RTP_CODES.contains(rec.getTransCode())) {
                 return false;
             }
-            else if (EMP_TYPE.contains(rec.getTransType())) {
+            else if (EMP_CODE.contains(rec.getTransCode())) {
                 return true;
             }
         }
@@ -88,10 +88,10 @@ public class SqlAccrualHelper
 
     static boolean isEmployeeAppointed(LinkedList<TransactionRecord> empRecords) {
         for (TransactionRecord rec : empRecords) {
-            if (APP_RTP_TYPES.contains(rec.getTransType())) {
+            if (APP_RTP_CODES.contains(rec.getTransCode())) {
                 return true;
             }
-            else if (EMP_TYPE.contains(rec.getTransType())) {
+            else if (EMP_CODE.contains(rec.getTransCode())) {
                 return false;
             }
         }
@@ -104,7 +104,7 @@ public class SqlAccrualHelper
      */
     static PayType getPayType(LinkedList<TransactionRecord> payTypeRecs) throws AccrualException {
         for (TransactionRecord rec : payTypeRecs) {
-            if (PAY_TYPES.contains(rec.getTransType()) && rec.hasNonNullValue("CDPAYTYPE")) {
+            if (PAY_CODES.contains(rec.getTransCode()) && rec.hasNonNullValue("CDPAYTYPE")) {
                 return PayType.valueOf(rec.getValue("CDPAYTYPE"));
             }
         }
@@ -117,7 +117,7 @@ public class SqlAccrualHelper
      */
     static BigDecimal getMinTotalHours(LinkedList<TransactionRecord> minHourRecs) {
         for (TransactionRecord rec : minHourRecs) {
-            if (MIN_TYPES.contains(rec.getTransType()) && rec.getValue("NUMINTOTHRS") != null) {
+            if (MIN_CODES.contains(rec.getTransCode()) && rec.getValue("NUMINTOTHRS") != null) {
                 return new BigDecimal(rec.getValue("NUMINTOTHRS"));
             }
         }
@@ -130,7 +130,7 @@ public class SqlAccrualHelper
      */
     static BigDecimal getMinEndHours(LinkedList<TransactionRecord> minHourRecs) throws AccrualException {
         for (TransactionRecord rec : minHourRecs) {
-            if (MIN_TYPES.contains(rec.getTransType()) && rec.getValue("NUMINTOTEND") != null) {
+            if (MIN_CODES.contains(rec.getTransCode()) && rec.getValue("NUMINTOTEND") != null) {
                 return new BigDecimal(rec.getValue("NUMINTOTEND"));
             }
         }
@@ -141,23 +141,23 @@ public class SqlAccrualHelper
      * Returns a list of just min type transactions from the given history
      */
     static LinkedList<TransactionRecord> getMinRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
-        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(MIN, RTP, APP));
-        return transHistory.getTransRecords(types, orderByAsc);
+        Set<TransactionCode> codes = new LinkedHashSet<>(Arrays.asList(MIN, RTP, APP));
+        return transHistory.getTransRecords(codes, orderByAsc);
     }
 
     /**
      * Returns a list of just employee status transactions from the given history
      */
     static LinkedList<TransactionRecord> getEmpRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
-        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(RTP, EMP, APP));
-        return transHistory.getTransRecords(types, orderByAsc);
+        Set<TransactionCode> codes = new LinkedHashSet<>(Arrays.asList(RTP, EMP, APP));
+        return transHistory.getTransRecords(codes, orderByAsc);
     }
 
     /**
      * Returns a list of just pay type transactions from the given history
      */
     static LinkedList<TransactionRecord> getPayTypeRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
-        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
-        return transHistory.getTransRecords(types, orderByAsc);
+        Set<TransactionCode> codes = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
+        return transHistory.getTransRecords(codes, orderByAsc);
     }
 }

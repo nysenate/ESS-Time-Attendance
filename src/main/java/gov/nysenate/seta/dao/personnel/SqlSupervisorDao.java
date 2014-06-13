@@ -106,8 +106,8 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
      */
     @Override
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
-        Set<TransactionCode> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
-        TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transTypes, date);
+        Set<TransactionCode> transCodes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
+        TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transCodes, date);
 
         int supId = -1;
         if (transHistory.hasRecords()) {
@@ -189,7 +189,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
          */
         if (!res.isEmpty()) {
             SupervisorEmpGroup empGroup = new SupervisorEmpGroup(supId, start, end);
-            Set<TransactionCode> supTransTypes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
+            Set<TransactionCode> supTransCodes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
             Map<Integer, EmployeeSupInfo> primaryEmps = new HashMap<>();
             Map<Integer, EmployeeSupInfo> overrideEmps = new HashMap<>();
             Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmps = new HashMap<>();
@@ -215,7 +215,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                 EmployeeSupInfo empSupInfo = new EmployeeSupInfo(empId, start, end);
                 empSupInfo.setSupId(currSupId);
                 empSupInfo.setEmpLastName(colMap.get("NALAST").toString());
-                if (supTransTypes.contains(transType)) {
+                if (supTransCodes.contains(transType)) {
                     empSupInfo.setSupStartDate(effectDate);
                 }
 
@@ -231,7 +231,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                 if (rank == 1) {
                     /**
                      * Add the employee to their supervisor's respective group if their supervisor id
-                     * matches the given 'supId'. For PRIMARY AND SUP_OVR types we flag mismatches as possible
+                     * matches the given 'supId'. For PRIMARY AND SUP_OVR codes we flag mismatches as possible
                      * employees when the effect date is between the 'start' and 'end' dates. The proceeding
                      * record(s) for those employees will then need to be checked to see if the supervisor matches
                      * at some point on/after the 'start' date.

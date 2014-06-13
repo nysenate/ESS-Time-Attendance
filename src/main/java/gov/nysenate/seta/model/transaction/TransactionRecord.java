@@ -10,7 +10,7 @@ public class TransactionRecord
     protected int employeeId;
     protected int changeId;
     protected boolean active;
-    protected TransactionCode transType;
+    protected TransactionCode transCode;
     protected Map<String, String> valueMap;
     protected Date originalDate;
     protected Date updateDate;
@@ -75,12 +75,12 @@ public class TransactionRecord
         this.active = active;
     }
 
-    public TransactionCode getTransType() {
-        return transType;
+    public TransactionCode getTransCode() {
+        return transCode;
     }
 
-    public void setTransType(TransactionCode transType) {
-        this.transType = transType;
+    public void setTransCode(TransactionCode transCode) {
+        this.transCode = transCode;
     }
 
     public Map<String, String> getValueMap() {

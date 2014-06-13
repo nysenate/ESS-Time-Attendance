@@ -18,23 +18,23 @@ public interface EmployeeTransactionDao
      * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
      * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes);
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
      * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date end);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end);
 
     /**
      * Retrieves a TransactionHistory of all the records for the given set of TransactionCodes that have an
      * effective date before or equal to the 'end' date.
      *
      * @param empId int - Employee id
-     * @param types TransactionCode - the set of transactions to retrieve
+     * @param codes TransactionCode - the set of transactions to retrieve
      * @param start Date - the transaction's effective date must be equal to or after this date.
      * @param end Date - the transaction's effective date must be equal to or before this date.
      * @return TransactionHistory
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date start, Date end);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end);
 }

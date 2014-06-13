@@ -33,28 +33,28 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types) {
-        return getTransHistory(empId, types, new Date());
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes) {
+        return getTransHistory(empId, codes, new Date());
     }
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date end) {
-        return getTransHistory(empId, types, getBeginningOfTime(), end);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end) {
+        return getTransHistory(empId, codes, getBeginningOfTime(), end);
     }
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date start, Date end) {
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("dateStart", start);
         params.addValue("dateEnd", end);
-        params.addValue("transCodes", getTransCodesFromSet(types));
+        params.addValue("transCodes", getTransCodesFromSet(codes));
 
-        String sql = applyAuditColumnsInSelectSql(GET_TRANS_HISTORY_SQL, "audColumns", "", types);
+        String sql = applyAuditColumnsInSelectSql(GET_TRANS_HISTORY_SQL, "audColumns", "", codes);
         List<TransactionRecord> transRecordList =
-                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", types));
+                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes));
 
         TransactionHistory transHistory = new TransactionHistory(empId);
         transHistory.addTransactionRecords(transRecordList);
@@ -68,8 +68,8 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
      * @param replaceKey String - An identifier inside the sql for replacement. e.g ${auditCols} where 'auditCols' is the key.
      *                            The replacement string cannot be the first entry in the select clause due to commas.
      * @param pfx String - A prefix to apply to each column name. Leave empty if you just want the column name as is.
-     * @param restrictSet Set<TransactionCode> - Only the columns for the desired types will be added. If null then
-     *                                           all the columns for every transaction type will be added.
+     * @param restrictSet Set<TransactionCode> - Only the columns for the desired codes will be added. If null then
+     *                                           all the columns for every transaction code will be added.
      * @return String - sql statement with audit columns
      */
     private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx, Set<TransactionCode> restrictSet) {
@@ -80,8 +80,8 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         List<String> auditColList = new ArrayList<>();
         if (restrictSet != null && !restrictSet.isEmpty() && !restrictSet.contains(TransactionCode.APP) &&
             !restrictSet.contains(TransactionCode.RTP)) {
-            for (TransactionCode type : restrictSet) {
-                auditColList.addAll(type.getDbColumnList());
+            for (TransactionCode code : restrictSet) {
+                auditColList.addAll(code.getDbColumnList());
             }
         }
         else {
@@ -103,21 +103,21 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
     }
 
     /**
-     * Helper method to return a set of the transaction codes in the 'types' set.
-     * @param types Set<TransactionCode>
+     * Helper method to return a set of the transaction codes in the 'codes' set.
+     * @param codes Set<TransactionCode>
      * @return Set<String>
      */
-    private Set<String> getTransCodesFromSet(Set<TransactionCode> types) {
-        if (types==null||types.size()==0) {
-            types = new HashSet<TransactionCode>();
+    private Set<String> getTransCodesFromSet(Set<TransactionCode> codes) {
+        if (codes==null||codes.size()==0) {
+            codes = new HashSet<TransactionCode>();
             TransactionCode[] allTransactionCodes = TransactionCode.values();
-            for (TransactionCode curTransType : allTransactionCodes) {
-                types.add(curTransType);
+            for (TransactionCode curTransCode : allTransactionCodes) {
+                codes.add(curTransCode);
             }
         }
         Set<String> transCodes = new HashSet<>();
-        for (TransactionCode type : types) {
-            transCodes.add(type.name());
+        for (TransactionCode code : codes) {
+            transCodes.add(code.name());
         }
         return transCodes;
     }

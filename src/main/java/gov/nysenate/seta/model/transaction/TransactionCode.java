@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * The TransactionCode refers to a specific change made to an employee's personnel record.
- * The dbColumns stored for each type refer to the set of columns in the SFMS audit table
+ * The dbColumns stored for each code refer to the set of columns in the SFMS audit table
  * where the relevant changes are stored.
  */
 public enum TransactionCode
@@ -81,18 +81,18 @@ public enum TransactionCode
     YMS("PAY", "CDMARITALYON", "YONKERS MARITAL STATUS"),
     YWT("PAY", "NUYONTAXEX", "YONKERS WITHHOLDING EXEMP");
 
-    private TransactionCode(String type, String dbColumns, String desc) {
-        this.type = type;
+    private TransactionCode(String code, String dbColumns, String desc) {
+        this.code = code;
         this.dbColumns = dbColumns;
         this.desc = desc;
     }
 
-    private String type;
+    private String code;
     private String dbColumns;
     private String desc;
 
-    public String getType() {
-        return type;
+    public String getCode() {
+        return code;
     }
 
     public String getDbColumns() {

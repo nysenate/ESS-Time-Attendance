@@ -25,12 +25,12 @@ public class TransactionHistory
     }
 
     /**
-     * Returns true if records exist for a given type of transaction.
-     * @param type TransactionCode
+     * Returns true if records exist for a given transaction code.
+     * @param code TransactionCode
      * @return boolean
      */
-    public boolean hasRecords(TransactionCode type) {
-        return recordHistory.get(type) != null && !recordHistory.get(type).isEmpty();
+    public boolean hasRecords(TransactionCode code) {
+        return recordHistory.get(code) != null && !recordHistory.get(code).isEmpty();
     }
 
     /** --- Functional Getters/Setters --- */
@@ -41,11 +41,11 @@ public class TransactionHistory
      */
     public void addTransactionRecord(TransactionRecord record) {
         if (record != null) {
-            TransactionCode type = record.getTransType();
-            if (!recordHistory.containsKey(type)) {
-                recordHistory.put(type, new LinkedList<TransactionRecord>());
+            TransactionCode code = record.getTransCode();
+            if (!recordHistory.containsKey(code)) {
+                recordHistory.put(code, new LinkedList<TransactionRecord>());
             }
-            this.recordHistory.get(type).add(record);
+            this.recordHistory.get(code).add(record);
         }
     }
 
@@ -61,26 +61,26 @@ public class TransactionHistory
 
     /**
      * See overloaded method. This provides the option to change the sort order for the returned list of records.
-     * @param type TransactionCode
+     * @param code TransactionCode
      * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(TransactionCode type, boolean sortByDateAsc) {
-        return getTransRecords(new HashSet<>(Arrays.asList(type)), sortByDateAsc);
+    public LinkedList<TransactionRecord> getTransRecords(TransactionCode code, boolean sortByDateAsc) {
+        return getTransRecords(new HashSet<>(Arrays.asList(code)), sortByDateAsc);
     }
 
     /**
      * Returns a single ordered LinkedList containing a set of transaction records. This is useful if
      * you need all the transaction records to be ordered into a single collection.
-     * @param transTypes Set<TransactionCode> - The set of types to return in the list
+     * @param transCodes Set<TransactionCode> - The set of transaction codes to return in the list
      * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transTypes, boolean sortByDateAsc) {
+    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transCodes, boolean sortByDateAsc) {
         LinkedList<TransactionRecord> sortedRecList = new LinkedList<>();
-        for (TransactionCode type : recordHistory.keySet()) {
-            if (transTypes.contains(type)) {
-                sortedRecList.addAll(recordHistory.get(type));
+        for (TransactionCode code : recordHistory.keySet()) {
+            if (transCodes.contains(code)) {
+                sortedRecList.addAll(recordHistory.get(code));
             }
         }
         Collections.sort(sortedRecList, (sortByDateAsc) ? new TransDateAscending() : new TransDateDescending());
@@ -88,7 +88,7 @@ public class TransactionHistory
     }
 
     /**
-     * Shorthand method to retrieve every available transaction type.
+     * Shorthand method to retrieve every available transaction code.
      * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
      * @return LinkedList<TransactionRecord>
      */

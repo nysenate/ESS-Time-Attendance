@@ -26,12 +26,12 @@ public class SqlEmployeeTransactionDaoTests extends AbstractContextTests
 
     @Test
     public void testGetTransactionHistoryMapWithDate_Succeeds() throws Exception {
-        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(APP, RTP, MIN, TYP));
-        LinkedList<TransactionRecord> recs = transHistDao.getTransHistory(10976, types, new Date()).getAllTransRecords(false);
+        Set<TransactionCode> transactionCodes = new LinkedHashSet<>(Arrays.asList(APP, RTP, MIN, TYP));
+        LinkedList<TransactionRecord> recs = transHistDao.getTransHistory(10976, transactionCodes, new Date()).getAllTransRecords(false);
         //logger.debug(OutputUtils.toJson(recs));
-        //types = new LinkedHashSet<>(Arrays.asList(APP, RTP, SUP, ADT, SAL,  MIN, TYP));
-        types = null;
-        recs = transHistDao.getTransHistory(6221, types, new LocalDate(2014, 5, 1).toDate()).getAllTransRecords(true);
+        transactionCodes = new LinkedHashSet<>(Arrays.asList(APP, RTP, SUP, ADT, SAL,  MIN, TYP));
+        //transactionCodes = null;
+        recs = transHistDao.getTransHistory(6221, transactionCodes, new LocalDate(2014, 5, 1).toDate()).getAllTransRecords(true);
         Map<String, String> holdValues = null;
         for (TransactionRecord curRec : recs) {
             if (holdValues==null) {

@@ -55,12 +55,12 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     @Autowired
     protected HolidayDao holidayDao;
 
-    protected static final Set<TransactionCode> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
-    protected static final Set<TransactionCode> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
+    protected static final Set<TransactionCode> PAY_CODES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
+    protected static final Set<TransactionCode> MIN_CODES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
 
-    protected static final Set<TransactionCode> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
-    protected static final Set<TransactionCode> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
-    protected static final Set<TransactionCode> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+    protected static final Set<TransactionCode> APP_RTP_CODES = new HashSet<>(Arrays.asList(RTP, APP));
+    protected static final Set<TransactionCode> EMP_CODES = new HashSet<>(Arrays.asList(EMP));
+    protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     /** --- SQL Queries --- */
 
@@ -296,8 +296,8 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      * processing logic.
      */
     private TransactionHistory getAccrualTransactions(int empId, Date startDate, Date endDate) {
-        Set<TransactionCode> types = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
-        return empTransactionDao.getTransHistory(empId, types, startDate, endDate);
+        Set<TransactionCode> codes = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
+        return empTransactionDao.getTransHistory(empId, codes, startDate, endDate);
     }
 
     /** --- Data Retrieval Methods -- */
