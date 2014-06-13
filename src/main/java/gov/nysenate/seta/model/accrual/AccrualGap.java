@@ -1,7 +1,7 @@
 package gov.nysenate.seta.model.accrual;
 
 import gov.nysenate.seta.model.period.PayPeriod;
-import gov.nysenate.seta.model.personnel.TransactionRecord;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
 
 import java.util.Date;
 import java.util.LinkedList;

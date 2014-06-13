@@ -7,14 +7,14 @@ import gov.nysenate.seta.dao.attendance.TimeEntryDao;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.payroll.HolidayDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
-import gov.nysenate.seta.dao.personnel.EmployeeTransactionDao;
+import gov.nysenate.seta.dao.transaction.EmployeeTransactionDao;
 import gov.nysenate.seta.model.accrual.*;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.model.personnel.TransactionHistory;
-import gov.nysenate.seta.model.personnel.TransactionRecord;
-import gov.nysenate.seta.model.personnel.TransactionType;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.util.OutputUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static gov.nysenate.seta.dao.accrual.SqlAccrualHelper.*;
-import static gov.nysenate.seta.model.personnel.TransactionType.*;
+import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 /**
  * TODO: Document the following things:
@@ -55,12 +55,12 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     @Autowired
     protected HolidayDao holidayDao;
 
-    protected static final Set<TransactionType> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
-    protected static final Set<TransactionType> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
+    protected static final Set<TransactionCode> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
+    protected static final Set<TransactionCode> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
 
-    protected static final Set<TransactionType> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
-    protected static final Set<TransactionType> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
-    protected static final Set<TransactionType> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+    protected static final Set<TransactionCode> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
+    protected static final Set<TransactionCode> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
+    protected static final Set<TransactionCode> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     /** --- SQL Queries --- */
 
@@ -296,7 +296,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      * processing logic.
      */
     private TransactionHistory getAccrualTransactions(int empId, Date startDate, Date endDate) {
-        Set<TransactionType> types = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
+        Set<TransactionCode> types = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
         return empTransactionDao.getTransHistory(empId, types, startDate, endDate);
     }
 

@@ -1,10 +1,10 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.transaction;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.personnel.mapper.TransactionRecordRowMapper;
-import gov.nysenate.seta.model.personnel.TransactionHistory;
-import gov.nysenate.seta.model.personnel.TransactionRecord;
-import gov.nysenate.seta.model.personnel.TransactionType;
+import gov.nysenate.seta.dao.transaction.mapper.TransactionRecordRowMapper;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
@@ -33,19 +33,19 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionType> types) {
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types) {
         return getTransHistory(empId, types, new Date());
     }
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionType> types, Date end) {
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date end) {
         return getTransHistory(empId, types, getBeginningOfTime(), end);
     }
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionType> types, Date start, Date end) {
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date start, Date end) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("dateStart", start);
@@ -68,24 +68,24 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
      * @param replaceKey String - An identifier inside the sql for replacement. e.g ${auditCols} where 'auditCols' is the key.
      *                            The replacement string cannot be the first entry in the select clause due to commas.
      * @param pfx String - A prefix to apply to each column name. Leave empty if you just want the column name as is.
-     * @param restrictSet Set<TransactionType> - Only the columns for the desired types will be added. If null then
+     * @param restrictSet Set<TransactionCode> - Only the columns for the desired types will be added. If null then
      *                                           all the columns for every transaction type will be added.
      * @return String - sql statement with audit columns
      */
-    private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx, Set<TransactionType> restrictSet) {
+    private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx, Set<TransactionCode> restrictSet) {
         Map<String, String> selectMap = new HashMap<>();
 
         /** Restrict the columns to just the ones needed unless the set is empty or contains APP or RTP
          *  because those serve as initial snapshots and therefore need all the columns. */
         List<String> auditColList = new ArrayList<>();
-        if (restrictSet != null && !restrictSet.isEmpty() && !restrictSet.contains(TransactionType.APP) &&
-            !restrictSet.contains(TransactionType.RTP)) {
-            for (TransactionType type : restrictSet) {
+        if (restrictSet != null && !restrictSet.isEmpty() && !restrictSet.contains(TransactionCode.APP) &&
+            !restrictSet.contains(TransactionCode.RTP)) {
+            for (TransactionCode type : restrictSet) {
                 auditColList.addAll(type.getDbColumnList());
             }
         }
         else {
-            auditColList.addAll(TransactionType.getAllDbColumnsList());
+            auditColList.addAll(TransactionCode.getAllDbColumnsList());
         }
 
         /** Apply the prefix to the names if requested */
@@ -104,12 +104,19 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
 
     /**
      * Helper method to return a set of the transaction codes in the 'types' set.
-     * @param types Set<TransactionType>
+     * @param types Set<TransactionCode>
      * @return Set<String>
      */
-    private Set<String> getTransCodesFromSet(Set<TransactionType> types) {
+    private Set<String> getTransCodesFromSet(Set<TransactionCode> types) {
+        if (types==null||types.size()==0) {
+            types = new HashSet<TransactionCode>();
+            TransactionCode[] allTransactionCodes = TransactionCode.values();
+            for (TransactionCode curTransType : allTransactionCodes) {
+                types.add(curTransType);
+            }
+        }
         Set<String> transCodes = new HashSet<>();
-        for (TransactionType type : types) {
+        for (TransactionCode type : types) {
             transCodes.add(type.name());
         }
         return transCodes;

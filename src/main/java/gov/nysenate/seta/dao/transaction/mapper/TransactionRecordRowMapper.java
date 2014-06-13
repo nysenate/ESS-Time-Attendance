@@ -1,7 +1,7 @@
-package gov.nysenate.seta.dao.personnel.mapper;
+package gov.nysenate.seta.dao.transaction.mapper;
 
-import gov.nysenate.seta.model.personnel.TransactionRecord;
-import gov.nysenate.seta.model.personnel.TransactionType;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -12,13 +12,13 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
 {
     private String pfx = "";
     private String auditPfx = "";
-    private Set<TransactionType> transTypes;
+    private Set<TransactionCode> transTypes;
 
-    public TransactionRecordRowMapper(String pfx, String auditPfx, TransactionType transType) {
+    public TransactionRecordRowMapper(String pfx, String auditPfx, TransactionCode transType) {
         this(pfx, auditPfx, new HashSet<>(Arrays.asList(transType)));
     }
 
-    public TransactionRecordRowMapper(String pfx, String auditPfx, Set<TransactionType> transTypes) {
+    public TransactionRecordRowMapper(String pfx, String auditPfx, Set<TransactionCode> transTypes) {
         this.pfx = pfx;
         this.auditPfx = auditPfx;
         this.transTypes = transTypes;
@@ -30,7 +30,7 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
         transRec.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
         transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
-        transRec.setTransType(TransactionType.valueOf(rs.getString(pfx + "CDTRANS")));
+        transRec.setTransType(TransactionCode.valueOf(rs.getString(pfx + "CDTRANS")));
         transRec.setOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
         transRec.setUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
         transRec.setEffectDate(rs.getDate(pfx + "DTEFFECT"));
@@ -40,10 +40,10 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
          * transaction type. The appointment transactions (APP/RTP) will have value maps containing every column
          * since they represent the initial snapshot of the data.
          */
-        TransactionType type = transRec.getTransType();
-        boolean isAppointment = type.equals(TransactionType.APP) || type.equals(TransactionType.RTP);
+        TransactionCode type = transRec.getTransType();
+        boolean isAppointment = type.equals(TransactionCode.APP) || type.equals(TransactionCode.RTP);
         Map<String, String> valueMap = new HashMap<>();
-        for (String col : ((isAppointment) ? TransactionType.getAllDbColumnsList() : type.getDbColumnList())) {
+        for (String col : ((isAppointment) ? TransactionCode.getAllDbColumnsList() : type.getDbColumnList())) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
         }
         transRec.setValueMap(valueMap);

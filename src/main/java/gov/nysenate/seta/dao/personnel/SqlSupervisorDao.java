@@ -1,15 +1,18 @@
 package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
+import gov.nysenate.seta.dao.transaction.EmployeeTransactionDao;
 import gov.nysenate.seta.model.exception.*;
 import gov.nysenate.seta.model.personnel.*;
+import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -19,7 +22,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
-import static gov.nysenate.seta.model.personnel.TransactionType.*;
+import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @Repository
 public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
@@ -103,7 +106,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
      */
     @Override
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
-        Set<TransactionType> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
+        Set<TransactionCode> transTypes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
         TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transTypes, date);
 
         int supId = -1;
@@ -186,7 +189,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
          */
         if (!res.isEmpty()) {
             SupervisorEmpGroup empGroup = new SupervisorEmpGroup(supId, start, end);
-            Set<TransactionType> supTransTypes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
+            Set<TransactionCode> supTransTypes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
             Map<Integer, EmployeeSupInfo> primaryEmps = new HashMap<>();
             Map<Integer, EmployeeSupInfo> overrideEmps = new HashMap<>();
             Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmps = new HashMap<>();
@@ -198,7 +201,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                 logger.trace(colMap.toString());
                 String group = colMap.get("EMP_GROUP").toString();
                 int empId = Integer.parseInt(colMap.get("NUXREFEM").toString());
-                TransactionType transType = TransactionType.valueOf(colMap.get("CDTRANS").toString());
+                TransactionCode transType = TransactionCode.valueOf(colMap.get("CDTRANS").toString());
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.S");
                 Date effectDate = formatter.parseDateTime(colMap.get("DTEFFECT").toString()).toDate();
                 int rank = Integer.parseInt(colMap.get("TRANS_RANK").toString());

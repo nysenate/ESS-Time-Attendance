@@ -1,15 +1,15 @@
-package gov.nysenate.seta.model.personnel;
+package gov.nysenate.seta.model.transaction;
 
 import java.util.*;
 
 /**
  * The TransactionHistory provides an ordered collection of TransactionRecords. This class is intended to be
- * used in methods that need to know about the history of a specific TransactionType for an employee.
+ * used in methods that need to know about the history of a specific TransactionCode for an employee.
  */
 public class TransactionHistory
 {
     protected int employeeId;
-    protected Map<TransactionType, List<TransactionRecord>> recordHistory;
+    protected Map<TransactionCode, List<TransactionRecord>> recordHistory;
 
     public TransactionHistory(int empId) {
         this.employeeId = empId;
@@ -26,10 +26,10 @@ public class TransactionHistory
 
     /**
      * Returns true if records exist for a given type of transaction.
-     * @param type TransactionType
+     * @param type TransactionCode
      * @return boolean
      */
-    public boolean hasRecords(TransactionType type) {
+    public boolean hasRecords(TransactionCode type) {
         return recordHistory.get(type) != null && !recordHistory.get(type).isEmpty();
     }
 
@@ -41,7 +41,7 @@ public class TransactionHistory
      */
     public void addTransactionRecord(TransactionRecord record) {
         if (record != null) {
-            TransactionType type = record.getTransType();
+            TransactionCode type = record.getTransType();
             if (!recordHistory.containsKey(type)) {
                 recordHistory.put(type, new LinkedList<TransactionRecord>());
             }
@@ -61,24 +61,24 @@ public class TransactionHistory
 
     /**
      * See overloaded method. This provides the option to change the sort order for the returned list of records.
-     * @param type TransactionType
+     * @param type TransactionCode
      * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(TransactionType type, boolean sortByDateAsc) {
+    public LinkedList<TransactionRecord> getTransRecords(TransactionCode type, boolean sortByDateAsc) {
         return getTransRecords(new HashSet<>(Arrays.asList(type)), sortByDateAsc);
     }
 
     /**
      * Returns a single ordered LinkedList containing a set of transaction records. This is useful if
      * you need all the transaction records to be ordered into a single collection.
-     * @param transTypes Set<TransactionType> - The set of types to return in the list
+     * @param transTypes Set<TransactionCode> - The set of types to return in the list
      * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionType> transTypes, boolean sortByDateAsc) {
+    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transTypes, boolean sortByDateAsc) {
         LinkedList<TransactionRecord> sortedRecList = new LinkedList<>();
-        for (TransactionType type : recordHistory.keySet()) {
+        for (TransactionCode type : recordHistory.keySet()) {
             if (transTypes.contains(type)) {
                 sortedRecList.addAll(recordHistory.get(type));
             }
