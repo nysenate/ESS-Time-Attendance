@@ -5,25 +5,25 @@ import gov.nysenate.seta.model.accrual.AnnualAccrualSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
-import gov.nysenate.seta.model.personnel.TransactionHistory;
-import gov.nysenate.seta.model.personnel.TransactionRecord;
-import gov.nysenate.seta.model.personnel.TransactionType;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import org.joda.time.LocalDate;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import static gov.nysenate.seta.model.personnel.TransactionType.*;
-import static gov.nysenate.seta.model.personnel.TransactionType.APP;
+import static gov.nysenate.seta.model.transaction.TransactionCode.*;
+import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
 
 public class SqlAccrualHelper
 {
-    protected static final Set<TransactionType> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
-    protected static final Set<TransactionType> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
+    protected static final Set<TransactionCode> PAY_TYPES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
+    protected static final Set<TransactionCode> MIN_TYPES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
 
-    protected static final Set<TransactionType> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
-    protected static final Set<TransactionType> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
-    protected static final Set<TransactionType> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+    protected static final Set<TransactionCode> APP_RTP_TYPES = new HashSet<>(Arrays.asList(RTP, APP));
+    protected static final Set<TransactionCode> EMP_TYPE = new HashSet<>(Arrays.asList(EMP));
+    protected static final Set<TransactionCode> APP_RTP_EMP_TYPES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
@@ -141,7 +141,7 @@ public class SqlAccrualHelper
      * Returns a list of just min type transactions from the given history
      */
     static LinkedList<TransactionRecord> getMinRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
-        Set<TransactionType> types = new LinkedHashSet<>(Arrays.asList(MIN, RTP, APP));
+        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(MIN, RTP, APP));
         return transHistory.getTransRecords(types, orderByAsc);
     }
 
@@ -149,7 +149,7 @@ public class SqlAccrualHelper
      * Returns a list of just employee status transactions from the given history
      */
     static LinkedList<TransactionRecord> getEmpRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
-        Set<TransactionType> types = new LinkedHashSet<>(Arrays.asList(RTP, EMP, APP));
+        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(RTP, EMP, APP));
         return transHistory.getTransRecords(types, orderByAsc);
     }
 
@@ -157,7 +157,7 @@ public class SqlAccrualHelper
      * Returns a list of just pay type transactions from the given history
      */
     static LinkedList<TransactionRecord> getPayTypeRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
-        Set<TransactionType> types = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
+        Set<TransactionCode> types = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
         return transHistory.getTransRecords(types, orderByAsc);
     }
 }

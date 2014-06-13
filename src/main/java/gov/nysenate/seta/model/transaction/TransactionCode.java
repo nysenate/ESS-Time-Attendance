@@ -1,4 +1,4 @@
-package gov.nysenate.seta.model.personnel;
+package gov.nysenate.seta.model.transaction;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -7,11 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The TransactionType refers to a specific change made to an employee's personnel record.
+ * The TransactionCode refers to a specific change made to an employee's personnel record.
  * The dbColumns stored for each type refer to the set of columns in the SFMS audit table
  * where the relevant changes are stored.
  */
-public enum TransactionType
+public enum TransactionCode
 {
     ACC("PER", "CDACCRUE", "ACCRUE"),
     ACT("PER", "DTAPPOINTFRM, DTAPPOINTTO", "ACCRUAL DATES"),
@@ -81,7 +81,7 @@ public enum TransactionType
     YMS("PAY", "CDMARITALYON", "YONKERS MARITAL STATUS"),
     YWT("PAY", "NUYONTAXEX", "YONKERS WITHHOLDING EXEMP");
 
-    private TransactionType(String type, String dbColumns, String desc) {
+    private TransactionCode(String type, String dbColumns, String desc) {
         this.type = type;
         this.dbColumns = dbColumns;
         this.desc = desc;
@@ -105,7 +105,7 @@ public enum TransactionType
 
     public static List<String> getAllDbColumnsList() {
         List<String> columns = new ArrayList<>();
-        for (TransactionType t : TransactionType.values()) {
+        for (TransactionCode t : TransactionCode.values()) {
             columns.addAll(t.getDbColumnList());
         }
         return columns;

@@ -1,12 +1,9 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.transaction;
 
-import gov.nysenate.seta.model.exception.TransRecordException;
-import gov.nysenate.seta.model.personnel.TransactionHistory;
-import gov.nysenate.seta.model.personnel.TransactionRecord;
-import gov.nysenate.seta.model.personnel.TransactionType;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,23 +18,23 @@ public interface EmployeeTransactionDao
      * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
      * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionType> types);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types);
 
     /**
      * See overloaded method. {@code start} defaults to the beginning of time.
      * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionType> types, Date end);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date end);
 
     /**
-     * Retrieves a TransactionHistory of all the records for the given set of TransactionTypes that have an
+     * Retrieves a TransactionHistory of all the records for the given set of TransactionCodes that have an
      * effective date before or equal to the 'end' date.
      *
      * @param empId int - Employee id
-     * @param types TransactionType - the set of transactions to retrieve
+     * @param types TransactionCode - the set of transactions to retrieve
      * @param start Date - the transaction's effective date must be equal to or after this date.
      * @param end Date - the transaction's effective date must be equal to or before this date.
      * @return TransactionHistory
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionType> types, Date start, Date end);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> types, Date start, Date end);
 }

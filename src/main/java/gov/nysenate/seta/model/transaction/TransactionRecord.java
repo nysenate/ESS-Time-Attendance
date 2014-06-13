@@ -1,4 +1,6 @@
-package gov.nysenate.seta.model.personnel;
+package gov.nysenate.seta.model.transaction;
+
+import gov.nysenate.seta.model.transaction.TransactionCode;
 
 import java.util.Date;
 import java.util.Map;
@@ -8,7 +10,7 @@ public class TransactionRecord
     protected int employeeId;
     protected int changeId;
     protected boolean active;
-    protected TransactionType transType;
+    protected TransactionCode transType;
     protected Map<String, String> valueMap;
     protected Date originalDate;
     protected Date updateDate;
@@ -73,11 +75,11 @@ public class TransactionRecord
         this.active = active;
     }
 
-    public TransactionType getTransType() {
+    public TransactionCode getTransType() {
         return transType;
     }
 
-    public void setTransType(TransactionType transType) {
+    public void setTransType(TransactionCode transType) {
         this.transType = transType;
     }
 
