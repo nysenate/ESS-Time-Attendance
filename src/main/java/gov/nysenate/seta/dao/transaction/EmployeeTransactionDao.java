@@ -12,19 +12,43 @@ import java.util.Set;
  * Supervisor) this interface helps to obtain a collection of the transactions that have taken place so that a
  * point in time representation can be re-created for an employee.
  */
-public interface EmployeeTransactionDao
-{
+public interface EmployeeTransactionDao {
     /**
      * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
-     * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
+     *
+     * //@see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
      */
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes);
 
     /**
+     * See overloaded method. {@code start} defaults to the beginning of time and {@code end} is today.
+     *
+     * //@see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
+     */
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, boolean earliestRecLikeAppoint);
+
+    /**
      * See overloaded method. {@code start} defaults to the beginning of time.
-     * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
+     *
+     * //@see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
      */
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end);
+
+
+    /**
+     * See overloaded method. {@code start} defaults to the beginning of time.
+     *
+     * //@see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date)
+     */
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint);
+
+    /**
+     * See overloaded method. {@code start} defaults to the beginning of time.
+     *
+     * @see #getTransHistory(int, java.util.Set, java.util.Date, java.util.Date, boolean)
+     */
+
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end);
 
     /**
      * Retrieves a TransactionHistory of all the records for the given set of TransactionCodes that have an
@@ -33,8 +57,22 @@ public interface EmployeeTransactionDao
      * @param empId int - Employee id
      * @param codes TransactionCode - the set of transactions to retrieve
      * @param start Date - the transaction's effective date must be equal to or after this date.
-     * @param end Date - the transaction's effective date must be equal to or before this date.
+     * @param end   Date - the transaction's effective date must be equal to or before this date.
      * @return TransactionHistory
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end);
+    //public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end, boolean earliestRecLikeAppoint);
+
+    /**
+     * Retrieves a TransactionHistory of all the records for the given set of TransactionCodes that have an
+     * effective date before or equal to the 'end' date.
+     *
+     * @param empId int - Employee id
+     * @param codes TransactionCode - the set of transactions to retrieve
+     * @param start Date - the transaction's effective date must be equal to or after this date.
+     * @param end   Date - the transaction's effective date must be equal to or before this date.
+     * @param earliestRecLikeAppoint    boolean - Whether or not to treat the first record (regardless of thr transaction codes)
+     *                                  like an appoint/reappoint where all columns are initialized.
+     * @return TransactionHistory
+     */
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end, boolean earliestRecLikeAppoint);
 }

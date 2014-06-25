@@ -2,6 +2,7 @@ package gov.nysenate.seta.dao.transaction.mapper;
 
 import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,15 +16,28 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
     private String pfx = "";
     private String auditPfx = "";
     private Set<TransactionCode> transCodes;
+    private boolean earliestRecLikeAppoint = false;
+    private boolean firstRecord = true;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionRecordRowMapper.class);
+    private int nuchange = -1;
 
     public TransactionRecordRowMapper(String pfx, String auditPfx, TransactionCode transCode) {
         this(pfx, auditPfx, new HashSet<>(Arrays.asList(transCode)));
     }
 
+    public TransactionRecordRowMapper(String pfx, String auditPfx, TransactionCode transCode, boolean earliestRecLikeAppoint) {
+        this(pfx, auditPfx, new HashSet<>(Arrays.asList(transCode)), earliestRecLikeAppoint);
+    }
+
     public TransactionRecordRowMapper(String pfx, String auditPfx, Set<TransactionCode> transCodes) {
+        this(pfx, auditPfx, transCodes, false);
+    }
+
+    public TransactionRecordRowMapper(String pfx, String auditPfx, Set<TransactionCode> transCodes, boolean earliestRecLikeAppoint) {
         this.pfx = pfx;
         this.auditPfx = auditPfx;
         this.transCodes = transCodes;
+        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
     }
 
     @Override
@@ -43,11 +57,22 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
          */
         TransactionCode code = transRec.getTransCode();
         boolean isAppointment = code.equals(TransactionCode.APP) || code.equals(TransactionCode.RTP);
+
         Map<String, String> valueMap = new HashMap<>();
-        for (String col : ((isAppointment) ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList())) {
+        for (String col : ((isAppointment ||(earliestRecLikeAppoint && rowNum==0)||transRec.getChangeId()==nuchange) ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList())) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
         }
+
+        if (earliestRecLikeAppoint && rowNum==0)  {
+          nuchange = transRec.getChangeId();
+        }
+        else if (transRec.getChangeId()==nuchange) {
+        }
         transRec.setValueMap(valueMap);
+        if (firstRecord) {
+            logger.debug(nuchange+" TransactionRecordRowMapper FirstRecord:"+OutputUtils.toJson(valueMap));
+        }
+        firstRecord = false;
         return transRec;
     }
 }

@@ -3,14 +3,21 @@ package gov.nysenate.seta.dao.accrual;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.AnnualAccrualSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
+import gov.nysenate.seta.model.exception.TransactionHistoryException;
+import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
@@ -18,6 +25,8 @@ import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
 
 public class SqlAccrualHelper
 {
+    private static final Logger logger = LoggerFactory.getLogger(SqlAccrualHelper.class);
+
     protected static final Set<TransactionCode> PAY_CODES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
     protected static final Set<TransactionCode> MIN_CODES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
 
@@ -159,5 +168,149 @@ public class SqlAccrualHelper
     static LinkedList<TransactionRecord> getPayTypeRecordsFromHistory(TransactionHistory transHistory, boolean orderByAsc) {
         Set<TransactionCode> codes = new LinkedHashSet<>(Arrays.asList(TYP, RTP, APP));
         return transHistory.getTransRecords(codes, orderByAsc);
+    }
+
+    /**
+     * Returns the expected employee hours given a period of time
+     */
+    public static int getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
+        int expectedHours = 0;
+        AuditHistory auditHistory = new AuditHistory();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String sdtstart = null;
+        try {
+            sdtstart =simpleDateFormat.format(dtstart);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        String sdtend = null;
+        try {
+            sdtend =simpleDateFormat.format(dtend);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            logger.debug("==================================================================================================================================");
+            logger.debug("getExpectedHours Emp Id:"+transHistory.getEmployeeId()+" date range:"+sdtstart+" - "+sdtend);
+            logger.debug("==================================================================================================================================");
+            auditHistory.setTransactionHistory(transHistory);
+            List<Map> auditRecords = auditHistory.getAuditRecords();
+            Date dteffect = null;
+            Date dteffectEnd = null;
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+            Map currentRec = null;
+            Map nextRec = null;
+            for (int x=0;x<auditRecords.size();x++) {
+                currentRec = auditRecords.get(x);
+                if (x<auditRecords.size()-1) {
+                    nextRec  = auditRecords.get(x+1);
+                }
+                else {
+                    nextRec = null;
+                }
+                try {
+                    dteffect = sdf.parse((String) currentRec.get("EffectDate"));
+                    /*
+                    * TODO: For certain cdstatper changes, set dteffectEnd to nextRec.dteffect and dteffect = currentRec.dteffect+1
+                    * In some rare cases of cdstatper, change occurs in effect date +1
+                    * instead of effect date.
+                     */
+                    if (nextRec == null) {
+                        LocalDate localDate = new LocalDate(new Date());
+                        localDate.plusMonths(1);
+                        dteffectEnd = localDate.toDate();
+                        logger.debug("- getExpectedHours Emp Id:" + transHistory.getEmployeeId() + " Last Record Effective (1 Month future:" + sdf.format(dteffectEnd) + ")");
+                    } else {
+                        dteffectEnd = sdf.parse((String) nextRec.get("EffectDate"));
+                        LocalDate localDate = new LocalDate(dteffectEnd);
+                        localDate = localDate.plusDays(-1);
+                        dteffectEnd = localDate.toDate();
+                        logger.debug("- getExpectedHours Emp Id:" + transHistory.getEmployeeId() + " Normal Record Effective:" + sdf.format(dteffectEnd));
+                    }
+
+                    /*
+                    * Make sure that we do not include hours outside of the Start Date
+                    * and End Date parameters.
+                     */
+                    if (dtstart.after(dteffect) && !dtstart.after(dteffectEnd)) {
+                        dteffect = dtstart;
+                    }
+                    if (dtend.before(dteffectEnd) && !dtend.before(dteffect)) {
+                        dteffectEnd = dtend;
+                    }
+                    String currentPaytype = (String) currentRec.get("CDPAYTYPE");
+                    String currentEmpStatus = (String) currentRec.get("CDEMPSTATUS");
+                    String currentAgencyCode = (String) currentRec.get("CDAGENCY");
+                    String currentStatusPer = (String) currentRec.get("CDSTATPER");
+
+                    /*
+                    * Employee has to be an Active Non-Senator employee who is not on
+                    * Leave Without Pay when adding expected hours.
+                     */
+                   logger.debug("-----------currentEmpStatus=="+currentEmpStatus+", currentAgencyCode=="+currentAgencyCode+", currentStatusPer=="+currentStatusPer);
+
+                    /*
+                    * Agency Code commented for testing since there is an issue with Null
+                    * Agency Codes when a value should exist.
+                     */
+
+                    if (currentEmpStatus!=null && currentEmpStatus.equalsIgnoreCase("A") && currentAgencyCode!=null /*&& !currentAgencyCode.equals("04210")*/ && currentStatusPer!=null && !currentStatusPer.equalsIgnoreCase("LWOP"))
+                    {
+                        logger.debug("---------------PAYTYPE:("+currentPaytype+")");
+                        if (!dteffect.before(dtstart) && !dteffectEnd.after(dtend)) {
+                            if (currentPaytype.equalsIgnoreCase("RA")) {
+                                logger.debug("---------------PAYTYPE:(RA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * 7");
+                                logger.debug("---------------PAYTYPE:(RA):PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd):" + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd));
+
+                                expectedHours = expectedHours + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * 7;
+                            } else if (currentPaytype.equalsIgnoreCase("SA")) {
+                                int proRate = 7;
+                                logger.debug("---------------PAYTYPE:(SA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * " + proRate);
+                                // TODO  need to calculate proRate;
+                                expectedHours = expectedHours + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * proRate;
+                            } else if (currentPaytype.equalsIgnoreCase("TE")) {
+                                logger.debug("---------------PAYTYPE:(TE) NEEDS CODING");
+                                // TODO  need to sum up TE Hours worked;
+                            }
+                        }
+                        String sdteffect = null;
+                        try {
+                            sdteffect = simpleDateFormat.format(dteffect);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        /*
+                        * The code assumes that the Transaction History is in Effect Date Ascending Order
+                         */
+
+                        String sdteffectEnd = null;
+                        try {
+                            sdteffectEnd = simpleDateFormat.format(dteffectEnd);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        logger.debug("getExpectedHours Emp Id:"+transHistory.getEmployeeId()+" Effective:"+sdteffect+" - "+sdteffectEnd+", PAYTYPE:"+currentPaytype+", Exp Hours Subtotal:"+expectedHours);
+                    }
+
+                }
+                catch (ParseException e) {
+                     e.printStackTrace();
+                }
+            }
+
+        } catch (TransactionHistoryNotFoundEx transactionHistoryNotFoundEx) {
+            transactionHistoryNotFoundEx.printStackTrace();
+        } catch (TransactionHistoryException e) {
+            e.printStackTrace();
+        }
+
+        return expectedHours;
+
     }
 }

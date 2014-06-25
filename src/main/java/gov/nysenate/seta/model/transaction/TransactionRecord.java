@@ -1,6 +1,9 @@
 package gov.nysenate.seta.model.transaction;
 
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.util.OutputUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
@@ -15,6 +18,8 @@ public class TransactionRecord
     protected Date originalDate;
     protected Date updateDate;
     protected Date effectDate;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionRecord.class);
+
 
     public TransactionRecord() {}
 
@@ -114,4 +119,5 @@ public class TransactionRecord
     public void setEffectDate(Date effectDate) {
         this.effectDate = effectDate;
     }
+
 }

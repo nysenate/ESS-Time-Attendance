@@ -1,5 +1,9 @@
 package gov.nysenate.seta.model.transaction;
 
+import gov.nysenate.seta.util.OutputUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -10,10 +14,19 @@ public class TransactionHistory
 {
     protected int employeeId;
     protected Map<TransactionCode, List<TransactionRecord>> recordHistory;
+    protected boolean earliestRecLikeAppoint = false;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionHistory.class);
 
     public TransactionHistory(int empId) {
         this.employeeId = empId;
         this.recordHistory = new HashMap<>();
+        this.earliestRecLikeAppoint = false;
+    }
+
+    public TransactionHistory(int empId, boolean earliestRecLikeAppoint) {
+        this.employeeId = empId;
+        this.recordHistory = new HashMap<>();
+        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
     }
 
     /**
@@ -38,12 +51,16 @@ public class TransactionHistory
     /**
      * Adds a transaction record to the history queue.
      * @param record TransactionRecord
+     * @param addingFirstRecord Indicator we are adding the first record
      */
-    public void addTransactionRecord(TransactionRecord record) {
+    public void addTransactionRecord(TransactionRecord record, boolean addingFirstRecord) {
         if (record != null) {
             TransactionCode code = record.getTransCode();
+            if (addingFirstRecord) {
+                code = TransactionCode.APP;
+            }
             if (!recordHistory.containsKey(code)) {
-                recordHistory.put(code, new LinkedList<TransactionRecord>());
+                    recordHistory.put( code, new LinkedList<TransactionRecord>());
             }
             this.recordHistory.get(code).add(record);
         }
@@ -54,8 +71,11 @@ public class TransactionHistory
      * @param recordsList List<TransactionRecord>
      */
     public void addTransactionRecords(List<TransactionRecord> recordsList) {
+        //logger.debug("=====================addTransactionRecords recordList:"+OutputUtils.toJson(recordsList));
+        boolean addFirstRecord = true;
         for (TransactionRecord record : recordsList) {
-            this.addTransactionRecord(record);
+            this.addTransactionRecord(record, addFirstRecord);
+            addFirstRecord = false;
         }
     }
 
@@ -78,12 +98,15 @@ public class TransactionHistory
      */
     public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transCodes, boolean sortByDateAsc) {
         LinkedList<TransactionRecord> sortedRecList = new LinkedList<>();
+        //logger.debug("Transaction History getTransRecords KeySet:"+OutputUtils.toJson(recordHistory.keySet()));
+        //logger.debug("Transaction History getTransRecords recordHistory:"+OutputUtils.toJson(recordHistory));
         for (TransactionCode code : recordHistory.keySet()) {
-            if (transCodes.contains(code)) {
+            if (transCodes.contains(code) ) {
                 sortedRecList.addAll(recordHistory.get(code));
             }
         }
         Collections.sort(sortedRecList, (sortByDateAsc) ? new TransDateAscending() : new TransDateDescending());
+        //logger.debug("Transaction History getTransRecords sortedRecList:"+OutputUtils.toJson(sortedRecList));
         return sortedRecList;
     }
 

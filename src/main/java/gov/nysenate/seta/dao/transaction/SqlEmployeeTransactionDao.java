@@ -18,6 +18,7 @@ import java.util.*;
 public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTransactionDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeTransactionDao.class);
+    private boolean earliestRecLikeAppoint = false;
 
     protected static final String GET_TRANS_HISTORY_SQL =
         "SELECT aud.NUXREFEM, ptx.CDSTATUS, ptx.CDTRANS, ptx.CDTRANSTYP, ptx.NUCHANGE, " +
@@ -29,32 +30,68 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         "LEFT JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM PL21TRANCODE) code ON ptx.CDTRANS = code.CDTRANS\n" +
         "WHERE aud.NUXREFEM = :empId AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
         "AND ptx.CDTRANS IN (:transCodes)\n" +
-        "ORDER BY ptx.DTEFFECT DESC, ptx.DTTXNORIGIN DESC";
+        "ORDER BY ptx.DTEFFECT, ptx.DTTXNORIGIN";
 
     /** {@inheritDoc} */
     @Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes) {
+        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes) 1");
         return getTransHistory(empId, codes, new Date());
     }
 
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, boolean earliestRecLikeAppoint) {
+        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, boolean earliestRecLikeAppoint) 2");
+        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
+        return getTransHistory(empId, codes, new Date(), earliestRecLikeAppoint);
+    }
+
     /** {@inheritDoc} */
-    @Override
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) {
+        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) 2");
+        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
+        return getTransHistory(empId, codes, getBeginningOfTime(), end, earliestRecLikeAppoint);
+    }
+
+    /** {@inheritDoc} */
+     @Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end) {
+        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) 3");
         return getTransHistory(empId, codes, getBeginningOfTime(), end);
     }
 
     /** {@inheritDoc} */
-    @Override
+    //@Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end) {
+        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end) 4");
+        return getTransHistory(empId, codes, start, end,  false );
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end, boolean earliestRecLikeAppoint) {
+        //logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end, boolean earliestRecLikeAppoint) 5");
+        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("dateStart", start);
         params.addValue("dateEnd", end);
-        params.addValue("transCodes", getTransCodesFromSet(codes));
 
-        String sql = applyAuditColumnsInSelectSql(GET_TRANS_HISTORY_SQL, "audColumns", "", codes);
+        if (earliestRecLikeAppoint) {
+            params.addValue("transCodes", getTransCodesFromSet(null));
+        }
+        else {
+            params.addValue("transCodes", getTransCodesFromSet(codes));
+        }
+
+        String sql = applyAuditColumnsInSelectSql(GET_TRANS_HISTORY_SQL, "audColumns", "", codes, earliestRecLikeAppoint);
         List<TransactionRecord> transRecordList =
-                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes));
+                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes, earliestRecLikeAppoint));
+
+        /*for (int x = 0;x < transRecordList.size();x++) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(transRecordList.get(x).getValueMap().toString());
+            logger.debug("!!!!"+x+":"+sb.toString());
+        }*/
 
         TransactionHistory transHistory = new TransactionHistory(empId);
         transHistory.addTransactionRecords(transRecordList);
@@ -72,13 +109,13 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
      *                                           all the columns for every transaction code will be added.
      * @return String - sql statement with audit columns
      */
-    private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx, Set<TransactionCode> restrictSet) {
+    private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx, Set<TransactionCode> restrictSet, boolean earliestRecLikeAppoint) {
         Map<String, String> selectMap = new HashMap<>();
 
         /** Restrict the columns to just the ones needed unless the set is empty or contains APP or RTP
          *  because those serve as initial snapshots and therefore need all the columns. */
         List<String> auditColList = new ArrayList<>();
-        if (restrictSet != null && !restrictSet.isEmpty() && !restrictSet.contains(TransactionCode.APP) &&
+        if (!earliestRecLikeAppoint && restrictSet != null && !restrictSet.isEmpty() && !restrictSet.contains(TransactionCode.APP) &&
             !restrictSet.contains(TransactionCode.RTP)) {
             for (TransactionCode code : restrictSet) {
                 auditColList.addAll(code.getDbColumnList());
@@ -99,6 +136,7 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         String auditColumns = StringUtils.join(auditColList, ",");
         selectMap.put(replaceKey, (!auditColumns.isEmpty()) ? ("," + auditColumns) : "");
         StrSubstitutor strSub = new StrSubstitutor(selectMap);
+
         return strSub.replace(selectSql);
     }
 
@@ -121,4 +159,5 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         }
         return transCodes;
     }
+
 }

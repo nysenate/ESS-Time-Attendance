@@ -111,6 +111,11 @@ public enum TransactionCode
         return columns;
     }
 
+    public List<String> getCodeList() {
+        return Arrays.asList(StringUtils.split(code, ","));
+    }
+
+
     public String getDesc() {
         return desc;
     }

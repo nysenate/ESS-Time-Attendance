@@ -105,7 +105,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
     /** {@inheritDoc} */
     @Override
-    public PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod) throws AccrualException {
+    public PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod, boolean earliestRecLikeAppoint) throws AccrualException {
         if (payPeriod == null) {
             throw new IllegalArgumentException("Supplied payPeriod cannot be null.");
         }
@@ -120,7 +120,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         Map<Integer, AnnualAccrualSummary> annualSummaries = getAnnualAccrualSummaries(empId, year);
         LinkedList<PeriodAccrualSummary> periodSummaries = getPeriodAccrualSummaries(empId, year, startDate);
 
-        return getAccuralSummary(empId, payPeriod, annualSummaries, periodSummaries);
+        return getAccuralSummary(empId, payPeriod, annualSummaries, periodSummaries, earliestRecLikeAppoint);
     }
 
     /** {@inheritDoc} */
@@ -133,7 +133,8 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
     private PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod,
                                                    Map<Integer, AnnualAccrualSummary> annualSummaries,
-                                                   LinkedList<PeriodAccrualSummary> periodSummaries) throws AccrualException {
+                                                   LinkedList<PeriodAccrualSummary> periodSummaries,
+                                                   boolean earliestRecLikeAppoint) throws AccrualException {
 
         Date payPeriodEndDate = payPeriod.getEndDate();
         Date prevPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
@@ -297,7 +298,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      */
     private TransactionHistory getAccrualTransactions(int empId, Date startDate, Date endDate) {
         Set<TransactionCode> codes = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
-        return empTransactionDao.getTransHistory(empId, codes, startDate, endDate);
+        return empTransactionDao.getTransHistory(empId, codes, startDate, endDate, true);
     }
 
     /** --- Data Retrieval Methods -- */

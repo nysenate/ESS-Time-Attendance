@@ -107,7 +107,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     @Override
     public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
         Set<TransactionCode> transCodes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
-        TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transCodes, date);
+        TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transCodes, date, true);
 
         int supId = -1;
         if (transHistory.hasRecords()) {
