@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.payroll;
 
 import gov.nysenate.seta.model.exception.RespCtrException;
 import gov.nysenate.seta.model.personnel.ResponsibilityCenter;

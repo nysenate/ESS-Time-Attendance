@@ -1,0 +1,33 @@
+package gov.nysenate.seta.dao.allowances.mapper;
+
+import gov.nysenate.seta.model.allowances.AllowanceUsage;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+
+/**
+ * This row mapper doesn't implement the RowMapper interface but rather provides a static
+ * method to map all the summary columns for a subclass of Allowance.
+ */
+public class AmountExceedRowMapper implements RowMapper<BigDecimal>
+{
+    protected String pfx;
+
+    public AmountExceedRowMapper(String pfx) {
+        this.pfx = pfx;
+    }
+    /**
+     * Sets accrual summary columns on the supplied AccrualSummary object.
+     * @throws java.sql.SQLException
+     */
+
+    public  BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
+        BigDecimal amountExceed = null;
+        amountExceed =rs.getBigDecimal(pfx + "MOAMTEXCEED");
+        return amountExceed;
+    }
+}

@@ -5,7 +5,7 @@ import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.attendance.TimeEntryDao;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.payroll.HolidayDao;
+import gov.nysenate.seta.dao.personnel.HolidayDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.transaction.EmployeeTransactionDao;
 import gov.nysenate.seta.model.accrual.*;

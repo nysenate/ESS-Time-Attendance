@@ -1,7 +1,7 @@
-package gov.nysenate.seta.dao.payroll;
+package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.payroll.mapper.HolidayRowMapper;
+import gov.nysenate.seta.dao.personnel.mapper.HolidayRowMapper;
 import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
 import org.slf4j.Logger;

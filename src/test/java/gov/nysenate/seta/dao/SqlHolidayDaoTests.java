@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.AbstractContextTests;
-import gov.nysenate.seta.dao.payroll.SqlHolidayDao;
+import gov.nysenate.seta.dao.personnel.SqlHolidayDao;
 import gov.nysenate.seta.util.OutputUtils;
 import org.joda.time.DateTime;
 import org.junit.Test;

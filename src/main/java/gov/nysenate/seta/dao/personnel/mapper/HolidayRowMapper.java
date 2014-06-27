@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.payroll.mapper;
+package gov.nysenate.seta.dao.personnel.mapper;
 
 import gov.nysenate.seta.model.payroll.Holiday;
 import org.springframework.jdbc.core.RowMapper;

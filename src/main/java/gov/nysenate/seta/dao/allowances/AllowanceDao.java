@@ -5,7 +5,9 @@ package gov.nysenate.seta.dao.allowances;
  */
 
 import gov.nysenate.seta.dao.base.BaseDao;
+import gov.nysenate.seta.model.allowances.AllowanceUsage;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,4 +16,5 @@ import java.util.List;
  */
 public interface AllowanceDao extends BaseDao
 {
-}
+    LinkedList<AllowanceUsage> getAllowanceUsage(int empId, int year);
+    }
