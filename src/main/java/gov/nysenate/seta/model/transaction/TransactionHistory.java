@@ -60,7 +60,7 @@ public class TransactionHistory
                 code = TransactionCode.APP;
             }
             if (!recordHistory.containsKey(code)) {
-                    recordHistory.put( code, new LinkedList<TransactionRecord>());
+                recordHistory.put( code, new LinkedList<TransactionRecord>());
             }
             this.recordHistory.get(code).add(record);
         }

@@ -3,6 +3,8 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
+import gov.nysenate.seta.model.transaction.AuditHistory;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.util.OutputUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -23,9 +25,16 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
 
     @Test
     public void testGetAllowanceUsage() throws Exception {
-        LinkedList<AllowanceUsage> allowanceUsages;
-        allowanceUsages =allowanceDao.getAllowanceUsage(45, 2014);
-        logger.debug("allowanceUsage Count:"+allowanceUsages.size()+": "+ OutputUtils.toJson(allowanceUsages));
+        TransactionHistory transactionHistory = new TransactionHistory(45);
+        AuditHistory auditHistory = new AuditHistory();
+        auditHistory.setTransactionHistory(transactionHistory);
+        AllowanceUsage allowanceUsage;
+        allowanceUsage = allowanceDao.getAllowanceUsage(45, 2014, auditHistory);
+        //TransactionHistory transactionHistory = new TransactionHistory(45);
+        //AuditHistory auditHistory = new AuditHistory();
+        //auditHistory.setTransactionHistory(transactionHistory);
+
+        logger.debug("allowanceUsage: "+ OutputUtils.toJson(allowanceUsage));
     }
 
 }

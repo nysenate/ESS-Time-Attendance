@@ -45,6 +45,9 @@ public class SqlEmployeeTransactionDaoTests extends AbstractContextTests
         //logger.debug(OutputUtils.toJson(recs));
         AuditHistory auditHistory = new AuditHistory();
         auditHistory.setTransactionHistory(transactionHistory);
+        List<Map<String, String>> records = auditHistory.getAuditRecordsBetween(new LocalDate(2014, 3, 1).toDate(), new LocalDate(2014,6,30).toDate(),true);
+        logger.debug("Audit records("+records.size()+"):"+ records);
+
         //logger.debug(OutputUtils.toJson(auditHistory.getAuditRecords()));
         //logger.debug("Working Days until now:"+new PeriodAccrualSummary().getWorkingDaysBetweenDates(new LocalDate(2014,1,1).toDate(), new Date()));
 

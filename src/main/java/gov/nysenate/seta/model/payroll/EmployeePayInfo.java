@@ -5,11 +5,10 @@ import gov.nysenate.seta.model.personnel.Employee;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class EmployeePayInfo
-{
+public class EmployeePayInfo {
     protected Employee employee;
     protected PayType payType;
-    protected BigDecimal biweeklySalary;
+    protected BigDecimal salary;
     protected Date payUpdatedDate;
     protected Date w4SignedDate;
     protected boolean directDepositActive;
@@ -18,12 +17,20 @@ public class EmployeePayInfo
         this.employee = employee;
     }
 
-    public BigDecimal getBiweeklySalary() {
-        return biweeklySalary;
+    public BigDecimal getSalary() {
+        return salary;
     }
 
-    public void setBiweeklySalary(BigDecimal biweeklySalary) {
-        this.biweeklySalary = biweeklySalary;
+    public void setSalary(BigDecimal salary) {
+        this.salary = salary;
+    }
+
+    public PayType getPaytype() {
+        return payType;
+    }
+
+    public void setPaytype(PayType payType) {
+        this.payType = payType;
     }
 
     public Date getPayUpdatedDate() {

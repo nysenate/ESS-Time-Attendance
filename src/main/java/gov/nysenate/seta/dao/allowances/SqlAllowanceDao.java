@@ -3,8 +3,11 @@ package gov.nysenate.seta.dao.allowances;
 
 import gov.nysenate.seta.dao.allowances.mapper.AllowanceRowMapper;
 import gov.nysenate.seta.dao.allowances.mapper.AmountExceedRowMapper;
+import gov.nysenate.seta.dao.allowances.mapper.SalaryRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
+import gov.nysenate.seta.model.payroll.SalaryRec;
+import gov.nysenate.seta.model.transaction.AuditHistory;
 import org.joda.time.LocalDate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -12,13 +15,13 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by heitner on 6/26/2014.
  */
 @Repository
 public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
+
     /** --- SQL Queries --- */
 
     protected static final String GET_ALLOWANCE_USAGE_SQL =
@@ -50,11 +53,21 @@ public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
             "    AND b.cdstatus = 'A'" +
             " ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
 
+    protected static final String GET_SALARY_POT_SQL =
+            " SELECT b.mosalbiwkly, b.dteffect, b.dttxnorigin " +
+            "   FROM SASS_OWNER.pd21ptxncode a" +
+            "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange) " +
+            "  WHERE A.NUXREFEM = :empId " +
+            "    AND a.cdtrans = 'SAL'" +
+            "    AND a.cdstatus = 'A'" +
+            "    AND b.cdstatus = 'A'" +
+            " ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
+
 //    protected static final String GET_ALLOWANCE_USAGE_SQL =
 
     /** {@inheritDoc} */
     @Override
-     public LinkedList<AllowanceUsage> getAllowanceUsage(int empId, int year) {
+     public AllowanceUsage getAllowanceUsage(int empId, int year, AuditHistory auditHistory) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         Date janDate = new LocalDate(year, 1, 1).toDate();
         params.addValue("empId", empId);
@@ -69,8 +82,9 @@ public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
         params.addValue("decDate", decDate);
 
         LinkedList<BigDecimal> amountExceedRecs = null;
-        amountExceedRecs = new LinkedList<>(remoteNamedJdbc.query(GET_ALLOWANCE_USAGE_SQL, params,
+        amountExceedRecs = new LinkedList<>(remoteNamedJdbc.query(GET_AMOUNT_EXCEED_POT_SQL, params,
                 new AmountExceedRowMapper("")));
+
         if (amountExceedRecs==null || amountExceedRecs.size()==0) {
             annualAllowanceRecs.get(0).setMoneyAllowed(null);
         }
@@ -78,7 +92,14 @@ public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
             annualAllowanceRecs.get(0).setMoneyAllowed(amountExceedRecs.get(0));
         }
 
-        return annualAllowanceRecs;
+        LinkedList<SalaryRec> salaries = null;
+        params = new MapSqlParameterSource();
+        params.addValue("empId", empId);
+        salaries = new LinkedList<>(remoteNamedJdbc.query(GET_SALARY_POT_SQL, params,
+                new SalaryRowMapper("")));
+
+        annualAllowanceRecs.get(0).setSalaryRecs(salaries);
+        return annualAllowanceRecs.get(0);
     }
 
 }

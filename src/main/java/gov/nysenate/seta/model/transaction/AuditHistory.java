@@ -140,14 +140,20 @@ public class AuditHistory {
         return holdAuditRec;
     }
 
-    public List<Map<String, String>> getAuditRecordsBetween(Date dtstart, Date dtend) {
+    public List<Map<String, String>> getAuditRecordsBetween(Date dtstart, Date dtend, boolean alwaysStartDateRecord) {
         List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
 
         for (int x = 0; x < auditRecords.size(); x++) {
             Map<String, String> latestAuditRec = auditRecords.get(x);
             try {
                 Date currentEffectDate = sdf.parse(latestAuditRec.get("EffectDate"));
+
                 if (!(currentEffectDate.before(dtstart)||currentEffectDate.after(dtend))) {
+                    if (alwaysStartDateRecord) {
+                        if (x>0 && currentEffectDate.after(dtstart) && recordHistoryReturned.size()==0) {
+                            recordHistoryReturned.add(auditRecords.get(x-1));
+                        }
+                    }
                     recordHistoryReturned.add(latestAuditRec);
                 }
             } catch (Exception e) {
