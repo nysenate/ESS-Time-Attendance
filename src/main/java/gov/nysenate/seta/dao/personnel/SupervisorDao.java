@@ -2,7 +2,6 @@ package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.exception.SupervisorException;
-import gov.nysenate.seta.model.personnel.Supervisor;
 import gov.nysenate.seta.model.personnel.SupervisorChain;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 

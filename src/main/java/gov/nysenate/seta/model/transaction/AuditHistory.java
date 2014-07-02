@@ -4,7 +4,6 @@ import gov.nysenate.seta.dao.transaction.SqlEmployeeTransactionDao;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
 import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import gov.nysenate.seta.util.OutputUtils;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +33,21 @@ public class AuditHistory {
         this.recordHistory = new HashMap<>();
     }
 
+    public AuditHistory(TransactionHistory transactionHistory)  throws TransactionHistoryNotFoundEx, TransactionHistoryException {
+        this.employeeId = transactionHistory.getEmployeeId();
+        this.recordHistory = new HashMap<>();
+        this.setTransactionHistory(transactionHistory);
+        buildAuditTrail();
+    }
+
+    /** --- Functional Getters/Setters --- */
+
+
+    /**
+     * Sets transaction history and derives Audit History (flattened transaction history)
+     * @param transactionHistory TransactionHistory
+     */
+
     public void setTransactionHistory(TransactionHistory transactionHistory) throws TransactionHistoryNotFoundEx, TransactionHistoryException {
         if (transactionHistory == null) {
             if (employeeId<1) {
@@ -50,18 +64,27 @@ public class AuditHistory {
         buildAuditTrail();
     }
 
+    /**
+     * Returns transaction history and used in this Audit History
+     */
+
     public TransactionHistory getTransactionHistory() {
         return this.transactionHistory;
     }
 
     /** --- Local classes --- */
 
+    /**
+     * Derives Audit History (flattened transaction history) from transaction history which
+     * should have been set
+     */
+
     protected void buildAuditTrail() throws TransactionHistoryException {
         try {
             Map<String, String> holdValues = null;
             auditRecords = new ArrayList<Map>();
             Date effectDate = null;
-
+            logger.debug("buildAuditTrail transactionHistory:"+transactionHistory.getAllTransRecords(true).size());
             for (TransactionRecord curTrans : transactionHistory.getAllTransRecords(true)) {
                 if (holdValues==null) {
                     holdValues = new HashMap<String, String>();
@@ -122,6 +145,73 @@ public class AuditHistory {
         }
     }
 
+    /**
+     * Check to see if a specific record matches on the values passed in.
+     * @param recNum int - Record# being checked for a match
+     * @param matchValues Map<String, String> - Values used to match
+     * @param matchOnAll boolean - If true, the record needs to match all values in matchValues,
+     *                             if false, the record needs to match at least one value in matchValues
+     */
+
+    protected boolean matchOnValues (int recNum, Map<String, String> matchValues, boolean matchOnAll) {
+        Map<String, String> currentValues = this.auditRecords.get(recNum);
+        return matchOnValues(currentValues, matchValues, matchOnAll);
+    }
+
+    /**
+     * Check to currentValues if a specific record matches on the values passed in.
+     * @param currentValues Map<String, String> - Record being checked for matches
+     * @param matchValues Map<String, String> - Values used to match
+     * @param matchOnAll boolean - If true, the record needs to match all values in matchValues,
+     *                             if false, the record needs to match at least one value in matchValues
+     */
+
+    protected boolean matchOnValues (Map<String, String> currentValues, Map<String, String> matchValues, boolean matchOnAll) {
+        Set<String> keySet = matchValues.keySet();
+        boolean matched = matchOnAll;
+
+        for (String curKey : keySet) {
+            try {
+                if (matchOnAll) {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (matchValues.get(curKey) != null) {
+                                return false;
+                            }
+                        } else if (!((String) matchValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            return false;
+                        }
+                    }
+                    else {
+                        return false;
+                    }
+
+                }
+                else {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (matchValues.get(curKey) == null) {
+                                return true;
+                            }
+                        } else if (((String) matchValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+
+            }
+        }
+        return matchOnAll;
+    }
+
+
+    /*
+     * Returns how Personnel/Payroll information looks on any given date (Point in Time)
+     * @param dtpot Date - Point in Time Date
+     */
+
     public Map<String, String> getPointInTime(Date dtpot) {
         Map<String, String> holdAuditRec = null;
 
@@ -139,6 +229,57 @@ public class AuditHistory {
         }
         return holdAuditRec;
     }
+
+    /*
+     * Find matched records
+     * @param dtpot Date - Point in Time Date
+     */
+
+    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord) {
+        Map<String, String> holdAuditRec = null;
+        List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> auditRecords = this.getAuditRecordsBetween(dtstart, dtend, alwaysStartDateRecord);
+        for (int x = 0; x < auditRecords.size(); x++) {
+            Map<String, String> latestAuditRec = auditRecords.get(x);
+            try {
+                if (this.matchOnValues(latestAuditRec, matchValues, matchOnAll)) {
+                    recordHistoryReturned.add(latestAuditRec);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return auditRecords;
+    }
+
+    /*
+     * Returns how Personnel/Payroll information looks on any given date (Point in Time)
+     * @param dtpot Date - Point in Time Date
+     */
+
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll) {
+        Map<String, String> holdAuditRec = null;
+        List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
+        for (int x = 0; x < auditRecords.size(); x++) {
+            Map<String, String> latestAuditRec = auditRecords.get(x);
+            try {
+                if (this.matchOnValues(latestAuditRec, matchValues, matchOnAll)) {
+                    recordHistoryReturned.add(latestAuditRec);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return recordHistoryReturned;
+    }
+
+    /*
+     * Returns Audit Records given a date range. Records only show given a change in at least one field v
+     * value has changed
+     * @param dtstart Date - Start Date
+     * @param dtend Date - End Date
+     * @return List<Map<String, String>>
+     */
 
     public List<Map<String, String>> getAuditRecordsBetween(Date dtstart, Date dtend, boolean alwaysStartDateRecord) {
         List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
@@ -171,6 +312,14 @@ public class AuditHistory {
     public boolean hasRecords() {
         return !auditRecords.isEmpty();
     }
+
+    /*
+     * Returns Audit Records given a date range. Records only show given a change in at least one field v
+     * value has changed
+     * @param dtstart Date - Start Date
+     * @param dtend Date - End Date
+     * @return List<Map<String, String>>
+     */
 
     public List<Map> getAuditRecords(){
         return auditRecords;

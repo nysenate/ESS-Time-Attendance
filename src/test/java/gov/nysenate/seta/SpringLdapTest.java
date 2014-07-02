@@ -5,12 +5,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.*;
+import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.DirContextAdapter;
+import org.springframework.ldap.core.LdapTemplate;
 
 import javax.naming.Name;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-
 import java.util.List;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;

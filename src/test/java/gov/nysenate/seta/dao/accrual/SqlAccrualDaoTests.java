@@ -4,7 +4,8 @@ import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.util.OutputUtils;
+import gov.nysenate.seta.model.transaction.AuditHistory;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,6 +37,9 @@ public class SqlAccrualDaoTests extends AbstractContextTests
 
     @Test
     public void testGetAccrualSummaries() throws Exception {
+        TransactionHistory transactionHistory = new TransactionHistory(45);
+        logger.debug("TRANSACTION RECORDS:"+transactionHistory.getAllTransRecords(true));
+        AuditHistory auditHistory = new AuditHistory(transactionHistory);
 
     }
 }

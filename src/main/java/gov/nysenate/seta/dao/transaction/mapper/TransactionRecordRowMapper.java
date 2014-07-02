@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.transaction.mapper;
 
-import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

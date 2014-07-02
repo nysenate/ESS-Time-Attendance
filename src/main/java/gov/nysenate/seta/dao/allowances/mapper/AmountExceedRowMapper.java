@@ -1,13 +1,10 @@
 package gov.nysenate.seta.dao.allowances.mapper;
 
-import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 
 /**
  * This row mapper doesn't implement the RowMapper interface but rather provides a static

@@ -2,10 +2,8 @@ package gov.nysenate.seta.dao.attendance;
 
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

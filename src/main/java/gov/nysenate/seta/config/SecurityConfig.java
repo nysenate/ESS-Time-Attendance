@@ -4,7 +4,6 @@ import gov.nysenate.seta.security.filter.EssAuthenticationFilter;
 import gov.nysenate.seta.security.realm.EssLdapRealm;
 import gov.nysenate.seta.security.xsrf.XsrfTokenValidator;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
-import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;

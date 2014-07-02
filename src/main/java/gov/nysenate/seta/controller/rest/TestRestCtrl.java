@@ -2,9 +2,9 @@ package gov.nysenate.seta.controller.rest;
 
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
-import gov.nysenate.seta.model.personnel.EmployeeException;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.personnel.Employee;
+import gov.nysenate.seta.model.personnel.EmployeeException;
 import gov.nysenate.seta.model.personnel.SupervisorChain;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import org.joda.time.DateTime;

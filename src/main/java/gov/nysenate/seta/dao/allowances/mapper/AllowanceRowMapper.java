@@ -38,6 +38,7 @@ public class AllowanceRowMapper  implements RowMapper<AllowanceUsage>
         Date endDate = rs.getDate(pfx + "DTENDTE");
         int dtyear = new Integer(new SimpleDateFormat("yyyy").format(endDate)).intValue();
 
+        allowanceUsage.setEmpId(rs.getInt(pfx + "NUXREFEM"));
         allowanceUsage.setMoneyUsed(rs.getBigDecimal(pfx + "TE_AMOUNT_PAID"));
         allowanceUsage.setHoursUsed(rs.getBigDecimal(pfx + "TE_HRS_PAID"));
         allowanceUsage.setEndDate(endDate);

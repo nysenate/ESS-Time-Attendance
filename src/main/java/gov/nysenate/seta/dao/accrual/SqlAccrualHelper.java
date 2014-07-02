@@ -8,9 +8,9 @@ import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.transaction.AuditHistory;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
-import gov.nysenate.seta.model.transaction.TransactionCode;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
-import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
 
 public class SqlAccrualHelper
 {

@@ -1,7 +1,5 @@
 package gov.nysenate.seta.model.transaction;
 
-import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

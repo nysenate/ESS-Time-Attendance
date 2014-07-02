@@ -1,7 +1,5 @@
 package gov.nysenate.seta;
 
-import gov.nysenate.seta.util.DeepCopy;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -8,9 +8,6 @@ import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Data access layer for retrieving and computing allowance information
  * (e.g temporary employee yearly allowances, hours used).

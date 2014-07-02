@@ -37,13 +37,13 @@ public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
              "    AND A.DTENDTE >= :janDate\n"+
              "    AND A.CDSTATUS = 'A'\n"+
              "            )\n"+
-             "    SELECT SUM(NUHRHRSPD) AS TE_HRS_PAID, SUM(NVL(MOTOTHRSPD, 0)) - SUM(NVL(MOPRIORYRTE,0)) AS TE_AMOUNT_PAID, (SUM(NVL(MOTOTHRSPD, 0)) -  SUM(NVL(MOPRIORYRTE,0)) ) MOTESPEND,  MAX(DTENDTE) DTENDTE\n"+
+             "    SELECT MIN(NUXREFEM) NUXREFEM, SUM(NUHRHRSPD) AS TE_HRS_PAID, SUM(NVL(MOTOTHRSPD, 0)) - SUM(NVL(MOPRIORYRTE,0)) AS TE_AMOUNT_PAID, (SUM(NVL(MOTOTHRSPD, 0)) -  SUM(NVL(MOPRIORYRTE,0)) ) MOTESPEND,  MAX(DTENDTE) DTENDTE\n"+
              "    FROM TE_PAY\n"+
              "    WHERE ROWIDMAX = ROWIDCUR\n"+
              "    AND NULINE = NULINELAST";
 
     protected static final String GET_AMOUNT_EXCEED_POT_SQL =
-            " SELECT b.moamtexceed, b.dteffect, b.dttxnorigin " +
+            " SELECT b.moamtexceed, b.dteffect, b.dttxnorigin, a.nuxrefem " +
             "   FROM SASS_OWNER.pd21ptxncode a" +
             "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange) " +
             "  WHERE A.NUXREFEM = :empId " +
@@ -54,7 +54,7 @@ public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
             " ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
 
     protected static final String GET_SALARY_POT_SQL =
-            " SELECT b.mosalbiwkly, b.dteffect, b.dttxnorigin " +
+            " SELECT b.mosalbiwkly, b.dteffect, b.dttxnorigin, a.nuxrefem " +
             "   FROM SASS_OWNER.pd21ptxncode a" +
             "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange) " +
             "  WHERE A.NUXREFEM = :empId " +

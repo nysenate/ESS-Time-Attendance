@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.transaction;
 
-import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.model.transaction.TransactionHistory;
 
 import java.util.Date;
 import java.util.Set;

@@ -1,7 +1,6 @@
 package gov.nysenate.seta.util;
 
 import java.io.InputStream;
-import java.io.IOException;
 
 /**
  * ByteArrayInputStream implementation that does not synchronize methods.
