@@ -206,6 +206,71 @@ public class AuditHistory {
         return matchOnAll;
     }
 
+    /**
+     * Check to see if a specific record matches on the values passed in.
+     * @param recNum int - Record# being checked for a match
+     * @param matchValues Map<String, String> - Values used to match
+     * @param matchOnAll boolean - If true, the record needs to exclude all values in matchValues,
+     *                             if false, the record needs to exclude at least one value in matchValues     */
+
+    protected boolean doesNotContainValues (int recNum, Map<String, String> matchValues, boolean matchOnAll) {
+        Map<String, String> currentValues = this.auditRecords.get(recNum);
+        return doesNotContainValues(currentValues, matchValues, matchOnAll);
+    }
+
+    /**
+     * Check to currentValues if a specific record does not match on the values passed in.
+     * @param currentValues Map<String, String> - Record being checked for matches
+     * @param excludeValues Map<String, String> - Does not contain these Values. Depending on excludeOnAll,
+     *                      either one value or all values must not match
+     * @param excludeOnAll boolean - If true, every value must not match in order to return true.
+     *                               If false, at least one value does not match in order to be true
+     */
+
+    protected boolean doesNotContainValues (Map<String, String> currentValues, Map<String, String> excludeValues, boolean excludeOnAll) {
+        Set<String> keySet = excludeValues.keySet();
+        boolean matched = excludeOnAll;
+
+         /*
+           Exclude on All means that every value must not match in order to return true
+           (default to true, if at least one value matches, then return false)
+           Not Excluding on All means that at least one value does not match in order to be true
+           (default to false, if at least one value matches then return true)
+          */
+
+        for (String curKey : keySet) {
+            try {
+                if (excludeOnAll) {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (excludeValues.get(curKey) == null) {
+                                return false;
+                            }
+                        } else if (((String) excludeValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            return false;
+                        }
+                    }
+                }
+                else {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (excludeValues.get(curKey) != null) {
+                                logger.debug(curKey+" current value is null so returning true");
+                                return true;
+                            }
+                        } else if (!((String) excludeValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            logger.debug(curKey+": "+currentValues.get(curKey)+" != "+excludeValues.get(curKey)+" so returning true");
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+
+            }
+        }
+        return matched;
+    }
 
     /*
      * Returns how Personnel/Payroll information looks on any given date (Point in Time)
@@ -236,6 +301,15 @@ public class AuditHistory {
      */
 
     public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord) {
+        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, null, true);
+    }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord,  Map<String, String> excludeValues) {
+        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, excludeValues, true);
+    }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord,  Map<String, String> excludeValues , boolean excludeOnAll) {
+        logger.debug("getMatchedAuditRecords()");
         Map<String, String> holdAuditRec = null;
         List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
         List<Map<String, String>> auditRecords = this.getAuditRecordsBetween(dtstart, dtend, alwaysStartDateRecord);
@@ -243,7 +317,20 @@ public class AuditHistory {
             Map<String, String> latestAuditRec = auditRecords.get(x);
             try {
                 if (this.matchOnValues(latestAuditRec, matchValues, matchOnAll)) {
-                    recordHistoryReturned.add(latestAuditRec);
+                    boolean excludesValues = false;
+                    logger.debug("Matched on Values");
+                    if (excludeValues==null ||excludeValues.size()==0) {
+                        excludesValues = true;
+                        logger.debug("        Matched on Values (no excluded values)");
+                    }
+                    else {
+                        excludesValues = this.doesNotContainValues(latestAuditRec, excludeValues, excludeOnAll);
+                        logger.debug("        Matched on Values (excludes values:"+excludesValues+")");
+                    }
+                    if (excludesValues) {
+                        logger.debug("        Matched on Values (excludes values:"+excludesValues+") adding record");
+                        recordHistoryReturned.add(latestAuditRec);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -252,19 +339,40 @@ public class AuditHistory {
         return auditRecords;
     }
 
+
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll) {
+        return getMatchedAuditRecords(matchValues, matchOnAll, null, true);
+    }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll, Map<String, String> excludeValues ) {
+        return getMatchedAuditRecords(matchValues, matchOnAll, excludeValues, true);
+    }
     /*
      * Returns how Personnel/Payroll information looks on any given date (Point in Time)
      * @param dtpot Date - Point in Time Date
      */
 
-    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll) {
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll,  Map<String, String> excludeValues ,boolean excludeOnAll) {
         Map<String, String> holdAuditRec = null;
         List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
         for (int x = 0; x < auditRecords.size(); x++) {
             Map<String, String> latestAuditRec = auditRecords.get(x);
             try {
                 if (this.matchOnValues(latestAuditRec, matchValues, matchOnAll)) {
-                    recordHistoryReturned.add(latestAuditRec);
+                    boolean excludesValues = false;
+                    logger.debug("Matched on Values");
+                    if (excludeValues==null ||excludeValues.size()==0) {
+                        excludesValues = true;
+                        logger.debug("        Matched on Values (no excluded values)");
+                    }
+                    else {
+                        excludesValues = this.doesNotContainValues(latestAuditRec, excludeValues, excludeOnAll);
+                        logger.debug("        Matched on Values (excludes values:"+excludesValues+")");
+                    }
+                    if (excludesValues) {
+                        logger.debug("        Matched on Values (excludes values:" + excludesValues + ") adding record");
+                        recordHistoryReturned.add(latestAuditRec);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

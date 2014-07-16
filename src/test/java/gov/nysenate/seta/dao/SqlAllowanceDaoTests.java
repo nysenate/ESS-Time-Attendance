@@ -39,8 +39,10 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
         //logger.debug("AuditRecords:"+OutputUtils.toJson(auditHistory.getAuditRecords()));
         Map<String, String> matchValues = new HashMap<String, String>();
         matchValues.put("CDPAYTYPE", "TE");
+        Map<String, String> excludeValues = new HashMap<String, String>();
+        excludeValues.put("CDAGENCY", "04210");
 
-        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, true);
+        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, false, excludeValues);
         logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));
         //auditHistory.setTransactionHistory(transactionHistory);
 
@@ -52,5 +54,65 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
 
         //logger.debug("allowanceUsage: "+ OutputUtils.toJson(allowanceUsage));
     }
+    @Test
+    public void testDoesNotContain() {
+
+        Map<String, String> currentRecord = new HashMap<String, String>();
+        currentRecord.put("CDPAYTYPE", "TE");
+        currentRecord.put("EMP", "TESTEMP");
+        currentRecord.put("CDLOCAT", "C415");
+        currentRecord.put("CDSTATUS", "A");
+
+        Map<String, String> excludeValues = new HashMap<String, String>();
+        excludeValues.put("EMP", "TESTEMP");
+        excludeValues.put("CDSTATUS", "A");
+        logger.debug("doesNotContainValues returned:"+doesNotContainValues(currentRecord, excludeValues, true));
+    }
+
+    protected boolean doesNotContainValues (Map<String, String> currentValues, Map<String, String> excludeValues, boolean excludeOnAll) {
+        Set<String> keySet = excludeValues.keySet();
+        boolean matched = excludeOnAll;
+
+         /*
+           Exclude on All means that every value must not match in order to return true
+           (default to true, if at least one value matches, then return false)
+           Not Excluding on All means that at least one value does not match in order to be true
+           (default to false, if at least one value matches then return true)
+          */
+
+        for (String curKey : keySet) {
+            try {
+                if (excludeOnAll) {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (excludeValues.get(curKey) == null) {
+                                return false;
+                            }
+                        } else if (((String) excludeValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            return false;
+                        }
+                    }
+                }
+                else {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (excludeValues.get(curKey) != null) {
+                                logger.debug(curKey+" current value is null so returning true");
+                                return true;
+                            }
+                        } else if (!((String) excludeValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            logger.debug(curKey+": "+currentValues.get(curKey)+" != "+excludeValues.get(curKey)+" so returning true");
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+
+            }
+        }
+        return matched;
+    }
+
 
 }
