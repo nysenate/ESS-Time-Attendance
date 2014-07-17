@@ -77,23 +77,4 @@ public class WebIntializer implements WebApplicationInitializer
                       .addMappingForUrlPatterns(EnumSet.of(FORWARD), false, "/*");
 
     }
-
-    /**
-     * Returns a Properties object that holds the profile configuration. The profiles are used to decide which beans
-     * should be wired together at deploy time.
-     *
-     * @return Properties
-     */
-    private Properties getProfileProperties() {
-        Properties properties = new Properties();
-        Resource resource = new ClassPathResource(PropertyConfig.PROFILE_PROPERTIES_FILENAME);
-        try {
-            properties.load(resource.getInputStream());
-        }
-        catch (IOException ex) {
-            System.err.println("Failed to load profile configuration. A profile.properties file should be located in the " +
-                               "classpath defining the Spring profiles.");
-        }
-        return properties;
-    }
 }

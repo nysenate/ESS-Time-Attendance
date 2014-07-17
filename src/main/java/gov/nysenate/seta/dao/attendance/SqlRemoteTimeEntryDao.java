@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +19,12 @@ import java.util.Map;
  *
  */
 @Repository("remoteTimeEntry")
-public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
+public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 {
     @Resource(name = "localTimeRecordDao")
     private TimeRecordDao timeRecordDao;
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlRemoteEntryDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeEntryDao.class);
 
     protected static final String GET_TIME_ENTRY_SQL_TMPL =
         "SELECT * FROM PD23TIMESHEET WHERE CDSTATUS = 'A' AND %s ";
@@ -72,9 +71,9 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
 
     /** {@inheritDoc} */
     @Override
-    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
+    public Map<String, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
         List<TimeRecord> timeRecords;
-        Map<BigDecimal, List<TimeEntry>> timeEntries = new HashMap<>();
+        Map<String, List<TimeEntry>> timeEntries = new HashMap<>();
         MapSqlParameterSource params = new MapSqlParameterSource();
 //        timeRecords = timeRecordDao.getRecordByEmployeeId(empId);
         timeRecords = new ArrayList<>(); /** FIXME */
@@ -99,7 +98,7 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
         MapSqlParameterSource param = new MapSqlParameterSource();
 
         param.addValue("tSDayId", tsd.getEntryId());
-        param.addValue("timesheetId", tsd.getTimesheetId());
+        param.addValue("timesheetId", tsd.getTimeRecordId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());
         param.addValue("workHR", tsd.getWorkHours());
@@ -109,10 +108,10 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("sickFamilyHR", tsd.getSickFamHours());
         param.addValue("miscHR", tsd.getMiscHours());
         param.addValue("miscTypeId", (tsd.getMiscType() != null) ? tsd.getMiscType().getCode() : null);
-        param.addValue("tOriginalUserId", tsd.gettOriginalUserId());
-        param.addValue("tUpdateUserId", tsd.gettUpdateUserId());
-        param.addValue("tOriginalDate", tsd.gettOriginalDate());
-        param.addValue("tUpdateDate", tsd.gettUpdateDate());
+        param.addValue("tOriginalUserId", tsd.getTxOriginalUserId());
+        param.addValue("tUpdateUserId", tsd.getTxUpdateUserId());
+        param.addValue("tOriginalDate", tsd.getTxOriginalDate());
+        param.addValue("tUpdateDate", tsd.getTxUpdateDate());
         param.addValue("status", getStatusCode(tsd.isActive()));
         param.addValue("empComment", tsd.getEmpComment());
         param.addValue("payType", tsd.getPayType().name());
@@ -129,7 +128,7 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
         MapSqlParameterSource param = new MapSqlParameterSource();
 
         param.addValue("tSDayId", tsd.getEntryId());
-        param.addValue("timesheetId", tsd.getTimesheetId());
+        param.addValue("timesheetId", tsd.getTimeRecordId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());
         param.addValue("workHR", tsd.getWorkHours());
@@ -139,10 +138,10 @@ public class SqlRemoteEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("sickFamilyHR", tsd.getSickFamHours());
         param.addValue("miscHR", tsd.getMiscHours());
         param.addValue("miscTypeId", tsd.getMiscType().getCode());
-        param.addValue("tOriginalUserId", tsd.gettOriginalUserId());
-        param.addValue("tUpdateUserId", tsd.gettUpdateUserId());
-        param.addValue("tOriginalDate", tsd.gettOriginalDate());
-        param.addValue("tUpdateDate", tsd.gettUpdateDate());
+        param.addValue("tOriginalUserId", tsd.getTxOriginalUserId());
+        param.addValue("tUpdateUserId", tsd.getTxUpdateUserId());
+        param.addValue("tOriginalDate", tsd.getTxOriginalDate());
+        param.addValue("tUpdateDate", tsd.getTxUpdateDate());
         param.addValue("status", getStatusCode(tsd.isActive()));
         param.addValue("empComment", tsd.getEmpComment());
         param.addValue("payType", tsd.getPayType().name());

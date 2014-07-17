@@ -20,9 +20,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository("remoteTimeRecordDao")
-public class SqlRemoteRecordDao extends SqlBaseDao implements TimeRecordDao
+public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 {
-    private static final Logger logger = LoggerFactory.getLogger(SqlRemoteRecordDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeRecordDao.class);
 
     protected static final String GET_TIME_REC_SQL_TMPL =
         "SELECT \n" +

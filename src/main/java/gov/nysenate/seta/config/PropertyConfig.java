@@ -14,7 +14,6 @@ public class PropertyConfig
 {
     public static final String PROPERTY_FILENAME = "app.properties";
     public static final String TEST_PROPERTY_FILENAME = "test.app.properties";
-    public static final String PROFILE_PROPERTIES_FILENAME = "profile.properties";
 
     /**
      * This instance is necessary for Spring to load up the property file and allow access to
@@ -25,7 +24,6 @@ public class PropertyConfig
     public static PropertySourcesPlaceholderConfigurer properties() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
         Resource[] resources = new ClassPathResource[] { new ClassPathResource(PROPERTY_FILENAME),
-                                                         new ClassPathResource(PROFILE_PROPERTIES_FILENAME),
                                                          new ClassPathResource(TEST_PROPERTY_FILENAME) };
         pspc.setLocations(resources);
         pspc.setIgnoreUnresolvablePlaceholders(true);
