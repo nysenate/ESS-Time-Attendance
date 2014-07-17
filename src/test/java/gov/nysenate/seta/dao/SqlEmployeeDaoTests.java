@@ -36,7 +36,7 @@ public class SqlEmployeeDaoTests extends AbstractContextTests
 
     @Test
     public void testGetEmployeeByEmail_validIdReturnsEmployee() throws Exception {
-        String validEmail = "crain@nysenate.gov";
+        String validEmail = "stouffer@nysenate.gov";
         Employee emp = employeeDao.getEmployeeByEmail(validEmail);
         assertNotNull(emp);
         assertEquals(validEmail, emp.getEmail());

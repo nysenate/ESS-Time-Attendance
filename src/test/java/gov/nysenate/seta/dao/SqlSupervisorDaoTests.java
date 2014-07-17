@@ -19,7 +19,7 @@ public class SqlSupervisorDaoTests extends AbstractContextTests
 
     @Test
     public void testGetSupervisorIdForEmpWithDate_ReturnsCorrectSupervisorId() throws Exception {
-        logger.info("{}", supervisorDao.getSupervisorIdForEmp(9896, new DateTime(2010, 3, 4, 0, 0, 0).toDate()));
+        logger.info("{}", supervisorDao.getSupervisorIdForEmp(11423, new DateTime(2014, 7, 16, 0, 0, 0).toDate()));
     }
 
     @Test
