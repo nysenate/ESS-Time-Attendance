@@ -5,6 +5,7 @@ import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.transaction.AuditHistory;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import org.joda.time.LocalDate;
 import org.junit.Test;
@@ -12,10 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class SqlAccrualDaoTests extends AbstractContextTests
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDaoTests.class);
-
+    protected static final Set<TransactionCode> SAL_CODES = new HashSet<>(Arrays.asList(TransactionCode.SAL, TransactionCode.RTP, TransactionCode.APP));
     @Autowired
     SqlAccrualDao accrualDao;
 
@@ -38,6 +43,8 @@ public class SqlAccrualDaoTests extends AbstractContextTests
     @Test
     public void testGetAccrualSummaries() throws Exception {
         TransactionHistory transactionHistory = new TransactionHistory(45);
+
+        transactionHistory.getTransRecords(SAL_CODES, true);
         logger.debug("TRANSACTION RECORDS:"+transactionHistory.getAllTransRecords(true));
         AuditHistory auditHistory = new AuditHistory(transactionHistory);
 

@@ -3,6 +3,7 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
 import gov.nysenate.seta.dao.transaction.SqlEmployeeTransactionDao;
+import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
@@ -35,19 +36,25 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
         Set<TransactionCode> allTransCodes = new HashSet<TransactionCode>(Arrays.asList(TransactionCode.values()));
         TransactionHistory transactionHistory = sqlEmployeeTransactionDao.getTransHistory(45,  allTransCodes);
         auditHistory = new AuditHistory(transactionHistory);
+//        Map<String, String> matchValues = new HashMap<String, String>();
+//        matchValues.put("CDPAYTYPE", "TE");
+//        String[] columnChangeFilter =  {"MOSALBIWKLY"}; //{"DETXNNOTEPAY"}; //{"MOSALBIWKLY"};
+//        logger.debug("PAYTPE=TE:"+OutputUtils.toJson(auditHistory.getMatchedAuditRecords(matchValues, true, columnChangeFilter)));
+
         //auditHistory.setTransactionHistory(transactionHistory);
         //logger.debug("AuditRecords:"+OutputUtils.toJson(auditHistory.getAuditRecords()));
-        Map<String, String> matchValues = new HashMap<String, String>();
-        matchValues.put("CDPAYTYPE", "TE");
-        Map<String, String> excludeValues = new HashMap<String, String>();
-        excludeValues.put("CDAGENCY", "04210");
+//        Map<String, String> matchValues = new HashMap<String, String>();
+//        matchValues.put("CDPAYTYPE", "TE");
+//        Map<String, String> excludeValues = new HashMap<String, String>();
+//       excludeValues.put("CDAGENCY", "04210");
 
-        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, false, excludeValues);
-        logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));
+//        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, false, excludeValues);
+        //logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));
         //auditHistory.setTransactionHistory(transactionHistory);
 
-        //AllowanceUsage allowanceUsage;
-       // allowanceUsage = allowanceDao.getAllowanceUsage(45, 2014, auditHistory);
+        AllowanceUsage allowanceUsage;
+        allowanceUsage = allowanceDao.getAllowanceUsage(45, 2014, auditHistory);
+        logger.debug(OutputUtils.toJson(allowanceUsage));//*/
         //TransactionHistory transactionHistory = new TransactionHistory(45);
         //AuditHistory auditHistory = new AuditHistory();
         //auditHistory.setTransactionHistory(transactionHistory);
@@ -68,6 +75,21 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
         excludeValues.put("CDSTATUS", "A");
         logger.debug("doesNotContainValues returned:"+doesNotContainValues(currentRecord, excludeValues, true));
     }
+
+    @Test
+    public void testMatchOnValues() {
+
+        Map<String, String> currentRecord = new HashMap<String, String>();
+        currentRecord.put("CDPAYTYPE", "TE");
+        currentRecord.put("EMP", "TESTEMP");
+        currentRecord.put("CDLOCAT", "C415");
+        currentRecord.put("CDSTATUS", "A");
+
+        Map<String, String> matchValues = new HashMap<String, String>();
+        matchValues.put("CDPAYTYPE", "TE");
+        logger.debug("matchOnValues returned:"+matchOnValues(currentRecord, matchValues, false));
+    }
+
 
     protected boolean doesNotContainValues (Map<String, String> currentValues, Map<String, String> excludeValues, boolean excludeOnAll) {
         Set<String> keySet = excludeValues.keySet();
@@ -112,6 +134,47 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
             }
         }
         return matched;
+    }
+
+
+    protected boolean matchOnValues (Map<String, String> currentValues, Map<String, String> matchValues, boolean matchOnAll) {
+        Set<String> keySet = matchValues.keySet();
+        boolean matched = matchOnAll;
+
+        for (String curKey : keySet) {
+            try {
+                if (matchOnAll) {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (matchValues.get(curKey) != null) {
+                                return false;
+                            }
+                        } else if (!((String) matchValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            return false;
+                        }
+                    }
+                    else {
+                        return false;
+                    }
+
+                }
+                else {
+                    if (currentValues.containsKey(curKey)) {
+                        if (currentValues.get(curKey) == null) {
+                            if (matchValues.get(curKey) == null) {
+                                return true;
+                            }
+                        } else if (((String) matchValues.get(curKey)).equals(((String) currentValues.get(curKey)))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+
+            }
+        }
+        return matchOnAll;
     }
 
 

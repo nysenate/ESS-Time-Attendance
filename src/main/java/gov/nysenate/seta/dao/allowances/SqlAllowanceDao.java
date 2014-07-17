@@ -8,19 +8,25 @@ import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.payroll.SalaryRec;
 import gov.nysenate.seta.model.transaction.AuditHistory;
+import gov.nysenate.seta.util.OutputUtils;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.LinkedList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by heitner on 6/26/2014.
  */
 @Repository
 public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
+
+    private static final Logger logger = LoggerFactory.getLogger(AllowanceUsage.class);
 
     /** --- SQL Queries --- */
 
@@ -93,13 +99,41 @@ public class SqlAllowanceDao  extends SqlBaseDao implements AllowanceDao {
         }
 
         LinkedList<SalaryRec> salaries = null;
-        params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
-        salaries = new LinkedList<>(remoteNamedJdbc.query(GET_SALARY_POT_SQL, params,
-                new SalaryRowMapper("")));
+        //params = new MapSqlParameterSource();
+        //params.addValue("empId", empId);
+        //salaries = new LinkedList<>(remoteNamedJdbc.query(GET_SALARY_POT_SQL, params,
+              //new SalaryRowMapper("")));
+        Map<String, String> matchValues = new HashMap<String, String>();
+        matchValues.put("CDPAYTYPE", "TE");
+        String[] columnChangeFilter =  {"MOSALBIWKLY"};
+
+        salaries = setSalaryRecs(auditHistory.getMatchedAuditRecords(matchValues, true, columnChangeFilter));
 
         annualAllowanceRecs.get(0).setSalaryRecs(salaries);
+
         return annualAllowanceRecs.get(0);
+    }
+
+    protected LinkedList<SalaryRec> setSalaryRecs(List<Map<String, String>> auditRecs) {
+        LinkedList<SalaryRec> salaries = null;
+        salaries = new LinkedList<SalaryRec>();
+        Map<String, String> currentAuditRec = null;
+
+        for (int x=0;x <auditRecs.size(); x++) {
+            SalaryRec salaryRec = new SalaryRec();
+            currentAuditRec = auditRecs.get(x);
+            logger.debug(OutputUtils.toJson(currentAuditRec));
+
+            salaryRec.setSalary(new BigDecimal(currentAuditRec.get("MOSALBIWKLY")));
+            try {
+                salaryRec.setEffectDate(new SimpleDateFormat("MM/dd/yyyy").parse(currentAuditRec.get("EffectDate")));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            salaries.add(salaryRec);
+        }
+
+        return salaries;
     }
 
 }

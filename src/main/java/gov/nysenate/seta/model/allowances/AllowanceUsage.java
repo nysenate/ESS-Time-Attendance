@@ -25,7 +25,6 @@ public class AllowanceUsage {
     SalaryType salaryType;
     private static final Logger logger = LoggerFactory.getLogger(AllowanceUsage.class);
 
-
     public AllowanceUsage() {
 
     }
@@ -106,21 +105,36 @@ public class AllowanceUsage {
          return salaryRecs;
      }
 
+    /*
+    *  Computes the Available Money by getting the latest salary (Should be TEmporary Salary
+    *  with a Column Change Filter on the TEmporary Salary field. This code assumes that the
+    *  audit records are sorted either ascending or descending order on effect date, therefore
+    *  the latest Salary Record should be either the first or last record depending on the sort
+    *  order.
+    *  Money Available = Latest Amount Not to Exceed - Money Used
+    *  Hours Available = Money Available / Latest TEmporary Salary
+    *
+     */
+
     private void computeAvailableMoney() {
         logger.debug("computeAvailableMoney");
         if (salaryRecs != null && salaryRecs.size() > 0 && moneyUsed != null && moneyUsed.floatValue() >= 0f && moneyAllowed != null && moneyAllowed.floatValue() > 0) {
             logger.debug("computeAvailableMoney can compute  values");
+
             float latestSalary = 0f;
             int recToUse = 0;
+
             if (salaryRecs.get(0).getEffectDate().before(salaryRecs.get(salaryRecs.size() - 1).getEffectDate())) {
                 logger.debug("computeAvailableMoney last date should be the latest");
                 recToUse = salaryRecs.size()-1;
             }
+
             latestSalary = salaryRecs.get(recToUse).getSalary().floatValue();
             logger.debug("computeAvailableMoney using salary("+recToUse+"):"+latestSalary);
 
             moneyAvailable = new BigDecimal(moneyAllowed.floatValue() - moneyUsed.floatValue());
             logger.debug("computeAvailableMoney Money Available:"+moneyAvailable.floatValue());
+
             if (latestSalary > 0f) {
                 hoursAvailable = new BigDecimal(moneyAvailable.floatValue() / latestSalary);
                 logger.debug("computeAvailableMoney Hours Available:"+hoursAvailable.floatValue());

@@ -49,12 +49,29 @@ public class AuditHistory {
      */
 
     public void setTransactionHistory(TransactionHistory transactionHistory) throws TransactionHistoryNotFoundEx, TransactionHistoryException {
+        setTransactionHistory(transactionHistory, null);
+    }
+
+    /**
+     * Sets transaction history and derives Audit History (flattened transaction history)
+     * @param transactionHistory TransactionHistory
+     * @param  transactionCodes  Set<TransactionCode>
+     */
+
+    public void setTransactionHistory(TransactionHistory transactionHistory, Set<TransactionCode> transactionCodes) throws TransactionHistoryNotFoundEx, TransactionHistoryException {
         if (transactionHistory == null) {
             if (employeeId<1) {
                 throw new TransactionHistoryNotFoundEx("Transaction History cannot be set to null when employee id is not set.");
             }
             else {
-                Set<TransactionCode> codes = new HashSet<TransactionCode>(Arrays.asList(TransactionCode.values()));
+
+                Set<TransactionCode> codes = null;
+                if (transactionCodes==null||transactionCodes.size()==0) {
+                    codes = new HashSet<TransactionCode>(Arrays.asList(TransactionCode.values()));
+                }
+                else {
+                    codes = transactionCodes;
+                }
                 SqlEmployeeTransactionDao transHistDao = new SqlEmployeeTransactionDao();
                 transactionHistory = transHistDao.getTransHistory(employeeId, codes, true);
             }
@@ -301,16 +318,32 @@ public class AuditHistory {
      */
 
     public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord) {
-        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, null, true);
+        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, null, true, null);
+    }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord, String[] columnChangeFilter) {
+        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, null, true, columnChangeFilter);
     }
 
     public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord,  Map<String, String> excludeValues) {
-        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, excludeValues, true);
+        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, excludeValues, true, null);
     }
 
-    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord,  Map<String, String> excludeValues , boolean excludeOnAll) {
+    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord,  Map<String, String> excludeValues, String[] columnChangeFilter) {
+        return getMatchedAuditRecords(dtstart, dtend, matchValues, matchOnAll, alwaysStartDateRecord, excludeValues, true, columnChangeFilter);
+    }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Date dtstart, Date dtend, Map<String, String> matchValues, boolean matchOnAll, boolean alwaysStartDateRecord,  Map<String, String> excludeValues , boolean excludeOnAll, String[] columnChangeFilter) {
         logger.debug("getMatchedAuditRecords()");
         Map<String, String> holdAuditRec = null;
+        String[] lastValues = null;
+
+        if (columnChangeFilter != null) {
+            lastValues = new String[columnChangeFilter.length];
+        }
+
+        boolean previousValuesSet = false;
+
         List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
         List<Map<String, String>> auditRecords = this.getAuditRecordsBetween(dtstart, dtend, alwaysStartDateRecord);
         for (int x = 0; x < auditRecords.size(); x++) {
@@ -318,6 +351,43 @@ public class AuditHistory {
             try {
                 if (this.matchOnValues(latestAuditRec, matchValues, matchOnAll)) {
                     boolean excludesValues = false;
+                    boolean columnValuesChanged = false;
+
+                    if (columnChangeFilter==null||columnChangeFilter.length==0) {
+                        columnValuesChanged = true;
+                    }
+                    else {
+                        for (int y = 0;y < columnChangeFilter.length; y++) {
+                            if (latestAuditRec.containsKey(columnChangeFilter[y])) {
+                                if (!previousValuesSet) {
+                                    columnValuesChanged = true;
+                                    logger.debug("Previous value not set so columnValuesChanged");
+                                }
+                                else if (previousValuesSet && latestAuditRec.get(columnChangeFilter[y])==null && lastValues[y]!=null) {
+                                    columnValuesChanged = true;
+                                    logger.debug("Current Value is NULL and previous value is not NULL so columnValuesChanged");
+                                }
+                                else if  (previousValuesSet && latestAuditRec.get(columnChangeFilter[y])!=null && lastValues[y]==null) {
+                                    logger.debug("Current Value is NOT NULL and previous value is NULL so columnValuesChanged");
+                                    columnValuesChanged = true;
+                                }
+                                else if (previousValuesSet && !latestAuditRec.get(columnChangeFilter[y]).trim().equals(lastValues[y].trim())) {
+                                    logger.debug("Current Value:'"+latestAuditRec.get(columnChangeFilter[y])+"', previous value:'"+lastValues[y]+"' so  columnValuesChanged");
+                                    columnValuesChanged = true;
+                                }
+                                else {
+                                    logger.debug("***********Current Value:'"+latestAuditRec.get(columnChangeFilter[y])+"', previous value:'"+lastValues[y]+"'  NO CHANGE");
+                                }
+                                lastValues[y] = latestAuditRec.get(columnChangeFilter[y]);
+                                previousValuesSet = true;
+                            }
+                            else {
+                                logger.debug("*********** Could not find "+columnChangeFilter[y]+" in current audit record.");
+                            }
+
+                        }
+                    }
+
                     logger.debug("Matched on Values");
                     if (excludeValues==null ||excludeValues.size()==0) {
                         excludesValues = true;
@@ -327,7 +397,7 @@ public class AuditHistory {
                         excludesValues = this.doesNotContainValues(latestAuditRec, excludeValues, excludeOnAll);
                         logger.debug("        Matched on Values (excludes values:"+excludesValues+")");
                     }
-                    if (excludesValues) {
+                    if (excludesValues && columnValuesChanged) {
                         logger.debug("        Matched on Values (excludes values:"+excludesValues+") adding record");
                         recordHistoryReturned.add(latestAuditRec);
                     }
@@ -341,25 +411,79 @@ public class AuditHistory {
 
 
     public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll) {
-        return getMatchedAuditRecords(matchValues, matchOnAll, null, true);
+        return getMatchedAuditRecords(matchValues, matchOnAll, null, true, null);
+    }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll, String[] columnChangeFilter) {
+        return getMatchedAuditRecords(matchValues, matchOnAll, null, true, columnChangeFilter);
     }
 
     public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll, Map<String, String> excludeValues ) {
-        return getMatchedAuditRecords(matchValues, matchOnAll, excludeValues, true);
+        return getMatchedAuditRecords(matchValues, matchOnAll, excludeValues, true, null);
     }
+
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll, Map<String, String> excludeValues, String[] columnChangeFilter ) {
+        return getMatchedAuditRecords(matchValues, matchOnAll, excludeValues, true, columnChangeFilter);
+    }
+
     /*
      * Returns how Personnel/Payroll information looks on any given date (Point in Time)
      * @param dtpot Date - Point in Time Date
      */
 
-    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll,  Map<String, String> excludeValues ,boolean excludeOnAll) {
+    public List<Map<String, String>> getMatchedAuditRecords(Map<String, String> matchValues, boolean matchOnAll,  Map<String, String> excludeValues ,boolean excludeOnAll, String[] columnChangeFilter) {
         Map<String, String> holdAuditRec = null;
+        String[] lastValues = null;
+
+        if (columnChangeFilter != null) {
+            lastValues = new String[columnChangeFilter.length];
+        }
+
+        boolean previousValuesSet = false;
+
         List<Map<String, String>> recordHistoryReturned = new ArrayList<Map<String, String>>();
+
         for (int x = 0; x < auditRecords.size(); x++) {
             Map<String, String> latestAuditRec = auditRecords.get(x);
             try {
                 if (this.matchOnValues(latestAuditRec, matchValues, matchOnAll)) {
                     boolean excludesValues = false;
+                    boolean columnValuesChanged = false;
+
+                    if (columnChangeFilter==null||columnChangeFilter.length==0) {
+                        columnValuesChanged = true;
+                    }
+                    else {
+                         for (int y = 0;y < columnChangeFilter.length; y++) {
+                             if (latestAuditRec.containsKey(columnChangeFilter[y])) {
+                                    if (!previousValuesSet) {
+                                        columnValuesChanged = true;
+                                        logger.debug("Previous value not set so columnValuesChanged");
+                                    }
+                                    else if (previousValuesSet && latestAuditRec.get(columnChangeFilter[y])==null && lastValues[y]!=null) {
+                                        columnValuesChanged = true;
+                                        logger.debug("Current Value is NULL and previous value is not NULL so columnValuesChanged");
+                                    }
+                                    else if  (previousValuesSet && latestAuditRec.get(columnChangeFilter[y])!=null && lastValues[y]==null) {
+                                        logger.debug("Current Value is NOT NULL and previous value is NULL so columnValuesChanged");
+                                        columnValuesChanged = true;
+                                    }
+                                    else if (previousValuesSet && !latestAuditRec.get(columnChangeFilter[y]).equals(lastValues[y])) {
+                                        logger.debug("Current Value:'"+latestAuditRec.get(columnChangeFilter[y])+"', previous value:'"+lastValues[y]+"' so  columnValuesChanged");
+                                        columnValuesChanged = true;
+                                    }
+                                    else {
+                                        logger.debug("***********Current Value:'"+latestAuditRec.get(columnChangeFilter[y])+"', previous value:'"+lastValues[y]+"' so  NO CHANGE");
+                                    }
+                                 lastValues[y] = latestAuditRec.get(columnChangeFilter[y]);
+                                 previousValuesSet = true;
+                             }
+                             else {
+                                 logger.debug("*********** Could not find "+columnChangeFilter[y]+" in current audit record.");
+                             }
+                         }
+                    }
+
                     logger.debug("Matched on Values");
                     if (excludeValues==null ||excludeValues.size()==0) {
                         excludesValues = true;
@@ -369,7 +493,7 @@ public class AuditHistory {
                         excludesValues = this.doesNotContainValues(latestAuditRec, excludeValues, excludeOnAll);
                         logger.debug("        Matched on Values (excludes values:"+excludesValues+")");
                     }
-                    if (excludesValues) {
+                    if (excludesValues && columnValuesChanged) {
                         logger.debug("        Matched on Values (excludes values:" + excludesValues + ") adding record");
                         recordHistoryReturned.add(latestAuditRec);
                     }
