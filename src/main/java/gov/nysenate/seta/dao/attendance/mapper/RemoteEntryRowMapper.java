@@ -21,9 +21,9 @@ public class RemoteEntryRowMapper implements RowMapper<TimeEntry>
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeEntry te = new TimeEntry();
-        te.setEntryId(rs.getBigDecimal(pfx + "NUXRDAY"));
-        te.setTimesheetId(rs.getBigDecimal(pfx + "NUXRTIMESHEET"));
-        te.setEmpId(rs.getBigDecimal(pfx + "NUXREFEM"));
+        te.setEntryId(rs.getString(pfx + "NUXRDAY"));
+        te.setTimeRecordId(rs.getString(pfx + "NUXRTIMESHEET"));
+        te.setEmpId(rs.getInt(pfx + "NUXREFEM"));
         te.setDate(rs.getDate(pfx + "DTDAY"));
         te.setWorkHours(rs.getBigDecimal(pfx + "NUWORK"));
         te.setTravelHours(rs.getBigDecimal(pfx + "NUTRAVEL"));
@@ -36,10 +36,10 @@ public class RemoteEntryRowMapper implements RowMapper<TimeEntry>
         if (rs.getString(pfx + "NUXRMISC") != null) {
             te.setMiscType(MiscLeaveType.valueOfCode(rs.getString(pfx + "NUXRMISC")));
         }
-        te.settOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
-        te.settUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
-        te.settOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
-        te.settUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
+        te.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
+        te.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
+        te.setTxOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
+        te.setTxUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
         te.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         te.setEmpComment(rs.getString(pfx + "DECOMMENTS"));
         te.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));

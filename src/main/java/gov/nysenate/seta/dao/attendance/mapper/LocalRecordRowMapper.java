@@ -18,7 +18,7 @@ public class LocalRecordRowMapper implements RowMapper<TimeRecord>
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord record = new TimeRecord();
-        record.setTimeRecordId(rs.getBigDecimal(pfx + "time_record_id"));
+        record.setTimeRecordId(rs.getString(pfx + "time_record_id"));
         record.setEmployeeId(rs.getInt(pfx + "emp_id"));
         record.setTxOriginalUserId(rs.getString(pfx + "t_original_user"));
         record.setTxUpdateUserId(rs.getString(pfx + "t_update_user"));
@@ -31,7 +31,6 @@ public class LocalRecordRowMapper implements RowMapper<TimeRecord>
         record.setRemarks(rs.getString(pfx + "remarks"));
         record.setExceptionDetails(rs.getString(pfx + "exc_details"));
         record.setProcessedDate(rs.getDate(pfx + "proc_date"));
-
         return record;
     }
 }

@@ -20,7 +20,7 @@ public class RemoteRecordRowMapper implements RowMapper<TimeRecord>
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord record = new TimeRecord();
-        record.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET"));
+        record.setTimeRecordId(rs.getString(pfx + "NUXRTIMESHEET"));
         record.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
         record.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
         record.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
@@ -31,7 +31,7 @@ public class RemoteRecordRowMapper implements RowMapper<TimeRecord>
         record.setBeginDate(rs.getDate(pfx + "DTBEGIN"));
         record.setEndDate(rs.getDate(pfx + "DTEND"));
         record.setRemarks(rs.getString(pfx + "DEREMARKS"));
-        record.setSupervisorId(rs.getBigDecimal(pfx + "NUXREFSV"));
+        record.setSupervisorId(rs.getInt(pfx + "NUXREFSV"));
         record.setExceptionDetails(rs.getString(pfx + "DEEXCEPTION"));
         record.setProcessedDate(rs.getDate(pfx + "DTPROCESS"));
         return record;

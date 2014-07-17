@@ -18,7 +18,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,21 +35,21 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         "FROM ts.time_entry \n" +
         "WHERE status = 'A' AND %s";
 
-    protected static final String GET_ENTRY_BY_TIMESHEETID = String.format(GET_TIME_ENTRY_SQL_TMPL,"timesheet_id = :timesheetId");
-    protected static final String GET_ENTRY_BY_EMPID = String.format(GET_TIME_ENTRY_SQL_TMPL,"emp_id = :empId AND timesheet_id = :timesheetId");
+    protected static final String GET_ENTRY_BY_TIME_RECORD_ID = String.format(GET_TIME_ENTRY_SQL_TMPL,"time_record_id = :timeRecordId");
+    protected static final String GET_ENTRY_BY_EMP_ID = String.format(GET_TIME_ENTRY_SQL_TMPL,"emp_id = :empId AND timesheet_id = :timeRecordId");
 
     protected static final String SET_ENTRY_SQL =
         "INSERT \n" +
         "INTO ts.time_entry (time_entry_id, time_record_id, emp_id, day_date, work_hr, travel_hr, holiday_hr, " +
         "                    sick_emp_hr, sick_family_hr, misc_hr, misc_type, t_original_user, t_update_user, " +
         "                    t_original_date, t_update_date, status, emp_comment, pay_type, vacation_hr, personal_hr) \n" +
-        "VALUES (:tSDayId, :timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :empComment, :payType, :vacationHR, :personalHR)";
+        "VALUES (:tSDayId, :timeRecordId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :empComment, :payType, :vacationHR, :personalHR)";
 
     protected static final String UPDATE_ENTRY_SQL =
         "UPDATE ts.time_entry \n" +
         "SET \n" +
-        "(time_record_id = :timesheetId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
-        "WHERE TSDayId = :tSDayId";
+        "(time_record_id = :timeRecordId, emp_id = :empId, day_date = :dayDate, work_hr = :workHR, travel_hr = :travelHR, holiday_hr = :holidayHR, sick_emp_hr = :sickEmpHR, sick_family_hr = :sickFamilyHR, misc_hr = :miscHR, misc_type = :miscTypeId, t_original_user = :tOriginalUserId, t_update_user = :tUpdateUserId, t_original_date = :tOriginalDate, t_update_date = :tUpdateDate, status = :status, emp_comment = :empComment, pay_type = :payType, vacation_hr = :vacationHR, personal_hr = :personalHR) \n" +
+        "WHERE tsDayId = :tSDayId";
 
     protected static final String GET_SUM_OF_HOURS =
         "SELECT " +
@@ -77,7 +76,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("timesheetId", timeRecordId);
         try {
-            timeEntryList = localNamedJdbc.query(GET_ENTRY_BY_TIMESHEETID, params, new LocalEntryRowMapper(""));
+            timeEntryList = localNamedJdbc.query(GET_ENTRY_BY_TIME_RECORD_ID, params, new LocalEntryRowMapper(""));
         }
         catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Entries of {} error: {}", timeRecordId, ex.getMessage());
@@ -88,10 +87,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
     }
 
     @Override
-    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
+    public Map<String, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
 
         List<TimeRecord> timeRecords;
-        Map<BigDecimal, List<TimeEntry>> timeEntryList = null;
+        Map<String, List<TimeEntry>> timeEntryList = null;
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         timeRecords = new ArrayList<>(); /**TODO FIX THIS *///timeRecordDao.getRecordByEmployeeId(empId);
@@ -102,7 +101,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
             params.addValue("timesheetId",tr.getTimeRecordId());
 
             try{
-                timeEntryList.put(tr.getTimeRecordId(), localNamedJdbc.query(GET_ENTRY_BY_EMPID, params,
+                timeEntryList.put(tr.getTimeRecordId(), localNamedJdbc.query(GET_ENTRY_BY_EMP_ID, params,
                         new LocalEntryRowMapper("")));
             }catch (DataRetrievalFailureException ex){
                 logger.warn("Retrieve Time Entries of {} error: {}", empId, ex.getMessage());
@@ -119,7 +118,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         MapSqlParameterSource param = new MapSqlParameterSource();
 
         param.addValue("tSDayId", tsd.getEntryId());
-        param.addValue("timesheetId", tsd.getTimesheetId());
+        param.addValue("timesheetId", tsd.getTimeRecordId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());
         param.addValue("workHR", tsd.getWorkHours());
@@ -129,10 +128,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         param.addValue("sickFamilyHR", tsd.getSickFamHours());
         param.addValue("miscHR", tsd.getMiscHours());
         param.addValue("miscTypeId", tsd.getMiscType()!= null ? tsd.getMiscType().getCode():null);
-        param.addValue("tOriginalUserId", tsd.gettOriginalUserId());
-        param.addValue("tUpdateUserId", tsd.gettUpdateUserId());
-        param.addValue("tOriginalDate", tsd.gettOriginalDate());
-        param.addValue("tUpdateDate", tsd.gettUpdateDate());
+        param.addValue("tOriginalUserId", tsd.getTxOriginalUserId());
+        param.addValue("tUpdateUserId", tsd.getTxUpdateUserId());
+        param.addValue("tOriginalDate", tsd.getTxOriginalDate());
+        param.addValue("tUpdateDate", tsd.getTxUpdateDate());
         param.addValue("status", getStatusCode(tsd.isActive()));
         param.addValue("empComment", tsd.getEmpComment());
         param.addValue("payType", tsd.getPayType().name());
@@ -150,7 +149,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         MapSqlParameterSource param = new MapSqlParameterSource();
 
         param.addValue("tSDayId", tsd.getEntryId());
-        param.addValue("timesheetId", tsd.getTimesheetId());
+        param.addValue("timesheetId", tsd.getTimeRecordId());
         param.addValue("empId", tsd.getEmpId());
         param.addValue("dayDate", tsd.getDate());
         param.addValue("workHR", tsd.getWorkHours());
@@ -160,10 +159,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         param.addValue("sickFamilyHR", tsd.getSickFamHours());
         param.addValue("miscHR", tsd.getMiscHours());
         param.addValue("miscTypeId", tsd.getMiscType().getCode());
-        param.addValue("tOriginalUserId", tsd.gettOriginalUserId());
-        param.addValue("tUpdateUserId", tsd.gettUpdateUserId());
-        param.addValue("tOriginalDate", tsd.gettOriginalDate());
-        param.addValue("tUpdateDate", tsd.gettUpdateDate());
+        param.addValue("tOriginalUserId", tsd.getTxOriginalUserId());
+        param.addValue("tUpdateUserId", tsd.getTxUpdateUserId());
+        param.addValue("tOriginalDate", tsd.getTxOriginalDate());
+        param.addValue("tUpdateDate", tsd.getTxUpdateDate());
         param.addValue("status", getStatusCode(tsd.isActive()));
         param.addValue("empComment", tsd.getEmpComment());
         param.addValue("payType", tsd.getPayType().name());

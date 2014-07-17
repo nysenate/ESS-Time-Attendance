@@ -8,13 +8,14 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * Represents the time entry for a specific date.
+ * A TimeEntry contains all the hours worked and charged for a specific date.
+ * TimeEntries are associated together via a common TimeRecord Id.
  */
 public class TimeEntry
 {
-    protected BigDecimal entryId;
-    protected BigDecimal timesheetId;
-    protected BigDecimal empId;
+    protected String entryId;
+    protected String timeRecordId;
+    protected Integer empId;
     protected Date date;
     protected BigDecimal workHours;
     protected BigDecimal travelHours;
@@ -28,18 +29,21 @@ public class TimeEntry
     protected boolean active;
     protected String empComment;
     protected PayType payType;
-    protected String tOriginalUserId;
-    protected String tUpdateUserId;
-    protected Timestamp tOriginalDate;
-    protected Timestamp tUpdateDate;
+    protected String txOriginalUserId;
+    protected String txUpdateUserId;
+    protected Date txOriginalDate;
+    protected Date txUpdateDate;
+
+    /** --- Constructors --- */
 
     public TimeEntry() {}
 
-    /** --- Functional Getters --- */
+    /** --- Functional Getters/Setters --- */
 
     public BigDecimal getDailyTotal() {
         BigDecimal total = new BigDecimal(0);
         total = total.add(getWorkHours());
+        total = total.add(getTravelHours());
         total = total.add(getHolidayHours());
         total = total.add(getVacationHours());
         total = total.add(getPersonalHours());
@@ -83,27 +87,27 @@ public class TimeEntry
 
     /** --- Basic Getters/Setters --- */
 
-    public BigDecimal getEntryId() {
+    public String getEntryId() {
         return entryId;
     }
 
-    public void setEntryId(BigDecimal entryId) {
+    public void setEntryId(String entryId) {
         this.entryId = entryId;
     }
 
-    public BigDecimal getTimesheetId() {
-        return timesheetId;
+    public String getTimeRecordId() {
+        return timeRecordId;
     }
 
-    public void setTimesheetId(BigDecimal timesheetId) {
-        this.timesheetId = timesheetId;
+    public void setTimeRecordId(String timeRecordId) {
+        this.timeRecordId = timeRecordId;
     }
 
-    public BigDecimal getEmpId() {
+    public Integer getEmpId() {
         return empId;
     }
 
-    public void setEmpId(BigDecimal empId) {
+    public void setEmpId(Integer empId) {
         this.empId = empId;
     }
 
@@ -179,35 +183,35 @@ public class TimeEntry
         this.payType = payType;
     }
 
-    public String gettOriginalUserId() {
-        return tOriginalUserId;
+    public String getTxOriginalUserId() {
+        return txOriginalUserId;
     }
 
-    public void settOriginalUserId(String tOriginalUserId) {
-        this.tOriginalUserId = tOriginalUserId;
+    public void setTxOriginalUserId(String txOriginalUserId) {
+        this.txOriginalUserId = txOriginalUserId;
     }
 
-    public String gettUpdateUserId() {
-        return tUpdateUserId;
+    public String getTxUpdateUserId() {
+        return txUpdateUserId;
     }
 
-    public void settUpdateUserId(String tUpdateUserId) {
-        this.tUpdateUserId = tUpdateUserId;
+    public void setTxUpdateUserId(String txUpdateUserId) {
+        this.txUpdateUserId = txUpdateUserId;
     }
 
-    public Timestamp gettOriginalDate() {
-        return tOriginalDate;
+    public Date getTxOriginalDate() {
+        return txOriginalDate;
     }
 
-    public void settOriginalDate(Timestamp tOriginalDate) {
-        this.tOriginalDate = tOriginalDate;
+    public void setTxOriginalDate(Timestamp txOriginalDate) {
+        this.txOriginalDate = txOriginalDate;
     }
 
-    public Timestamp gettUpdateDate() {
-        return tUpdateDate;
+    public Date getTxUpdateDate() {
+        return txUpdateDate;
     }
 
-    public void settUpdateDate(Timestamp tUpdateDate) {
-        this.tUpdateDate = tUpdateDate;
+    public void setTxUpdateDate(Timestamp txUpdateDate) {
+        this.txUpdateDate = txUpdateDate;
     }
 }

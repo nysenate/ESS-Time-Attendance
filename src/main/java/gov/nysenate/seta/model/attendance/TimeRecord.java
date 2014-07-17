@@ -1,16 +1,19 @@
 package gov.nysenate.seta.model.attendance;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * A Time Record is the biweekly collection of daily time entries. The time record
+ * is typically created in accordance with the attendance pay periods.
+ */
 public class TimeRecord
 {
-    protected BigDecimal timeRecordId;
-    protected int employeeId;
-    protected BigDecimal supervisorId;
+    protected String timeRecordId;
+    protected Integer employeeId;
+    protected Integer supervisorId;
     protected boolean active;
     protected Date beginDate;
     protected Date endDate;
@@ -20,9 +23,11 @@ public class TimeRecord
     protected TimeRecordStatus recordStatus;
     protected String txOriginalUserId;
     protected String txUpdateUserId;
-    protected Timestamp txOriginalDate;
-    protected Timestamp txUpdateDate;
+    protected Date txOriginalDate;
+    protected Date txUpdateDate;
     protected List<TimeEntry> timeEntries;
+
+    /** --- Constructors --- */
 
     public TimeRecord() {
         this.timeEntries = new ArrayList<>();
@@ -30,27 +35,27 @@ public class TimeRecord
 
     /** --- Basic Getters/Setters --- */
 
-    public BigDecimal getTimeRecordId() {
+    public String getTimeRecordId() {
         return timeRecordId;
     }
 
-    public void setTimeRecordId(BigDecimal timeRecordId) {
+    public void setTimeRecordId(String timeRecordId) {
         this.timeRecordId = timeRecordId;
     }
 
-    public int getEmployeeId() {
+    public Integer getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(int employeeId) {
+    public void setEmployeeId(Integer employeeId) {
         this.employeeId = employeeId;
     }
 
-    public BigDecimal getSupervisorId() {
+    public Integer getSupervisorId() {
         return supervisorId;
     }
 
-    public void setSupervisorId(BigDecimal supervisorId) {
+    public void setSupervisorId(Integer supervisorId) {
         this.supervisorId = supervisorId;
     }
 
@@ -126,7 +131,7 @@ public class TimeRecord
         this.txUpdateUserId = txUpdateUserId;
     }
 
-    public Timestamp getTxOriginalDate() {
+    public Date getTxOriginalDate() {
         return txOriginalDate;
     }
 
@@ -134,7 +139,7 @@ public class TimeRecord
         this.txOriginalDate = txOriginalDate;
     }
 
-    public Timestamp getTxUpdateDate() {
+    public Date getTxUpdateDate() {
         return txUpdateDate;
     }
 

@@ -8,8 +8,8 @@ import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 
 import java.util.List;
 
-public interface MigrationDao extends BaseDao {
-
+public interface MigrationDao extends BaseDao
+{
     /**
      * Retrieve Time Records using LastRecordId / Starting from previous Ending.
      * @param rowNumber - First entry number.

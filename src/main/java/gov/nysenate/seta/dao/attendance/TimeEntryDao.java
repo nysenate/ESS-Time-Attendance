@@ -21,14 +21,14 @@ public interface TimeEntryDao extends BaseDao
     public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryException;
 
     /**
-     * Retrieve all time entries for a given employee.     *
+     * Retrieve all time entries for a given employee.
      * @param empId - int Employee ID
      * @return Mapped List of Entry objects otherwise TimeEntryNotFoundException
      * @throws TimeEntryNotFoundEx
      * @throws TimeRecordNotFoundException
      */
-    public Map<BigDecimal, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,
-                                                                                  TimeRecordNotFoundException;
+    public Map<String, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,
+                                                                              TimeRecordNotFoundException;
 
     /**
      * Insert the given time entry.

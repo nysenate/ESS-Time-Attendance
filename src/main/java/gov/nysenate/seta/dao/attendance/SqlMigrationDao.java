@@ -177,13 +177,13 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
             {
                 if(timeEntryList.indexOf(te) == (timeEntryList.size()-1))
                 {
-                    SyncCheck sc = new SyncCheck();
-                    sc.setDate(te.gettOriginalDate());
-                    sc.setDataId(te.getEntryId());
-                    sc.setDataType("TimeEntry");
-                    sc.setDataSide("Remote");
-
-                    syncCheckDao.setSyncData(sc);
+//                    SyncCheck sc = new SyncCheck();
+//                    sc.setDate(te.getTxOriginalDate());
+//                    sc.setDataId(te.getEntryId());
+//                    sc.setDataType("TimeEntry");
+//                    sc.setDataSide("Remote");
+//
+//                    syncCheckDao.setSyncData(sc);
                 }
 
                 localEntryDao.setTimeEntry(te);

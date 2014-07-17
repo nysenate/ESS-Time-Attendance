@@ -9,21 +9,14 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- */
 @Repository("remoteTimeEntry")
 public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 {
-    @Resource(name = "localTimeRecordDao")
-    private TimeRecordDao timeRecordDao;
-
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeEntryDao.class);
 
     protected static final String GET_TIME_ENTRY_SQL_TMPL =
@@ -31,7 +24,7 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 
     protected static final String GET_ENTRY_BY_TIME_RECORD_ID =
         String.format(GET_TIME_ENTRY_SQL_TMPL, "NUXRTIMESHEET = :timesheetId \n" +
-                                               "ORDER BY DTDAY ASC");
+        "ORDER BY DTDAY ASC");
 
     protected static final String GET_ENTRY_BY_EMPID =
         String.format(GET_TIME_ENTRY_SQL_TMPL,"NUXREFEM = :empId AND NUXRTIMESHEET = :timesheetId");
@@ -82,7 +75,7 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
             params.addValue("timesheetId", timeRecord.getTimeRecordId());
             try {
                 timeEntries.put(timeRecord.getTimeRecordId(), remoteNamedJdbc.query(GET_ENTRY_BY_EMPID, params,
-                    new RemoteEntryRowMapper()));
+                        new RemoteEntryRowMapper()));
             }
             catch (DataRetrievalFailureException ex){
                 logger.warn("Retrieve Time Entries of {} error: {}", empId, ex.getMessage());
@@ -94,9 +87,7 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 
     @Override
     public boolean setTimeEntry(TimeEntry tsd) {
-
         MapSqlParameterSource param = new MapSqlParameterSource();
-
         param.addValue("tSDayId", tsd.getEntryId());
         param.addValue("timesheetId", tsd.getTimeRecordId());
         param.addValue("empId", tsd.getEmpId());
@@ -117,38 +108,37 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("payType", tsd.getPayType().name());
         param.addValue("vacationHR", tsd.getVacationHours());
         param.addValue("personalHR", tsd.getPersonalHours());
-
-        if(remoteNamedJdbc.update(SET_ENTRY_SQL, param)==1) return true;
-        else return false;
+        return (remoteNamedJdbc.update(SET_ENTRY_SQL, param) == 1);
     }
 
     @Override
-    public boolean updateTimeEntry(TimeEntry tsd) {
+    public boolean updateTimeEntry(TimeEntry timeEntry) {
+        MapSqlParameterSource params = getTimeEntryParams(timeEntry);
+        return (remoteNamedJdbc.update(UPDATE_ENTRY_SQL, params) == 1);
+    }
 
+    private static MapSqlParameterSource getTimeEntryParams(TimeEntry timeEntry) {
         MapSqlParameterSource param = new MapSqlParameterSource();
-
-        param.addValue("tSDayId", tsd.getEntryId());
-        param.addValue("timesheetId", tsd.getTimeRecordId());
-        param.addValue("empId", tsd.getEmpId());
-        param.addValue("dayDate", tsd.getDate());
-        param.addValue("workHR", tsd.getWorkHours());
-        param.addValue("travelHR", tsd.getTravelHours());
-        param.addValue("holidayHR", tsd.getHolidayHours());
-        param.addValue("sickEmpHR", tsd.getSickEmpHours());
-        param.addValue("sickFamilyHR", tsd.getSickFamHours());
-        param.addValue("miscHR", tsd.getMiscHours());
-        param.addValue("miscTypeId", tsd.getMiscType().getCode());
-        param.addValue("tOriginalUserId", tsd.getTxOriginalUserId());
-        param.addValue("tUpdateUserId", tsd.getTxUpdateUserId());
-        param.addValue("tOriginalDate", tsd.getTxOriginalDate());
-        param.addValue("tUpdateDate", tsd.getTxUpdateDate());
-        param.addValue("status", getStatusCode(tsd.isActive()));
-        param.addValue("empComment", tsd.getEmpComment());
-        param.addValue("payType", tsd.getPayType().name());
-        param.addValue("vacationHR", tsd.getVacationHours());
-        param.addValue("personalHR", tsd.getPersonalHours());
-
-        if(remoteNamedJdbc.update(UPDATE_ENTRY_SQL, param)==1) return true;
-        else return false;
+        param.addValue("tSDayId", timeEntry.getEntryId());
+        param.addValue("timesheetId", timeEntry.getTimeRecordId());
+        param.addValue("empId", timeEntry.getEmpId());
+        param.addValue("dayDate", timeEntry.getDate());
+        param.addValue("workHR", timeEntry.getWorkHours());
+        param.addValue("travelHR", timeEntry.getTravelHours());
+        param.addValue("holidayHR", timeEntry.getHolidayHours());
+        param.addValue("sickEmpHR", timeEntry.getSickEmpHours());
+        param.addValue("sickFamilyHR", timeEntry.getSickFamHours());
+        param.addValue("miscHR", timeEntry.getMiscHours());
+        param.addValue("miscTypeId", timeEntry.getMiscType().getCode());
+        param.addValue("tOriginalUserId", timeEntry.getTxOriginalUserId());
+        param.addValue("tUpdateUserId", timeEntry.getTxUpdateUserId());
+        param.addValue("tOriginalDate", timeEntry.getTxOriginalDate());
+        param.addValue("tUpdateDate", timeEntry.getTxUpdateDate());
+        param.addValue("status", getStatusCode(timeEntry.isActive()));
+        param.addValue("empComment", timeEntry.getEmpComment());
+        param.addValue("payType", timeEntry.getPayType().name());
+        param.addValue("vacationHR", timeEntry.getVacationHours());
+        param.addValue("personalHR", timeEntry.getPersonalHours());
+        return param;
     }
 }

@@ -41,7 +41,7 @@ public interface TimeRecordDao extends BaseDao
      * @param startDate Date - The start date
      * @param endDate Date - The end date
      * @param statuses Set<TimeRecordStatus> - The set of statuses to filter by
-     * @return
+     * @return Map<Integer, List<TimeRecord>>
      */
     public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate, Set<TimeRecordStatus> statuses);
 
