@@ -6,18 +6,35 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * A TransactionRecord represents a single unit of change that was made to an
+ * employee's personnel or payroll data and is identified by a TransactionCode.
+ * A map of the values affected in the database are stored in this record.
+ */
 public class TransactionRecord
 {
-    protected int employeeId;
-    protected int changeId;
-    protected boolean active;
-    protected TransactionCode transCode;
-    protected Map<String, String> valueMap;
-    protected Date originalDate;
-    protected Date updateDate;
-    protected Date effectDate;
     private static final Logger logger = LoggerFactory.getLogger(TransactionRecord.class);
 
+    /** The employee id that this record belongs to. */
+    protected int employeeId;
+
+    /** A reference to the change id used for grouping transactions. */
+    protected int changeId;
+
+    /** Indicates if record is active or inactive. */
+    protected boolean active;
+
+    /** The transaction code indicates the kinds of changes made. */
+    protected TransactionCode transCode;
+
+    /** A mapping of the transaction's database column names to their values. */
+    protected Map<String, String> valueMap;
+
+    /** The date in which this transaction is effective. */
+    protected Date effectDate;
+
+    protected Date originalDate;
+    protected Date updateDate;
 
     public TransactionRecord() {}
 
@@ -25,7 +42,7 @@ public class TransactionRecord
         return valueMap != null && !valueMap.isEmpty();
     }
 
-    /** Functional Getters/Setters */
+    /** --- Functional Getters/Setters --- */
 
     /**
      * Delegate to retrieve the value associated with the given column name.
@@ -52,7 +69,7 @@ public class TransactionRecord
         throw new IllegalStateException("The value map for the transaction record was not set.");
     }
 
-    /** Basic Getters/Setters */
+    /** --- Basic Getters/Setters --- */
 
     public int getEmployeeId() {
         return employeeId;
@@ -117,5 +134,4 @@ public class TransactionRecord
     public void setEffectDate(Date effectDate) {
         this.effectDate = effectDate;
     }
-
 }
