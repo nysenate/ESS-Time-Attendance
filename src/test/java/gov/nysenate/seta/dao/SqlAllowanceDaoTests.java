@@ -35,7 +35,8 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
     public void testGetAllowanceUsage() throws Exception {
         Set<TransactionCode> allTransCodes = new HashSet<TransactionCode>(Arrays.asList(TransactionCode.values()));
         TransactionHistory transactionHistory = sqlEmployeeTransactionDao.getTransHistory(45,  allTransCodes);
-        auditHistory = new AuditHistory(transactionHistory);
+        auditHistory = new AuditHistory();
+        auditHistory.setTransactionHistory(transactionHistory);
 //        Map<String, String> matchValues = new HashMap<String, String>();
 //        matchValues.put("CDPAYTYPE", "TE");
 //        String[] columnChangeFilter =  {"MOSALBIWKLY"}; //{"DETXNNOTEPAY"}; //{"MOSALBIWKLY"};

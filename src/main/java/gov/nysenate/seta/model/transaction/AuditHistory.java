@@ -6,6 +6,7 @@ import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -21,7 +22,11 @@ public class AuditHistory {
     protected Map<TransactionCode, List<TransactionRecord>> recordHistory;
     protected List<Map> auditRecords;
     TransactionHistory transactionHistory;
+
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+
+    @Autowired
+    SqlEmployeeTransactionDao transHistDao;
     private static final Logger logger = LoggerFactory.getLogger(AuditHistory.class);
 
     public AuditHistory() {
@@ -72,7 +77,6 @@ public class AuditHistory {
                 else {
                     codes = transactionCodes;
                 }
-                SqlEmployeeTransactionDao transHistDao = new SqlEmployeeTransactionDao();
                 transactionHistory = transHistDao.getTransHistory(employeeId, codes, true);
             }
         }

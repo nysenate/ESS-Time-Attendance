@@ -19,7 +19,7 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
     private boolean earliestRecLikeAppoint = false;
     private boolean firstRecord = true;
     private static final Logger logger = LoggerFactory.getLogger(TransactionRecordRowMapper.class);
-    private int nuchange = -1;
+    private int firstChangeId = -1;
 
     public TransactionRecordRowMapper(String pfx, String auditPfx, TransactionCode transCode) {
         this(pfx, auditPfx, new HashSet<>(Arrays.asList(transCode)));
@@ -59,18 +59,18 @@ public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
         boolean isAppointment = code.equals(TransactionCode.APP) || code.equals(TransactionCode.RTP);
 
         Map<String, String> valueMap = new HashMap<>();
-        for (String col : ((isAppointment ||(earliestRecLikeAppoint && rowNum==0)||transRec.getChangeId()==nuchange) ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList())) {
+        for (String col : ((isAppointment ||(earliestRecLikeAppoint && rowNum==0)||transRec.getChangeId()==firstChangeId) ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList())) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
         }
 
         if (earliestRecLikeAppoint && rowNum==0)  {
-          nuchange = transRec.getChangeId();
+            firstChangeId = transRec.getChangeId();
         }
-        else if (transRec.getChangeId()==nuchange) {
+        else if (transRec.getChangeId()==firstChangeId) {
         }
         transRec.setValueMap(valueMap);
         if (firstRecord) {
-            logger.debug(nuchange+" TransactionRecordRowMapper FirstRecord:"+OutputUtils.toJson(valueMap));
+            logger.debug(firstChangeId+" TransactionRecordRowMapper FirstRecord:"+OutputUtils.toJson(valueMap));
         }
         firstRecord = false;
         return transRec;
