@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,6 +55,7 @@ public class SqlAccrualHelper
     /**
      * Get the end date of the previous pay period. Assumes pay period is contiguous.
      */
+
     static Date getPrevPayPeriodEndDate(PayPeriod payPeriod) {
         return new LocalDate(payPeriod.getStartDate()).minusDays(1).toDate();
     }
@@ -72,6 +74,7 @@ public class SqlAccrualHelper
     /**
      * Similar to 'periodSummaryIsCurrent' but for annual accrual summary.
      */
+
     static boolean annualSummaryIsCurrent(AnnualAccrualSummary annualSummary, PayPeriod payPeriod) {
         //logger.debug(OutputUtils.toJson(annualSummary));
         Date prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
@@ -172,8 +175,8 @@ public class SqlAccrualHelper
     /**
      * Returns the expected employee hours given a period of time
      */
-    public static int getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
-        int expectedHours = 0;
+    public static BigDecimal getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
+        BigDecimal expectedHours = new BigDecimal("0");
         AuditHistory auditHistory = new AuditHistory();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String sdtstart = null;
@@ -212,28 +215,31 @@ public class SqlAccrualHelper
                 }
                 try {
                     dteffect = sdf.parse((String) currentRec.get("EffectDate"));
-                    /*
+
+                   /**
                     * TODO: For certain cdstatper changes, set dteffectEnd to nextRec.dteffect and dteffect = currentRec.dteffect+1
                     * In some rare cases of cdstatper, change occurs in effect date +1
                     * instead of effect date.
-                     */
+                    */
+
                     if (nextRec == null) {
                         LocalDate localDate = new LocalDate(new Date());
                         localDate.plusMonths(1);
                         dteffectEnd = localDate.toDate();
                         logger.debug("- getExpectedHours Emp Id:" + transHistory.getEmployeeId() + " Last Record Effective (1 Month future:" + sdf.format(dteffectEnd) + ")");
                     } else {
-                        dteffectEnd = sdf.parse((String) nextRec.get("EffectDate"));
+                        dteffectEnd = getNextEffectDate(currentRec, nextRec);
                         LocalDate localDate = new LocalDate(dteffectEnd);
                         localDate = localDate.plusDays(-1);
                         dteffectEnd = localDate.toDate();
                         logger.debug("- getExpectedHours Emp Id:" + transHistory.getEmployeeId() + " Normal Record Effective:" + sdf.format(dteffectEnd));
                     }
 
-                    /*
+                   /**
                     * Make sure that we do not include hours outside of the Start Date
                     * and End Date parameters.
-                     */
+                    */
+
                     if (dtstart.after(dteffect) && !dtstart.after(dteffectEnd)) {
                         dteffect = dtstart;
                     }
@@ -245,16 +251,17 @@ public class SqlAccrualHelper
                     String currentAgencyCode = (String) currentRec.get("CDAGENCY");
                     String currentStatusPer = (String) currentRec.get("CDSTATPER");
 
-                    /*
+                   /**
                     * Employee has to be an Active Non-Senator employee who is not on
                     * Leave Without Pay when adding expected hours.
-                     */
+                    */
+
                    logger.debug("-----------currentEmpStatus=="+currentEmpStatus+", currentAgencyCode=="+currentAgencyCode+", currentStatusPer=="+currentStatusPer);
 
-                    /*
+                   /**
                     * Agency Code commented for testing since there is an issue with Null
                     * Agency Codes when a value should exist.
-                     */
+                    */
 
                     if (currentEmpStatus!=null && currentEmpStatus.equalsIgnoreCase("A") && currentAgencyCode!=null /*&& !currentAgencyCode.equals("04210")*/ && currentStatusPer!=null && !currentStatusPer.equalsIgnoreCase("LWOP"))
                     {
@@ -263,13 +270,15 @@ public class SqlAccrualHelper
                             if (currentPaytype.equalsIgnoreCase("RA")) {
                                 logger.debug("---------------PAYTYPE:(RA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * 7");
                                 logger.debug("---------------PAYTYPE:(RA):PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd):" + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd));
-
-                                expectedHours = expectedHours + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * 7;
+                                expectedHours = expectedHours.add(new BigDecimal(PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * 7.0), MathContext.DECIMAL64);
                             } else if (currentPaytype.equalsIgnoreCase("SA")) {
-                                int proRate = 7;
+                                logger.debug("SA Prorated: 7.0 * "+SqlAccrualHelper.saProrate(currentRec).doubleValue()+" * 4.0)/4.0");
+                                double proRate = /*Math.round(*/7.0 * SqlAccrualHelper.saProrate(currentRec).doubleValue() /** 4.0)/4.0*/;
                                 logger.debug("---------------PAYTYPE:(SA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * " + proRate);
                                 // TODO  need to calculate proRate;
-                                expectedHours = expectedHours + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * proRate;
+                                logger.debug("---------------ADDING HOURS:" + new BigDecimal(((double)PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd)) * proRate));
+
+                                expectedHours = expectedHours.add(new BigDecimal(((double) PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd)) * proRate), MathContext.DECIMAL64);
                             } else if (currentPaytype.equalsIgnoreCase("TE")) {
                                 logger.debug("---------------PAYTYPE:(TE) NEEDS CODING");
                                 // TODO  need to sum up TE Hours worked;
@@ -283,9 +292,9 @@ public class SqlAccrualHelper
                             e.printStackTrace();
                         }
 
-                        /*
+                       /**
                         * The code assumes that the Transaction History is in Effect Date Ascending Order
-                         */
+                        */
 
                         String sdteffectEnd = null;
                         try {
@@ -311,5 +320,142 @@ public class SqlAccrualHelper
 
         return expectedHours;
 
+    };
+
+   /**
+    * Get the Next Record's Effect date, current record has been included in order to
+    * check to see if the Personnel Status Code has changed from the current record to
+    * the next record, if it has and the next record
+    */
+
+    private static Date getNextEffectDate(Map currentRec, Map nextRec) {
+        Date returnNextEffectDate = null;
+        Date nextEffectDate = null;
+        String currentStatPer = null;
+        String nextStatPer = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+
+        if (nextRec!=null) {
+            currentStatPer = (String) currentRec.get("CDSTATPER");
+            nextStatPer = (String) nextRec.get("CDSTATPER");
+
+            try {
+                nextEffectDate = sdf.parse((String) nextRec.get("EffectDate"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            if (currentStatPer==null && nextStatPer != null) {
+                return nextEffectDate;
+            }
+            else if (currentStatPer == null && nextStatPer == null) {
+                return null;
+            }
+            else {
+                if (currentStatPer.equalsIgnoreCase(nextStatPer)) {
+                    return nextEffectDate;
+                }
+                else {
+                    if (nextStatPer.equalsIgnoreCase("RSGN")) {
+                        LocalDate localDate = new LocalDate(nextEffectDate);
+                        localDate = localDate.plusDays(1);
+                        returnNextEffectDate = localDate.toDate();
+                    }
+                }
+            }
+        }
+
+        return returnNextEffectDate;
+    }
+
+ /**
+  * Prorate based on calculated days (7 Hours per day) along with Number of Min Hours to Year
+  * End. Return the calculated prorate as a decimal value between 0 and 1.
+  */
+
+    public static BigDecimal saProrate (Map currentRec) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdfmmddyy = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+
+        Date appointFromDate = null;
+        Date effectDate = null;
+        Date janDate = null;
+        Date decDate = null;
+        Date startDate = null;
+        Date endDate = null;
+        String year = null;
+        LocalDate localDate;
+        int expectedDays = 0;
+        int workDays = 0;
+        int workHours = 0;
+        int numberOfHoursToYearEnd = 0;
+        BigDecimal proRate = null;
+
+        try {
+            effectDate = sdfmmddyy.parse((String) currentRec.get("EffectDate"));
+            year = sdfYear.format(effectDate);
+            try {
+                localDate = new LocalDate(Integer.parseInt(year), 1, 1);
+                janDate = localDate.toDate();
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            try {
+                localDate = new LocalDate(Integer.parseInt(year), 12, 31);
+                decDate = localDate.toDate();
+
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            appointFromDate = sdf.parse(((String) currentRec.get("DTAPPOINTFRM")).substring(0, 10));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Date appointToDate = null;
+        try {
+            appointToDate = sdf.parse(((String) currentRec.get("DTAPPOINTTO")).substring(0, 10));
+        } catch (ParseException e) {
+            e.printStackTrace();
+    }
+
+        if (appointFromDate.before(janDate)) {
+            startDate = janDate;
+        }
+        else {
+            startDate = appointFromDate;
+        }
+
+        if (appointToDate.after(decDate)) {
+            endDate = decDate;
+        }
+        else {
+            endDate = appointToDate;
+        }
+
+        workDays = PeriodAccrualSummary.getWorkingDaysBetweenDates(startDate, endDate);
+
+        workHours = workDays  * 7;
+
+         try {
+             numberOfHoursToYearEnd = new Integer((String) currentRec.get("NUMINTOTEND")).intValue();
+         }
+         catch (Exception e) {
+                e.printStackTrace();
+         }
+        logger.debug("PRORATE:" + numberOfHoursToYearEnd + "/" + workHours);
+        proRate = new BigDecimal(((double)numberOfHoursToYearEnd / (double)workHours));
+
+        return proRate;
     }
 }

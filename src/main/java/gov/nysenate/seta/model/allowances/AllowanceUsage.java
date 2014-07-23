@@ -105,7 +105,7 @@ public class AllowanceUsage {
          return salaryRecs;
      }
 
-    /*
+   /**
     *  Computes the Available Money by getting the latest salary (Should be TEmporary Salary
     *  with a Column Change Filter on the TEmporary Salary field. This code assumes that the
     *  audit records are sorted either ascending or descending order on effect date, therefore
@@ -114,7 +114,7 @@ public class AllowanceUsage {
     *  Money Available = Latest Amount Not to Exceed - Money Used
     *  Hours Available = Money Available / Latest TEmporary Salary
     *
-     */
+    */
 
     private void computeAvailableMoney() {
         logger.debug("computeAvailableMoney");
