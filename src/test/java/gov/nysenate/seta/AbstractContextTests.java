@@ -4,6 +4,7 @@ import gov.nysenate.seta.config.WebApplicationConfig;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -19,7 +20,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = {WebApplicationConfig.class})
+@ContextConfiguration(classes = {TestConfig.class, WebApplicationConfig.class})
+@ActiveProfiles("test")
 public abstract class AbstractContextTests
 {
     protected MockMvc mockMvc;

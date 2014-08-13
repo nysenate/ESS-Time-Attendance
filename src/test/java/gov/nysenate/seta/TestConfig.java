@@ -1,5 +1,7 @@
-package gov.nysenate.seta.config;
+package gov.nysenate.seta;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -8,21 +10,19 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
- * Configures access to the app.properties config file through @Value annotations.
+ * Property config that will execute only when the spring profile is in 'test' mode.
+ * This allows for loading test.app.properties for unit tests.
  */
 @Configuration
-@Profile({"dev", "prod"})
-public class PropertyConfig
-{
-    public static final String PROPERTY_FILENAME = "app.properties";
+@Profile({"test"})
+public class TestConfig {
+    private static final Logger logger = LoggerFactory.getLogger(TestConfig.class);
 
-    /**
-     * This instance is necessary for Spring to load up the property file and allow access to
-     * it through the @Value(${propertyName}) annotation. Also note that this bean must be static
-     * in order to work properly with current Spring behavior.
-     */
+    public static final String PROPERTY_FILENAME = "test.app.properties";
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer properties() {
+        logger.info("Test property file loaded");
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
         Resource[] resources = new ClassPathResource[] { new ClassPathResource(PROPERTY_FILENAME) };
         pspc.setLocations(resources);
