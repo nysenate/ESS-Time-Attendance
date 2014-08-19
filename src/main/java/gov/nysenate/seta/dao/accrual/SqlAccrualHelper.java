@@ -1,8 +1,11 @@
 package gov.nysenate.seta.dao.accrual;
 
+import gov.nysenate.seta.dao.allowances.SqlTEHoursDao;
+import gov.nysenate.seta.dao.allowances.TEHoursDao;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.AnnualAccrualSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
+import gov.nysenate.seta.model.allowances.TEHours;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
 import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import gov.nysenate.seta.model.payroll.PayType;
@@ -14,6 +17,7 @@ import gov.nysenate.seta.model.transaction.TransactionRecord;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -33,6 +37,9 @@ public class SqlAccrualHelper
     protected static final Set<TransactionCode> APP_RTP_CODES = new HashSet<>(Arrays.asList(RTP, APP));
     protected static final Set<TransactionCode> EMP_CODE = new HashSet<>(Arrays.asList(EMP));
     protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+
+    @Autowired
+    private static SqlTEHoursDao tEHoursDao;
 
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
@@ -176,7 +183,7 @@ public class SqlAccrualHelper
      * Returns the expected employee hours given a period of time
      */
     public static BigDecimal getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
-        BigDecimal expectedHours = new BigDecimal("0");
+        BigDecimal  expectedHours = new BigDecimal("0");
         AuditHistory auditHistory = new AuditHistory();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String sdtstart = null;
@@ -203,6 +210,7 @@ public class SqlAccrualHelper
             Date dteffect = null;
             Date dteffectEnd = null;
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+
             Map currentRec = null;
             Map nextRec = null;
             for (int x=0;x<auditRecords.size();x++) {
@@ -272,10 +280,16 @@ public class SqlAccrualHelper
                                 logger.debug("---------------PAYTYPE:(RA):PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd):" + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd));
                                 expectedHours = expectedHours.add(new BigDecimal(PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * 7.0), MathContext.DECIMAL64);
                             } else if (currentPaytype.equalsIgnoreCase("SA")) {
+
+                                /*
+                                    double is loosing the precision of BigDecimal but using it for now since it is being rounded
+                                    to the nearest quater hour, we may not need the precision of Big Decimal
+                                 */
+
                                 logger.debug("SA Prorated: 7.0 * "+SqlAccrualHelper.saProrate(currentRec).doubleValue()+" * 4.0)/4.0");
-                                double proRate = /*Math.round(*/7.0 * SqlAccrualHelper.saProrate(currentRec).doubleValue() /** 4.0)/4.0*/;
+                                double proRate = Math.round(7.0 * SqlAccrualHelper.saProrate(currentRec).doubleValue()  * 4.0)/4.0;
                                 logger.debug("---------------PAYTYPE:(SA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * " + proRate);
-                                // TODO  need to calculate proRate;
+
                                 logger.debug("---------------ADDING HOURS:" + new BigDecimal(((double)PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd)) * proRate));
 
                                 expectedHours = expectedHours.add(new BigDecimal(((double) PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd)) * proRate), MathContext.DECIMAL64);
@@ -317,6 +331,12 @@ public class SqlAccrualHelper
         } catch (TransactionHistoryException e) {
             e.printStackTrace();
         }
+//        teHourses = tEHoursDao.getTEHours(transHistory.getEmployeeId(), dtstart, dtend);
+ //       expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
+        ArrayList<TEHours> teHourses;
+        //TEHoursDao tEHoursDao = new SqlTEHoursDao();
+        teHourses = tEHoursDao.getTEHours(transHistory.getEmployeeId(), dtstart, dtend);
+        expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
 
         return expectedHours;
 

@@ -37,7 +37,6 @@ public class SqlAccrualDaoTests extends AbstractContextTests
     public void testGetAccrualSummary_ReappointmentWithinLessThanAYear() throws Exception {
         PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2011,12,27).toDate());
         //logger.info(OutputUtils.toJson(accrualDao.getAccuralSummary(11384, payPeriod)));
-
     }
 
     @Test

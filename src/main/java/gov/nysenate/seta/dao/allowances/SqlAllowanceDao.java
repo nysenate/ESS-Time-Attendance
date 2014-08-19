@@ -3,7 +3,6 @@ package gov.nysenate.seta.dao.allowances;
 
 import gov.nysenate.seta.dao.allowances.mapper.AllowanceRowMapper;
 import gov.nysenate.seta.dao.allowances.mapper.AmountExceedRowMapper;
-import gov.nysenate.seta.dao.allowances.mapper.SalaryRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.payroll.SalaryRec;

@@ -1,5 +1,6 @@
 package gov.nysenate.seta;
 
+import gov.nysenate.seta.config.TestConfig;
 import gov.nysenate.seta.config.WebApplicationConfig;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -19,7 +20,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = {WebApplicationConfig.class})
+@ContextConfiguration(classes = {WebApplicationConfig.class, TestConfig.class})
 public abstract class AbstractContextTests
 {
     protected MockMvc mockMvc;

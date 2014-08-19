@@ -74,6 +74,10 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(6221,  allTransCodes);
         logger.debug("Expected Hours RA:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
+        transactionHistory = sqlEmployeeTransactionDao.getTransHistory(11442,  allTransCodes);
+        logger.debug("Expected Hours TE:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+
+
         //logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));
         //auditHistory.setTransactionHistory(transactionHistory);
 

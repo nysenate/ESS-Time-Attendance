@@ -13,6 +13,7 @@ public class TEHours {
     protected Date beginDate;
     protected Date endDate;
     protected int hourStatus;
+    protected int empId;
 
     /**
      * --- Basic Getters/Setters ---
@@ -42,7 +43,6 @@ public class TEHours {
         return endDate;
     }
 
-
     public void setHourStatus(int hourStatus) {
         this.hourStatus = hourStatus;
     }
@@ -50,5 +50,14 @@ public class TEHours {
     public int getHourStatus() {
         return hourStatus;
     }
+
+    public void setEmpId(int empId) {
+        this.empId = empId;
+    }
+
+    public int getEmpId() {
+        return empId;
+    }
+
 
 }
