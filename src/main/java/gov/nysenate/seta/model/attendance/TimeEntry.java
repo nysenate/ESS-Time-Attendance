@@ -38,6 +38,75 @@ public class TimeEntry
 
     public TimeEntry() {}
 
+    /** --- Overrides --- */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TimeEntry)) return false;
+
+        TimeEntry timeEntry = (TimeEntry) o;
+
+        if (active != timeEntry.active) return false;
+        if (!date.equals(timeEntry.date)) return false;
+        if (empComment != null ? !empComment.equals(timeEntry.empComment) : timeEntry.empComment != null) return false;
+        if (empId != null ? !empId.equals(timeEntry.empId) : timeEntry.empId != null) return false;
+        if (entryId != null ? !entryId.equals(timeEntry.entryId) : timeEntry.entryId != null) return false;
+        if (holidayHours != null ? !holidayHours.equals(timeEntry.holidayHours) : timeEntry.holidayHours != null)
+            return false;
+        if (miscHours != null ? !miscHours.equals(timeEntry.miscHours) : timeEntry.miscHours != null) return false;
+        if (miscType != timeEntry.miscType) return false;
+        if (payType != timeEntry.payType) return false;
+        if (personalHours != null ? !personalHours.equals(timeEntry.personalHours) : timeEntry.personalHours != null)
+            return false;
+        if (sickEmpHours != null ? !sickEmpHours.equals(timeEntry.sickEmpHours) : timeEntry.sickEmpHours != null)
+            return false;
+        if (sickFamHours != null ? !sickFamHours.equals(timeEntry.sickFamHours) : timeEntry.sickFamHours != null)
+            return false;
+        if (timeRecordId != null ? !timeRecordId.equals(timeEntry.timeRecordId) : timeEntry.timeRecordId != null)
+            return false;
+        if (travelHours != null ? !travelHours.equals(timeEntry.travelHours) : timeEntry.travelHours != null)
+            return false;
+        if (txOriginalDate != null ? !txOriginalDate.equals(timeEntry.txOriginalDate) : timeEntry.txOriginalDate != null)
+            return false;
+        if (txOriginalUserId != null ? !txOriginalUserId.equals(timeEntry.txOriginalUserId) : timeEntry.txOriginalUserId != null)
+            return false;
+        if (txUpdateDate != null ? !txUpdateDate.equals(timeEntry.txUpdateDate) : timeEntry.txUpdateDate != null)
+            return false;
+        if (txUpdateUserId != null ? !txUpdateUserId.equals(timeEntry.txUpdateUserId) : timeEntry.txUpdateUserId != null)
+            return false;
+        if (vacationHours != null ? !vacationHours.equals(timeEntry.vacationHours) : timeEntry.vacationHours != null)
+            return false;
+        if (workHours != null ? !workHours.equals(timeEntry.workHours) : timeEntry.workHours != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = entryId != null ? entryId.hashCode() : 0;
+        result = 31 * result + (timeRecordId != null ? timeRecordId.hashCode() : 0);
+        result = 31 * result + (empId != null ? empId.hashCode() : 0);
+        result = 31 * result + date.hashCode();
+        result = 31 * result + (workHours != null ? workHours.hashCode() : 0);
+        result = 31 * result + (travelHours != null ? travelHours.hashCode() : 0);
+        result = 31 * result + (holidayHours != null ? holidayHours.hashCode() : 0);
+        result = 31 * result + (vacationHours != null ? vacationHours.hashCode() : 0);
+        result = 31 * result + (personalHours != null ? personalHours.hashCode() : 0);
+        result = 31 * result + (sickEmpHours != null ? sickEmpHours.hashCode() : 0);
+        result = 31 * result + (sickFamHours != null ? sickFamHours.hashCode() : 0);
+        result = 31 * result + (miscHours != null ? miscHours.hashCode() : 0);
+        result = 31 * result + (miscType != null ? miscType.hashCode() : 0);
+        result = 31 * result + (active ? 1 : 0);
+        result = 31 * result + (empComment != null ? empComment.hashCode() : 0);
+        result = 31 * result + (payType != null ? payType.hashCode() : 0);
+        result = 31 * result + (txOriginalUserId != null ? txOriginalUserId.hashCode() : 0);
+        result = 31 * result + (txUpdateUserId != null ? txUpdateUserId.hashCode() : 0);
+        result = 31 * result + (txOriginalDate != null ? txOriginalDate.hashCode() : 0);
+        result = 31 * result + (txUpdateDate != null ? txUpdateDate.hashCode() : 0);
+        return result;
+    }
+
     /** --- Functional Getters/Setters --- */
 
     public BigDecimal getDailyTotal() {

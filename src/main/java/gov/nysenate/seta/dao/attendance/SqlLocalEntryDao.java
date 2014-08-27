@@ -69,7 +69,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
             "te.day_date BETWEEN  :startDate AND :endDate" +
         "GROUP BY te.emp_id";
 
-    @Override
+    //@Override
     public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryNotFoundEx {
 
         List<TimeEntry> timeEntryList;
@@ -86,33 +86,33 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
     }
 
-    @Override
-    public Map<String, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
+//    @Override
+//    public Map<String, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx, TimeRecordNotFoundException {
+//
+//        List<TimeRecord> timeRecords;
+//        Map<String, List<TimeEntry>> timeEntryList = null;
+//        MapSqlParameterSource params = new MapSqlParameterSource();
+//
+//        timeRecords = new ArrayList<>(); /**TODO FIX THIS *///timeRecordDao.getRecordByEmployeeId(empId);
+//
+//        for(TimeRecord tr : timeRecords)
+//        {
+//            params.addValue("empId",empId);
+//            params.addValue("timesheetId",tr.getTimeRecordId());
+//
+//            try{
+//                timeEntryList.put(tr.getTimeRecordId(), localNamedJdbc.query(GET_ENTRY_BY_EMP_ID, params,
+//                        new LocalEntryRowMapper("")));
+//            }catch (DataRetrievalFailureException ex){
+//                logger.warn("Retrieve Time Entries of {} error: {}", empId, ex.getMessage());
+//                throw new TimeEntryNotFoundEx("No matching Time Entries for Employee id: " + empId);
+//            }
+//        }
+//
+//        return timeEntryList;
+//    }
 
-        List<TimeRecord> timeRecords;
-        Map<String, List<TimeEntry>> timeEntryList = null;
-        MapSqlParameterSource params = new MapSqlParameterSource();
-
-        timeRecords = new ArrayList<>(); /**TODO FIX THIS *///timeRecordDao.getRecordByEmployeeId(empId);
-
-        for(TimeRecord tr : timeRecords)
-        {
-            params.addValue("empId",empId);
-            params.addValue("timesheetId",tr.getTimeRecordId());
-
-            try{
-                timeEntryList.put(tr.getTimeRecordId(), localNamedJdbc.query(GET_ENTRY_BY_EMP_ID, params,
-                        new LocalEntryRowMapper("")));
-            }catch (DataRetrievalFailureException ex){
-                logger.warn("Retrieve Time Entries of {} error: {}", empId, ex.getMessage());
-                throw new TimeEntryNotFoundEx("No matching Time Entries for Employee id: " + empId);
-            }
-        }
-
-        return timeEntryList;
-    }
-
-    @Override
+    //@Override TODO CLEAN UP
     public boolean setTimeEntry(TimeEntry tsd) {
 
         MapSqlParameterSource param = new MapSqlParameterSource();
@@ -143,8 +143,8 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
     }
 
-    @Override
-    public boolean updateTimeEntry(TimeEntry tsd) {
+    //@Override
+    public void updateTimeEntry(TimeEntry tsd) {
 
         MapSqlParameterSource param = new MapSqlParameterSource();
 
@@ -169,8 +169,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         param.addValue("vacationHR", tsd.getVacationHours());
         param.addValue("personalHR", tsd.getPersonalHours());
 
-        if(localNamedJdbc.update(UPDATE_ENTRY_SQL, param)==1) return true;
-        else return false;
+        localNamedJdbc.update(UPDATE_ENTRY_SQL, param);
     }
 
     public List<PeriodAccrualUsage> getLocalPeriodAccrualUsage(int empId, List<PayPeriod> payPeriodList) throws TimeEntryNotFoundEx {

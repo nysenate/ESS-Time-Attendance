@@ -186,7 +186,7 @@ public class SqlMigrationDao extends SqlBaseDao implements MigrationDao {
 //                    syncCheckDao.setSyncData(sc);
                 }
 
-                localEntryDao.setTimeEntry(te);
+                localEntryDao.updateTimeEntry(te);
             }
 
             if(timeEntryList.size()==threshold)

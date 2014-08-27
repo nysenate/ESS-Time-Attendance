@@ -21,26 +21,9 @@ public interface TimeEntryDao extends BaseDao
     public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryException;
 
     /**
-     * Retrieve all time entries for a given employee.
-     * @param empId - int Employee ID
-     * @return Mapped List of Entry objects otherwise TimeEntryNotFoundException
-     * @throws TimeEntryNotFoundEx
-     * @throws TimeRecordNotFoundException
-     */
-    public Map<String, List<TimeEntry>> getTimeEntryByEmpId(int empId) throws TimeEntryNotFoundEx,
-                                                                              TimeRecordNotFoundException;
-
-    /**
-     * Insert the given time entry.
-     * @param tsd - TimeEntry class object containing data to be inserted
-     * @return boolean, true if data successfully inserted, otherwise false.
-     */
-    public boolean setTimeEntry(TimeEntry tsd);
-
-    /**
-     * Update time entry using TimeEntry Object
+     * Update or insert a time entry using TimeEntry Object
      * @param tsd - TimeEntry class object containing data to be updated
      * @return boolean, true if data successfully updated, otherwise false.
      */
-    public boolean updateTimeEntry(TimeEntry tsd);
+    public void updateTimeEntry(TimeEntry tsd);
   }
