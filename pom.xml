@@ -18,6 +18,8 @@
         <commons.lang3.version>3.1</commons.lang3.version>
         <c3p0.version>0.9.1.2</c3p0.version>
         <joda-time.version>2.3</joda-time.version>
+        <guava.version>17.0</guava.version>
+        <guava.jackson.version>2.4.0</guava.jackson.version>
     </properties>
 
     <dependencies>
@@ -45,6 +47,20 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>${joda-time.version}</version>
+        </dependency>
+
+        <!-- Guava -->
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-guava</artifactId>
+            <version>${guava.jackson.version}</version>
         </dependency>
     </dependencies>
 
