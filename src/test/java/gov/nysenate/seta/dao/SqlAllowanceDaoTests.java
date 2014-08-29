@@ -68,15 +68,15 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
 //        Map<String, String> excludeValues = new HashMap<String, String>();
 //       excludeValues.put("CDAGENCY", "04210");
 //        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, false);
- //       logger.info(String.valueOf(SqlAccrualHelper.saProrate(matchedAuditRecords.get(matchedAuditRecords.size() - 1))));
-        logger.debug("Expected Hours:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+//       logger.info(String.valueOf(SqlAccrualHelper.saProrate(matchedAuditRecords.get(matchedAuditRecords.size() - 1))));
+//         SqlAccrualHelper.testTeHours();
+        logger.debug("Expected Hours:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(6221,  allTransCodes);
-        logger.debug("Expected Hours RA:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+        logger.debug("Expected Hours RA:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(11442,  allTransCodes);
-        logger.debug("Expected Hours TE:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
-
+        logger.debug("Expected Hours TE:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         //logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));
         //auditHistory.setTransactionHistory(transactionHistory);
@@ -91,6 +91,7 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
 
         //logger.debug("allowanceUsage: "+ OutputUtils.toJson(allowanceUsage));
     }
+
     @Test
     public void testDoesNotContain() {
 

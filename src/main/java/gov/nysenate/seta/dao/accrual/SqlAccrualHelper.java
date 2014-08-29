@@ -39,7 +39,7 @@ public class SqlAccrualHelper
     protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     @Autowired
-    private static SqlTEHoursDao tEHoursDao;
+    private SqlTEHoursDao tEHoursDao;
 
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
@@ -179,10 +179,16 @@ public class SqlAccrualHelper
         return transHistory.getTransRecords(codes, orderByAsc);
     }
 
+    public  BigDecimal getActualHours(int nuxrefem, Date dtstart, Date dtend) {
+       BigDecimal  actualHours = new BigDecimal("0");
+
+       return actualHours;
+    }
+
     /**
      * Returns the expected employee hours given a period of time
      */
-    public static BigDecimal getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
+    public  BigDecimal getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
         BigDecimal  expectedHours = new BigDecimal("0");
         AuditHistory auditHistory = new AuditHistory();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -254,6 +260,7 @@ public class SqlAccrualHelper
                     if (dtend.before(dteffectEnd) && !dtend.before(dteffect)) {
                         dteffectEnd = dtend;
                     }
+
                     String currentPaytype = (String) currentRec.get("CDPAYTYPE");
                     String currentEmpStatus = (String) currentRec.get("CDEMPSTATUS");
                     String currentAgencyCode = (String) currentRec.get("CDAGENCY");
@@ -335,12 +342,44 @@ public class SqlAccrualHelper
  //       expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
         ArrayList<TEHours> teHourses;
         //TEHoursDao tEHoursDao = new SqlTEHoursDao();
+        if (transHistory==null) {
+            logger.debug("********transHistory IS NULL");
+        }
+        else {
+            logger.debug("********transHistory xref:"+transHistory.getEmployeeId());
+        }
+
+        if (dtstart==null) {
+            logger.debug("********dtstart IS NULL");
+        }
+
+        if (dtend==null) {
+            logger.debug("********dtend IS NULL");
+        }
+
+        if (tEHoursDao==null) {
+            logger.debug("********tEHoursDao IS NULL");
+            tEHoursDao = new SqlTEHoursDao();
+        }
+
         teHourses = tEHoursDao.getTEHours(transHistory.getEmployeeId(), dtstart, dtend);
         expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
 
         return expectedHours;
 
     };
+
+    public void testTeHours() {
+        logger.debug("Before getting records");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        ArrayList<TEHours> teHourses = tEHoursDao.getTEHours(11225, 2014);
+        for (TEHours curTEHours : teHourses) {
+            logger.debug("Current TE Hours:"+sdf.format(curTEHours.getBeginDate())+" - "+sdf.format(curTEHours.getEndDate())+": "+curTEHours.getTEHours());
+        }
+        logger.debug("Record Count:"+teHourses.size());
+        logger.debug("total:"+tEHoursDao.sumTEHours(teHourses).getTEHours());
+        //return tEHoursDao.sumTEHours(teHourses).getTEHours()
+    }
 
    /**
     * Get the Next Record's Effect date, current record has been included in order to
