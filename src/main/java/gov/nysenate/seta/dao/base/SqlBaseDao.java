@@ -24,6 +24,7 @@ public abstract class SqlBaseDao
     @Resource(name = "remoteNamedJdbcTemplate")
     protected NamedParameterJdbcTemplate remoteNamedJdbc;
 
+
     /**
      * For use in queries where we don't care about the start date.
      * @return Date
