@@ -18,6 +18,7 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -27,6 +28,7 @@ import java.util.*;
 
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
+@Component
 public class SqlAccrualHelper
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualHelper.class);
@@ -36,7 +38,7 @@ public class SqlAccrualHelper
 
     protected static final Set<TransactionCode> APP_RTP_CODES = new HashSet<>(Arrays.asList(RTP, APP));
     protected static final Set<TransactionCode> EMP_CODE = new HashSet<>(Arrays.asList(EMP));
-    protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+    //protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
 
     @Autowired
     private SqlTEHoursDao tEHoursDao;
@@ -62,7 +64,6 @@ public class SqlAccrualHelper
     /**
      * Get the end date of the previous pay period. Assumes pay period is contiguous.
      */
-
     static Date getPrevPayPeriodEndDate(PayPeriod payPeriod) {
         return new LocalDate(payPeriod.getStartDate()).minusDays(1).toDate();
     }
@@ -81,7 +82,6 @@ public class SqlAccrualHelper
     /**
      * Similar to 'periodSummaryIsCurrent' but for annual accrual summary.
      */
-
     static boolean annualSummaryIsCurrent(AnnualAccrualSummary annualSummary, PayPeriod payPeriod) {
         //logger.debug(OutputUtils.toJson(annualSummary));
         Date prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
@@ -144,7 +144,7 @@ public class SqlAccrualHelper
 
     /**
      * Looks up the first non null 'min hours until end of year' value in the given list of trans recs.
-     * Retursn null if nothing found.
+     * Returns null if nothing found.
      */
     static BigDecimal getMinEndHours(LinkedList<TransactionRecord> minHourRecs) throws AccrualException {
         for (TransactionRecord rec : minHourRecs) {
@@ -301,8 +301,8 @@ public class SqlAccrualHelper
 
                                 expectedHours = expectedHours.add(new BigDecimal(((double) PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd)) * proRate), MathContext.DECIMAL64);
                             } else if (currentPaytype.equalsIgnoreCase("TE")) {
-                                logger.debug("---------------PAYTYPE:(TE) NEEDS CODING");
-                                // TODO  need to sum up TE Hours worked;
+                                //logger.debug("---------------PAYTYPE:(TE) NEEDS CODING");
+                                //  TE Hours handled in allowances package
                             }
                         }
                         String sdteffect = null;
@@ -338,6 +338,7 @@ public class SqlAccrualHelper
         } catch (TransactionHistoryException e) {
             e.printStackTrace();
         }
+
 //        teHourses = tEHoursDao.getTEHours(transHistory.getEmployeeId(), dtstart, dtend);
  //       expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
         ArrayList<TEHours> teHourses;
@@ -359,17 +360,18 @@ public class SqlAccrualHelper
 
         if (tEHoursDao==null) {
             logger.debug("********tEHoursDao IS NULL");
-            tEHoursDao = new SqlTEHoursDao();
+            //tEHoursDao = new SqlTEHoursDao();
         }
 
-        // TODO Fix NullPointerException below caused by not Autowiring correctly
+        /* TODO move the autowired tEHoursDao class to another class so as to not need to
+        *  autowire in this method
+        */
 
         teHourses = tEHoursDao.getTEHours(transHistory.getEmployeeId(), dtstart, dtend);
         expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
 
         return expectedHours;
-
-    };
+    }
 
     public void testTeHours() {
         logger.debug("Before getting records");

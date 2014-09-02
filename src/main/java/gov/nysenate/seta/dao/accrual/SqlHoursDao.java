@@ -155,6 +155,7 @@ public class SqlHoursDao extends SqlBaseDao implements HoursDao
                  new HoursRowMapper()));
 
         Hours hours = null;
+
         if (hoursList.size()>0) {
             hours = hoursList.get(0);
         }

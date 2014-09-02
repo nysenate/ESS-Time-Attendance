@@ -22,6 +22,7 @@ public class SqlAccrualDaoTests extends AbstractContextTests
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDaoTests.class);
     protected static final Set<TransactionCode> SAL_CODES = new HashSet<>(Arrays.asList(TransactionCode.SAL, TransactionCode.RTP, TransactionCode.APP));
+
     @Autowired
     SqlAccrualDao accrualDao;
 

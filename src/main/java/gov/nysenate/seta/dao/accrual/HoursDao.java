@@ -16,5 +16,4 @@ public interface HoursDao extends BaseDao {
 
     public  BigDecimal getTotalHours(int empId, Date beginDate, Date endDate);
 
-
 }
