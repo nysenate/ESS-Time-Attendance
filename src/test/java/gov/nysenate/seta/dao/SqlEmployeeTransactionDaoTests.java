@@ -48,7 +48,7 @@ public class SqlEmployeeTransactionDaoTests extends AbstractContextTests
         //logger.debug(OutputUtils.toJson(auditHistory.getAuditRecords()));
         //logger.debug("Working Days until now:"+new PeriodAccrualSummary().getWorkingDaysBetweenDates(new LocalDate(2014,1,1).toDate(), new Date()));
 
-        logger.debug("TOTAL EXPECTED HOURS:"+ SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new Date()));
+        logger.debug("TOTAL EXPECTED HOURS:"+ new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new Date()));
         //logger.info("01/01/14:"+OutputUtils.toJson(auditHistory.getPointInTime(new LocalDate(2014, 01, 10).toDate())));
         //logger.info("01/01/10:"+OutputUtils.toJson(auditHistory.getPointInTime(new LocalDate(2010, 01, 10).toDate())));
         //logger.info("01/01/05:"+OutputUtils.toJson(auditHistory.getPointInTime(new LocalDate(2005, 01, 10).toDate())));

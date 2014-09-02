@@ -362,6 +362,8 @@ public class SqlAccrualHelper
             tEHoursDao = new SqlTEHoursDao();
         }
 
+        // TODO Fix NullPointerException below caused by not Autowiring correctly
+
         teHourses = tEHoursDao.getTEHours(transHistory.getEmployeeId(), dtstart, dtend);
         expectedHours.add(new BigDecimal(String.valueOf(tEHoursDao.sumTEHours(teHourses).getTEHours())));
 

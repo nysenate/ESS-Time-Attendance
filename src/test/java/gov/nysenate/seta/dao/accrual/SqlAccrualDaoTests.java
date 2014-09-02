@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +27,9 @@ public class SqlAccrualDaoTests extends AbstractContextTests
 
     @Autowired
     PayPeriodDao payPeriodDao;
+
+    @Autowired
+    SqlHoursDao sqlHoursDao;
 
     @Test
     public void testGetAccuralSummary() throws Exception {
@@ -48,4 +52,18 @@ public class SqlAccrualDaoTests extends AbstractContextTests
         AuditHistory auditHistory = new AuditHistory(transactionHistory);
 
     }
+
+    @Test
+    public void testHoursDao() throws Exception {
+        logger.debug("******************************start testHoursDao");
+        BigDecimal hours = new BigDecimal("0");
+        logger.debug("SA/RA HOURS:"+hours);
+        hours = sqlHoursDao.getTotalHours(6221, new LocalDate(2014, 01, 01).toDate(), new LocalDate(2014, 7, 31).toDate());
+        logger.debug("SA/RA HOURS(2):"+hours);
+        hours = sqlHoursDao.getTotalHours(10170, new LocalDate(2014, 01, 01).toDate(), new LocalDate(2014, 7, 31).toDate());
+        logger.debug("SA/RA HOURS(3):"+hours);
+        hours = sqlHoursDao.getTotalHours(45, new LocalDate(2014, 01, 01).toDate(), new LocalDate(2014, 7, 31).toDate());
+        logger.debug("SA/RA HOURS(4):"+hours);
+    }
+
 }
