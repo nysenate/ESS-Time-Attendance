@@ -28,7 +28,6 @@ import java.util.*;
 
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
-@Component
 public class SqlAccrualHelper
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualHelper.class);
@@ -39,9 +38,6 @@ public class SqlAccrualHelper
     protected static final Set<TransactionCode> APP_RTP_CODES = new HashSet<>(Arrays.asList(RTP, APP));
     protected static final Set<TransactionCode> EMP_CODE = new HashSet<>(Arrays.asList(EMP));
     //protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
-
-    @Autowired
-    private SqlTEHoursDao tEHoursDao;
 
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
@@ -188,7 +184,7 @@ public class SqlAccrualHelper
     /**
      * Returns the expected employee hours given a period of time
      */
-    public  BigDecimal getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
+    public  BigDecimal getExpectedHours(TransactionHistory transHistory, SqlTEHoursDao tEHoursDao,Date dtstart, Date dtend) {
         BigDecimal  expectedHours = new BigDecimal("0");
         AuditHistory auditHistory = new AuditHistory();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -373,7 +369,7 @@ public class SqlAccrualHelper
         return expectedHours;
     }
 
-    public void testTeHours() {
+    public void testTeHours(SqlTEHoursDao tEHoursDao) {
         logger.debug("Before getting records");
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
         ArrayList<TEHours> teHourses = tEHoursDao.getTEHours(11225, 2014);

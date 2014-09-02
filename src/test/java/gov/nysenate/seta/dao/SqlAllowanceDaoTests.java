@@ -3,6 +3,7 @@ package gov.nysenate.seta.dao;
 import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.dao.accrual.SqlAccrualHelper;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
+import gov.nysenate.seta.dao.allowances.SqlTEHoursDao;
 import gov.nysenate.seta.dao.transaction.SqlEmployeeTransactionDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.transaction.AuditHistory;
@@ -34,6 +35,9 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
     private SqlEmployeeTransactionDao sqlEmployeeTransactionDao;
 
     AuditHistory auditHistory;
+
+    @Autowired
+    private SqlTEHoursDao tEHoursDao;
 
     @Test
     public void testBigDecimalAddition() {
@@ -70,13 +74,13 @@ public class SqlAllowanceDaoTests  extends AbstractContextTests {
 //        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, false);
 //       logger.info(String.valueOf(SqlAccrualHelper.saProrate(matchedAuditRecords.get(matchedAuditRecords.size() - 1))));
 //         SqlAccrualHelper.testTeHours();
-        logger.debug("Expected Hours:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+        logger.debug("Expected Hours:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, tEHoursDao, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(6221,  allTransCodes);
-        logger.debug("Expected Hours RA:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+        logger.debug("Expected Hours RA:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, tEHoursDao, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(11442,  allTransCodes);
-        logger.debug("Expected Hours TE:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+        logger.debug("Expected Hours TE:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, tEHoursDao, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         //logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));
         //auditHistory.setTransactionHistory(transactionHistory);

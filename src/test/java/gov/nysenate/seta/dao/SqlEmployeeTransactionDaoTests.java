@@ -2,6 +2,7 @@ package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.AbstractContextTests;
 import gov.nysenate.seta.dao.accrual.SqlAccrualHelper;
+import gov.nysenate.seta.dao.allowances.SqlTEHoursDao;
 import gov.nysenate.seta.dao.transaction.SqlEmployeeTransactionDao;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
@@ -18,15 +19,14 @@ import java.util.*;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @Component
-public class SqlEmployeeTransactionDaoTests extends AbstractContextTests
-{
+public class SqlEmployeeTransactionDaoTests extends AbstractContextTests {
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeTransactionDaoTests.class);
 
     @Autowired
     private SqlEmployeeTransactionDao transHistDao;
 
     @Autowired
-    SqlAccrualHelper sqlAccrualHelper;
+    private SqlTEHoursDao tEHoursDao;
 
     @Test
     public void testGetTransactionHistoryMapWithDate_Succeeds() throws Exception {
@@ -47,13 +47,13 @@ public class SqlEmployeeTransactionDaoTests extends AbstractContextTests
         //logger.debug(OutputUtils.toJson(recs));
         AuditHistory auditHistory = new AuditHistory();
         auditHistory.setTransactionHistory(transactionHistory);
-        List<Map<String, String>> records = auditHistory.getAuditRecordsBetween(new LocalDate(2014, 3, 1).toDate(), new LocalDate(2014,6,30).toDate(),true);
-        logger.debug("Audit records("+records.size()+"):"+ records);
+        List<Map<String, String>> records = auditHistory.getAuditRecordsBetween(new LocalDate(2014, 3, 1).toDate(), new LocalDate(2014, 6, 30).toDate(), true);
+        logger.debug("Audit records(" + records.size() + "):" + records);
 
         //logger.debug(OutputUtils.toJson(auditHistory.getAuditRecords()));
         //logger.debug("Working Days until now:"+new PeriodAccrualSummary().getWorkingDaysBetweenDates(new LocalDate(2014,1,1).toDate(), new Date()));
 
-        logger.debug("TOTAL EXPECTED HOURS:"+ sqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new Date()));
+        logger.debug("TOTAL EXPECTED HOURS:" + new SqlAccrualHelper().getExpectedHours(transactionHistory, tEHoursDao, new LocalDate(2014, 1, 1).toDate(), new Date()));
         //logger.info("01/01/14:"+OutputUtils.toJson(auditHistory.getPointInTime(new LocalDate(2014, 01, 10).toDate())));
         //logger.info("01/01/10:"+OutputUtils.toJson(auditHistory.getPointInTime(new LocalDate(2010, 01, 10).toDate())));
         //logger.info("01/01/05:"+OutputUtils.toJson(auditHistory.getPointInTime(new LocalDate(2005, 01, 10).toDate())));

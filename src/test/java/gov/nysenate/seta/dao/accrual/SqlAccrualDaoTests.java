@@ -18,8 +18,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SqlAccrualDaoTests extends AbstractContextTests
-{
+public class SqlAccrualDaoTests extends AbstractContextTests {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDaoTests.class);
     protected static final Set<TransactionCode> SAL_CODES = new HashSet<>(Arrays.asList(TransactionCode.SAL, TransactionCode.RTP, TransactionCode.APP));
 
@@ -34,13 +33,13 @@ public class SqlAccrualDaoTests extends AbstractContextTests
 
     @Test
     public void testGetAccuralSummary() throws Exception {
-        PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2014,5,27).toDate());
+        PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2014, 5, 27).toDate());
         //logger.info(OutputUtils.toJson(accrualDao.getAccuralSummary(10976, payPeriod)));
     }
 
     @Test
     public void testGetAccrualSummary_ReappointmentWithinLessThanAYear() throws Exception {
-        PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2011,12,27).toDate());
+        PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2011, 12, 27).toDate());
         //logger.info(OutputUtils.toJson(accrualDao.getAccuralSummary(11384, payPeriod)));
     }
 
@@ -49,7 +48,7 @@ public class SqlAccrualDaoTests extends AbstractContextTests
         TransactionHistory transactionHistory = new TransactionHistory(45);
 
         transactionHistory.getTransRecords(SAL_CODES, true);
-        logger.debug("TRANSACTION RECORDS:"+transactionHistory.getAllTransRecords(true));
+        logger.debug("TRANSACTION RECORDS:" + transactionHistory.getAllTransRecords(true));
         AuditHistory auditHistory = new AuditHistory(transactionHistory);
 
     }
@@ -58,13 +57,13 @@ public class SqlAccrualDaoTests extends AbstractContextTests
     public void testHoursDao() throws Exception {
         logger.debug("******************************start testHoursDao");
         BigDecimal hours = new BigDecimal("0");
-        logger.debug("SA/RA HOURS:"+hours);
+        logger.debug("SA/RA HOURS:" + hours);
         hours = sqlHoursDao.getTotalHours(6221, new LocalDate(2014, 01, 01).toDate(), new LocalDate(2014, 7, 31).toDate());
-        logger.debug("SA/RA HOURS(2):"+hours);
+        logger.debug("SA/RA HOURS(2):" + hours);
         hours = sqlHoursDao.getTotalHours(10170, new LocalDate(2014, 01, 01).toDate(), new LocalDate(2014, 7, 31).toDate());
-        logger.debug("SA/RA HOURS(3):"+hours);
+        logger.debug("SA/RA HOURS(3):" + hours);
         hours = sqlHoursDao.getTotalHours(45, new LocalDate(2014, 01, 01).toDate(), new LocalDate(2014, 7, 31).toDate());
-        logger.debug("SA/RA HOURS(4):"+hours);
+        logger.debug("SA/RA HOURS(4):" + hours);
     }
 
 }
