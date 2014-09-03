@@ -1,6 +1,5 @@
 package gov.nysenate.seta;
 
-import gov.nysenate.seta.config.TestConfig;
 import gov.nysenate.seta.config.WebApplicationConfig;
 import org.junit.Before;
 import org.junit.runner.RunWith;

@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
  * Configures access to the app.properties config file through @Value annotations.
  */
 @Configuration
-//@Profile({"dev", "prod"})
+@Profile({"dev", "prod"})
 public class PropertyConfig
 {
     public static final String PROPERTY_FILENAME = "app.properties";

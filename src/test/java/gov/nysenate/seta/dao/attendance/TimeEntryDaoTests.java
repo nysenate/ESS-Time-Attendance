@@ -16,6 +16,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TimeEntryDaoTests extends AbstractContextTests
 {
@@ -59,12 +61,13 @@ public class TimeEntryDaoTests extends AbstractContextTests
     @Test
     public void getTimeEntryTest(){
         updateTimeEntryTest();
+        List<TimeEntry> timeEntry = new ArrayList<>();
         try {
-            assert (remoteTimeEntryDao.getTimeEntriesByRecordId(Integer.parseInt(testEntry.getTimeRecordId())).equals(testEntry));
+            timeEntry = remoteTimeEntryDao.getTimeEntriesByRecordId(Integer.parseInt(testEntry.getTimeRecordId()));
         }
         catch(Exception ex){
             logger.error(ex.getMessage());
-            assert (false);
         }
+        assert (timeEntry.contains(testEntry));
     }
 }
