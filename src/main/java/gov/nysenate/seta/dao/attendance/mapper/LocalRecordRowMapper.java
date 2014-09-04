@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.attendance.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import org.springframework.jdbc.core.RowMapper;
@@ -7,7 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class LocalRecordRowMapper implements RowMapper<TimeRecord>
+public class LocalRecordRowMapper extends BaseRowMapper<TimeRecord>
 {
     private String pfx = "";
 

@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = {WebApplicationConfig.class, TestConfig.class})
+@ContextConfiguration(classes = {WebApplicationConfig.class})
 @ActiveProfiles("test")
 public abstract class AbstractContextTests
 {

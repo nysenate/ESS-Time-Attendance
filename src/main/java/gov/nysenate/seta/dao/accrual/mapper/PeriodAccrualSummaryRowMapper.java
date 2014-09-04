@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.accrual.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.dao.period.mapper.PayPeriodRowMapper;
 import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
 import org.springframework.jdbc.core.RowMapper;
@@ -7,7 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PeriodAccrualSummaryRowMapper implements RowMapper<PeriodAccrualSummary>
+public class PeriodAccrualSummaryRowMapper extends BaseRowMapper<PeriodAccrualSummary>
 {
     protected String pfx = "";
     protected PayPeriodRowMapper payPeriodRowMapper;

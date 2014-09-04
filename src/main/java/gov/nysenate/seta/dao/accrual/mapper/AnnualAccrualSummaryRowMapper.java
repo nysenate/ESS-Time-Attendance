@@ -1,12 +1,13 @@
 package gov.nysenate.seta.dao.accrual.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.accrual.AnnualAccrualSummary;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AnnualAccrualSummaryRowMapper implements RowMapper<AnnualAccrualSummary>
+public class AnnualAccrualSummaryRowMapper extends BaseRowMapper<AnnualAccrualSummary>
 {
     @Override
     public AnnualAccrualSummary mapRow(ResultSet rs, int rowNum) throws SQLException {

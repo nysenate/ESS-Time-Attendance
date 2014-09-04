@@ -7,6 +7,7 @@ import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public interface TimeEntryDao extends BaseDao
      * @return List<TimeEntry>
      * @throws TimeEntryException - TimeEntryNotFoundEx if no matching time entries were found
      */
-    public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryException;
+    public List<TimeEntry> getTimeEntriesByRecordId(BigInteger timeRecordId) throws TimeEntryException;
 
     /**
      * Update or insert a time entry using TimeEntry Object

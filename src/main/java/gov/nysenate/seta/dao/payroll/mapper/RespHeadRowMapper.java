@@ -1,12 +1,13 @@
 package gov.nysenate.seta.dao.payroll.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.personnel.ResponsibilityHead;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class RespHeadRowMapper implements RowMapper<ResponsibilityHead>
+public class RespHeadRowMapper extends BaseRowMapper<ResponsibilityHead>
 {
     private String pfx;
 

@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.transaction.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.util.OutputUtils;
@@ -11,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class TransactionRecordRowMapper implements RowMapper<TransactionRecord>
+public class TransactionRecordRowMapper extends BaseRowMapper<TransactionRecord>
 {
     private String pfx = "";
     private String auditPfx = "";

@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.period.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import org.springframework.jdbc.core.RowMapper;
@@ -7,7 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PayPeriodRowMapper implements RowMapper<PayPeriod>
+public class PayPeriodRowMapper extends BaseRowMapper<PayPeriod>
 {
     protected String pfx;
 

@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.allowances.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.allowances.TEHours;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ import java.text.SimpleDateFormat;
  * This row mapper doesn't implement the RowMapper interface but rather provides a static
  * method to map all the summary columns for a subclass of Allowance.
  */
-public class TEHoursRowMapper implements RowMapper<TEHours>
+public class TEHoursRowMapper extends BaseRowMapper<TEHours>
 {
     protected String pfx;
 

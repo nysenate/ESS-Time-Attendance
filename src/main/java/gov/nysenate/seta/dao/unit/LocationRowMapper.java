@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.unit;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.unit.Address;
 import gov.nysenate.seta.model.unit.Location;
 import gov.nysenate.seta.model.unit.LocationType;
@@ -8,7 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class LocationRowMapper implements RowMapper<Location>
+public class LocationRowMapper extends BaseRowMapper<Location>
 {
     private String pfx;
 

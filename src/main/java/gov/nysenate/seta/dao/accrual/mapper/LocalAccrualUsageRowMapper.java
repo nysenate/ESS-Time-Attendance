@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.accrual.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.accrual.AccrualUsage;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -9,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Created by riken on 4/16/14.
  */
-public class LocalAccrualUsageRowMapper implements RowMapper<AccrualUsage> {
+public class LocalAccrualUsageRowMapper extends BaseRowMapper<AccrualUsage> {
 
         @Override
         public AccrualUsage mapRow(ResultSet rs, int rowNum) throws SQLException {

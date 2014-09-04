@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -31,23 +32,24 @@ public class TimeEntryDaoTests extends AbstractContextTests
     @PostConstruct
     private void init(){
         testEntry = new TimeEntry();
-        testEntry.setEntryId("11111111111111111111111111111111111111");
-        testEntry.setTimeRecordId("11111111111111111111111111111111111111");
+        testEntry.setEntryId(new BigInteger("11111111111111111111111111111111111111"));
+        testEntry.setTimeRecordId(new BigInteger("11111111111111111111111111111111111111"));
         testEntry.setEmpId(11423);
-        testEntry.setDate(Date.valueOf(LocalDate.of(1990, 8, 14)));
-        testEntry.setWorkHours(BigDecimal.TEN);
-        testEntry.setTravelHours(BigDecimal.ZERO);
-        testEntry.setHolidayHours(BigDecimal.ZERO);
-        testEntry.setVacationHours(BigDecimal.ZERO);
-        testEntry.setPersonalHours(BigDecimal.ZERO);
-        testEntry.setSickEmpHours(BigDecimal.ZERO);
-        testEntry.setSickFamHours(BigDecimal.ZERO);
-        testEntry.setMiscHours(BigDecimal.ZERO);
+        testEntry.setEmployeeName("STOUFFER");
+        testEntry.setDate(LocalDate.of(1990, 8, 14));
+        testEntry.setWorkHours(10);
+        testEntry.setTravelHours(0);
+        testEntry.setHolidayHours(0);
+        testEntry.setVacationHours(0);
+        testEntry.setPersonalHours(0);
+        testEntry.setSickEmpHours(0);
+        testEntry.setSickFamHours(0);
+        testEntry.setMiscHours(0);
         testEntry.setMiscType(MiscLeaveType.valueOfCode(null));
         testEntry.setTxOriginalUserId("STOUFFER");
         testEntry.setTxUpdateUserId("STOUFFER");
-        testEntry.setTxOriginalDate(Timestamp.valueOf(LocalDate.of(1990, 8, 14).atStartOfDay()));
-        testEntry.setTxUpdateDate(Timestamp.valueOf(LocalDate.of(1990, 8, 14).atStartOfDay()));
+        testEntry.setTxOriginalDate(LocalDate.of(1990, 8, 14).atStartOfDay());
+        testEntry.setTxUpdateDate(LocalDate.of(1990, 8, 14).atStartOfDay());
         testEntry.setActive(true);
         testEntry.setEmpComment("was born today");
         testEntry.setPayType(PayType.RA);
@@ -61,13 +63,12 @@ public class TimeEntryDaoTests extends AbstractContextTests
     @Test
     public void getTimeEntryTest(){
         updateTimeEntryTest();
-        List<TimeEntry> timeEntry = new ArrayList<>();
         try {
-            timeEntry = remoteTimeEntryDao.getTimeEntriesByRecordId(Integer.parseInt(testEntry.getTimeRecordId()));
+            List<TimeEntry> timeEntry = remoteTimeEntryDao.getTimeEntriesByRecordId(testEntry.getTimeRecordId());
+            assert (timeEntry.contains(testEntry));
         }
         catch(Exception ex){
             logger.error(ex.getMessage());
         }
-        assert (timeEntry.contains(testEntry));
     }
 }

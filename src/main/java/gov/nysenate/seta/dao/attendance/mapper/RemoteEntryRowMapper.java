@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.attendance.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
@@ -8,8 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class RemoteEntryRowMapper implements RowMapper<TimeEntry>
-{
+public class RemoteEntryRowMapper extends BaseRowMapper<TimeEntry>{
     private String pfx = "";
 
     public RemoteEntryRowMapper() {}
@@ -21,28 +21,29 @@ public class RemoteEntryRowMapper implements RowMapper<TimeEntry>
     @Override
     public TimeEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeEntry te = new TimeEntry();
-        te.setEntryId(rs.getString(pfx + "NUXRDAY"));
-        te.setTimeRecordId(rs.getString(pfx + "NUXRTIMESHEET"));
+        te.setEntryId(rs.getBigDecimal(pfx + "NUXRDAY").toBigInteger());
+        te.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET").toBigInteger());
         te.setEmpId(rs.getInt(pfx + "NUXREFEM"));
-        te.setDate(rs.getDate(pfx + "DTDAY"));
-        te.setWorkHours(rs.getBigDecimal(pfx + "NUWORK"));
-        te.setTravelHours(rs.getBigDecimal(pfx + "NUTRAVEL"));
-        te.setHolidayHours(rs.getBigDecimal(pfx + "NUHOLIDAY"));
-        te.setVacationHours(rs.getBigDecimal(pfx + "NUVACATION"));
-        te.setPersonalHours(rs.getBigDecimal(pfx + "NUPERSONAL"));
-        te.setSickEmpHours(rs.getBigDecimal(pfx + "NUSICKEMP"));
-        te.setSickFamHours(rs.getBigDecimal(pfx + "NUSICKFAM"));
-        te.setMiscHours(rs.getBigDecimal(pfx + "NUMISC"));
+        te.setEmployeeName(rs.getString(pfx + "NAUSER"));
+        te.setDate(getLocalDate(rs, pfx + "DTDAY"));
+        te.setWorkHours(rs.getInt(pfx + "NUWORK"));
+        te.setTravelHours(rs.getInt(pfx + "NUTRAVEL"));
+        te.setHolidayHours(rs.getInt(pfx + "NUHOLIDAY"));
+        te.setVacationHours(rs.getInt(pfx + "NUVACATION"));
+        te.setPersonalHours(rs.getInt(pfx + "NUPERSONAL"));
+        te.setSickEmpHours(rs.getInt(pfx + "NUSICKEMP"));
+        te.setSickFamHours(rs.getInt(pfx + "NUSICKFAM"));
+        te.setMiscHours(rs.getInt(pfx + "NUMISC"));
         if (rs.getString(pfx + "NUXRMISC") != null) {
             te.setMiscType(MiscLeaveType.valueOfCode(rs.getString(pfx + "NUXRMISC")));
         }
         te.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
         te.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
-        te.setTxOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
-        te.setTxUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
+        te.setTxOriginalDate(getLocalDateTime(rs, pfx + "DTTXNORIGIN"));
+        te.setTxUpdateDate(getLocalDateTime(rs, pfx + "DTTXNUPDATE"));
         te.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         te.setEmpComment(rs.getString(pfx + "DECOMMENTS"));
         te.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));
         return te;
-}
+    }
 }

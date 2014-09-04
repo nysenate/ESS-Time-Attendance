@@ -7,8 +7,6 @@ import gov.nysenate.seta.model.accrual.AccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccrualUsage;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
-import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import gov.nysenate.seta.model.period.PayPeriod;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -18,9 +16,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
+import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 @Repository("localTimeEntry")
 public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
@@ -70,7 +67,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         "GROUP BY te.emp_id";
 
     //@Override
-    public List<TimeEntry> getTimeEntriesByRecordId(int timeRecordId) throws TimeEntryNotFoundEx {
+    public List<TimeEntry> getTimeEntriesByRecordId(BigInteger timeRecordId) throws TimeEntryNotFoundEx {
 
         List<TimeEntry> timeEntryList;
         MapSqlParameterSource params = new MapSqlParameterSource();

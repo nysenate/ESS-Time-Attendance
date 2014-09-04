@@ -5,23 +5,23 @@ import gov.nysenate.seta.dao.base.BasicSqlQuery;
 public enum SqlRemoteTimeEntryQuery implements BasicSqlQuery{
     SELECT_TIME_ENTRY_BY_TIME_RECORD_ID(
         "SELECT * FROM PD23TIMESHEET " + "\n" +
-        "WHERE CDSTATUS = 'A' AND NUXRTIMESHEET = :timesheetId "
+        "WHERE CDSTATUS = :status AND NUXRTIMESHEET = :timesheetId "
     ),
     INSERT_TIME_ENTRY_SQL(
-        "INSERT INTO PD23TIMESHEET (NUXRDAY, NUXRTIMESHEET, NUXREFEM, DTDAY, NUWORK, NUTRAVEL, NUHOLIDAY, NUSICKEMP, " +
+        "INSERT INTO PD23TIMESHEET ( NUXRDAY, NUXRTIMESHEET, NUXREFEM, NAUSER, DTDAY, NUWORK, NUTRAVEL, NUHOLIDAY, NUSICKEMP, " +
         "                           NUSICKFAM, NUMISC, NUXRMISC, NATXNORGUSER, NATXNUPDUSER, DTTXNORIGIN, DTTXNUPDATE, " +
-        "                           CDSTATUS, DECOMMENTS, CDPAYTYPE, NUVACATION, NUPERSONAL) "+ "\n" +
-        "VALUES (:tSDayId, :timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, " +
+        "                           CDSTATUS, DECOMMENTS, CDPAYTYPE, NUVACATION, NUPERSONAL ) "+ "\n" +
+        "VALUES ( :tSDayId, :timesheetId, :empId, :employeeName, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, " +
         "        :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, " +
-        "        :empComment, :payType, :vacationHR, :personalHR)"
+        "        :empComment, :payType, :vacationHR, :personalHR )"
     ),
     UPDATE_TIME_ENTRY_SQL(
-        "UPDATE PD23TIMESHEET \n" +
-        "SET (NUXRTIMESHEET = :timesheetId, NUXREFEM = :empId, DTDAY = :dayDate, NUWORK = :workHR, NUTRAVEL = :travelHR, " +
-        "     NUHOLIDAY = :holidayHR, NUSICKEMP = :sickEmpHR, NUSICKFAM = :sickFamilyHR, NUMISC = :miscHR, " +
-        "     NUXRMISC = :miscTypeId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, " +
-        "     DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, DECOMMENTS = :empComment, " +
-        "     CDPAYTYPE = :payType, NUVACATION = :vacationHR, NUPERSONAL = :personalHR) " + "\n" +
+        "UPDATE PD23TIMESHEET " + "\n" +
+        "SET NUXRTIMESHEET = :timesheetId, NUXREFEM = :empId, NAUSER = :employeeName, DTDAY = :dayDate, NUWORK = :workHR, NUTRAVEL = :travelHR, " +
+            "NUHOLIDAY = :holidayHR, NUSICKEMP = :sickEmpHR, NUSICKFAM = :sickFamilyHR, NUMISC = :miscHR, " +
+            "NUXRMISC = :miscTypeId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, " +
+            "DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, DECOMMENTS = :empComment, " +
+            "CDPAYTYPE = :payType, NUVACATION = :vacationHR, NUPERSONAL = :personalHR " + "\n" +
         "WHERE NUXRDAY = :tSDayId"
     )
     ;

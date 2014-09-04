@@ -1,12 +1,13 @@
 package gov.nysenate.seta.dao.personnel.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.payroll.Holiday;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class HolidayRowMapper implements RowMapper<Holiday>
+public class HolidayRowMapper extends BaseRowMapper<Holiday>
 {
     protected String pfx;
 

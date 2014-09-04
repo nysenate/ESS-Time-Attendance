@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.allowances.mapper;
 
+import gov.nysenate.seta.dao.base.BaseRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.math.BigDecimal;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
  * This row mapper doesn't implement the RowMapper interface but rather provides a static
  * method to map all the summary columns for a subclass of Allowance.
  */
-public class AmountExceedRowMapper implements RowMapper<BigDecimal>
+public class AmountExceedRowMapper extends BaseRowMapper<BigDecimal>
 {
     protected String pfx;
 

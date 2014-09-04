@@ -3,8 +3,10 @@ package gov.nysenate.seta.model.attendance;
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -13,26 +15,27 @@ import java.util.Date;
  */
 public class TimeEntry
 {
-    protected String entryId;
-    protected String timeRecordId;
-    protected Integer empId;
-    protected Date date;
-    protected BigDecimal workHours;
-    protected BigDecimal travelHours;
-    protected BigDecimal holidayHours;
-    protected BigDecimal vacationHours;
-    protected BigDecimal personalHours;
-    protected BigDecimal sickEmpHours;
-    protected BigDecimal sickFamHours;
-    protected BigDecimal miscHours;
+    protected BigInteger entryId;
+    protected BigInteger timeRecordId;
+    protected int empId;
+    protected String employeeName;
+    protected LocalDate date;
+    protected int workHours;
+    protected int travelHours;
+    protected int holidayHours;
+    protected int vacationHours;
+    protected int personalHours;
+    protected int sickEmpHours;
+    protected int sickFamHours;
+    protected int miscHours;
     protected MiscLeaveType miscType;
     protected boolean active;
     protected String empComment;
     protected PayType payType;
     protected String txOriginalUserId;
     protected String txUpdateUserId;
-    protected Date txOriginalDate;
-    protected Date txUpdateDate;
+    protected LocalDateTime txOriginalDate;
+    protected LocalDateTime txUpdateDate;
 
     /** --- Constructors --- */
 
@@ -48,24 +51,22 @@ public class TimeEntry
         TimeEntry timeEntry = (TimeEntry) o;
 
         if (active != timeEntry.active) return false;
+        if (empId != timeEntry.empId) return false;
+        if (holidayHours != timeEntry.holidayHours) return false;
+        if (miscHours != timeEntry.miscHours) return false;
+        if (personalHours != timeEntry.personalHours) return false;
+        if (sickEmpHours != timeEntry.sickEmpHours) return false;
+        if (sickFamHours != timeEntry.sickFamHours) return false;
+        if (travelHours != timeEntry.travelHours) return false;
+        if (vacationHours != timeEntry.vacationHours) return false;
+        if (workHours != timeEntry.workHours) return false;
         if (!date.equals(timeEntry.date)) return false;
         if (empComment != null ? !empComment.equals(timeEntry.empComment) : timeEntry.empComment != null) return false;
-        if (empId != null ? !empId.equals(timeEntry.empId) : timeEntry.empId != null) return false;
+        if (!employeeName.equals(timeEntry.employeeName)) return false;
         if (entryId != null ? !entryId.equals(timeEntry.entryId) : timeEntry.entryId != null) return false;
-        if (holidayHours != null ? !holidayHours.equals(timeEntry.holidayHours) : timeEntry.holidayHours != null)
-            return false;
-        if (miscHours != null ? !miscHours.equals(timeEntry.miscHours) : timeEntry.miscHours != null) return false;
         if (miscType != timeEntry.miscType) return false;
         if (payType != timeEntry.payType) return false;
-        if (personalHours != null ? !personalHours.equals(timeEntry.personalHours) : timeEntry.personalHours != null)
-            return false;
-        if (sickEmpHours != null ? !sickEmpHours.equals(timeEntry.sickEmpHours) : timeEntry.sickEmpHours != null)
-            return false;
-        if (sickFamHours != null ? !sickFamHours.equals(timeEntry.sickFamHours) : timeEntry.sickFamHours != null)
-            return false;
         if (timeRecordId != null ? !timeRecordId.equals(timeEntry.timeRecordId) : timeEntry.timeRecordId != null)
-            return false;
-        if (travelHours != null ? !travelHours.equals(timeEntry.travelHours) : timeEntry.travelHours != null)
             return false;
         if (txOriginalDate != null ? !txOriginalDate.equals(timeEntry.txOriginalDate) : timeEntry.txOriginalDate != null)
             return false;
@@ -75,9 +76,6 @@ public class TimeEntry
             return false;
         if (txUpdateUserId != null ? !txUpdateUserId.equals(timeEntry.txUpdateUserId) : timeEntry.txUpdateUserId != null)
             return false;
-        if (vacationHours != null ? !vacationHours.equals(timeEntry.vacationHours) : timeEntry.vacationHours != null)
-            return false;
-        if (workHours != null ? !workHours.equals(timeEntry.workHours) : timeEntry.workHours != null) return false;
 
         return true;
     }
@@ -86,16 +84,17 @@ public class TimeEntry
     public int hashCode() {
         int result = entryId != null ? entryId.hashCode() : 0;
         result = 31 * result + (timeRecordId != null ? timeRecordId.hashCode() : 0);
-        result = 31 * result + (empId != null ? empId.hashCode() : 0);
+        result = 31 * result + empId;
+        result = 31 * result + employeeName.hashCode();
         result = 31 * result + date.hashCode();
-        result = 31 * result + (workHours != null ? workHours.hashCode() : 0);
-        result = 31 * result + (travelHours != null ? travelHours.hashCode() : 0);
-        result = 31 * result + (holidayHours != null ? holidayHours.hashCode() : 0);
-        result = 31 * result + (vacationHours != null ? vacationHours.hashCode() : 0);
-        result = 31 * result + (personalHours != null ? personalHours.hashCode() : 0);
-        result = 31 * result + (sickEmpHours != null ? sickEmpHours.hashCode() : 0);
-        result = 31 * result + (sickFamHours != null ? sickFamHours.hashCode() : 0);
-        result = 31 * result + (miscHours != null ? miscHours.hashCode() : 0);
+        result = 31 * result + workHours;
+        result = 31 * result + travelHours;
+        result = 31 * result + holidayHours;
+        result = 31 * result + vacationHours;
+        result = 31 * result + personalHours;
+        result = 31 * result + sickEmpHours;
+        result = 31 * result + sickFamHours;
+        result = 31 * result + miscHours;
         result = 31 * result + (miscType != null ? miscType.hashCode() : 0);
         result = 31 * result + (active ? 1 : 0);
         result = 31 * result + (empComment != null ? empComment.hashCode() : 0);
@@ -109,115 +108,123 @@ public class TimeEntry
 
     /** --- Functional Getters/Setters --- */
 
-    public BigDecimal getDailyTotal() {
-        BigDecimal total = new BigDecimal(0);
-        total = total.add(getWorkHours());
-        total = total.add(getTravelHours());
-        total = total.add(getHolidayHours());
-        total = total.add(getVacationHours());
-        total = total.add(getPersonalHours());
-        total = total.add(getSickEmpHours());
-        total = total.add(getSickFamHours());
-        total = total.add(getMiscHours());
+    public int getDailyTotal() {
+        int total = 0;
+        total += this.getWorkHours();
+        total += this.getTravelHours();
+        total += this.getHolidayHours();
+        total += this.getVacationHours();
+        total += this.getPersonalHours();
+        total += this.getSickEmpHours();
+        total += this.getSickFamHours();
+        total += this.getMiscHours();
         return total;
-    }
-
-    public void setWorkHours(BigDecimal workHours) {
-        this.workHours = (workHours != null) ? workHours : BigDecimal.ZERO;
-    }
-
-    public void setTravelHours(BigDecimal travelHours) {
-        this.travelHours = (travelHours != null) ? travelHours : BigDecimal.ZERO;
-    }
-
-    public void setHolidayHours(BigDecimal holidayHours) {
-        this.holidayHours = (holidayHours != null) ? holidayHours : BigDecimal.ZERO;
-    }
-
-    public void setVacationHours(BigDecimal vacationHours) {
-        this.vacationHours = (vacationHours != null) ? vacationHours : BigDecimal.ZERO;
-    }
-
-    public void setPersonalHours(BigDecimal personalHours) {
-        this.personalHours = (personalHours != null) ? personalHours : BigDecimal.ZERO;
-    }
-
-    public void setSickEmpHours(BigDecimal sickEmpHours) {
-        this.sickEmpHours = (sickEmpHours != null) ? sickEmpHours : BigDecimal.ZERO;
-    }
-
-    public void setSickFamHours(BigDecimal sickFamHours) {
-        this.sickFamHours = (sickFamHours != null) ? sickFamHours : BigDecimal.ZERO;
-    }
-
-    public void setMiscHours(BigDecimal miscHours) {
-        this.miscHours = (miscHours != null) ? miscHours : BigDecimal.ZERO;
     }
 
     /** --- Basic Getters/Setters --- */
 
-    public String getEntryId() {
+    public BigInteger getEntryId() {
         return entryId;
     }
 
-    public void setEntryId(String entryId) {
+    public void setEntryId(BigInteger entryId) {
         this.entryId = entryId;
     }
 
-    public String getTimeRecordId() {
+    public BigInteger getTimeRecordId() {
         return timeRecordId;
     }
 
-    public void setTimeRecordId(String timeRecordId) {
+    public void setTimeRecordId(BigInteger timeRecordId) {
         this.timeRecordId = timeRecordId;
     }
 
-    public Integer getEmpId() {
+    public int getEmpId() {
         return empId;
     }
 
-    public void setEmpId(Integer empId) {
+    public void setEmpId(int empId) {
         this.empId = empId;
     }
 
-    public Date getDate() {
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public BigDecimal getWorkHours() {
+    public int getWorkHours() {
         return workHours;
     }
 
-    public BigDecimal getTravelHours() {
+    public void setWorkHours(int workHours) {
+        this.workHours = workHours;
+    }
+
+    public int getTravelHours() {
         return travelHours;
     }
 
-    public BigDecimal getHolidayHours() {
+    public void setTravelHours(int travelHours) {
+        this.travelHours = travelHours;
+    }
+
+    public int getHolidayHours() {
         return holidayHours;
     }
 
-    public BigDecimal getVacationHours() {
+    public void setHolidayHours(int holidayHours) {
+        this.holidayHours = holidayHours;
+    }
+
+    public int getVacationHours() {
         return vacationHours;
     }
 
-    public BigDecimal getPersonalHours() {
+    public void setVacationHours(int vacationHours) {
+        this.vacationHours = vacationHours;
+    }
+
+    public int getPersonalHours() {
         return personalHours;
     }
 
-    public BigDecimal getSickEmpHours() {
+    public void setPersonalHours(int personalHours) {
+        this.personalHours = personalHours;
+    }
+
+    public int getSickEmpHours() {
         return sickEmpHours;
     }
 
-    public BigDecimal getSickFamHours() {
+    public void setSickEmpHours(int sickEmpHours) {
+        this.sickEmpHours = sickEmpHours;
+    }
+
+    public int getSickFamHours() {
         return sickFamHours;
     }
 
-    public BigDecimal getMiscHours() {
+    public void setSickFamHours(int sickFamHours) {
+        this.sickFamHours = sickFamHours;
+    }
+
+    public int getMiscHours() {
         return miscHours;
+    }
+
+    public void setMiscHours(int miscHours) {
+        this.miscHours = miscHours;
     }
 
     public MiscLeaveType getMiscType() {
@@ -268,19 +275,19 @@ public class TimeEntry
         this.txUpdateUserId = txUpdateUserId;
     }
 
-    public Date getTxOriginalDate() {
+    public LocalDateTime getTxOriginalDate() {
         return txOriginalDate;
     }
 
-    public void setTxOriginalDate(Timestamp txOriginalDate) {
+    public void setTxOriginalDate(LocalDateTime txOriginalDate) {
         this.txOriginalDate = txOriginalDate;
     }
 
-    public Date getTxUpdateDate() {
+    public LocalDateTime getTxUpdateDate() {
         return txUpdateDate;
     }
 
-    public void setTxUpdateDate(Timestamp txUpdateDate) {
+    public void setTxUpdateDate(LocalDateTime txUpdateDate) {
         this.txUpdateDate = txUpdateDate;
     }
 }
