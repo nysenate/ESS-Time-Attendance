@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @WebAppConfiguration
 @ContextConfiguration(classes = {WebApplicationConfig.class})
 @ActiveProfiles("test")
-public abstract class AbstractContextTests
+public abstract class BaseTests
 {
     protected MockMvc mockMvc;
 
