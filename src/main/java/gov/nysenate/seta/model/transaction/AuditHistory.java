@@ -1,32 +1,27 @@
 package gov.nysenate.seta.model.transaction;
 
-import gov.nysenate.seta.dao.transaction.SqlEmployeeTransactionDao;
+import gov.nysenate.seta.dao.base.SortOrder;
+import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
 import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
-import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * The AuditHistory provides an ordered collection of TransactionRecords derived by TransactionHistory. This class is intended to be
- * used in methods that need to easily obtain a view of how an employee looks at any given time. This class was created to simplify the
- * need to obtain multiple values for a given point in time.
+ * The AuditHistory provides an ordered collection of TransactionRecords derived by TransactionHistory. This class is
+ * intended to be used in methods that need to easily obtain a view of how an employee looks at any given time.
+ * This class was created to simplify the need to obtain multiple values for a given point in time.
  */
-
-public class AuditHistory {
+public class AuditHistory
+{
     protected int employeeId = -1;
     protected Map<TransactionCode, List<TransactionRecord>> recordHistory;
     protected List<Map> auditRecords;
     TransactionHistory transactionHistory;
-
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-    @Autowired
-    SqlEmployeeTransactionDao transHistDao;
     private static final Logger logger = LoggerFactory.getLogger(AuditHistory.class);
 
     public AuditHistory() {
@@ -77,6 +72,7 @@ public class AuditHistory {
                 else {
                     codes = transactionCodes;
                 }
+                SqlEmpTransactionDao transHistDao = new SqlEmpTransactionDao();
                 transactionHistory = transHistDao.getTransHistory(employeeId, codes, true);
             }
         }
@@ -105,8 +101,8 @@ public class AuditHistory {
             Map<String, String> holdValues = null;
             auditRecords = new ArrayList<Map>();
             Date effectDate = null;
-            logger.debug("buildAuditTrail transactionHistory:"+transactionHistory.getAllTransRecords(true).size());
-            for (TransactionRecord curTrans : transactionHistory.getAllTransRecords(true)) {
+            logger.debug("buildAuditTrail transactionHistory:"+transactionHistory.getAllTransRecords(SortOrder.ASC).size());
+            for (TransactionRecord curTrans : transactionHistory.getAllTransRecords(SortOrder.ASC)) {
                 if (holdValues==null) {
                     holdValues = new HashMap<String, String>();
                     holdValues.put("EffectDate",sdf.format(curTrans.getEffectDate()));

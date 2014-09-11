@@ -1,8 +1,11 @@
 package gov.nysenate.seta.dao.base;
 
+/**
+ * Simple enumeration to indicate which order a collection should be sorted.
+ */
 public enum SortOrder
 {
-    ASC,
-    DESC,
-    NONE
+    ASC,  // Ascending
+    DESC, // Descending
+    NONE  // Doesn't Matter
 }

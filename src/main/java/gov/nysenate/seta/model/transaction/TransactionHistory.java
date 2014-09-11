@@ -1,9 +1,14 @@
 package gov.nysenate.seta.model.transaction;
 
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import gov.nysenate.seta.dao.base.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The TransactionHistory provides an ordered collection of TransactionRecords. This class is intended to be
@@ -11,20 +16,27 @@ import java.util.*;
  */
 public class TransactionHistory
 {
-    protected int employeeId;
-    protected Map<TransactionCode, List<TransactionRecord>> recordHistory;
-    protected boolean earliestRecLikeAppoint = false;
     private static final Logger logger = LoggerFactory.getLogger(TransactionHistory.class);
 
+    /** The employee id that this history refers to. */
+    protected int employeeId;
+
+    /** A collection of TransactionRecords grouped via the TransactionCode. */
+    protected LinkedListMultimap<TransactionCode, TransactionRecord> recordMultimap;
+
+    /** Indicates if the earliest transaction record should represent the initial state, similar to an
+     *  APP transaction. This is due to some early employees who are missing APP transactions. */
+    protected boolean earliestRecLikeAppoint = false;
+
+    /** --- Constructors --- */
+
     public TransactionHistory(int empId) {
-        this.employeeId = empId;
-        this.recordHistory = new HashMap<>();
-        this.earliestRecLikeAppoint = false;
+        this(empId, false);
     }
 
     public TransactionHistory(int empId, boolean earliestRecLikeAppoint) {
         this.employeeId = empId;
-        this.recordHistory = new HashMap<>();
+        this.recordMultimap = LinkedListMultimap.create();
         this.earliestRecLikeAppoint = earliestRecLikeAppoint;
     }
 
@@ -33,7 +45,7 @@ public class TransactionHistory
      * @return boolean
      */
     public boolean hasRecords() {
-        return !recordHistory.isEmpty();
+        return !recordMultimap.isEmpty();
     }
 
     /**
@@ -42,7 +54,7 @@ public class TransactionHistory
      * @return boolean
      */
     public boolean hasRecords(TransactionCode code) {
-        return recordHistory.get(code) != null && !recordHistory.get(code).isEmpty();
+        return !recordMultimap.get(code).isEmpty();
     }
 
     /** --- Functional Getters/Setters --- */
@@ -50,18 +62,15 @@ public class TransactionHistory
     /**
      * Adds a transaction record to the history queue.
      * @param record TransactionRecord
-     * @param addingFirstRecord Indicator we are adding the first record
+     * @param isFirstRec Indicator we are adding the first record
      */
-    public void addTransactionRecord(TransactionRecord record, boolean addingFirstRecord) {
+    public void addTransactionRecord(TransactionRecord record, boolean isFirstRec) {
         if (record != null) {
             TransactionCode code = record.getTransCode();
-            if (addingFirstRecord) {
+            if (isFirstRec) {
                 code = TransactionCode.APP;
             }
-            if (!recordHistory.containsKey(code)) {
-                recordHistory.put( code, new LinkedList<TransactionRecord>());
-            }
-            this.recordHistory.get(code).add(record);
+            recordMultimap.put(code, record);
         }
     }
 
@@ -70,7 +79,6 @@ public class TransactionHistory
      * @param recordsList List<TransactionRecord>
      */
     public void addTransactionRecords(List<TransactionRecord> recordsList) {
-        //logger.debug("=====================addTransactionRecords recordList:"+OutputUtils.toJson(recordsList));
         boolean addFirstRecord = true;
         for (TransactionRecord record : recordsList) {
             this.addTransactionRecord(record, addFirstRecord);
@@ -79,60 +87,71 @@ public class TransactionHistory
     }
 
     /**
-     * See overloaded method. This provides the option to change the sort order for the returned list of records.
+     * See overloaded method.
+     * @see #getTransRecords(java.util.Set, gov.nysenate.seta.dao.base.SortOrder)
      * @param code TransactionCode
-     * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
+     * @param dateSort SortOrder
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(TransactionCode code, boolean sortByDateAsc) {
-        return getTransRecords(new HashSet<>(Arrays.asList(code)), sortByDateAsc);
+    public LinkedList<TransactionRecord> getTransRecords(TransactionCode code, SortOrder dateSort) {
+        return getTransRecords(new HashSet<>(Arrays.asList(code)), dateSort);
     }
 
     /**
      * Returns a single ordered LinkedList containing a set of transaction records. This is useful if
-     * you need all the transaction records to be ordered into a single collection.
-     * @param transCodes Set<TransactionCode> - The set of transaction codes to return in the list
-     * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
+     * you need a subset of the transaction records to be ordered into a single collection.
+     * @param transCodes Set<TransactionCode> - The set of transaction codes to return in the list.
+     * @param dateSort SortOrder - Sort order based on the effective date
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transCodes, boolean sortByDateAsc) {
+    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transCodes, SortOrder dateSort) {
         LinkedList<TransactionRecord> sortedRecList = new LinkedList<>();
-        //logger.debug("Transaction History getTransRecords KeySet:"+OutputUtils.toJson(recordHistory.keySet()));
-        //logger.debug("Transaction History getTransRecords recordHistory:"+OutputUtils.toJson(recordHistory));
-        for (TransactionCode code : recordHistory.keySet()) {
-            if (transCodes.contains(code) ) {
-                sortedRecList.addAll(recordHistory.get(code));
-            }
-        }
-        Collections.sort(sortedRecList, (sortByDateAsc) ? new TransDateAscending() : new TransDateDescending());
-        //logger.debug("Transaction History getTransRecords sortedRecList:"+OutputUtils.toJson(sortedRecList));
+        recordMultimap.keySet().stream()
+            .filter(transCodes::contains)
+            .forEach(code -> sortedRecList.addAll(recordMultimap.get(code)));
+        sortedRecList.sort((dateSort.equals(SortOrder.ASC)) ? new TransDateAscending() : new TransDateDescending());
         return sortedRecList;
     }
 
     /**
-     * Shorthand method to retrieve every available transaction code.
-     * @param sortByDateAsc boolean - If true, list will be ordered by earliest effect date first.
+     * Shorthand method to retrieve every available transaction record.
+     * @see #getTransRecords(java.util.Set, gov.nysenate.seta.dao.base.SortOrder)
+     * @param dateOrder SortOrder - Sort order based on the effective date
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getAllTransRecords(boolean sortByDateAsc) {
-        return getTransRecords(recordHistory.keySet(), sortByDateAsc);
+    public LinkedList<TransactionRecord> getAllTransRecords(SortOrder dateOrder) {
+        return getTransRecords(recordMultimap.keySet(), dateOrder);
+    }
+
+    /**
+     * Get an immutable copy of the record multimap stored in this transaction history.
+     * @return ImmutableMultimap<TransactionCode, TransactionRecord>
+     */
+    public ImmutableMultimap<TransactionCode, TransactionRecord> getRecordMultimap() {
+        return ImmutableMultimap.copyOf(recordMultimap);
     }
 
     /** --- Local classes --- */
 
-    protected static class TransDateAscending implements Comparator<TransactionRecord> {
+    protected static class TransDateAscending implements Comparator<TransactionRecord>
+    {
         @Override
         public int compare(TransactionRecord o1, TransactionRecord o2) {
-            int dateCompare = o1.getEffectDate().compareTo(o2.getEffectDate());
-            return (dateCompare != 0) ? dateCompare : o1.getOriginalDate().compareTo(o2.originalDate);
+            return ComparisonChain.start()
+                .compare(o1.getEffectDate(), o2.getEffectDate())
+                .compare(o1.getOriginalDate(), o2.getOriginalDate())
+                .result();
         }
     }
 
-    protected static class TransDateDescending implements Comparator<TransactionRecord> {
+    protected static class TransDateDescending implements Comparator<TransactionRecord>
+    {
         @Override
         public int compare(TransactionRecord o1, TransactionRecord o2) {
-            int dateCompare = o2.getEffectDate().compareTo(o1.getEffectDate());
-            return (dateCompare != 0) ? dateCompare : o2.getOriginalDate().compareTo(o1.originalDate);
+            return ComparisonChain.start()
+                .compare(o2.getEffectDate(), o1.getEffectDate())
+                .compare(o2.getOriginalDate(), o1.getOriginalDate())
+                .result();
         }
     }
 

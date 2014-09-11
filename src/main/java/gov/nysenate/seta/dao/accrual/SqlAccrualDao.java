@@ -4,10 +4,11 @@ import gov.nysenate.seta.dao.accrual.mapper.AnnualAccrualSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.attendance.TimeEntryDao;
+import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.personnel.HolidayDao;
-import gov.nysenate.seta.dao.transaction.EmployeeTransactionDao;
+import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.accrual.*;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -44,7 +45,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDao.class);
 
     @Autowired
-    protected EmployeeTransactionDao empTransactionDao;
+    protected EmpTransactionDao empTransactionDao;
 
     @Resource(name = "localTimeEntry")
     protected TimeEntryDao localTimeEntryDao;
@@ -197,7 +198,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
         TransactionHistory historyDuringGap = getAccrualTransactions(empId, accrualGap.getStartDate(), accrualGap.getEndDate());
         accrualGap.setGapPeriods(payPeriodDao.getPayPeriods(PayPeriodType.AF, gapStartDate, gapEndDate, true));
-        accrualGap.setRecordsDuringGap(historyDuringGap.getAllTransRecords(false));
+        accrualGap.setRecordsDuringGap(historyDuringGap.getAllTransRecords(SortOrder.DESC));
         accrualGap.setPeriodUsageRecs(getPeriodAccrualUsageRecords(empId, gapStartDate, gapEndDate));
 
         /** TODO: Add local timesheet data */
@@ -268,9 +269,9 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      */
     protected AccrualState getInitialAccrualState(AnnualAccrualSummary annSummary, Date endDate,
                                                   TransactionHistory transHistory, boolean hasEndDate) throws AccrualException {
-        LinkedList<TransactionRecord> empRecords = getEmpRecordsFromHistory(transHistory, false);
-        LinkedList<TransactionRecord> minRecords = getMinRecordsFromHistory(transHistory, false);
-        LinkedList<TransactionRecord> payTypeRecords = getPayTypeRecordsFromHistory(transHistory, false);
+        LinkedList<TransactionRecord> empRecords = getEmpRecordsFromHistory(transHistory, SortOrder.DESC);
+        LinkedList<TransactionRecord> minRecords = getMinRecordsFromHistory(transHistory, SortOrder.DESC);
+        LinkedList<TransactionRecord> payTypeRecords = getPayTypeRecordsFromHistory(transHistory, SortOrder.DESC);
 
         AccrualState accState = new AccrualState(annSummary);
         accState.setEndDate(endDate);

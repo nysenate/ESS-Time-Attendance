@@ -33,7 +33,10 @@ public class TransactionRecord
     /** The date in which this transaction is effective. */
     protected Date effectDate;
 
+    /** The date when this record was created. */
     protected Date originalDate;
+
+    /** The date when this record was updated. */
     protected Date updateDate;
 
     public TransactionRecord() {}

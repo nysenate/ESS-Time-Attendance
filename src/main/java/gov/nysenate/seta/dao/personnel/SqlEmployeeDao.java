@@ -2,7 +2,7 @@ package gov.nysenate.seta.dao.personnel;
 
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.personnel.mapper.EmployeeRowMapper;
-import gov.nysenate.seta.dao.transaction.EmployeeTransactionDao;
+import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeException;
 import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
@@ -22,7 +22,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeDao.class);
 
     @Autowired
-    protected EmployeeTransactionDao transHistoryDao;
+    protected EmpTransactionDao transHistoryDao;
 
     protected static final String GET_EMP_SQL_TMPL =
         "SELECT DISTINCT \n" +

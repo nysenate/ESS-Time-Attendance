@@ -36,11 +36,8 @@ public class DeepCopy {
                     new ObjectInputStream(fbos.getInputStream());
             obj = in.readObject();
         }
-        catch(IOException e) {
+        catch(IOException | ClassNotFoundException e) {
             e.printStackTrace();
-        }
-        catch(ClassNotFoundException cnfe) {
-            cnfe.printStackTrace();
         }
         return obj;
     }

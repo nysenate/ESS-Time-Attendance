@@ -1,13 +1,25 @@
 package gov.nysenate.seta;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
+import com.sun.xml.internal.fastinfoset.algorithm.UUIDEncodingAlgorithm;
+import gov.nysenate.seta.model.transaction.TransactionCode;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+import sun.util.logging.resources.logging_fr;
+
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * A sample file to run misc tests.
  */
 public class SillyTests
 {
+   private static final Logger logger = LoggerFactory.getLogger(SillyTests.class);
+
    public void test() {
        Map<String, String> values = new HashMap<String, String>();
        values.put("val", "value");
@@ -23,8 +35,31 @@ public class SillyTests
        }
    }
 
-  public static void main(String[] args) {
+    @Test
+    public void testUUID() throws Exception {
+        logger.debug("{}", UUID.fromString("db551bca-0882-4a58-b3b3-8b2b8c27768a"));
+        Set<TransactionCode> hashSet = Sets.newHashSet(TransactionCode.APP, null);
+        logger.info("{}", Sets.intersection(null, TransactionCode.getAll()));
+    }
+
+    public static void main(String[] args) {
       SillyTests sillyTests = new SillyTests();
       sillyTests.test();
-  }
+    }
+
+    @Test
+    public void testInt() throws Exception {
+        Integer i = Integer.valueOf("5");
+        logger.info("{}", i);
+        Range<LocalDate> dateRange = Range.lessThan(LocalDate.of(2014, 1, 12));
+        LocalDate date = LocalDate.now();
+        date.atStartOfDay().plusHours(2);
+        logger.info("{}", dateRange);
+    }
+
+    @Test
+    public void testSomething() throws Exception {
+        String s  = "S1234A";
+        logger.info(s.substring(0, 1) + StringUtils.trimLeadingCharacter(s.substring(1), '0'));
+    }
 }

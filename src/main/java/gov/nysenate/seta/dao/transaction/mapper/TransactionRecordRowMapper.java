@@ -14,13 +14,15 @@ import java.util.*;
 
 public class TransactionRecordRowMapper extends BaseRowMapper<TransactionRecord>
 {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionRecordRowMapper.class);
+
     private String pfx = "";
     private String auditPfx = "";
     private Set<TransactionCode> transCodes;
     private boolean earliestRecLikeAppoint = false;
     private boolean firstRecord = true;
-    private static final Logger logger = LoggerFactory.getLogger(TransactionRecordRowMapper.class);
-    private int firstChangeId = -1;
+
+    private int nuchange = -1;
 
     public TransactionRecordRowMapper(String pfx, String auditPfx, TransactionCode transCode) {
         this(pfx, auditPfx, new HashSet<>(Arrays.asList(transCode)));
@@ -60,18 +62,18 @@ public class TransactionRecordRowMapper extends BaseRowMapper<TransactionRecord>
         boolean isAppointment = code.equals(TransactionCode.APP) || code.equals(TransactionCode.RTP);
 
         Map<String, String> valueMap = new HashMap<>();
-        for (String col : ((isAppointment ||(earliestRecLikeAppoint && rowNum==0)||transRec.getChangeId()==firstChangeId) ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList())) {
+        for (String col : ((isAppointment ||(earliestRecLikeAppoint && rowNum==0)||transRec.getChangeId()==nuchange) ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList())) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
         }
 
         if (earliestRecLikeAppoint && rowNum==0)  {
-            firstChangeId = transRec.getChangeId();
+          nuchange = transRec.getChangeId();
         }
-        else if (transRec.getChangeId()==firstChangeId) {
+        else if (transRec.getChangeId()==nuchange) {
         }
         transRec.setValueMap(valueMap);
         if (firstRecord) {
-            logger.debug(firstChangeId+" TransactionRecordRowMapper FirstRecord:"+OutputUtils.toJson(valueMap));
+            logger.debug(nuchange+" TransactionRecordRowMapper FirstRecord:"+OutputUtils.toJson(valueMap));
         }
         firstRecord = false;
         return transRec;

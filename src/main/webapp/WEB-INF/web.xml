@@ -15,4 +15,10 @@
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>
 
+    <!-- Configures the Spring profile -->
+    <context-param>
+        <param-name>spring.profiles.active</param-name>
+        <param-value>dev</param-value>
+    </context-param>
+
 </web-app>

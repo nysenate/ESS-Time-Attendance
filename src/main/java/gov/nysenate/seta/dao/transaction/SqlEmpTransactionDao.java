@@ -1,5 +1,9 @@
 package gov.nysenate.seta.dao.transaction;
 
+import com.google.common.collect.ImmutableRangeSet;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeSet;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.transaction.mapper.TransactionRecordRowMapper;
 import gov.nysenate.seta.model.transaction.TransactionCode;
@@ -12,72 +16,71 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Repository
-public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTransactionDao
+public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDao
 {
-    private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeTransactionDao.class);
-    private boolean earliestRecLikeAppoint = false;
+    private static final Logger logger = LoggerFactory.getLogger(SqlEmpTransactionDao.class);
 
     protected static final String GET_TRANS_HISTORY_SQL =
         "SELECT aud.NUXREFEM, ptx.CDSTATUS, ptx.CDTRANS, ptx.CDTRANSTYP, ptx.NUCHANGE, " +
         "       CAST (ptx.DTTXNORIGIN AS TIMESTAMP) AS DTTXNORIGIN, " +
         "       CAST (ptx.DTTXNUPDATE AS TIMESTAMP) AS DTTXNUPDATE,\n" +
         "       ptx.DTEFFECT ${audColumns}\n" +
-        "FROM PM21PERAUDIT aud\n" +
-        "LEFT JOIN PD21PTXNCODE ptx ON aud.NUCHANGE = ptx.NUCHANGE\n" +
-        "LEFT JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM PL21TRANCODE) code ON ptx.CDTRANS = code.CDTRANS\n" +
+        "FROM SASS_OWNER.PM21PERAUDIT aud\n" +
+        "JOIN SASS_OWNER.PD21PTXNCODE ptx ON aud.NUCHANGE = ptx.NUCHANGE\n" +
+        "JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM SASS_OWNER.PL21TRANCODE) code ON ptx.CDTRANS = code.CDTRANS\n" +
         "WHERE aud.NUXREFEM = :empId AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
         "AND ptx.CDTRANS IN (:transCodes)\n" +
         "ORDER BY ptx.DTEFFECT, ptx.DTTXNORIGIN";
 
     /** {@inheritDoc} */
     @Override
+    public TransactionHistory getTransHistory(int empId) {
+        return getTransHistory(empId, TransactionCode.getAll());
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes) {
-        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes) 1");
         return getTransHistory(empId, codes, new Date());
     }
 
+    /** {@inheritDoc} */
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, boolean earliestRecLikeAppoint) {
-        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, boolean earliestRecLikeAppoint) 2");
-        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
         return getTransHistory(empId, codes, new Date(), earliestRecLikeAppoint);
     }
 
     /** {@inheritDoc} */
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) {
-        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) 2");
-        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
         return getTransHistory(empId, codes, getBeginningOfTime(), end, earliestRecLikeAppoint);
     }
 
     /** {@inheritDoc} */
      @Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end) {
-        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) 3");
         return getTransHistory(empId, codes, getBeginningOfTime(), end);
     }
 
     /** {@inheritDoc} */
-    //@Override
+    @Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end) {
-        logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end) 4");
         return getTransHistory(empId, codes, start, end,  false );
     }
 
     /** {@inheritDoc} */
     @Override
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end, boolean earliestRecLikeAppoint) {
-        //logger.debug(" getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end, boolean earliestRecLikeAppoint) 5");
-        this.earliestRecLikeAppoint = earliestRecLikeAppoint;
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date start, Date end,
+                                              boolean earliestRecLikeAppoint) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("dateStart", start);
         params.addValue("dateEnd", end);
 
         if (earliestRecLikeAppoint) {
-            params.addValue("transCodes", getTransCodesFromSet(null));
+            params.addValue("transCodes", getAllTransCodes());
         }
         else {
             params.addValue("transCodes", getTransCodesFromSet(codes));
@@ -87,20 +90,26 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         List<TransactionRecord> transRecordList =
                 remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes, earliestRecLikeAppoint));
 
-        /*for (int x = 0;x < transRecordList.size();x++) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(transRecordList.get(x).getValueMap().toString());
-            logger.debug("!!!!"+x+":"+sb.toString());
-        }*/
-
         TransactionHistory transHistory = new TransactionHistory(empId);
         transHistory.addTransactionRecords(transRecordList);
         return transHistory;
     }
 
+    @Override
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange, boolean requireInitialState) {
+        RangeSet<LocalDate> dateRanges = ImmutableRangeSet.of(dateRange);
+        return getTransHistory(empId, codes, dateRanges, requireInitialState);
+    }
+
+    @Override
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, RangeSet<LocalDate> dateRanges, boolean requireInitialState) {
+        return null;
+    }
+
     /**
      * Helper method to add audit columns to the select sql statement. This is done because the columns need to be
      * explicitly added to prevent name clashes and we don't want to manually write them out.
+     *
      * @param selectSql String - The sql with a select statement to add the audit columns to.
      * @param replaceKey String - An identifier inside the sql for replacement. e.g ${auditCols} where 'auditCols' is the key.
      *                            The replacement string cannot be the first entry in the select clause due to commas.
@@ -109,14 +118,15 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
      *                                           all the columns for every transaction code will be added.
      * @return String - sql statement with audit columns
      */
-    private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx, Set<TransactionCode> restrictSet, boolean earliestRecLikeAppoint) {
+    private String applyAuditColumnsInSelectSql(String selectSql, String replaceKey, String pfx,
+                                                Set<TransactionCode> restrictSet, boolean earliestRecLikeAppoint) {
         Map<String, String> selectMap = new HashMap<>();
 
         /** Restrict the columns to just the ones needed unless the set is empty or contains APP or RTP
          *  because those serve as initial snapshots and therefore need all the columns. */
         List<String> auditColList = new ArrayList<>();
-        if (!earliestRecLikeAppoint && restrictSet != null && !restrictSet.isEmpty() && !restrictSet.contains(TransactionCode.APP) &&
-            !restrictSet.contains(TransactionCode.RTP)) {
+        if (!earliestRecLikeAppoint && restrictSet != null && !restrictSet.isEmpty() &&
+            !restrictSet.contains(TransactionCode.APP) && !restrictSet.contains(TransactionCode.RTP)) {
             for (TransactionCode code : restrictSet) {
                 auditColList.addAll(code.getDbColumnList());
             }
@@ -146,12 +156,8 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
      * @return Set<String>
      */
     private Set<String> getTransCodesFromSet(Set<TransactionCode> codes) {
-        if (codes==null||codes.size()==0) {
-            codes = new HashSet<TransactionCode>();
-            TransactionCode[] allTransactionCodes = TransactionCode.values();
-            for (TransactionCode curTransCode : allTransactionCodes) {
-                codes.add(curTransCode);
-            }
+        if (codes == null) {
+            codes = new HashSet<>();
         }
         Set<String> transCodes = new HashSet<>();
         for (TransactionCode code : codes) {
@@ -160,4 +166,13 @@ public class SqlEmployeeTransactionDao extends SqlBaseDao implements EmployeeTra
         return transCodes;
     }
 
+    /**
+     * Returns the code strings for all the TransactionCodes.
+     * @return Set<String>
+     */
+    private Set<String> getAllTransCodes() {
+        Set<TransactionCode> allCodes = new HashSet<>();
+        Collections.addAll(allCodes, TransactionCode.values());
+        return getTransCodesFromSet(allCodes);
+    }
 }

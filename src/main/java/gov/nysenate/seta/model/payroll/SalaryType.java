@@ -5,8 +5,8 @@ package gov.nysenate.seta.model.payroll;
  * Refer to the Senate's Time and Attendance Plan for more information about
  * the details for each pay type.
  */
-
-public enum SalaryType {
+public enum SalaryType
+{
     HOURLY("Hourly Salary", "TE", 3600000l),
     BIWEEKLY("Biweekly Salary", "RA", 1209600000l),
     BIWEEKLYSA("Biweekly Salary", "SA", 1209600000l),

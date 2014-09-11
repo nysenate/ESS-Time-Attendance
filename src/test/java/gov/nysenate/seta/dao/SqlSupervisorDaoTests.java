@@ -5,6 +5,7 @@ import gov.nysenate.seta.dao.personnel.SupervisorDao;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.util.OutputUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ public class SqlSupervisorDaoTests extends AbstractContextTests
 
     @Test
     public void testGetSupervisorIdForEmpWithDate_ReturnsCorrectSupervisorId() throws Exception {
-        logger.info("{}", supervisorDao.getSupervisorIdForEmp(11423, new DateTime(2014, 7, 16, 0, 0, 0).toDate()));
+        logger.info("{}", supervisorDao.getSupervisorIdForEmp(10976, new LocalDate(2014, 7, 10).toDate()));
     }
 
     @Test
@@ -29,7 +30,7 @@ public class SqlSupervisorDaoTests extends AbstractContextTests
 
     @Test
     public void testGetSupEmpGroup_ReturnsEmpGroup() throws Exception {
-        SupervisorEmpGroup group = supervisorDao.getSupervisorEmpGroup(9896, new DateTime(2012, 2, 27, 0, 0, 0).toDate(), new DateTime(2014, 3, 12, 0, 0, 0).toDate());
+        SupervisorEmpGroup group = supervisorDao.getSupervisorEmpGroup(9896, new DateTime(2014, 7, 27, 0, 0, 0).toDate(), new DateTime(2014, 3, 12, 0, 0, 0).toDate());
         logger.info(OutputUtils.toJson(group));
     }
 

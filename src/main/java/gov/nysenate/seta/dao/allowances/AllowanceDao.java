@@ -1,9 +1,5 @@
 package gov.nysenate.seta.dao.allowances;
 
-/**
- * Created by heitner on 6/25/2014.
- */
-
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.transaction.AuditHistory;
@@ -14,5 +10,5 @@ import gov.nysenate.seta.model.transaction.AuditHistory;
  */
 public interface AllowanceDao extends BaseDao
 {
-    AllowanceUsage getAllowanceUsage(int empId, int year, AuditHistory auditHistory);
-    }
+    public AllowanceUsage getAllowanceUsage(int empId, int year, AuditHistory auditHistory);
+}

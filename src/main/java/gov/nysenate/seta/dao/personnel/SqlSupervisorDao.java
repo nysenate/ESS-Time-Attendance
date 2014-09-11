@@ -1,7 +1,8 @@
 package gov.nysenate.seta.dao.personnel;
 
+import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.EmployeeTransactionDao;
+import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorMissingEmpsEx;
 import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
@@ -34,7 +35,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     private static final Logger logger = LoggerFactory.getLogger(SqlSupervisorDao.class);
 
     @Autowired
-    private EmployeeTransactionDao empTransactionDao;
+    private EmpTransactionDao empTransactionDao;
 
     /**
      * This query returns a listing of all supervisor related transactions for employees that have at
@@ -115,7 +116,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
         int supId = -1;
         if (transHistory.hasRecords()) {
-            TransactionRecord latestSupRec = transHistory.getAllTransRecords(false).getFirst();
+            TransactionRecord latestSupRec = transHistory.getAllTransRecords(SortOrder.DESC).getFirst();
             String supIdStr = latestSupRec.getValueMap().get("NUXREFSV");
             if (StringUtils.isNumeric(supIdStr)) {
                 supId = Integer.parseInt(supIdStr);

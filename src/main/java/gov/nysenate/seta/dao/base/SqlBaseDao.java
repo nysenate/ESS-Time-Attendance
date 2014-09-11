@@ -90,12 +90,7 @@ public abstract class SqlBaseDao
      * @return char
      */
     public static char getStatusCode(Boolean status) {
-        if (status != null && status.equals(true)) {
-            return 'A';
-        }
-        else {
-            return 'I';
-        }
+        return (status != null && status.equals(true)) ? 'A' : 'I';
     }
 
     /**
@@ -119,6 +114,4 @@ public abstract class SqlBaseDao
         StrSubstitutor strSub = new StrSubstitutor(replaceMap);
         return strSub.replace(sql);
     }
-
-
 }
