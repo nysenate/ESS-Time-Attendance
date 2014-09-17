@@ -107,7 +107,7 @@ public class AuditHistory
                     holdValues = new HashMap<String, String>();
                     holdValues.put("EffectDate",sdf.format(curTrans.getEffectDate()));
                     holdValues.putAll(curTrans.getValueMap());
-                    effectDate = curTrans.getEffectDate();
+// commented out by ash                   effectDate = curTrans.getEffectDate();
                     auditRecords.add(holdValues);
                     //logger.debug("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-INITIAL Audit Record"+OutputUtils.toJson(holdValues));
                 }
@@ -124,7 +124,7 @@ public class AuditHistory
                         //logger.debug("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-UPDATING Audit Record");
                     }
                     else {
-                        effectDate = curTrans.getEffectDate();
+          //commented out by ash              effectDate = curTrans.getEffectDate();
                         auditRecords.add(newValues);
                         //logger.debug("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-INSERTING Audit Record");
                     }

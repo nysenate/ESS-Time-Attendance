@@ -69,8 +69,9 @@ public interface EmpTransactionDao
 
     /** NEW METHODS */
 
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange,
-                                              boolean requireInitialState);
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange);
+
+//    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange);
 
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, RangeSet<LocalDate> dateRanges,
                                               boolean requireInitialState);

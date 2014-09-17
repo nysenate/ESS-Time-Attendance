@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -55,14 +56,16 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
 
     /** {@inheritDoc} */
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end, boolean earliestRecLikeAppoint) {
-        return getTransHistory(empId, codes, getBeginningOfTime(), end, earliestRecLikeAppoint);
+//        return getTransHistory(empId, codes, getBeginningOfTime(), end, earliestRecLikeAppoint);
+        throw new NotImplementedException();
     }
 
     /** {@inheritDoc} */
      @Override
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Date end) {
-        return getTransHistory(empId, codes, getBeginningOfTime(), end);
-    }
+//        return getTransHistory(empId, codes, getBeginningOfTime(), end);
+         throw new NotImplementedException();
+     }
 
     /** {@inheritDoc} */
     @Override
@@ -88,14 +91,18 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
 
         String sql = applyAuditColumnsInSelectSql(GET_TRANS_HISTORY_SQL, "audColumns", "", codes, earliestRecLikeAppoint);
         List<TransactionRecord> transRecordList =
-                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes, earliestRecLikeAppoint));
+                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes, TransDaoOption.DEFAULT));
 
-        TransactionHistory transHistory = new TransactionHistory(empId);
-        transHistory.addTransactionRecords(transRecordList);
+        TransactionHistory transHistory = new TransactionHistory(empId, null);
+     //    transHistory.addTransactionRecords(transRecordList);
         return transHistory;
     }
 
     @Override
+    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange) {
+        return null;
+    }
+
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange, boolean requireInitialState) {
         RangeSet<LocalDate> dateRanges = ImmutableRangeSet.of(dateRange);
         return getTransHistory(empId, codes, dateRanges, requireInitialState);

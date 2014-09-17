@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,8 @@ public class OutputUtils
     static {
         jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        jsonMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        jsonMapper.registerModule(new JSR310Module());
     }
 
     /**

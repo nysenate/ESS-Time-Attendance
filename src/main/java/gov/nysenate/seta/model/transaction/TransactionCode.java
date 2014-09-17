@@ -102,16 +102,30 @@ public enum TransactionCode
         return new HashSet<>(Arrays.asList(TransactionCode.values()));
     }
 
+    /** --- Methods --- */
+
+    public boolean isAppointType() {
+        return this.equals(APP) || this.equals(RTP);
+    }
+
+    public boolean usesAllColumns() {
+        return this.isAppointType();
+    }
+
     /** --- Functional Getters/Setters --- */
 
     public List<String> getDbColumnList() {
-        return Arrays.asList(StringUtils.split(dbColumns, ","));
+        return (this.usesAllColumns())
+            ? getAllDbColumnsList()
+            : Arrays.asList(StringUtils.split(dbColumns, ","));
     }
 
     public static List<String> getAllDbColumnsList() {
         List<String> columns = new ArrayList<>();
         for (TransactionCode t : TransactionCode.values()) {
-            columns.addAll(t.getDbColumnList());
+            if (!t.usesAllColumns()) {
+                columns.addAll(t.getDbColumnList());
+            }
         }
         return columns;
     }
@@ -120,10 +134,6 @@ public enum TransactionCode
 
     public TransactionType getType() {
         return type;
-    }
-
-    public String getDbColumns() {
-        return dbColumns;
     }
 
     public String getDesc() {

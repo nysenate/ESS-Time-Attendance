@@ -3,7 +3,8 @@ package gov.nysenate.seta.model.transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -31,21 +32,23 @@ public class TransactionRecord
     protected Map<String, String> valueMap;
 
     /** The date in which this transaction is effective. */
-    protected Date effectDate;
+    protected LocalDate effectDate;
 
     /** The date when this record was created. */
-    protected Date originalDate;
+    protected LocalDateTime originalDate;
 
     /** The date when this record was updated. */
-    protected Date updateDate;
+    protected LocalDateTime updateDate;
+
+    /** --- Constructors --- */
 
     public TransactionRecord() {}
+
+    /** --- Functional Getters/Setters --- */
 
     public boolean hasValues() {
         return valueMap != null && !valueMap.isEmpty();
     }
-
-    /** --- Functional Getters/Setters --- */
 
     /**
      * Delegate to retrieve the value associated with the given column name.
@@ -114,27 +117,27 @@ public class TransactionRecord
         this.valueMap = valueMap;
     }
 
-    public Date getOriginalDate() {
+    public LocalDateTime getOriginalDate() {
         return originalDate;
     }
 
-    public void setOriginalDate(Date originalDate) {
+    public void setOriginalDate(LocalDateTime originalDate) {
         this.originalDate = originalDate;
     }
 
-    public Date getUpdateDate() {
+    public LocalDateTime getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
 
-    public Date getEffectDate() {
+    public LocalDate getEffectDate() {
         return effectDate;
     }
 
-    public void setEffectDate(Date effectDate) {
+    public void setEffectDate(LocalDate effectDate) {
         this.effectDate = effectDate;
     }
 }
