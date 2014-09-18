@@ -3,9 +3,8 @@ package gov.nysenate.seta.dao.transaction;
 import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
-import com.google.common.collect.TreeRangeSet;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.mapper.TransactionRecordRowMapper;
+import gov.nysenate.seta.dao.transaction.mapper.TransRecordRowMapper;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
@@ -30,9 +29,9 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
         "       CAST (ptx.DTTXNORIGIN AS TIMESTAMP) AS DTTXNORIGIN, " +
         "       CAST (ptx.DTTXNUPDATE AS TIMESTAMP) AS DTTXNUPDATE,\n" +
         "       ptx.DTEFFECT ${audColumns}\n" +
-        "FROM SASS_OWNER.PM21PERAUDIT aud\n" +
-        "JOIN SASS_OWNER.PD21PTXNCODE ptx ON aud.NUCHANGE = ptx.NUCHANGE\n" +
-        "JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM SASS_OWNER.PL21TRANCODE) code ON ptx.CDTRANS = code.CDTRANS\n" +
+        "FROM " + MASTER_SCHEMA + ".PM21PERAUDIT aud\n" +
+        "JOIN " + MASTER_SCHEMA + ".PD21PTXNCODE ptx ON aud.NUCHANGE = ptx.NUCHANGE\n" +
+        "JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM " + MASTER_SCHEMA + ".PL21TRANCODE) code ON ptx.CDTRANS = code.CDTRANS\n" +
         "WHERE aud.NUXREFEM = :empId AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
         "AND ptx.CDTRANS IN (:transCodes)\n" +
         "ORDER BY ptx.DTEFFECT, ptx.DTTXNORIGIN";
@@ -91,7 +90,7 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
 
         String sql = applyAuditColumnsInSelectSql(GET_TRANS_HISTORY_SQL, "audColumns", "", codes, earliestRecLikeAppoint);
         List<TransactionRecord> transRecordList =
-                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes, TransDaoOption.DEFAULT));
+                remoteNamedJdbc.query(sql, params, new TransRecordRowMapper("", "", codes, TransDaoOption.DEFAULT));
 
         TransactionHistory transHistory = new TransactionHistory(empId, null);
      //    transHistory.addTransactionRecords(transRecordList);

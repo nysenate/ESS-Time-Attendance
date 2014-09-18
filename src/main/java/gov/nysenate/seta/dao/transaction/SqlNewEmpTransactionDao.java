@@ -2,7 +2,8 @@ package gov.nysenate.seta.dao.transaction;
 
 import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.mapper.TransactionRecordRowMapper;
+import gov.nysenate.seta.dao.transaction.mapper.TransHistoryHandler;
+import gov.nysenate.seta.dao.transaction.mapper.TransRecordRowMapper;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
@@ -27,13 +28,13 @@ public class SqlNewEmpTransactionDao extends SqlBaseDao implements NewEmpTransac
         "SELECT\n" +
         "    AUD.NUXREFEM, PTX.CDSTATUS, PTX.CDTRANS, PTX.CDTRANSTYP, PTX.NUCHANGE, " +
         "    CAST (PTX.DTTXNORIGIN AS TIMESTAMP) AS DTTXNORIGIN, CAST (PTX.DTTXNUPDATE AS TIMESTAMP) AS DTTXNUPDATE,\n" +
-        "    PTX.DTEFFECT ${audColumns}\n" +
+        "    PTX.DTEFFECT, AUD.DETXNNOTE50, AUD.DETXNNOTEPAY ${audColumns}\n" +
         "FROM " + MASTER_SCHEMA + ".PM21PERAUDIT AUD\n" +
         "JOIN " + MASTER_SCHEMA + ".PD21PTXNCODE PTX ON AUD.NUCHANGE = PTX.NUCHANGE\n" +
         "JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM " + MASTER_SCHEMA + ".PL21TRANCODE) CD ON PTX.CDTRANS = CD.CDTRANS\n" +
         "WHERE AUD.NUXREFEM = :empId AND PTX.CDSTATUS = 'A' AND PTX.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
         "AND PTX.CDTRANS IN (:transCodes)\n" +
-        "ORDER BY PTX.DTEFFECT, PTX.DTTXNORIGIN, PTX.CDTRANS";
+        "ORDER BY PTX.DTEFFECT, PTX.DTTXNORIGIN, AUD.DTTXNORIGIN, AUD.DTTXNUPDATE, PTX.CDTRANS";
 
     /** {@inheritDoc} */
     @Override
@@ -57,13 +58,13 @@ public class SqlNewEmpTransactionDao extends SqlBaseDao implements NewEmpTransac
         params.addValue("empId", empId)
               .addValue("dateStart", DateUtils.toDate(DateUtils.startOfDateRange(dateRange)))
               .addValue("dateEnd", DateUtils.toDate(DateUtils.endOfDateRange(dateRange)))
-              .addValue("transCodes", getTransCodesFromSet(codes));
+              // We don't filter by transaction codes here if the earliest record needs to be the initial state
+              .addValue("transCodes", (!options.shouldInitialize()) ? getTransCodesFromSet(codes) : getAllTransCodes());
 
         String sql = applyAuditColsToSql(GET_TRANS_HISTORY_SQL, "audColumns", "AUD.", codes, options);
-        List<TransactionRecord> records =
-                remoteNamedJdbc.query(sql, params, new TransactionRecordRowMapper("", "", codes, options));
-
-        return new TransactionHistory(empId, records);
+        TransHistoryHandler handler = new TransHistoryHandler(empId, "", "", codes, options);
+        remoteNamedJdbc.query(sql, params, handler);
+        return handler.getTransactionHistory();
     }
 
     /** --- Internal Methods --- */
@@ -85,8 +86,8 @@ public class SqlNewEmpTransactionDao extends SqlBaseDao implements NewEmpTransac
                                        TransDaoOption options) {
         Map<String, String> selectMap = new HashMap<>();
 
-        /** Restrict the columns to just the ones needed unless the set is empty or contains APP or RTP
-         *  because those serve as initial snapshots and therefore need all the columns. */
+        // Restrict the columns to just the ones needed unless the set is empty or contains APP or RTP
+        // because those serve as initial snapshots and therefore need all the columns. */
         List<String> auditColList = new ArrayList<>();
         if (!options.shouldInitialize() && restrictSet != null && !restrictSet.isEmpty() &&
             !restrictSet.stream().anyMatch(TransactionCode::isAppointType)) {
@@ -95,19 +96,16 @@ public class SqlNewEmpTransactionDao extends SqlBaseDao implements NewEmpTransac
         else {
             auditColList.addAll(TransactionCode.getAllDbColumnsList());
         }
-
-        /** Apply the prefix to the names if requested */
+        // Apply the prefix to the names if requested */
         if (StringUtils.isNotEmpty(pfx)) {
             for (int i = 0; i < auditColList.size(); i++) {
                 auditColList.set(i, pfx + auditColList.get(i));
             }
         }
-
-        /** Apply to the sql statement */
+        // Apply to the sql statement */
         String auditColumns = StringUtils.join(auditColList, ",");
         selectMap.put(replaceKey, (!auditColumns.isEmpty()) ? ("," + auditColumns) : "");
         StrSubstitutor strSub = new StrSubstitutor(selectMap);
-
         return strSub.replace(selectSql);
     }
 

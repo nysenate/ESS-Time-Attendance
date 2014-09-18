@@ -4,26 +4,26 @@ import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.dao.transaction.TransDaoOption;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
-import gov.nysenate.seta.util.OutputUtils;
+import gov.nysenate.seta.model.transaction.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class TransactionRecordRowMapper extends BaseRowMapper<TransactionRecord>
+@Deprecated
+public class TransRecordRowMapper extends BaseRowMapper<TransactionRecord>
 {
-    private static final Logger logger = LoggerFactory.getLogger(TransactionRecordRowMapper.class);
+    private static final Logger logger = LoggerFactory.getLogger(TransRecordRowMapper.class);
 
     protected String pfx = "";
     protected String auditPfx = "";
     protected Set<TransactionCode> transCodes;
     protected TransDaoOption options;
 
-    public TransactionRecordRowMapper(String pfx, String auditPfx, Set<TransactionCode> transCodes,
-                                      TransDaoOption options) {
+    public TransRecordRowMapper(String pfx, String auditPfx, Set<TransactionCode> transCodes,
+                                TransDaoOption options) {
         this.pfx = pfx;
         this.auditPfx = auditPfx;
         this.transCodes = transCodes;
@@ -35,31 +35,42 @@ public class TransactionRecordRowMapper extends BaseRowMapper<TransactionRecord>
      */
     @Override
     public TransactionRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
+        TransactionCode code = TransactionCode.valueOf(rs.getString(pfx + "CDTRANS"));
+
+        // If this is the first record, the options may request it to be set as APP.
+        if (rowNum == 0 && options.shouldSetToApp() && !code.isAppointType()) {
+            logger.debug("{} transaction will appear as 'APP' based on option: {}", code, options);
+            code = TransactionCode.APP;
+        }
+
+        // If initialization of earliest record was requested, the result set will not filter
+        // by the code. Thus every record after the first should get filtered out here.
+        // We can return null here but make sure to remove the null records afterwards
+        if (rowNum != 0 && options.shouldInitialize() && !transCodes.contains(code)) {
+            return null;
+        }
+
         TransactionRecord transRec = new TransactionRecord();
         transRec.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
         transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
-        transRec.setTransCode(TransactionCode.valueOf(rs.getString(pfx + "CDTRANS")));
+        transRec.setTransCode(code);
         transRec.setOriginalDate(getLocalDateTime(rs, pfx + "DTTXNORIGIN"));
         transRec.setUpdateDate(getLocalDateTime(rs, pfx + "DTTXNUPDATE"));
         transRec.setEffectDate(getLocalDate(rs, pfx + "DTEFFECT"));
+        transRec.setNote((transRec.getTransCode().getType().equals(TransactionType.PER))
+                         ? rs.getString(pfx + "DETXNNOTE50") : rs.getString(pfx + "DETXNNOTEPAY"));
 
         /**
          * The value map will contain the column -> value mappings for the db columns associated with the
          * transaction code. The appointment transactions (APP/RTP) will have value maps containing every column
          * since they represent the initial snapshot of the data.
          */
-        TransactionCode code = transRec.getTransCode();
         Map<String, String> valueMap = new HashMap<>();
         List<String> columns = (code.isAppointType() || (options.shouldInitialize() && rowNum == 0))
                                 ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList();
         for (String col : columns) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
-        }
-
-        if (rowNum == 0 && options.shouldSetToApp() && !code.isAppointType()) {
-            logger.debug("{} transaction will appear as 'APP' based on option: {}", transRec.getTransCode(), options);
-            transRec.setTransCode(TransactionCode.APP);
         }
 
         transRec.setValueMap(valueMap);

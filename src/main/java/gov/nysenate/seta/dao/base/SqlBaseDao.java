@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.base;
 
+import gov.nysenate.seta.util.DateUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,11 @@ public abstract class SqlBaseDao
     @Resource(name = "remoteNamedJdbcTemplate")
     protected NamedParameterJdbcTemplate remoteNamedJdbc;
 
+    /** The main production schema. Intended for read access only. */
+    protected static String MASTER_SCHEMA = "SASS_OWNER";
+
+    /** The time/attendance buffer schema. Permits writes. */
+    protected static String TS_SCHEMA = "TS_OWNER";
 
     /**
      * For use in queries where we don't care about the start date.
@@ -39,34 +44,10 @@ public abstract class SqlBaseDao
     }
 
     /**
-     * Convert a LocalDateTime to a Date.
-     */
-    public static Date toDate(LocalDateTime localDateTime) {
-        if (localDateTime == null) return null;
-        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-    }
-
-    /**
-     * Convert a LocalDate to a Date.
-     */
-    public static Date toDate(LocalDate localDate) {
-        if (localDate == null) return null;
-        return toDate(localDate.atStartOfDay());
-    }
-
-    /**
-     * Convert a Date to a LocalDateTime at the system's default time zone.
-     */
-    public static LocalDateTime getLocalDateTime(Date date) {
-        if (date == null) return null;
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
-
-    /**
      * Read the 'column' date value from the result set and cast it to a LocalDateTime.
      */
     public static LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
-        return getLocalDateTime(rs.getTimestamp(column));
+        return DateUtils.getLocalDateTime(rs.getTimestamp(column));
     }
 
     /**
@@ -74,7 +55,7 @@ public abstract class SqlBaseDao
      */
     public static LocalDate getLocalDate(Date date) {
         if (date == null) return null;
-        return getLocalDateTime(date).toLocalDate();
+        return DateUtils.getLocalDateTime(date).toLocalDate();
     }
 
     /**
