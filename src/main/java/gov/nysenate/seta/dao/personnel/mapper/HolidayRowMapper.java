@@ -19,7 +19,7 @@ public class HolidayRowMapper extends BaseRowMapper<Holiday>
     public Holiday mapRow(ResultSet rs, int rowNum) throws SQLException {
         Holiday holiday = new Holiday();
         holiday.setActive(rs.getString("CDSTATUS").equals("A"));
-        holiday.setDate(rs.getDate("DTHOLIDAY"));
+        holiday.setDate(getLocalDate(rs, "DTHOLIDAY"));
         holiday.setName(rs.getString("DEHOLIDAY"));
         holiday.setQuestionable(rs.getString("CDQUEST").equals("Y"));
         return holiday;

@@ -29,7 +29,7 @@ public class TransHistoryHandler extends BaseHandler
     /** The set of transaction codes to restrict the history to. */
     protected Set<TransactionCode> transCodes;
 
-    /** Options to indidcate certain processing behaviors. */
+    /** Options to indicate certain processing behaviors. */
     protected TransDaoOption options;
 
     /** Stores the valid records. */

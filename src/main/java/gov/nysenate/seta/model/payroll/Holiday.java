@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.payroll;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -7,18 +8,22 @@ import java.util.Date;
  */
 public class Holiday
 {
-    protected Date date;
+    protected LocalDate date;
     protected String name;
     protected boolean active;
+
+    /** Questionable holidays are declared at the discretion of the senate. */
     protected boolean questionable;
 
     public Holiday() {}
 
-    public Date getDate() {
+    /** --- Basic Getters/Setters --- */
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
