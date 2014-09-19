@@ -40,6 +40,12 @@ public class TransactionRecord
     /** The date when this record was updated. */
     protected LocalDateTime updateDate;
 
+    /** The date the actual audit record was created. */
+    protected LocalDateTime auditDate;
+
+    /** A note that is often associated with the record. */
+    protected String note;
+
     /** --- Constructors --- */
 
     public TransactionRecord() {}
@@ -133,11 +139,27 @@ public class TransactionRecord
         this.updateDate = updateDate;
     }
 
+    public LocalDateTime getAuditDate() {
+        return auditDate;
+    }
+
+    public void setAuditDate(LocalDateTime auditDate) {
+        this.auditDate = auditDate;
+    }
+
     public LocalDate getEffectDate() {
         return effectDate;
     }
 
     public void setEffectDate(LocalDate effectDate) {
         this.effectDate = effectDate;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

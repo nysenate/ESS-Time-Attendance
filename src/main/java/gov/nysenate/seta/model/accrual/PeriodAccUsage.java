@@ -2,12 +2,12 @@ package gov.nysenate.seta.model.accrual;
 
 import gov.nysenate.seta.model.period.PayPeriod;
 
-public class PeriodAccrualUsage extends AccrualUsage
+public class PeriodAccUsage extends AccrualUsage
 {
     int year;
     PayPeriod payPeriod;
 
-    public PeriodAccrualUsage() {}
+    public PeriodAccUsage() {}
 
     public int getYear() {
         return year;

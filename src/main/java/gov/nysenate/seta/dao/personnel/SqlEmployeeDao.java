@@ -113,18 +113,6 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         return employeeMap;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public List<Integer> getActiveEmployeesDuring(Date start, Date end) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Map<Integer, Employee> getActiveEmployeeMap(Date start, Date end) {
-        return null;
-    }
-
     /** Returns a EmployeeRowMapper that's configured for use in this dao */
     private EmployeeRowMapper getEmployeeRowMapper() {
         return new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_");

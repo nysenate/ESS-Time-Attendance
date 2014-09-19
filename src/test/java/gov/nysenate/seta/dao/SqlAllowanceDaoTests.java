@@ -1,14 +1,12 @@
 package gov.nysenate.seta.dao;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.accrual.SqlAccrualHelper;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
-import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
-import gov.nysenate.seta.util.OutputUtils;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -23,7 +21,8 @@ import java.util.*;
  * Created by heitner on 6/27/2014.
  */
 
-public class SqlAllowanceDaoTests  extends AbstractContextTests {
+public class SqlAllowanceDaoTests  extends BaseTests
+{
 
     private static final Logger logger = LoggerFactory.getLogger(SqlAllowanceDaoTests.class);
 

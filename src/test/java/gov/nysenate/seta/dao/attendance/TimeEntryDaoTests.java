@@ -1,26 +1,20 @@
 package gov.nysenate.seta.dao.attendance;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-public class TimeEntryDaoTests extends AbstractContextTests
+public class TimeEntryDaoTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(TimeEntryDaoTests.class);
 

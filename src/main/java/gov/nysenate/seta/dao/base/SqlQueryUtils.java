@@ -81,7 +81,7 @@ public abstract class SqlQueryUtils
                 }
             }
             if (!orderClauses.isEmpty()) {
-                clause += " ORDER BY " + StringUtils.join(orderClauses, ", ");
+                clause += "\nORDER BY " + StringUtils.join(orderClauses, ", ");
             }
         }
         return clause;

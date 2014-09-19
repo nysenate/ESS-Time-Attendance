@@ -1,6 +1,6 @@
 package gov.nysenate.seta.dao;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.personnel.LdapAuthDao;
 import gov.nysenate.seta.model.auth.SenateLdapPerson;
 import org.junit.Before;
@@ -16,7 +16,7 @@ import javax.naming.ldap.LdapName;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
-public class SenateLdapDaoTests extends AbstractContextTests
+public class SenateLdapDaoTests extends BaseTests
 {
     @Autowired
     LdapAuthDao ldapAuthDao;

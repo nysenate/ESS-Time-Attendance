@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.personnel;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -10,18 +11,22 @@ public class EmployeeSupInfo
     protected int empId;
     protected int supId;
     protected String empLastName;
-    protected Date startDate;
-    protected Date endDate;
-    protected Date supStartDate;
-    protected Date supEndDate;
+    protected LocalDate startDate;
+    protected LocalDate endDate;
+    protected LocalDate supStartDate;
+    protected LocalDate supEndDate;
+
+    /** --- Constructors --- */
 
     public EmployeeSupInfo() {}
 
-    public EmployeeSupInfo(int empId, Date startDate, Date endDate) {
+    public EmployeeSupInfo(int empId, LocalDate startDate, LocalDate endDate) {
         this.empId = empId;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    /** --- Basic Getters/Setters --- */
 
     public int getEmpId() {
         return empId;
@@ -47,35 +52,35 @@ public class EmployeeSupInfo
         this.empLastName = empLastName;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public Date getSupStartDate() {
+    public LocalDate getSupStartDate() {
         return supStartDate;
     }
 
-    public void setSupStartDate(Date supStartDate) {
+    public void setSupStartDate(LocalDate supStartDate) {
         this.supStartDate = supStartDate;
     }
 
-    public Date getSupEndDate() {
+    public LocalDate getSupEndDate() {
         return supEndDate;
     }
 
-    public void setSupEndDate(Date supEndDate) {
+    public void setSupEndDate(LocalDate supEndDate) {
         this.supEndDate = supEndDate;
     }
 }

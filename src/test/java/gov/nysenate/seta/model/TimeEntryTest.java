@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +9,8 @@ import java.math.BigDecimal;
 /**
  * Created by riken on 3/11/14.
  */
-public class TimeEntryTest extends AbstractContextTests {
+public class TimeEntryTest extends BaseTests
+{
 
     @Test
     public void testGetDailyTotal() throws Exception {

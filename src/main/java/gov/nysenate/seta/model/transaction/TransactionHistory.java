@@ -149,7 +149,10 @@ public class TransactionHistory
     }
 
     /**
-     * Given the 'key' find the most recent value associated with it in the values map.
+     * Use this method if you want to know the value of the given 'key' where the effective date is the latest
+     * to occur before or on 'latestDate'. In the case where multiple transaction records were in effect for
+     * the same latest effective date, the value belonging to the most recent record with that effective date
+     * will be used.
      *
      * @param key String - A key from the values map (e.g. 'NALAST')
      * @param latestDate LocalDate - The latest date to search until.
@@ -173,7 +176,10 @@ public class TransactionHistory
     }
 
     /**
-     * Given the 'key' find the earliest value associated with it in the values map.
+     * Use this method if you want to know the value of the given 'key' where the effective date is the first
+     * to occur after or on 'earliestDate'. In the case where multiple transaction records were in effect for
+     * the same earliest effective date, the value belonging to the most recent record with that effective date
+     * will be used.
      *
      * @param key String - A key from the value map (e.g. 'NALAST').
      * @param earliestDate LocalDate - The earliest date for which to search from.
@@ -216,7 +222,7 @@ public class TransactionHistory
             return ComparisonChain.start()
                 .compare(o1.getEffectDate(), o2.getEffectDate())
                 .compare(o1.getOriginalDate(), o2.getOriginalDate())
-                .compare(o1.getTransCode().name(), o2.getTransCode().name())
+                .compare(o1.getAuditDate(), o2.getAuditDate())
                 .result();
         }
     }
@@ -229,7 +235,7 @@ public class TransactionHistory
             return ComparisonChain.start()
                 .compare(o2.getEffectDate(), o1.getEffectDate())
                 .compare(o2.getOriginalDate(), o1.getOriginalDate())
-                .compare(o1.getTransCode().name(), o2.getTransCode().name())
+                .compare(o2.getAuditDate(), o1.getAuditDate())
                 .result();
         }
     }

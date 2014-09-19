@@ -1,18 +1,17 @@
 package gov.nysenate.seta.model.exception;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class HolidayNotFoundForDateEx extends HolidayException
 {
-    public HolidayNotFoundForDateEx(Date date) {
+    protected LocalDate requestedDate;
+
+    public HolidayNotFoundForDateEx(LocalDate date) {
         super("Holiday not found for date " + date.toString());
+        requestedDate = date;
     }
 
-    public HolidayNotFoundForDateEx(String message) {
-        super(message);
-    }
-
-    public HolidayNotFoundForDateEx(String message, Throwable cause) {
-        super(message, cause);
+    public LocalDate getRequestedDate() {
+        return requestedDate;
     }
 }

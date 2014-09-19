@@ -1,11 +1,18 @@
 package gov.nysenate.seta.dao.accrual;
 
+import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
+import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.model.accrual.AccrualException;
-import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
+import gov.nysenate.seta.model.accrual.AnnualAccSummary;
+import gov.nysenate.seta.model.accrual.PeriodAccSummary;
+import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;
+import org.springframework.dao.DataAccessException;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Data access layer for retrieving and computing accrual information
@@ -14,23 +21,31 @@ import java.util.List;
 public interface AccrualDao extends BaseDao
 {
     /**
-     * Retrieve accruals information for the given employee id and a specific pay period.
+     * Retrieve the per-pay-period accrual summaries for the given employee that occur before a specific date.
+     * A TreeMap is returned which maps the PeriodAccSummary object with it's associated 'basePayPeriod'.
+     *
      * @param empId int - Employee id
-     * @param payPeriod Date - Pay period to get accrual for
-     * @param earliestRecLikeAppoint boolean - If true, the earliest effect date record will be treated like an appoint record
-     *                               (ie: it will initialize all columns from the first record, regardless if it is an appoint,
-     *                               reappoint, or some other transaction)
-     * @return PeriodAccrualSummary if found, throws AccrualException otherwise.
-     * @throws  AccrualException
+     * @param year int - The year to retrieve accruals for
+     * @param beforeDate LocalDate - The retrieved period summaries will be effective prior to this date.
+     * @return TreeMap<LocalDate, PeriodAccSummary>
      */
-    public PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod, boolean earliestRecLikeAppoint) throws AccrualException;
+    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccrualSummaries(int empId, int year, LocalDate beforeDate);
 
     /**
-     * Retrieve a history of accruals for the given employee and the list of pay periods.
+     * Retrieve the running annual accrual summaries for the given employee for all years before or on the 'endYear'.
+     *
      * @param empId int - Employee id
-     * @param payPeriods List<PayPeriod> - Attendance pay period dates to build history from
-     * @return PeriodAccrualSummary
-     * @throws AccrualException
+     * @param endYear int - The year to retrieve annual summaries until.
+     * @return TreeMap<Integer, AnnualAccSummary>
      */
-    public List<PeriodAccrualSummary> getAccrualSummaries(int empId, List<PayPeriod> payPeriods) throws AccrualException;
+    public TreeMap<Integer, AnnualAccSummary> getAnnualAccrualSummaries(int empId, int endYear);
+
+    /**
+     * Retrieve the period accrual usage objects that represent the hours charged during a given pay period.
+     *
+     * @param empId int - Employee id
+     * @param dateRange Range<LocalDate> - The date range to obtain usages within
+     * @return TreeMap<PayPeriod, PeriodAccUsage>
+     */
+    public TreeMap<PayPeriod, PeriodAccUsage> getPeriodAccrualUsages(int empId, Range<LocalDate> dateRange);
 }

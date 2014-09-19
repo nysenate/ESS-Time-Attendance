@@ -1,14 +1,15 @@
 package gov.nysenate.seta;
 
+import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
-import com.sun.xml.internal.fastinfoset.algorithm.UUIDEncodingAlgorithm;
+import gov.nysenate.seta.dao.transaction.TransDaoOption;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.util.DateUtils;
 import org.junit.Test;
+import org.omg.CORBA.TRANSACTION_MODE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-import sun.util.logging.resources.logging_fr;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -59,7 +60,16 @@ public class SillyTests
 
     @Test
     public void testSomething() throws Exception {
-        String s  = "S1234A";
-        logger.info(s.substring(0, 1) + StringUtils.trimLeadingCharacter(s.substring(1), '0'));
+        TreeMap<LocalDate, String> testMap = new TreeMap<>();
+        testMap.put(LocalDate.of(2013, 1, 1), "First");
+        testMap.put(LocalDate.of(2013, 3, 1), "Second");
+        testMap.put(LocalDate.of(2013, 6, 1), "Third");
+        testMap.put(LocalDate.of(2013, 9, 1), "Fourth");
+        testMap.put(LocalDate.of(2014, 3, 1), "Fifth");
+
+        logger.info("{}", testMap.floorEntry(LocalDate.of(2013, 7, 1)));
+
+        logger.info("{}", TransactionCode.SAL.getDbColumnList());
+
     }
 }

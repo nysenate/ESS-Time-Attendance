@@ -1,20 +1,22 @@
 package gov.nysenate.seta.dao;
 
-import gov.nysenate.seta.AbstractContextTests;
+import com.google.common.collect.Range;
+import gov.nysenate.seta.BaseTests;
+import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.util.OutputUtils;
 import junit.framework.Assert;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-public class SqlPayPeriodDaoTests extends AbstractContextTests {
+public class SqlPayPeriodDaoTests extends BaseTests
+{
 
     private static final Logger logger = LoggerFactory.getLogger(SqlPayPeriodDaoTests.class);
 
@@ -23,40 +25,40 @@ public class SqlPayPeriodDaoTests extends AbstractContextTests {
 
     @Test
     public void testGetPayPeriod() throws Exception {
-        logger.info(OutputUtils.toJson(payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2012, 11, 7).toDate())));
+        logger.info(OutputUtils.toJson(payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2012, 11, 7))));
     }
 
     @Test
     public void testGetPayPeriods() throws Exception {
         logger.info(OutputUtils.toJson(payPeriodDao.getPayPeriods(PayPeriodType.AF,
-                                      new LocalDate(2010, 9, 2).toDate(), new LocalDate(2010, 10, 13).toDate(), true)));
+                Range.closed(LocalDate.of(2010, 9, 2), LocalDate.of(2010, 10, 13)), SortOrder.ASC)));
     }
 
     @Test
     public void testGetOpenPayPeriods() throws Exception {
-        logger.info(OutputUtils.toJson(payPeriodDao.getOpenAttendancePayPeriods(10976, new Date(), true)));
+        logger.info(OutputUtils.toJson(payPeriodDao.getOpenAttendancePayPeriods(10976, LocalDate.now(), SortOrder.DESC)));
     }
 
     @Test
     public void testGetPayPeriodDays() throws Exception {
         /** Regular pay period */
-        PayPeriod period = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2014, 4, 23).toDate());
-        Assert.assertEquals(14, period.getNumDays());
+        PayPeriod period = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2014, 4, 23));
+        Assert.assertEquals(14, period.getNumDaysInPeriod());
 
         /** Split after new year */
-        period = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2014, 1, 1).toDate());
-        Assert.assertEquals(1, period.getNumDays());
+        period = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2014, 1, 1));
+        Assert.assertEquals(1, period.getNumDaysInPeriod());
 
         /** Split before new year */
-        period = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2013, 12, 31).toDate());
-        Assert.assertEquals(13, period.getNumDays());
+        period = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2013, 12, 31));
+        Assert.assertEquals(13, period.getNumDaysInPeriod());
     }
 
     @Test
     public void testGetPayPeriodDays_checkForDaylightSavingsIssues() throws Exception {
-        PayPeriod marchDSTPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2014, 3, 12).toDate());
-        PayPeriod novemberDSTPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, new LocalDate(2014, 11, 5).toDate());
-        Assert.assertEquals(14, marchDSTPeriod.getNumDays());
-        Assert.assertEquals(14, novemberDSTPeriod.getNumDays());
+        PayPeriod marchDSTPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2014, 3, 12));
+        PayPeriod novemberDSTPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2014, 11, 5));
+        Assert.assertEquals(14, marchDSTPeriod.getNumDaysInPeriod());
+        Assert.assertEquals(14, novemberDSTPeriod.getNumDaysInPeriod());
     }
 }

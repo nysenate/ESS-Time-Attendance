@@ -3,6 +3,7 @@ package gov.nysenate.seta.model.accrual;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,8 +15,8 @@ import java.util.List;
 public class AccrualGap
 {
     protected int empId;
-    protected Date startDate;
-    protected Date endDate;
+    protected LocalDate startDate;
+    protected LocalDate endDate;
 
     protected List<PayPeriod> gapPeriods;
     protected LinkedList<TransactionRecord> recordsDuringGap;
@@ -36,13 +37,14 @@ public class AccrualGap
     public LinkedList<TransactionRecord> getTransRecsDuringPeriod(PayPeriod payPeriod) {
         LinkedList<TransactionRecord> recs = new LinkedList<>();
         for (TransactionRecord rec : recordsDuringGap) {
+            /** FIXME 09/12
             if (rec.getEffectDate().compareTo(payPeriod.getStartDate()) >= 0 &&
                     rec.getEffectDate().compareTo(payPeriod.getEndDate()) <= 0) {
                 recs.add(rec);
             }
             else {
                 break;
-            }
+            }               */
         }
         return recs;
     }

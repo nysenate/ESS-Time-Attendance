@@ -1,80 +1,89 @@
 package gov.nysenate.seta.model.period;
 
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.LocalDate;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Objects;
 
 /**
  * Contains the date information for a single pay period.
  */
 public class PayPeriod
 {
+    public static int PAY_PERIOD_LENGTH =
+
+    /** The type of pay period. The one we deal with most is Attendance Fiscal (AF). */
     protected PayPeriodType type;
-    protected Date startDate;
-    protected Date endDate;
+
+    /** The starting date of the pay period. */
+    protected LocalDate startDate;
+
+    /** The ending date of the pay period. */
+    protected LocalDate endDate;
+
+    /** A number that is attributed to the pay period that typically rolls over after a fiscal year. */
     protected int payPeriodNum;
+
+    /** Indicates if this pay period is set as active in the backing store. */
     protected boolean active;
+
+    /** --- Constructors --- */
 
     public PayPeriod() {}
 
     /** --- Functional Getters/Setters --- */
 
     /**
-     * Returns the number of days in the pay period.
-     * @return long
+     * Returns the number of days between the start date (inclusive) and end date (inclusive)
+     * of this pay period.
+     *
+     * @return int
      */
-    public long getNumDays() {
+    public int getNumDaysInPeriod() {
         if (startDate != null && endDate != null) {
-            Duration duration = new Duration(new DateTime(startDate), new DateTime(endDate).plusDays(1));
-            long hours = duration.getStandardHours();
-            /** Handle DST edge case: one extra hour during rollover */
-            if (hours % 24 == 1) {
-                hours -= 1;
-            }
-            /** Handle DST edge case: one less hour during rollover */
-            else if (hours % 24 == 23) {
-                hours += 1;
-            }
-            return hours / 24;
+            return Period.between(startDate, endDate.plusDays(1)).getDays();
         }
         throw new IllegalStateException("Start date and/or end date is null. " +
                                         "Cannot compute number of pay period days");
     }
 
     /**
-     * Indicates if pay period is the split that sometimes occurs at the end of the year.
+     * Indicates if this pay period is an end of year split pay period, which is basically a pay period
+     * that gets truncated to less than 14 days due to some pay period types (like AF) not rolling over years.
+     *
+     * @return boolean - true if this marks an end of year split pay period.
      */
     public boolean isEndOfYearSplit() {
-        LocalDate localDate = new LocalDate(endDate);
-        return localDate.getMonthOfYear() == 12 && localDate.getDayOfMonth() == 31 && getNumDays() != 14;
+        return endDate.getDayOfYear() == endDate.lengthOfYear() && getNumDaysInPeriod() != 14;
+    }
+
+    /**
+     * Indicates if this pay period is a start of year split pay period, which is basically a pay period
+     * that gets truncated to less than 14 days due to some pay period types (like AF) not rolling over years.
+     *
+     * @return boolean - true if this marks a start of year split pay period.
+     */
+    public boolean isStartOfYearSplit() {
+        return startDate.getDayOfYear() == 1 && getNumDaysInPeriod() != 14;
     }
 
     /** --- Overrides --- */
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PayPeriod payPeriod = (PayPeriod) o;
-        if (active != payPeriod.active) return false;
-        if (payPeriodNum != payPeriod.payPeriodNum) return false;
-        if (!endDate.equals(payPeriod.endDate)) return false;
-        if (!startDate.equals(payPeriod.startDate)) return false;
-        if (type != payPeriod.type) return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(type, startDate, endDate, payPeriodNum, active);
     }
 
     @Override
-    public int hashCode() {
-        int result = type.hashCode();
-        result = 31 * result + startDate.hashCode();
-        result = 31 * result + endDate.hashCode();
-        result = 31 * result + payPeriodNum;
-        result = 31 * result + (active ? 1 : 0);
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        final PayPeriod other = (PayPeriod) obj;
+        return Objects.equals(this.type, other.type) &&
+               Objects.equals(this.startDate, other.startDate) &&
+               Objects.equals(this.endDate, other.endDate) &&
+               Objects.equals(this.payPeriodNum, other.payPeriodNum) &&
+               Objects.equals(this.active, other.active);
     }
 
     @Override
@@ -85,43 +94,5 @@ public class PayPeriod
 
     /** --- Basic Getters/Setters --- */
 
-    public PayPeriodType getType() {
-        return type;
-    }
 
-    public void setType(PayPeriodType type) {
-        this.type = type;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public int getPayPeriodNum() {
-        return payPeriodNum;
-    }
-
-    public void setPayPeriodNum(int payPeriodNum) {
-        this.payPeriodNum = payPeriodNum;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }

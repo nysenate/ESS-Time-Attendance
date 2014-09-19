@@ -1,20 +1,24 @@
 package gov.nysenate.seta.model.accrual;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Represents a summary of accruals over a given year.
  */
-public class AnnualAccrualSummary extends AccrualSummary
+public class AnnualAccSummary extends AccrualSummary
 {
     int year;
-    Date endDate;
-    Date closeDate;
-    Date contServiceDate;
+    LocalDate endDate;
+    LocalDate closeDate;
+    LocalDate contServiceDate;
     int payPeriodsYtd;
     int payPeriodsBanked;
 
-    public AnnualAccrualSummary() {}
+    /** --- Constructors --- */
+
+    public AnnualAccSummary() {}
+
+    /** --- Basic Getters/Setters --- */
 
     public int getYear() {
         return year;
@@ -24,27 +28,27 @@ public class AnnualAccrualSummary extends AccrualSummary
         this.year = year;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public Date getCloseDate() {
+    public LocalDate getCloseDate() {
         return closeDate;
     }
 
-    public void setCloseDate(Date closeDate) {
+    public void setCloseDate(LocalDate closeDate) {
         this.closeDate = closeDate;
     }
 
-    public Date getContServiceDate() {
+    public LocalDate getContServiceDate() {
         return contServiceDate;
     }
 
-    public void setContServiceDate(Date contServiceDate) {
+    public void setContServiceDate(LocalDate contServiceDate) {
         this.contServiceDate = contServiceDate;
     }
 

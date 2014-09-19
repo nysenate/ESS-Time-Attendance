@@ -1,6 +1,6 @@
 package gov.nysenate.seta.service.ldap;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.model.auth.LdapAuthStatus;
 import gov.nysenate.seta.service.auth.EssLdapAuthService;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EssLdapAuthServiceTest extends AbstractContextTests
+public class EssLdapAuthServiceTest extends BaseTests
 {
     @Value("${test.ldap.valid.uid}") private String validUid;
     @Value("${test.ldap.valid.dn}") private String validDn;

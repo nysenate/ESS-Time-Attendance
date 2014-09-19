@@ -1,6 +1,6 @@
 package gov.nysenate.seta.security.xsrf;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import org.apache.shiro.codec.Base64;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class XsrfTokenValidatorTest extends AbstractContextTests
+public class XsrfTokenValidatorTest extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(XsrfTokenValidatorTest.class);
     private MockServletContext mockServletContext = new MockServletContext();

@@ -23,6 +23,7 @@ public class LdapAuthDao extends LdapBaseDao
    /**
      * Authenticates uid via a simple LDAP bind. If the bind was successful the matching Name will be returned.
      * Otherwise an error will have been thrown indicating the exception.
+    *
      * @param uid String (username)
      * @param credentials String (password)
      * @return Name representing authenticated user. Otherwise exception will be thrown.

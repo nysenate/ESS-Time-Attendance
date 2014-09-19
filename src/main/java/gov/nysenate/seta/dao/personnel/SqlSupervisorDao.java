@@ -1,8 +1,10 @@
 package gov.nysenate.seta.dao.personnel;
 
+import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.NewEmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.TransDaoOption;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorMissingEmpsEx;
 import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
@@ -12,9 +14,8 @@ import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
+import gov.nysenate.seta.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,14 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
+import static gov.nysenate.seta.util.DateUtils.endOfDateRange;
+import static gov.nysenate.seta.util.DateUtils.startOfDateRange;
+import static gov.nysenate.seta.util.DateUtils.toDate;
 
 @Repository
 public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
@@ -35,7 +41,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     private static final Logger logger = LoggerFactory.getLogger(SqlSupervisorDao.class);
 
     @Autowired
-    private EmpTransactionDao empTransactionDao;
+    private NewEmpTransactionDao empTransDao;
 
     /**
      * This query returns a listing of all supervisor related transactions for employees that have at
@@ -51,7 +57,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
         /**  Fetch the ids of the supervisor's direct employees. */
         "    SELECT DISTINCT 'PRIMARY' AS EMP_GROUP, NUXREFEM, NULL AS OVR_NUXREFSV\n" +
-        "    FROM PM21PERAUDIT WHERE NUXREFSV = :supId \n" +
+        "    FROM " + MASTER_SCHEMA + ".PM21PERAUDIT WHERE NUXREFSV = :supId \n" +
 
         /**  Combine that with the ids of the employees that are accessible through the sup overrides.
          *   The EMP_GROUP column will either be 'SUP_OVR' or 'EMP_OVR' to indicate the type of override. */
@@ -62,8 +68,8 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         "        WHEN ovr.NUXREFEMSUB IS NOT NULL THEN 'EMP_OVR' " +
         "    END,\n" +
         "    per.NUXREFEM, ovr.NUXREFSVSUB\n" +
-        "    FROM PM23SUPOVRRD ovr\n" +
-        "    LEFT JOIN PM21PERAUDIT per ON \n" +
+        "    FROM " + TS_SCHEMA + ".PM23SUPOVRRD ovr\n" +
+        "    LEFT JOIN " + MASTER_SCHEMA + ".PM21PERAUDIT per ON \n" +
         "      CASE WHEN ovr.NUXREFSVSUB IS NOT NULL AND per.NUXREFSV = ovr.NUXREFSVSUB THEN 1\n" +
         "           WHEN ovr.NUXREFEMSUB IS NOT NULL AND per.NUXREFEM = ovr.NUXREFEMSUB THEN 1\n" +
         "           ELSE 0\n" +
@@ -72,31 +78,33 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         "    AND :endDate BETWEEN NVL(ovr.DTSTART, :endDate) AND NVL(ovr.DTEND, :endDate)\n" +
         "    AND per.NUXREFEM IS NOT NULL\n" +
         "  ) empList\n" +
-        "JOIN PM21PERAUDIT per ON empList.NUXREFEM = per.NUXREFEM\n" +
-        "JOIN PD21PTXNCODE ptx ON per.NUXREFEM = ptx.NUXREFEM AND per.NUCHANGE = ptx.NUCHANGE\n" +
+        "JOIN " + MASTER_SCHEMA + ".PM21PERAUDIT per ON empList.NUXREFEM = per.NUXREFEM\n" +
+        "JOIN " + MASTER_SCHEMA + ".PD21PTXNCODE ptx ON per.NUXREFEM = ptx.NUXREFEM AND per.NUCHANGE = ptx.NUCHANGE\n" +
 
         /**  Retrieve just the APP/RTP/SUP/EMP transactions unless the employee doesn't
          *   have any of them (some earlier employees may be missing APP for example). */
         "WHERE \n" +
-        "    (per.NUXREFEM NOT IN (SELECT DISTINCT NUXREFEM FROM PD21PTXNCODE WHERE CDTRANS IN ('APP', 'RTP', 'SUP'))\n" +
-        "     OR ptx.CDTRANS IN ('APP', 'RTP', 'SUP', 'EMP'))\n" +
+        "    (per.NUXREFEM NOT IN (SELECT DISTINCT NUXREFEM FROM " + MASTER_SCHEMA + ".PD21PTXNCODE\n" +
+        "                          WHERE CDTRANS IN ('APP', 'RTP', 'SUP'))\n" +
+        "    OR ptx.CDTRANS IN ('APP', 'RTP', 'SUP', 'EMP'))\n" +
         "AND ptx.CDTRANSTYP = 'PER'\n" +
         "AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT <= :endDate\n" +
         "ORDER BY NUXREFEM, TRANS_RANK";
 
     protected static final String GET_SUP_CHAIN_EXCEPTIONS =
-        "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM PM23SPCHNEX WHERE CDSTATUS = 'A' AND NUXREFEM = :empId";
+        "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM " + MASTER_SCHEMA + ".PM23SPCHNEX\n" +
+        "WHERE CDSTATUS = 'A' AND NUXREFEM = :empId";
 
-    /**{@inheritDoc}
-     *
+    /**
+     * {@inheritDoc}
      * We determine this by simply checking if the empId managed any employees during the
      * given time range.
      */
     @Override
-    public boolean isSupervisor(int empId, Date start, Date end) {
+    public boolean isSupervisor(int empId, Range<LocalDate> dateRange) {
         SupervisorEmpGroup supervisorEmpGroup;
         try {
-            supervisorEmpGroup = getSupervisorEmpGroup(empId, start, end);
+            supervisorEmpGroup = getSupervisorEmpGroup(empId, dateRange);
         }
         catch (SupervisorException ex) {
             return false;
@@ -104,15 +112,16 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         return supervisorEmpGroup.hasEmployees();
     }
 
-    /**{@inheritDoc}
-     *
+    /**
+     * {@inheritDoc}
      * The latest employee transactions before the given 'date' are checked to determine
      * the supervisor id.
      */
     @Override
-    public int getSupervisorIdForEmp(int empId, Date date) throws SupervisorException {
+    public int getSupervisorIdForEmp(int empId, LocalDate date) throws SupervisorException {
         Set<TransactionCode> transCodes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
-        TransactionHistory transHistory = empTransactionDao.getTransHistory(empId, transCodes, date, true);
+        TransactionHistory transHistory =
+            empTransDao.getTransHistory(empId, transCodes, Range.atMost(date), TransDaoOption.INITIALIZE_AS_APP);
 
         int supId = -1;
         if (transHistory.hasRecords()) {
@@ -134,7 +143,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
      * {@inheritDoc}
      */
     @Override
-    public SupervisorChain getSupervisorChain(int empId, Date date) throws SupervisorException {
+    public SupervisorChain getSupervisorChain(int empId, LocalDate date) throws SupervisorException {
         int currEmpId = empId;
         int currDepth = 0;
         final int maxDepth = 10;
@@ -176,16 +185,18 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
     /**{@inheritDoc} */
     @Override
-    public SupervisorEmpGroup getSupervisorEmpGroup(int supId, Date start, Date end) throws SupervisorException {
+    public SupervisorEmpGroup getSupervisorEmpGroup(int supId, Range<LocalDate> dateRange) throws SupervisorException {
         MapSqlParameterSource params = new MapSqlParameterSource();
+        LocalDate startDate = startOfDateRange(dateRange);
+        LocalDate endDate = endOfDateRange(dateRange);
         params.addValue("supId", supId);
-        params.addValue("endDate", end);
+        params.addValue("endDate", toDate(endDate));
         List<Map<String, Object>> res;
         try {
             res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL, params, new ColumnMapRowMapper());
         }
         catch (DataRetrievalFailureException ex) {
-            throw new SupervisorException("Failed to retrieve matching employees for supId: " + supId + " before: " + end);
+            throw new SupervisorException("Failed to retrieve matching employees for supId: " + supId + " before: " + endDate);
         }
 
         /**
@@ -193,31 +204,31 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
          * are still under the given supervisor.
          */
         if (!res.isEmpty()) {
-            SupervisorEmpGroup empGroup = new SupervisorEmpGroup(supId, start, end);
+            SupervisorEmpGroup empGroup = new SupervisorEmpGroup(supId, startDate, endDate);
             Set<TransactionCode> supTransCodes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
             Map<Integer, EmployeeSupInfo> primaryEmps = new HashMap<>();
             Map<Integer, EmployeeSupInfo> overrideEmps = new HashMap<>();
             Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmps = new HashMap<>();
 
-            Map<Integer, Date> possiblePrimaryEmps = new HashMap<>();
-            Map<Integer, Map<Integer, Date>> possibleSupOvrEmps = new HashMap<>();
+            Map<Integer, LocalDate> possiblePrimaryEmps = new HashMap<>();
+            Map<Integer, Map<Integer, LocalDate>> possibleSupOvrEmps = new HashMap<>();
 
             for (Map<String,Object> colMap : res) {
                 logger.trace(colMap.toString());
                 String group = colMap.get("EMP_GROUP").toString();
                 int empId = Integer.parseInt(colMap.get("NUXREFEM").toString());
                 TransactionCode transType = TransactionCode.valueOf(colMap.get("CDTRANS").toString());
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.S");
-                Date effectDate = formatter.parseDateTime(colMap.get("DTEFFECT").toString()).toDate();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+                LocalDate effectDate = LocalDate.from(formatter.parse(colMap.get("DTEFFECT").toString()));
                 int rank = Integer.parseInt(colMap.get("TRANS_RANK").toString());
-                boolean effectDateIsPast = effectDate.compareTo(start) <= 0;
+                boolean effectDateIsPast = effectDate.compareTo(startDate) <= 0;
 
                 if (colMap.get("NUXREFSV") == null || !StringUtils.isNumeric(colMap.get("NUXREFSV").toString())) {
                     continue;
                 }
 
                 int currSupId = Integer.parseInt(colMap.get("NUXREFSV").toString());
-                EmployeeSupInfo empSupInfo = new EmployeeSupInfo(empId, start, end);
+                EmployeeSupInfo empSupInfo = new EmployeeSupInfo(empId, startDate, endDate);
                 empSupInfo.setSupId(currSupId);
                 empSupInfo.setEmpLastName(colMap.get("NALAST").toString());
                 if (supTransCodes.contains(transType)) {
@@ -262,13 +273,13 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                             int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
                             if (currSupId == ovrSupId && !empTerminated) {
                                 if (!supOverrideEmps.containsKey(ovrSupId)) {
-                                    supOverrideEmps.put(ovrSupId, new HashMap<Integer, EmployeeSupInfo>());
+                                    supOverrideEmps.put(ovrSupId, new HashMap<>());
                                 }
                                 supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
                             }
                             else if (!effectDateIsPast) {
                                 if (!possibleSupOvrEmps.containsKey(ovrSupId)) {
-                                    possibleSupOvrEmps.put(ovrSupId, new HashMap<Integer, Date>());
+                                    possibleSupOvrEmps.put(ovrSupId, new HashMap<>());
                                 }
                                 possibleSupOvrEmps.get(ovrSupId).put(empId, effectDate);
                             }
@@ -324,11 +335,11 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
             empGroup.setSupOverrideEmployees(supOverrideEmps);
             return empGroup;
         }
-        throw new SupervisorMissingEmpsEx("No employee associations could be found for supId: " + supId + " before " + end);
+        throw new SupervisorMissingEmpsEx("No employee associations could be found for supId: " + supId + " before " + endDate);
     }
 
     @Override
-    public void setSupervisorOverride(int supId, int ovrSupId, Date start, Date end) throws SupervisorException {
+    public void setSupervisorOverride(int supId, int ovrSupId, Range<LocalDate> dateRange) throws SupervisorException {
         throw new NotImplementedException();
     }
 }

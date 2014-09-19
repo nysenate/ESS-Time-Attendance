@@ -15,16 +15,17 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @Profile({"test"})
-public class TestConfig {
+public class TestConfig
+{
     private static final Logger logger = LoggerFactory.getLogger(TestConfig.class);
 
-    public static final String PROPERTY_FILENAME = "test.app.properties";
+    public static final String TEST_PROPERTY_FILENAME = "test.app.properties";
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer properties() {
         logger.info("Test property file loaded");
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
-        Resource[] resources = new ClassPathResource[] { new ClassPathResource(PROPERTY_FILENAME) };
+        Resource[] resources = new ClassPathResource[] { new ClassPathResource(TEST_PROPERTY_FILENAME) };
         pspc.setLocations(resources);
         pspc.setIgnoreUnresolvablePlaceholders(true);
         return pspc;

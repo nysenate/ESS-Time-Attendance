@@ -1,20 +1,26 @@
 package gov.nysenate.seta.model.personnel;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
 /**
- * Represents the employees that are managed by the associated supervisor.
- * The group of employees are for T&A purposes only and do not necessarily reflect
+ * Represents the employees that are managed by the certain supervisor.
+ * Note: The group of employees are for T&A purposes only and do not necessarily reflect
  * organizational hierarchy.
  */
 public class SupervisorEmpGroup
 {
+    /** The employee id of the supervisor this group is associated with. */
     protected int supervisorId;
-    protected Date startDate;
-    protected Date endDate;
 
-    /** Primary employees (directly assigned to this supervisor).
+    /** Employees were under this supervisor on/after this date. */
+    protected LocalDate startDate;
+
+    /** Employees were under this supervisor before/on this date. */
+    protected LocalDate endDate;
+
+    /** Primary employees that directly assigned to this supervisor.
      *  Mapping of empId -> EmployeeSupInfo */
     protected Map<Integer, EmployeeSupInfo> primaryEmployees;
 
@@ -27,13 +33,17 @@ public class SupervisorEmpGroup
      *  Mapping of the override granter supId -> (Map of empId -> EmployeeInfo) */
     protected Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmployees;
 
+    /** --- Constructors --- */
+
     public SupervisorEmpGroup() {}
 
-    public SupervisorEmpGroup(int supervisorId, Date startDate, Date endDate) {
+    public SupervisorEmpGroup(int supervisorId, LocalDate startDate, LocalDate endDate) {
         this.supervisorId = supervisorId;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    /** --- Methods --- */
 
     /**
      * @return true if any employees are stored, false otherwise.
@@ -44,7 +54,7 @@ public class SupervisorEmpGroup
                (supOverrideEmployees != null && !supOverrideEmployees.isEmpty());
     }
 
-    /** Basic Getters/Setters */
+    /** --- Basic Getters/Setters --- */
 
     public int getSupervisorId() {
         return supervisorId;
@@ -54,19 +64,19 @@ public class SupervisorEmpGroup
         this.supervisorId = supervisorId;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

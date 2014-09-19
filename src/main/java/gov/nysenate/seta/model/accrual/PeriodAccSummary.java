@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -14,13 +15,14 @@ import java.util.Date;
  * Also contains the accrual rates and expected hours, which are not
  * included in the AnnualAccrualSummary.
  */
-public class PeriodAccrualSummary extends AccrualSummary
+public class PeriodAccSummary extends AccrualSummary
 {
-    private static final Logger logger = LoggerFactory.getLogger(PeriodAccrualSummary.class);
+    private static final Logger logger = LoggerFactory.getLogger(PeriodAccSummary.class);
+
     int year;
 
     /** Indicates the pay period for which we want the current state of accruals for. */
-    PayPeriod payPeriod;
+    protected PayPeriod payPeriod;
 
     /** The base pay period is a previous pay period that contains the summary data for
      *  which these accruals are based off of. Basically the accrual information for a given pay
@@ -29,23 +31,25 @@ public class PeriodAccrualSummary extends AccrualSummary
      *  preceding pay period. Often we won't have the totals for the preceding period and will use
      *  an earlier period and calculate the hours in between.
      */
-    PayPeriod basePayPeriod;
+    protected PayPeriod basePayPeriod;
 
-    BigDecimal prevTotalHours;
-    BigDecimal expectedTotalHours;
-    BigDecimal expectedBiweekHours;
-    BigDecimal sickRate;
-    BigDecimal vacRate;
+    protected BigDecimal prevTotalHours;
+    protected BigDecimal expectedTotalHours;
+    protected BigDecimal expectedBiweekHours;
+    protected BigDecimal sickRate;
+    protected BigDecimal vacRate;
 
-    public PeriodAccrualSummary() {}
+    /** --- Constructors --- */
 
-    public PeriodAccrualSummary(AccrualSummary summary) {
+    public PeriodAccSummary() {}
+
+    public PeriodAccSummary(AccrualSummary summary) {
         super(summary);
     }
 
     /** --- Functional Getters/Setters --- */
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         if (basePayPeriod != null) {
             return basePayPeriod.getEndDate();
         }
@@ -118,6 +122,7 @@ public class PeriodAccrualSummary extends AccrualSummary
         this.vacRate = vacRate;
     }
 
+    @Deprecated
     public static int getWorkingDaysBetweenDates(Date startDate, Date endDate) {
         Calendar startCal = Calendar.getInstance();
         startCal.setTime(startDate);
