@@ -3,7 +3,11 @@ package gov.nysenate.seta.dao.attendance;
 import gov.nysenate.seta.dao.base.BasicSqlQuery;
 
 public enum SqlRemoteTimeEntryQuery implements BasicSqlQuery{
-    SELECT_TIME_ENTRY_BY_TIME_RECORD_ID(
+    SELECT_TIME_ENTRY_BY_TIME_ENTRY_ID(
+        "SELECT * FROM PD23TIMESHEET " + "\n" +
+        "WHERE CDSTATUS = :status AND NUXRDAY = :tSDayId "
+    ),
+    SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID(
         "SELECT * FROM PD23TIMESHEET " + "\n" +
         "WHERE CDSTATUS = :status AND NUXRTIMESHEET = :timesheetId "
     ),

@@ -11,4 +11,5 @@ import java.util.Date;
 
 public abstract class BaseRowMapper<T> extends BaseMapper implements RowMapper<T> {
 
+
 }

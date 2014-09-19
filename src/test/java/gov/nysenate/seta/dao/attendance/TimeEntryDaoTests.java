@@ -27,10 +27,10 @@ public class TimeEntryDaoTests extends AbstractContextTests
     @Resource(name = "remoteTimeEntry")
     private TimeEntryDao remoteTimeEntryDao;
 
-    private TimeEntry testEntry;
+    public static TimeEntry testEntry;
+    public static TimeEntry otherTestEntry;
 
-    @PostConstruct
-    private void init(){
+    public static void testEntryInit() {
         testEntry = new TimeEntry();
         testEntry.setEntryId(new BigInteger("11111111111111111111111111111111111111"));
         testEntry.setTimeRecordId(new BigInteger("11111111111111111111111111111111111111"));
@@ -53,6 +53,34 @@ public class TimeEntryDaoTests extends AbstractContextTests
         testEntry.setActive(true);
         testEntry.setEmpComment("was born today");
         testEntry.setPayType(PayType.RA);
+
+        otherTestEntry = new TimeEntry();
+        otherTestEntry.setEntryId(new BigInteger("11111111111111111111111111111111111112"));
+        otherTestEntry.setTimeRecordId(new BigInteger("11111111111111111111111111111111111111"));
+        otherTestEntry.setEmpId(11423);
+        otherTestEntry.setEmployeeName("STOUFFER");
+        otherTestEntry.setDate(LocalDate.of(1990, 8, 15));
+        otherTestEntry.setWorkHours(10);
+        otherTestEntry.setTravelHours(0);
+        otherTestEntry.setHolidayHours(0);
+        otherTestEntry.setVacationHours(0);
+        otherTestEntry.setPersonalHours(2);
+        otherTestEntry.setSickEmpHours(0);
+        otherTestEntry.setSickFamHours(0);
+        otherTestEntry.setMiscHours(12);
+        otherTestEntry.setMiscType(MiscLeaveType.MILITARY_LEAVE);
+        otherTestEntry.setTxOriginalUserId("STOUFFER");
+        otherTestEntry.setTxUpdateUserId("STOUFFER");
+        otherTestEntry.setTxOriginalDate(LocalDate.of(1990, 8, 15).atStartOfDay());
+        otherTestEntry.setTxUpdateDate(LocalDate.of(1990, 8, 15).atStartOfDay());
+        otherTestEntry.setActive(true);
+        otherTestEntry.setEmpComment(null);
+        otherTestEntry.setPayType(PayType.RA);
+    }
+
+    @PostConstruct
+    private void init(){
+        testEntryInit();
     }
 
     @Test
@@ -62,10 +90,24 @@ public class TimeEntryDaoTests extends AbstractContextTests
 
     @Test
     public void getTimeEntryTest(){
-        updateTimeEntryTest();
+        remoteTimeEntryDao.updateTimeEntry(otherTestEntry);
+        try {
+            TimeEntry timeEntry = remoteTimeEntryDao.getTimeEntryById(otherTestEntry.getEntryId());
+            assert (timeEntry.equals(otherTestEntry));
+        }
+        catch(Exception ex){
+            logger.error(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void getTimeEntriesTest(){
+        remoteTimeEntryDao.updateTimeEntry(testEntry);
+        remoteTimeEntryDao.updateTimeEntry(otherTestEntry);
         try {
             List<TimeEntry> timeEntry = remoteTimeEntryDao.getTimeEntriesByRecordId(testEntry.getTimeRecordId());
             assert (timeEntry.contains(testEntry));
+            assert (timeEntry.contains(otherTestEntry));
         }
         catch(Exception ex){
             logger.error(ex.getMessage());

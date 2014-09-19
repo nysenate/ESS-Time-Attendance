@@ -5,19 +5,15 @@ import gov.nysenate.seta.dao.base.OrderBy;
 import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.*;
-import gov.nysenate.seta.model.payroll.MiscLeaveType;
-import gov.nysenate.seta.model.payroll.PayType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository("remoteTimeEntry")
@@ -25,24 +21,37 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeEntryDao.class);
 
-    /** {@inheritDoc}
-     * @param timeRecordId*/
+    /** {@inheritDoc} */
+    @Override
+    public TimeEntry getTimeEntryById(BigInteger timeEntryId) throws TimeEntryException {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("status", "A");
+        params.addValue("tSDayId", new BigDecimal(timeEntryId));
+        try{
+            return remoteNamedJdbc.queryForObject(SqlRemoteTimeEntryQuery.SELECT_TIME_ENTRY_BY_TIME_ENTRY_ID.getSql(),
+                    params, new RemoteEntryRowMapper());
+        }
+        catch (DataAccessException ex) {
+            logger.warn("Could not retrieve time entry for id {} error: {}", timeEntryId, ex.getMessage());
+            throw new TimeEntryNotFoundEx("No matching TimeEntries for TimeEntry id: " + timeEntryId);
+        }
+    }
+
+    /** {@inheritDoc} */
     @Override
     public List<TimeEntry> getTimeEntriesByRecordId(BigInteger timeRecordId) throws TimeEntryException {
-        List<TimeEntry> timeEntryList;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("status", "A");
         params.addValue("timesheetId", new BigDecimal(timeRecordId));
         try {
-            timeEntryList = remoteNamedJdbc.query(SqlRemoteTimeEntryQuery.SELECT_TIME_ENTRY_BY_TIME_RECORD_ID.getSql(
+            return remoteNamedJdbc.query(SqlRemoteTimeEntryQuery.SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID.getSql(
                                                                                 new OrderBy("DTDAY", SortOrder.ASC) ),
                                                   params, new RemoteEntryRowMapper());
         }
-        catch (DataRetrievalFailureException ex){
-            logger.warn("Retrieve time entries for record {} error: {}", timeRecordId, ex.getMessage());
+        catch (DataAccessException ex){
+            logger.warn("Could not retrieve time entries for record {} error: {}", timeRecordId, ex.getMessage());
             throw new TimeEntryNotFoundEx("No matching TimeEntries for TimeRecord id: " + timeRecordId);
         }
-        return timeEntryList;
     }
 
     @Override
@@ -67,7 +76,7 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("sickFamilyHR", timeEntry.getSickFamHours());
         param.addValue("miscHR", timeEntry.getMiscHours());
         param.addValue("miscTypeId", timeEntry.getMiscType() != null ?
-                                        timeEntry.getMiscType().getCode() : "" );
+                                        new BigDecimal(timeEntry.getMiscType().getMiscLeaveId()) : null );
         param.addValue("tOriginalUserId", timeEntry.getTxOriginalUserId());
         param.addValue("tUpdateUserId", timeEntry.getTxUpdateUserId());
         param.addValue("tOriginalDate", toDate(timeEntry.getTxOriginalDate()));

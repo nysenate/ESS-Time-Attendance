@@ -1,8 +1,9 @@
 package gov.nysenate.seta.model.attendance;
 
-import java.sql.Timestamp;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,20 +12,21 @@ import java.util.List;
  */
 public class TimeRecord
 {
-    protected String timeRecordId;
+    protected BigInteger timeRecordId;
     protected Integer employeeId;
     protected Integer supervisorId;
+    protected String employeeName;
     protected boolean active;
-    protected Date beginDate;
-    protected Date endDate;
+    protected LocalDate beginDate;
+    protected LocalDate endDate;
     protected String remarks;
     protected String exceptionDetails;
-    protected Date processedDate;
+    protected LocalDate processedDate;
     protected TimeRecordStatus recordStatus;
     protected String txOriginalUserId;
     protected String txUpdateUserId;
-    protected Date txOriginalDate;
-    protected Date txUpdateDate;
+    protected LocalDateTime txOriginalDate;
+    protected LocalDateTime txUpdateDate;
     protected List<TimeEntry> timeEntries;
 
     /** --- Constructors --- */
@@ -35,11 +37,11 @@ public class TimeRecord
 
     /** --- Basic Getters/Setters --- */
 
-    public String getTimeRecordId() {
+    public BigInteger getTimeRecordId() {
         return timeRecordId;
     }
 
-    public void setTimeRecordId(String timeRecordId) {
+    public void setTimeRecordId(BigInteger timeRecordId) {
         this.timeRecordId = timeRecordId;
     }
 
@@ -59,6 +61,14 @@ public class TimeRecord
         this.supervisorId = supervisorId;
     }
 
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -67,19 +77,19 @@ public class TimeRecord
         this.active = active;
     }
 
-    public Date getBeginDate() {
+    public LocalDate getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Date beginDate) {
+    public void setBeginDate(LocalDate beginDate) {
         this.beginDate = beginDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -99,11 +109,11 @@ public class TimeRecord
         this.exceptionDetails = exceptionDetails;
     }
 
-    public Date getProcessedDate() {
+    public LocalDate getProcessedDate() {
         return processedDate;
     }
 
-    public void setProcessedDate(Date processedDate) {
+    public void setProcessedDate(LocalDate processedDate) {
         this.processedDate = processedDate;
     }
 
@@ -131,19 +141,19 @@ public class TimeRecord
         this.txUpdateUserId = txUpdateUserId;
     }
 
-    public Date getTxOriginalDate() {
+    public LocalDateTime getTxOriginalDate() {
         return txOriginalDate;
     }
 
-    public void setTxOriginalDate(Timestamp txOriginalDate) {
+    public void setTxOriginalDate(LocalDateTime txOriginalDate) {
         this.txOriginalDate = txOriginalDate;
     }
 
-    public Date getTxUpdateDate() {
+    public LocalDateTime getTxUpdateDate() {
         return txUpdateDate;
     }
 
-    public void setTxUpdateDate(Timestamp txUpdateDate) {
+    public void setTxUpdateDate(LocalDateTime txUpdateDate) {
         this.txUpdateDate = txUpdateDate;
     }
 

@@ -24,45 +24,6 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeRecordDao.class);
 
-    protected static final String GET_TIME_REC_SQL_TMPL =
-        "SELECT \n" +
-        /**   PM23TIMESHEET columns (no alias needed) */
-        "    rec.NUXRTIMESHEET, rec.NUXREFEM, rec.NATXNORGUSER, rec.NATXNUPDUSER, rec.DTTXNORIGIN, rec.DTTXNUPDATE, " +
-        "    rec.CDSTATUS, rec.CDTSSTAT, rec.DTBEGIN, rec.DTEND, rec.DEREMARKS, rec.NUXREFSV, rec.DEEXCEPTION, " +
-        "    rec.DTPROCESS, " +
-        /**   PD23TIMESHEET columns (aliased with ENT_) */
-        "    ent.NUXRDAY AS ENT_NUXRDAY, ent.NUXRTIMESHEET AS ENT_NUXRTIMESHEET, ent.NUXREFEM AS ENT_NUXREFEM, " +
-        "    ent.DTDAY AS ENT_DTDAY, ent.NUWORK AS ENT_NUWORK, ent.NUTRAVEL AS ENT_NUTRAVEL, ent.NUHOLIDAY AS ENT_NUHOLIDAY, " +
-        "    ent.NUVACATION AS ENT_NUVACATION, ent.NUPERSONAL AS ENT_NUPERSONAL, ent.NUSICKEMP AS ENT_NUSICKEMP, " +
-        "    ent.NUSICKFAM AS ENT_NUSICKFAM, ent.NUMISC AS ENT_NUMISC, ent.NUXRMISC AS ENT_NUXRMISC, ent.NATXNORGUSER AS ENT_NATXNORGUSER," +
-        "    ent.NATXNUPDUSER AS ENT_NATXNUPDUSER, ent.DTTXNORIGIN AS ENT_DTTXNORIGIN, ent.DTTXNUPDATE AS ENT_DTTXNUPDATE, " +
-        "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE " +
-        "FROM PM23TIMESHEET rec " +
-        "LEFT JOIN PD23TIMESHEET ent ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET \n" +
-        "WHERE rec.CDSTATUS = 'A' AND ent.CDSTATUS = 'A' %s \n" +
-        "ORDER BY rec.NUXREFEM ASC, rec.DTBEGIN ASC, ent.DTDAY ASC";
-
-    protected static final String GET_TIME_REC_BY_DATES_SQL =
-        String.format(GET_TIME_REC_SQL_TMPL,
-            "AND rec.NUXREFEM IN (:empIds) AND (:startDate <= TRUNC(rec.DTBEGIN)) AND (:endDate >= TRUNC(rec.DTEND)) " +
-            "AND rec.CDTSSTAT IN (:statuses)");
-
-    protected static final String GET_TREC_BY_EMPID_SQL = String.format(GET_TIME_REC_SQL_TMPL, "NUXREFEM = :empId");
-    protected static final String GET_TREC_BY_DATE_SQL = String.format(GET_TIME_REC_SQL_TMPL, "DTBEGIN = :startDate AND DTEND = :endDate");
-    protected static final String GET_TREC_BY_RECSTATUS_SQL = String.format(GET_TIME_REC_SQL_TMPL, "CDTSSTAT = :tSStatusId AND NUXREFEM = :empId AND DTBEGIN = :startDate AND DTEND = :endDate");
-
-    protected static final String SET_TIME_REC_SQL =
-            "INSERT \n" +
-                    "INTO PM23TIMESHEET \n" +
-                    "(NUXRTIMESHEET , NUXREFEM, NATXNORGUSER, NATXNUPDUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS, CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS) \n" +
-                    "VALUES (:timesheetId, :empId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n";
-
-    protected static final String UPDATE_TIME_REC_SQL =
-            "UPDATE ts.timesheet \n" +
-                    "SET \n" +
-                    "(NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId, DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId, DEEXCEPTION = :excDetails, DTPROCESS = :procDate) \n" +
-                    "WHERE timesheet_id = :timesheetId";
-
     /** {@inheritDoc} */
     @Override
     public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate) {
@@ -95,7 +56,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("endDate", endDate);
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(GET_TIME_REC_BY_DATES_SQL, params, handler);
+        remoteNamedJdbc.query(SqlRemoteTimeRecordQuery.GET_TIME_REC_BY_DATES_SQL.getSql(), params, handler);
         return handler.getRecordMap();
     }
 
@@ -143,7 +104,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("empId", empId);
 
         try{
-            timeRecordList = remoteNamedJdbc.query(GET_TREC_BY_EMPID_SQL, params,
+            timeRecordList = remoteNamedJdbc.query(SqlRemoteTimeRecordQuery.GET_TREC_BY_EMPID_SQL.getSql(), params,
                     new RemoteRecordRowMapper());
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
@@ -172,7 +133,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("excDetails", tr.getExceptionDetails());
         params.addValue("procDate", tr.getProcessedDate());
 
-        if (remoteNamedJdbc.update(SET_TIME_REC_SQL, params)==1) {    return true;}
+        if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.SET_TIME_REC_SQL.getSql(), params)==1) {    return true;}
         else{   return false;}
 
     }
@@ -182,24 +143,28 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        params.addValue("timesheetId", record.getTimeRecordId());
+        params.addValue("timesheetId", new BigDecimal(record.getTimeRecordId()));
         params.addValue("empId", record.getEmployeeId());
         params.addValue("tOriginalUserId", record.getTxOriginalUserId());
         params.addValue("tUpdateUserId", record.getTxUpdateUserId());
-        params.addValue("tOriginalDate", record.getTxOriginalDate());
-        params.addValue("tUpdateDate", record.getTxUpdateDate());
-        params.addValue("status", getStatusCode(record.isActive()));
+        params.addValue("employeeName", record.getEmployeeName());
+        params.addValue("tOriginalDate", toDate(record.getTxOriginalDate()));
+        params.addValue("tUpdateDate", toDate(record.getTxUpdateDate()));
+        params.addValue("status", String.valueOf(getStatusCode(record.isActive())));
         params.addValue("tSStatusId", record.getRecordStatus().getCode());
-        params.addValue("beginDate", record.getBeginDate());
-        params.addValue("endDate", record.getEndDate());
+        params.addValue("beginDate", toDate(record.getBeginDate()));
+        params.addValue("endDate", toDate(record.getEndDate()));
         params.addValue("remarks", record.getRemarks());
         params.addValue("supervisorId", record.getSupervisorId());
         params.addValue("excDetails", record.getExceptionDetails());
         params.addValue("procDate", record.getProcessedDate());
 
-        if (remoteNamedJdbc.update(UPDATE_TIME_REC_SQL, params)==1) return true;
-        else return false;
-
+        if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(), params)==0) {
+            if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.SET_TIME_REC_SQL.getSql(), params)==0) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

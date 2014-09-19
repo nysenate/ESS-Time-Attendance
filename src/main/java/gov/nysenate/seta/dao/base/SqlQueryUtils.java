@@ -51,14 +51,15 @@ public abstract class SqlQueryUtils
      */
     public static String getLimitOffsetClause(LimitOffset limitOffset) {
         String clause = "";
-        if (limitOffset != null) {
-            if (limitOffset.hasLimit()) {
-                clause = String.format(" LIMIT %d", limitOffset.getLimit());
-            }
-            if (limitOffset.hasOffset()) {
-                clause += String.format(" OFFSET %d", limitOffset.getOffsetStart());
-            }
-        }
+        // TODO: rework for Oracle
+//        if (limitOffset != null) {
+//            if (limitOffset.hasLimit()) {
+//                clause = String.format(" LIMIT %d", limitOffset.getLimit());
+//            }
+//            if (limitOffset.hasOffset()) {
+//                clause += String.format(" OFFSET %d", limitOffset.getOffsetStart());
+//            }
+//        }
         return clause;
     }
 

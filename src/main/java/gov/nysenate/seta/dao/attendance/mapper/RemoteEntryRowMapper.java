@@ -6,6 +6,7 @@ import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -35,7 +36,7 @@ public class RemoteEntryRowMapper extends BaseRowMapper<TimeEntry>{
         te.setSickFamHours(rs.getInt(pfx + "NUSICKFAM"));
         te.setMiscHours(rs.getInt(pfx + "NUMISC"));
         if (rs.getString(pfx + "NUXRMISC") != null) {
-            te.setMiscType(MiscLeaveType.valueOfCode(rs.getString(pfx + "NUXRMISC")));
+            te.setMiscType(MiscLeaveType.valueOfId(rs.getBigDecimal(pfx + "NUXRMISC").toBigInteger()));
         }
         te.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
         te.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));

@@ -6,6 +6,7 @@ import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.accrual.AccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccrualUsage;
 import gov.nysenate.seta.model.attendance.TimeEntry;
+import gov.nysenate.seta.model.attendance.TimeEntryException;
 import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
 import org.joda.time.DateTime;
@@ -65,6 +66,11 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
             "te.emp_id = :empId AND " +
             "te.day_date BETWEEN  :startDate AND :endDate" +
         "GROUP BY te.emp_id";
+
+    @Override
+    public TimeEntry getTimeEntryById(BigInteger timeEntryId) throws TimeEntryException {
+        return null;
+    }
 
     //@Override
     public List<TimeEntry> getTimeEntriesByRecordId(BigInteger timeRecordId) throws TimeEntryNotFoundEx {

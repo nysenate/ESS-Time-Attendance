@@ -21,20 +21,21 @@ public class RemoteRecordRowMapper extends BaseRowMapper<TimeRecord>
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord record = new TimeRecord();
-        record.setTimeRecordId(rs.getString(pfx + "NUXRTIMESHEET"));
+        record.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET").toBigInteger());
         record.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
         record.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
+        record.setEmployeeName(rs.getString(pfx + "NAUSER"));
         record.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
-        record.setTxOriginalDate(rs.getTimestamp(pfx + "DTTXNORIGIN"));
-        record.setTxUpdateDate(rs.getTimestamp(pfx + "DTTXNUPDATE"));
+        record.setTxOriginalDate(getLocalDateTime(rs,(pfx + "DTTXNORIGIN")));
+        record.setTxUpdateDate(getLocalDateTime(rs,(pfx + "DTTXNUPDATE")));
         record.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         record.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "CDTSSTAT")));
-        record.setBeginDate(rs.getDate(pfx + "DTBEGIN"));
-        record.setEndDate(rs.getDate(pfx + "DTEND"));
+        record.setBeginDate(getLocalDate(rs, pfx + "DTBEGIN"));
+        record.setEndDate(getLocalDate(rs, "DTEND"));
         record.setRemarks(rs.getString(pfx + "DEREMARKS"));
         record.setSupervisorId(rs.getInt(pfx + "NUXREFSV"));
         record.setExceptionDetails(rs.getString(pfx + "DEEXCEPTION"));
-        record.setProcessedDate(rs.getDate(pfx + "DTPROCESS"));
+        record.setProcessedDate(getLocalDate(rs, pfx + "DTPROCESS"));
         return record;
     }
 }
