@@ -43,6 +43,7 @@ import static gov.nysenate.seta.util.DateUtils.toDate;
  *   relate to the tables.
  */
 @Repository
+@Deprecated
 public class SqlAccrualDao extends SqlBaseDao //implements AccrualDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDao.class);
@@ -145,7 +146,7 @@ public class SqlAccrualDao extends SqlBaseDao //implements AccrualDao
          *  then we can simply return the summary and we're done. */
         PeriodAccSummary latestPeriodSum = periodSummaries.poll();
         if (periodSummaryIsCurrent(latestPeriodSum, payPeriod)) {
-            latestPeriodSum.setPayPeriod(payPeriod);
+//            latestPeriodSum.setPayPeriod(payPeriod);
             return latestPeriodSum;
         }
 

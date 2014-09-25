@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.period;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 
 import java.time.LocalDate;
@@ -9,7 +10,7 @@ import java.util.Objects;
 /**
  * Contains the date information for a single pay period.
  */
-public class PayPeriod
+public class PayPeriod implements Comparable<PayPeriod>
 {
     /** The expected number of days in a full pay period. */
     public static int DEFAULT_PAY_PERIOD_DAYS = 14;
@@ -99,6 +100,15 @@ public class PayPeriod
     public String toString() {
         return "PayPeriod{" + "type=" + type + ", startDate=" + startDate + ", endDate=" + endDate + ", payPeriodNum=" +
                 payPeriodNum + ", active=" + active + '}';
+    }
+
+    @Override
+    public int compareTo(PayPeriod o) {
+        return ComparisonChain.start()
+            .compare(this.getStartDate(), o.getStartDate())
+            .compare(this.getEndDate(), o.getEndDate())
+            .compare(this.isActive(), o.isActive())
+            .result();
     }
 
     /** --- Basic Getters/Setters --- */

@@ -21,9 +21,6 @@ public class PeriodAccSummary extends AccrualSummary
 
     int year;
 
-    /** Indicates the pay period for which we want the current state of accruals for. */
-    protected PayPeriod payPeriod;
-
     /** The base pay period is a previous pay period that contains the summary data for
      *  which these accruals are based off of. Basically the accrual information for a given pay
      *  period should reflect the hours available at the start of that pay period. Since hours are
@@ -64,14 +61,6 @@ public class PeriodAccSummary extends AccrualSummary
 
     public void setYear(int year) {
         this.year = year;
-    }
-
-    public PayPeriod getPayPeriod() {
-        return payPeriod;
-    }
-
-    public void setPayPeriod(PayPeriod payPeriod) {
-        this.payPeriod = payPeriod;
     }
 
     public PayPeriod getBasePayPeriod() {

@@ -11,35 +11,45 @@ public class AccrualSummary extends AccrualUsage
     protected static final BigDecimal MAX_VAC_ACCRUED = new BigDecimal(210);
     protected static final BigDecimal MAX_EMP_ACCRUED = new BigDecimal(1400);
 
-    BigDecimal vacHoursAccrued;
-    BigDecimal vacHoursBanked;
-    BigDecimal perHoursAccrued;
-    BigDecimal empHoursAccrued;
-    BigDecimal empHoursBanked;
+    /** The number of vacation hours accrued within a certain time frame. */
+    protected BigDecimal vacHoursAccrued;
+
+    /** The number of vacation hours that have rolled over from prior years. */
+    protected BigDecimal vacHoursBanked;
+
+    /** The number of personal hours accrued within a certain time frame. */
+    protected BigDecimal perHoursAccrued;
+
+    /** The number of sick employee hours accrued within a certain time frame. */
+    protected BigDecimal empHoursAccrued;
+
+    /** The number of sick employee hours that have rolled over from prior years. */
+    protected BigDecimal empHoursBanked;
+
+    /** --- Constructors --- */
 
     public AccrualSummary() {}
 
     /** --- Functional Getters/Setters --- */
 
-    public BigDecimal getVacHoursRemaining() {
+    public BigDecimal getVacHoursAvailable() {
         return getTotalVacHoursAccrued().subtract(vacHoursUsed);
     }
 
-    public BigDecimal getPerHoursRemaining() {
+    public BigDecimal getPerHoursAvailable() {
         return perHoursAccrued.subtract(perHoursUsed);
     }
 
-    public BigDecimal getEmpHoursRemaining() {
+    public BigDecimal getEmpHoursAvailable() {
         return getTotalEmpHoursAccrued().subtract(empHoursUsed).subtract(famHoursUsed);
     }
 
-    /** TODO: The max limit might not make sense. Learn the rules for this */
     public BigDecimal getTotalVacHoursAccrued() {
-        return vacHoursAccrued;
+        return vacHoursAccrued.add(vacHoursBanked);
     }
 
     public BigDecimal getTotalEmpHoursAccrued() {
-        return empHoursAccrued;
+        return empHoursAccrued.add(empHoursBanked);
     }
 
     /** --- Copy Constructor --- */

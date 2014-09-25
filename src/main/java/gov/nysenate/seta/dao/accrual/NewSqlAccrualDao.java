@@ -12,6 +12,7 @@ import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.util.DateUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,6 +34,7 @@ import static gov.nysenate.seta.dao.accrual.SqlAccrualQuery.GET_PERIOD_ACC_SUMMA
  *  the side effect is that there will likely not be accrual information for the more recent pay periods. The
  *  accruals will have to be computed to account for the missing data via the service layer.
  */
+@Service
 public class NewSqlAccrualDao extends SqlBaseDao implements AccrualDao
 {
     /** --- Implemented Methods --- */
@@ -77,7 +79,7 @@ public class NewSqlAccrualDao extends SqlBaseDao implements AccrualDao
         return new MapSqlParameterSource()
             .addValue("empId", empId)
             .addValue("prevYear", year - 1)
-            .addValue("beforeDate", endDate);
+            .addValue("beforeDate", DateUtils.toDate(endDate));
     }
 
     protected MapSqlParameterSource getAccrualUsageParams(int empId, LocalDate start, LocalDate end) {
