@@ -55,9 +55,9 @@ public class TransRecordRowMapper extends BaseRowMapper<TransactionRecord>
         transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
         transRec.setTransCode(code);
-        transRec.setOriginalDate(getLocalDateTime(rs, pfx + "DTTXNORIGIN"));
-        transRec.setUpdateDate(getLocalDateTime(rs, pfx + "DTTXNUPDATE"));
-        transRec.setEffectDate(getLocalDate(rs, pfx + "DTEFFECT"));
+        transRec.setOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
+        transRec.setUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
+        transRec.setEffectDate(getLocalDateFromRs(rs, pfx + "DTEFFECT"));
         transRec.setNote((transRec.getTransCode().getType().equals(TransactionType.PER))
                          ? rs.getString(pfx + "DETXNNOTE50") : rs.getString(pfx + "DETXNNOTEPAY"));
 

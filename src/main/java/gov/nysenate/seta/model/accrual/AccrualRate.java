@@ -29,6 +29,7 @@ public enum AccrualRate
 
     /**
      * Retrieve the accrual rate based on the payPeriods.
+     *
      * @param payPeriods int
      * @return BigDecimal with rate stored
      */
@@ -45,6 +46,7 @@ public enum AccrualRate
      * Retrieves the rate using a prorated percentage (occurs when one does not
      * work 1820 hours and accrue at a rate proportional to the number of hours
      * they are expected to work in a year).
+     *
      * @param payPeriods int
      * @param proratePercentage BigDecimal (percentage e.g 0.5)
      * @return BigDecimal with prorated accrual rate to the nearest .25.
@@ -55,6 +57,7 @@ public enum AccrualRate
 
     /**
      * Rounds the given BigDecimal to the nearest .25 increment.
+     *
      * @param num BigDecimal
      * @return BigDecimal with rounded value
      */

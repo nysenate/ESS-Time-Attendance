@@ -4,9 +4,9 @@ import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class is intended to be used within the accrual dao layer. It's purpose is to hold relevant data
@@ -20,9 +20,11 @@ public class AccrualGap
 
     protected List<PayPeriod> gapPeriods;
     protected LinkedList<TransactionRecord> recordsDuringGap;
-    protected LinkedList<PeriodAccrualUsage> periodUsageRecs;
+    protected LinkedList<PeriodAccUsage> periodUsageRecs;
 
-    public AccrualGap(int empId, Date startDate, Date endDate) {
+    /** --- Constructors --- */
+
+    public AccrualGap(int empId, LocalDate startDate, LocalDate endDate) {
         this.empId = empId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -34,6 +36,7 @@ public class AccrualGap
      * Filter transaction records such that only those that occur in the given pay period will be
      * returned. The order is maintained.
      */
+    @Deprecated
     public LinkedList<TransactionRecord> getTransRecsDuringPeriod(PayPeriod payPeriod) {
         LinkedList<TransactionRecord> recs = new LinkedList<>();
         for (TransactionRecord rec : recordsDuringGap) {
@@ -50,16 +53,10 @@ public class AccrualGap
     }
 
     /**
-     * Filters the usage record list such that either the ones that occur in the given pay period
-     * are returned or else null is returned.
+     * Return a usage record that is set for the given pay period or return an empty Optional if it doesn't exist.
      */
-    public PeriodAccrualUsage getUsageRecDuringPeriod(PayPeriod payPeriod) {
-        for (PeriodAccrualUsage rec : periodUsageRecs) {
-            if (rec.getPayPeriod().equals(payPeriod)) {
-                return rec;
-            }
-        }
-        return null;
+    public Optional<PeriodAccUsage> getUsageRecDuringPeriod(PayPeriod payPeriod) {
+        return periodUsageRecs.stream().filter(r -> r.getPayPeriod().equals(payPeriod)).findFirst();
     }
 
     /** --- Basic Getters/Setters --- */
@@ -72,19 +69,19 @@ public class AccrualGap
         this.empId = empId;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -104,11 +101,11 @@ public class AccrualGap
         this.recordsDuringGap = recordsDuringGap;
     }
 
-    public LinkedList<PeriodAccrualUsage> getPeriodUsageRecs() {
+    public LinkedList<PeriodAccUsage> getPeriodUsageRecs() {
         return periodUsageRecs;
     }
 
-    public void setPeriodUsageRecs(LinkedList<PeriodAccrualUsage> periodUsageRecs) {
+    public void setPeriodUsageRecs(LinkedList<PeriodAccUsage> periodUsageRecs) {
         this.periodUsageRecs = periodUsageRecs;
     }
 }

@@ -69,9 +69,8 @@ public final class SenateLdapPerson
 
     public SenateLdapPerson() {}
 
-    /**
-     * Getters/Setters
-     */
+    /** --- Basic Getters/Setters --- */
+
     public Name getDn() {
         return dn;
     }

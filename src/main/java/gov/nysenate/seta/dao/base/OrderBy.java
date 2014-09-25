@@ -3,7 +3,8 @@ package gov.nysenate.seta.dao.base;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 
-public class OrderBy {
+public class OrderBy
+{
     private static OrderBy NO_ORDER = new OrderBy();
 
     /** An immutable mapping of column names to sort order. */

@@ -10,33 +10,25 @@ import java.util.Date;
 public abstract class BaseMapper
 {
     /**
-     * Convert a Date to a LocalDate at the system's default time zone.
-     */
-    public static LocalDate getLocalDate(Date date) {
-        if (date == null) return null;
-        return getLocalDateTime(date).toLocalDate();
-    }
-
-    /**
      * Read the 'column' date value from the result set and cast it to a LocalDate.
      */
-    public static LocalDate getLocalDate(ResultSet rs, String column) throws SQLException {
+    public static LocalDate getLocalDateFromRs(ResultSet rs, String column) throws SQLException {
+        if (rs.getDate(column) == null) return null;
         return rs.getDate(column).toLocalDate();
-    }
-
-
-    /**
-     * Convert a Date to a LocalDateTime at the system's default time zone.
-     */
-    public static LocalDateTime getLocalDateTime(Date date) {
-        if (date == null) return null;
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     /**
      * Read the 'column' date value from the result set and cast it to a LocalDateTime.
      */
-    public static LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
-        return getLocalDateTime(rs.getTimestamp(column));
+    public static LocalDateTime getLocalDateTimeFromRs(ResultSet rs, String column) throws SQLException {
+        if (rs.getTimestamp(column) == null) return null;
+        return rs.getTimestamp(column).toLocalDateTime();
+    }
+
+    /**
+     * Interpret "A" as true and everything else as false.
+     */
+    public static boolean getStatusFromCode(String code) {
+        return code != null && code.trim().equalsIgnoreCase("A");
     }
 }

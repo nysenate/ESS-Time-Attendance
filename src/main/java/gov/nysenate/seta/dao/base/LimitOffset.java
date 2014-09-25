@@ -2,8 +2,10 @@ package gov.nysenate.seta.dao.base;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class LimitOffset {
+public class LimitOffset
+{
     /** Use this reference when no limit is desired. */
     public static final LimitOffset ALL = new LimitOffset(0,0);
 
@@ -83,20 +85,20 @@ public class LimitOffset {
     /** --- Overrides --- */
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof LimitOffset)) return false;
-        LimitOffset that = (LimitOffset) o;
-        if (limit != that.limit) return false;
-        if (offset != that.offset) return false;
-        return true;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final LimitOffset other = (LimitOffset) obj;
+        return Objects.equals(this.limit, other.limit) && Objects.equals(this.offset, other.offset);
     }
 
     @Override
     public int hashCode() {
-        int result = limit;
-        result = 31 * result + offset;
-        return result;
+        return Objects.hash(limit, offset);
     }
 
     /** --- Basic Getters/Setters --- */

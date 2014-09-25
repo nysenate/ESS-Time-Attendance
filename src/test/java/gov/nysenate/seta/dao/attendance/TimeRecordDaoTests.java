@@ -1,6 +1,6 @@
 package gov.nysenate.seta.dao.attendance;
 
-import gov.nysenate.seta.AbstractContextTests;
+import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.util.OutputUtils;
@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigInteger;
 
-public class TimeRecordDaoTests extends AbstractContextTests
+public class TimeRecordDaoTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(TimeRecordDaoTests.class);
 

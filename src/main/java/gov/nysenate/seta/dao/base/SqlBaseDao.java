@@ -47,21 +47,15 @@ public abstract class SqlBaseDao
      * Read the 'column' date value from the result set and cast it to a LocalDateTime.
      */
     public static LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
-        return DateUtils.getLocalDateTime(rs.getTimestamp(column));
-    }
-
-    /**
-     * Convert a Date to a LocalDate at the system's default time zone.
-     */
-    public static LocalDate getLocalDate(Date date) {
-        if (date == null) return null;
-        return DateUtils.getLocalDateTime(date).toLocalDate();
+        if (rs.getTimestamp(column) == null) return null;
+        return rs.getTimestamp(column).toLocalDateTime();
     }
 
     /**
      * Read the 'column' date value from the result set and cast it to a LocalDate.
      */
     public static LocalDate getLocalDate(ResultSet rs, String column) throws SQLException {
+        if (rs.getDate(column) == null) return null;
         return rs.getDate(column).toLocalDate();
     }
 
@@ -72,27 +66,5 @@ public abstract class SqlBaseDao
      */
     public static char getStatusCode(Boolean status) {
         return (status != null && status.equals(true)) ? 'A' : 'I';
-    }
-
-    /**
-     * Interpret 'A' as true and everything else as false.
-     * @param code String
-     * @return boolean
-     */
-    public static boolean getStatusFromCode(String code) {
-        return code != null && code.equals("A");
-    }
-
-    /**
-     * Replaces ${order} with either ASC or DESC.
-     * @param orderByAsc boolean - if true, set as ASC, otherwise DESC.
-     * @param sql String - The sql to replace
-     * @return String - The new sql string
-     */
-    public static String setOrderByClause(boolean orderByAsc, String sql) {
-        Map<String, String> replaceMap = new HashMap<>();
-        replaceMap.put("order", (orderByAsc) ? "ASC" : "DESC");
-        StrSubstitutor strSub = new StrSubstitutor(replaceMap);
-        return strSub.replace(sql);
     }
 }

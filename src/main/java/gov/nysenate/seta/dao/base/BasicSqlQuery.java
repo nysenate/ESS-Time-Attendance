@@ -1,38 +1,33 @@
 package gov.nysenate.seta.dao.base;
 
-
-import org.springframework.jdbc.object.SqlQuery;
-
 public interface BasicSqlQuery
 {
+    /** TODO: get rid of these. */
+    static String MASTER_SCHEMA = "SASS_OWNER";
+    static String TS_SCHEMA = "TS_OWNER";
+
     /**
      * Return the sql query as is.
      */
     public String getSql();
 
     /**
-     * Retrieve a formatted sql String with the envSchema value replaced where
-     * applicable. This is needed for allowing configurable schema names.
+     * Return which database this query is targeting.
      */
-    public default String getSql(String envSchema) {
-        return SqlQueryUtils.getSqlWithSchema(getSql(), envSchema);
-    }
+    public DbVendor getVendor();
 
     /**
-     * Returns a sql string with a limit clause
-     * appended to the end according to the supplied LimitOffset instance.
+     * Returns a sql query that is formatted to support the given limit offset operations.*
      */
     public default String getSql(LimitOffset limitOffset) {
-        return getSql() + SqlQueryUtils.getLimitOffsetClause(limitOffset);
+        return SqlQueryUtils.withLimitOffsetClause(getSql(), limitOffset, getVendor());
     }
 
     /**
      * Returns a sql string with an order by clause set according to the supplied OrderBy instance.
-     * @param orderBy
-     * @return
      */
     public default String getSql(OrderBy orderBy) {
-        return getSql() + SqlQueryUtils.getOrderByClause(orderBy);
+        return SqlQueryUtils.withOrderByClause(getSql(), orderBy);
     }
 
     /**
@@ -40,6 +35,6 @@ public interface BasicSqlQuery
      * order by clause set according to the supplied OrderBy instance.
      */
     public default String getSql(OrderBy orderBy, LimitOffset limitOffset) {
-        return getSql() + SqlQueryUtils.getOrderByClause(orderBy) + SqlQueryUtils.getLimitOffsetClause(limitOffset);
+        return SqlQueryUtils.withLimitOffsetClause(SqlQueryUtils.withOrderByClause(getSql(), orderBy), limitOffset, getVendor());
     }
 }

@@ -4,7 +4,7 @@ import gov.nysenate.seta.model.payroll.PayType;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * This class is intended for use within the accrual dao layer. It contains the necessary information
@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class AccrualState extends AccrualSummary
 {
-    protected Date endDate;
+    protected LocalDate endDate;
     protected boolean employeeActive;
     protected PayType payType;
     protected BigDecimal minTotalHours;
@@ -70,7 +70,7 @@ public class AccrualState extends AccrualSummary
         this.setTravelHoursUsed(BigDecimal.ZERO);
     }
 
-    public void applyUsage(PeriodAccrualUsage usage) {
+    public void applyUsage(PeriodAccUsage usage) {
         this.setVacHoursUsed(this.getVacHoursUsed().add(usage.getVacHoursUsed()));
         this.setPerHoursUsed(this.getPerHoursUsed().add(usage.getPerHoursUsed()));
         this.setEmpHoursUsed(this.getEmpHoursUsed().add(usage.getEmpHoursUsed()));
@@ -82,11 +82,11 @@ public class AccrualState extends AccrualSummary
 
     /** --- Basic Getters/Setters --- */
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

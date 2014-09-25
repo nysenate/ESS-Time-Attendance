@@ -70,10 +70,10 @@ public class TransHistoryHandler extends BaseHandler
         transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
         transRec.setTransCode(code);
-        transRec.setOriginalDate(getLocalDateTime(rs, pfx + "DTTXNORIGIN"));
-        transRec.setUpdateDate(getLocalDateTime(rs, pfx + "DTTXNUPDATE"));
-        transRec.setEffectDate(getLocalDate(rs, pfx + "DTEFFECT"));
-        transRec.setAuditDate(getLocalDateTime(rs, pfx + "AUD_DTTXNORIGIN"));
+        transRec.setOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
+        transRec.setUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
+        transRec.setEffectDate(getLocalDateFromRs(rs, pfx + "DTEFFECT"));
+        transRec.setAuditDate(getLocalDateTimeFromRs(rs, pfx + "AUD_DTTXNORIGIN"));
         transRec.setNote((transRec.getTransCode().getType().equals(TransactionType.PER))
                 ? rs.getString(pfx + "DETXNNOTE50") : rs.getString(pfx + "DETXNNOTEPAY"));
 

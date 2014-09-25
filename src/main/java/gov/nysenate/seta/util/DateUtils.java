@@ -11,6 +11,16 @@ import java.util.Date;
 public class DateUtils
 {
     /**
+     * Returns a LocalDate that is set to a date way in the past. Can't really use the LocalDate.MIN
+     * value because it doesn't play nice when converting into a database date.
+     *
+     * @return LocalDate
+     */
+    public static LocalDate longAgo() {
+        return LocalDate.ofYearDay(1, 1);
+    }
+
+    /**
      * Given the LocalDate range, extract the lower bound LocalDate. If the lower bound is not set,
      * a really early date will be returned. If the bound is open, a single day will be added to the
      * LocalDate. If its closed, the date will remain as is.

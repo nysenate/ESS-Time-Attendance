@@ -2,8 +2,8 @@ package gov.nysenate.seta.dao.accrual;
 
 import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.model.accrual.AccrualException;
-import gov.nysenate.seta.model.accrual.AnnualAccrualSummary;
-import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
+import gov.nysenate.seta.model.accrual.AnnualAccSummary;
+import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
 import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import gov.nysenate.seta.model.payroll.PayType;
@@ -12,7 +12,7 @@ import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
-import org.joda.time.LocalDate;
+import gov.nysenate.seta.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -20,6 +20,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
@@ -38,14 +39,14 @@ public class SqlAccrualHelper
     /**
      * Gets the latest annual accrual record that has a posted end date that is before our given 'payPeriodEndDate'.
      */
-    static AnnualAccrualSummary getActiveAnnualSummaryFromList(Map<Integer, AnnualAccrualSummary> annualSummaries,
-                                                                Date payPeriodEndDate) {
-        AnnualAccrualSummary annualAccSum = null;
+    static AnnualAccSummary getActiveAnnualSummaryFromList(Map<Integer, AnnualAccSummary> annualSummaries,
+                                                                LocalDate payPeriodEndDate) {
+        AnnualAccSummary annualAccSum = null;
         if (!annualSummaries.isEmpty()) {
             Iterator<Integer> yearIterator = new TreeSet<>(annualSummaries.keySet()).descendingIterator();
             while (yearIterator.hasNext()) {
                 annualAccSum = annualSummaries.get(yearIterator.next());
-                if (annualAccSum.getEndDate() == null || annualAccSum.getEndDate().before(payPeriodEndDate)) {
+                if (annualAccSum.getEndDate() == null || annualAccSum.getEndDate().isBefore(payPeriodEndDate)) {
                     break;
                 }
             }
@@ -56,8 +57,8 @@ public class SqlAccrualHelper
     /**
      * Get the end date of the previous pay period. Assumes pay period is contiguous.
      */
-    static Date getPrevPayPeriodEndDate(PayPeriod payPeriod) {
-        return new LocalDate(payPeriod.getStartDate()).minusDays(1).toDate();
+    static java.time.LocalDate getPrevPayPeriodEndDate(PayPeriod payPeriod) {
+        return payPeriod.getStartDate().minusDays(1);
     }
 
     /**
@@ -66,17 +67,17 @@ public class SqlAccrualHelper
      * period elapses and a summary record represents the state of a period after it's elapsed, a
      * pay period's available hours is essentially determined from the previous pay period's totals.
      */
-    static boolean periodSummaryIsCurrent(PeriodAccrualSummary periodSummary, PayPeriod payPeriod) {
-        Date prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
+    static boolean periodSummaryIsCurrent(PeriodAccSummary periodSummary, PayPeriod payPeriod) {
+        java.time.LocalDate prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
         return (periodSummary != null && periodSummary.getEndDate().compareTo(prevPayPeriodEndDate) == 0);
     }
 
     /**
      * Similar to 'periodSummaryIsCurrent' but for annual accrual summary.
      */
-    static boolean annualSummaryIsCurrent(AnnualAccrualSummary annualSummary, PayPeriod payPeriod) {
+    static boolean annualSummaryIsCurrent(AnnualAccSummary annualSummary, PayPeriod payPeriod) {
         //logger.debug(OutputUtils.toJson(annualSummary));
-        Date prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
+        java.time.LocalDate prevPayPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
         return (annualSummary != null && annualSummary.getEndDate() != null &&
                 annualSummary.getEndDate().compareTo(prevPayPeriodEndDate) == 0);
     }
@@ -224,15 +225,15 @@ public class SqlAccrualHelper
                     * instead of effect date.
                      */
                     if (nextRec == null) {
-                        LocalDate localDate = new LocalDate(new Date());
+                        LocalDate localDate = LocalDate.now();
                         localDate.plusMonths(1);
-                        dteffectEnd = localDate.toDate();
+                        dteffectEnd = DateUtils.toDate(localDate);
                         logger.debug("- getExpectedHours Emp Id:" + transHistory.getEmployeeId() + " Last Record Effective (1 Month future:" + sdf.format(dteffectEnd) + ")");
                     } else {
                         dteffectEnd = sdf.parse((String) nextRec.get("EffectDate"));
-                        LocalDate localDate = new LocalDate(dteffectEnd);
+                        LocalDate localDate = DateUtils.getLocalDate(dteffectEnd);
                         localDate = localDate.plusDays(-1);
-                        dteffectEnd = localDate.toDate();
+                        dteffectEnd = DateUtils.toDate(localDate);
                         logger.debug("- getExpectedHours Emp Id:" + transHistory.getEmployeeId() + " Normal Record Effective:" + sdf.format(dteffectEnd));
                     }
 
@@ -267,15 +268,15 @@ public class SqlAccrualHelper
                         logger.debug("---------------PAYTYPE:("+currentPaytype+")");
                         if (!dteffect.before(dtstart) && !dteffectEnd.after(dtend)) {
                             if (currentPaytype.equalsIgnoreCase("RA")) {
-                                logger.debug("---------------PAYTYPE:(RA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * 7");
-                                logger.debug("---------------PAYTYPE:(RA):PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd):" + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd));
+                                logger.debug("---------------PAYTYPE:(RA):" + expectedHours + " + " + PeriodAccSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * 7");
+                                logger.debug("---------------PAYTYPE:(RA):PeriodAccSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd):" + PeriodAccSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd));
 
-                                expectedHours = expectedHours + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * 7;
+                                expectedHours = expectedHours + PeriodAccSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * 7;
                             } else if (currentPaytype.equalsIgnoreCase("SA")) {
                                 int proRate = 7;
-                                logger.debug("---------------PAYTYPE:(SA):" + expectedHours + " + " + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * " + proRate);
+                                logger.debug("---------------PAYTYPE:(SA):" + expectedHours + " + " + PeriodAccSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) + " * " + proRate);
                                 // TODO  need to calculate proRate;
-                                expectedHours = expectedHours + PeriodAccrualSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * proRate;
+                                expectedHours = expectedHours + PeriodAccSummary.getWorkingDaysBetweenDates(dteffect, dteffectEnd) * proRate;
                             } else if (currentPaytype.equalsIgnoreCase("TE")) {
                                 logger.debug("---------------PAYTYPE:(TE) NEEDS CODING");
                                 // TODO  need to sum up TE Hours worked;

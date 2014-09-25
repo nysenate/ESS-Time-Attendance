@@ -1,8 +1,9 @@
 package gov.nysenate.seta.dao.accrual;
 
-import gov.nysenate.seta.dao.accrual.mapper.AnnualAccrualSummaryRowMapper;
-import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualSummaryRowMapper;
-import gov.nysenate.seta.dao.accrual.mapper.PeriodAccrualUsageRowMapper;
+import com.google.common.collect.Sets;
+import gov.nysenate.seta.dao.accrual.mapper.AnnualAccSummaryRowMapper;
+import gov.nysenate.seta.dao.accrual.mapper.PeriodAccSummaryRowMapper;
+import gov.nysenate.seta.dao.accrual.mapper.PeriodAccUsageRowMapper;
 import gov.nysenate.seta.dao.attendance.TimeEntryDao;
 import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
@@ -16,8 +17,8 @@ import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
+import gov.nysenate.seta.util.DateUtils;
 import gov.nysenate.seta.util.OutputUtils;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,12 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 import static gov.nysenate.seta.dao.accrual.SqlAccrualHelper.*;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
+import static gov.nysenate.seta.util.DateUtils.toDate;
 
 /**
  * TODO: Document the following things:
@@ -40,7 +43,7 @@ import static gov.nysenate.seta.model.transaction.TransactionCode.*;
  *   relate to the tables.
  */
 @Repository
-public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
+public class SqlAccrualDao extends SqlBaseDao //implements AccrualDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDao.class);
 
@@ -56,12 +59,12 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     @Autowired
     protected HolidayDao holidayDao;
 
-    protected static final Set<TransactionCode> PAY_CODES = new HashSet<>(Arrays.asList(TYP, RTP, APP));
-    protected static final Set<TransactionCode> MIN_CODES = new HashSet<>(Arrays.asList(MIN, RTP, APP));
+    protected static final Set<TransactionCode> PAY_CODES = Sets.newHashSet(TYP, RTP, APP);
+    protected static final Set<TransactionCode> MIN_CODES = Sets.newHashSet(MIN, RTP, APP);
 
-    protected static final Set<TransactionCode> APP_RTP_CODES = new HashSet<>(Arrays.asList(RTP, APP));
-    protected static final Set<TransactionCode> EMP_CODES = new HashSet<>(Arrays.asList(EMP));
-    protected static final Set<TransactionCode> APP_RTP_EMP_CODES = new HashSet<>(Arrays.asList(EMP, RTP, APP));
+    protected static final Set<TransactionCode> APP_RTP_CODES = Sets.newHashSet(RTP, APP);
+    protected static final Set<TransactionCode> EMP_CODES = Sets.newHashSet(EMP);
+    protected static final Set<TransactionCode> APP_RTP_EMP_CODES = Sets.newHashSet(EMP, RTP, APP);
 
     /** --- SQL Queries --- */
 
@@ -105,8 +108,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     /** --- Public Interface --- */
 
     /** {@inheritDoc} */
-    @Override
-    public PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod, boolean earliestRecLikeAppoint) throws AccrualException {
+    public PeriodAccSummary getAccuralSummary(int empId, PayPeriod payPeriod, boolean earliestRecLikeAppoint) throws AccrualException {
         if (payPeriod == null) {
             throw new IllegalArgumentException("Supplied payPeriod cannot be null.");
         }
@@ -114,35 +116,34 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
             throw new IllegalArgumentException("Supplied payPeriod must be of type AF (Attendance Fiscal).");
         }
 
-        Date startDate = payPeriod.getStartDate();
-        Date endDate = payPeriod.getEndDate();
-        int year = new LocalDate(endDate).getYear();
+        LocalDate startDate = payPeriod.getStartDate();
+        LocalDate endDate = payPeriod.getEndDate();
+        int year = endDate.getYear();
 
-        Map<Integer, AnnualAccrualSummary> annualSummaries = getAnnualAccrualSummaries(empId, year);
-        LinkedList<PeriodAccrualSummary> periodSummaries = getPeriodAccrualSummaries(empId, year, startDate);
+        Map<Integer, AnnualAccSummary> annualSummaries = getAnnualAccrualSummaries(empId, year);
+        LinkedList<PeriodAccSummary> periodSummaries = getPeriodAccrualSummaries(empId, year, startDate);
 
         return getAccuralSummary(empId, payPeriod, annualSummaries, periodSummaries, earliestRecLikeAppoint);
     }
 
     /** {@inheritDoc} */
-    @Override
-    public List<PeriodAccrualSummary> getAccrualSummaries(int empId, List<PayPeriod> payPeriods) throws AccrualException {
+    public List<PeriodAccSummary> getAccrualSummaries(int empId, List<PayPeriod> payPeriods) throws AccrualException {
         return null;
     }
 
     /** --- Processing Methods --- */
 
-    private PeriodAccrualSummary getAccuralSummary(int empId, PayPeriod payPeriod,
-                                                   Map<Integer, AnnualAccrualSummary> annualSummaries,
-                                                   LinkedList<PeriodAccrualSummary> periodSummaries,
+    private PeriodAccSummary getAccuralSummary(int empId, PayPeriod payPeriod,
+                                                   Map<Integer, AnnualAccSummary> annualSummaries,
+                                                   LinkedList<PeriodAccSummary> periodSummaries,
                                                    boolean earliestRecLikeAppoint) throws AccrualException {
 
-        Date payPeriodEndDate = payPeriod.getEndDate();
-        Date prevPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
+        LocalDate payPeriodEndDate = payPeriod.getEndDate();
+        LocalDate prevPeriodEndDate = getPrevPayPeriodEndDate(payPeriod);
 
         /** We first check to see if there is a period summary for the previous pay period. If it's available
          *  then we can simply return the summary and we're done. */
-        PeriodAccrualSummary latestPeriodSum = periodSummaries.poll();
+        PeriodAccSummary latestPeriodSum = periodSummaries.poll();
         if (periodSummaryIsCurrent(latestPeriodSum, payPeriod)) {
             latestPeriodSum.setPayPeriod(payPeriod);
             return latestPeriodSum;
@@ -153,7 +154,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         /** Since we didn't have a matching period summary record, the accruals must be rebuilt up to the given
          *  pay period. We look for an annual summary record because those have counts of how many pay periods
          *  were worked and are initially created by personnel. */
-        AnnualAccrualSummary activeAnnualSummary = getActiveAnnualSummaryFromList(annualSummaries, payPeriodEndDate);
+        AnnualAccSummary activeAnnualSummary = getActiveAnnualSummaryFromList(annualSummaries, payPeriodEndDate);
 
         /** If there are no annual summary records to work with we don't have enough information to reliably
          *  construct a period accrual summary. We can throw an error instead. */
@@ -162,7 +163,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
             throw new AccrualException(empId, AccrualExceptionType.NO_ACTIVE_ANNUAL_RECORD_FOUND);
         }
 
-        Date activeAnnualEndDate = activeAnnualSummary.getEndDate();
+        LocalDate activeAnnualEndDate = activeAnnualSummary.getEndDate();
 
         /** The annual summary will likely not be current if the period summary wasn't, but check anyways. */
         if (annualSummaryIsCurrent(activeAnnualSummary, payPeriod)) {
@@ -175,12 +176,12 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
          *  the summary. This usually occurs for (re)appointed employees, temps, and those on unpaid leave. */
         boolean hasEndDate = true;
         if (activeAnnualSummary.getEndDate() == null) {
-            activeAnnualEndDate = new LocalDate(activeAnnualSummary.getYear() - 1, 12, 31).toDate();
+            activeAnnualEndDate = LocalDate.of(activeAnnualSummary.getYear() - 1, 12, 31);
             hasEndDate = false;
         }
 
         /** Get the transactions that occurred before/on the end date of the annual summary. */
-        TransactionHistory historyBeforeSummary = getAccrualTransactions(empId, getBeginningOfTime(), activeAnnualEndDate);
+        TransactionHistory historyBeforeSummary = getAccrualTransactions(empId, DateUtils.longAgo(), activeAnnualEndDate);
 
         /** Establish the initial state based on the transaction records. */
         AccrualState accrualState = getInitialAccrualState(activeAnnualSummary, activeAnnualEndDate,
@@ -190,15 +191,15 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
         /** The gap is the date range for which we want to compute accruals for as well as determine how many
          *  hours were used (period usage records from PD23ATTEND or the local time sheet database. */
-        Date gapStartDate = new LocalDate(activeAnnualEndDate).plusDays(1).toDate();
-        Date gapEndDate = prevPeriodEndDate;
+        LocalDate gapStartDate = activeAnnualEndDate.plusDays(1);
+        LocalDate gapEndDate = prevPeriodEndDate;
         AccrualGap accrualGap = new AccrualGap(empId, gapStartDate, gapEndDate);
 
         logger.debug("Determining accruals between {} and {}", gapStartDate, gapEndDate);
 
-        TransactionHistory historyDuringGap = getAccrualTransactions(empId, accrualGap.getStartDate(), accrualGap.getEndDate());
-        accrualGap.setGapPeriods(payPeriodDao.getPayPeriods(PayPeriodType.AF, gapStartDate, gapEndDate, true));
-        accrualGap.setRecordsDuringGap(historyDuringGap.getAllTransRecords(SortOrder.DESC));
+//        TransactionHistory historyDuringGap = getAccrualTransactions(empId, accrualGap.getStartDate(), accrualGap.getEndDate());
+//        accrualGap.setGapPeriods(payPeriodDao.getPayPeriods(PayPeriodType.AF, gapStartDate, gapEndDate, true));
+//        accrualGap.setRecordsDuringGap(historyDuringGap.getAllTransRecords(SortOrder.DESC));
         accrualGap.setPeriodUsageRecs(getPeriodAccrualUsageRecords(empId, gapStartDate, gapEndDate));
 
         /** TODO: Add local timesheet data */
@@ -210,7 +211,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
             LinkedList<TransactionRecord> recordsInPeriod = accrualGap.getTransRecsDuringPeriod(gapPeriod);
 
             /** Also check if any usage records (PD23ATTEND) exist for the current gap period */
-            PeriodAccrualUsage periodUsage = accrualGap.getUsageRecDuringPeriod(gapPeriod);
+//            PeriodAccUsage periodUsage = accrualGap.getUsageRecDuringPeriod(gapPeriod);
 
             /** If the employee is set as terminated we want to skip accruals until they are reappointed */
             if (!accrualState.isEmployeeActive()) {
@@ -223,7 +224,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
             }
 
             /** If the year has rolled over, reset the accrual state. */
-            if (new LocalDate(accrualState.getEndDate()).getYear() != new LocalDate(gapPeriod.getEndDate()).getYear()) {
+            if (accrualState.getEndDate().getYear() != gapPeriod.getEndDate().getYear()) {
                 accrualState.applyYearRollover();
             }
 
@@ -254,9 +255,9 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
                 accrualState.incrementAccrualsEarned();
             }
 
-            if (periodUsage != null) {
-                accrualState.applyUsage(periodUsage);
-            }
+//            if (periodUsage != null) {
+//                accrualState.applyUsage(periodUsage);
+//            }
 
             logger.debug("Current accrual state: {}", OutputUtils.toJson(accrualState));
         }
@@ -267,7 +268,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     /**
      * Initializes an AccrualState object with information from the annual summary.
      */
-    protected AccrualState getInitialAccrualState(AnnualAccrualSummary annSummary, Date endDate,
+    protected AccrualState getInitialAccrualState(AnnualAccSummary annSummary, LocalDate endDate,
                                                   TransactionHistory transHistory, boolean hasEndDate) throws AccrualException {
         LinkedList<TransactionRecord> empRecords = getEmpRecordsFromHistory(transHistory, SortOrder.DESC);
         LinkedList<TransactionRecord> minRecords = getMinRecordsFromHistory(transHistory, SortOrder.DESC);
@@ -297,9 +298,9 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      * Get a TransactionHistory for an employee that contains any transactions relevant to accrual
      * processing logic.
      */
-    private TransactionHistory getAccrualTransactions(int empId, Date startDate, Date endDate) {
+    private TransactionHistory getAccrualTransactions(int empId, LocalDate startDate, LocalDate endDate) {
         Set<TransactionCode> codes = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
-        return empTransactionDao.getTransHistory(empId, codes, startDate, endDate, true);
+        return empTransactionDao.getTransHistory(empId, codes, toDate(startDate), toDate(endDate), true);
     }
 
     /** --- Data Retrieval Methods -- */
@@ -311,18 +312,18 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      *
      * @param empId int - Employee id
      * @param endYear int - Year to retrieve summaries until
-     * @return Map&lt;Integer, AnnualAccrualSummary&gt; - { Year -> Annual Accrual Record }
+     * @return Map&lt;Integer, AnnualAccSummary&gt; - { Year -> Annual Accrual Record }
      */
-    protected Map<Integer, AnnualAccrualSummary> getAnnualAccrualSummaries(int empId, int endYear) {
-        Map<Integer, AnnualAccrualSummary> annualAccRecMap = new HashMap<>();
+    protected Map<Integer, AnnualAccSummary> getAnnualAccrualSummaries(int empId, int endYear) {
+        Map<Integer, AnnualAccSummary> annualAccRecMap = new HashMap<>();
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("endYear", endYear);
-        List<AnnualAccrualSummary> annualAccRecs;
+        List<AnnualAccSummary> annualAccRecs;
         annualAccRecs = remoteNamedJdbc.query(GET_ANNUAL_ACCRUAL_SUMMARIES_SQL, params,
-                                              new AnnualAccrualSummaryRowMapper());
-        for (AnnualAccrualSummary annualAccRec : annualAccRecs)  {
+                                              new AnnualAccSummaryRowMapper());
+        for (AnnualAccSummary annualAccRec : annualAccRecs)  {
             annualAccRecMap.put(annualAccRec.getYear(), annualAccRec);
         }
         return annualAccRecMap;
@@ -336,15 +337,15 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      * @param empId int - Employee id
      * @param year int - Year
      * @param beforeDate Date - End Date
-     * @return List<PeriodAccrualSummary>
+     * @return List<PeriodAccSummary>
      */
-    protected LinkedList<PeriodAccrualSummary> getPeriodAccrualSummaries(int empId, int year, Date beforeDate) {
+    protected LinkedList<PeriodAccSummary> getPeriodAccrualSummaries(int empId, int year, LocalDate beforeDate) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("prevYear", year - 1);
         params.addValue("beforeDate", beforeDate);
         return new LinkedList<>(remoteNamedJdbc.query(GET_PERIOD_ACCRUAL_SUMMARY_SQL, params,
-                                                      new PeriodAccrualSummaryRowMapper("","")));
+                                                      new PeriodAccSummaryRowMapper("","")));
     }
 
     /**
@@ -353,14 +354,14 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
      * @param empId int - Employee id
      * @param startDate Date - Start date (inclusive)
      * @param endDate Date - End Date (inclusive)
-     * @return LinkedList<PeriodAccrualUsage>
+     * @return LinkedList<PeriodAccUsage>
      */
-    protected LinkedList<PeriodAccrualUsage> getPeriodAccrualUsageRecords(int empId, Date startDate, Date endDate) {
+    protected LinkedList<PeriodAccUsage> getPeriodAccrualUsageRecords(int empId, LocalDate startDate, LocalDate endDate) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         params.addValue("startDate", startDate);
         params.addValue("endDate", endDate);
         return new LinkedList<>(remoteNamedJdbc.query(GET_PERIOD_ACCRUAL_USAGE_SQL, params,
-                                                      new PeriodAccrualUsageRowMapper("","")));
+                                                      new PeriodAccUsageRowMapper("","")));
     }
 }

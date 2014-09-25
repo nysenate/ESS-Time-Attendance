@@ -128,7 +128,7 @@ public class SqlHoursDao extends SqlBaseDao implements HoursDao
      * @param empId int - Employee id
      * @param beginDate Date - Start date (inclusive)
      * @param endDate Date - End Date (inclusive)
-     * @return LinkedList<PeriodAccrualUsage>
+     * @return LinkedList<PeriodAccUsage>
      */
 
     protected Hours getLastSFMSHours(int empId, Date beginDate, Date endDate) {

@@ -2,12 +2,9 @@ package gov.nysenate.seta.dao.base;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Common utility methods to be used by enums/classes that store sql queries.
@@ -15,62 +12,48 @@ import java.util.Map;
 public abstract class SqlQueryUtils
 {
     /**
-     * Replaces the ${schema} placeholder in the given sql String with the given schema name.
-     * This is mainly used for queries where the schema name can be user defined, e.g. the environment schema.
+     * Wraps the input sql query with a limit offset clause. The returned query will have the
+     * proper syntax according to the supplied 'vendor'.
      *
-     * @param sql String - A string that contains the ${schema} placeholders.
-     * @param schema String - The name of the database schema
+     * @param sql String - The original sql query
+     * @param limitOffset LimitOffset - Limit/offset values should be set here
+     * @param vendor DbVendor - Used for determining the syntax of the limit clause.
      * @return String
      */
-    public static String getSqlWithSchema(String sql, String schema) {
-        Map<String, String> replaceMap = new HashMap<>();
-        replaceMap.put("schema", schema);
-        return new StrSubstitutor(replaceMap).replace(sql);
+    public static String withLimitOffsetClause(String sql, LimitOffset limitOffset, DbVendor vendor) {
+        String limitClause = "";
+        if (limitOffset != null) {
+            // If the database supports the LIMIT x OFFSET n clause, it's pretty simple.
+            if (vendor.supportsLimitOffset()) {
+                if (limitOffset.hasLimit()) {
+                    limitClause = String.format(" LIMIT %d", limitOffset.getLimit());
+                }
+                if (limitOffset.hasOffset()) {
+                    limitClause += String.format(" OFFSET %d", limitOffset.getOffsetStart());
+                }
+                return sql + limitClause;
+            }
+            // Otherwise use ORACLE's subquery approach
+            else {
+                Integer start = (limitOffset.hasOffset()) ? limitOffset.getOffsetStart() : 1;
+                Integer end = (limitOffset.hasLimit()) ? start + limitOffset.getLimit() : 100000;
+                return String.format(
+                    "SELECT * FROM (SELECT ROWNUM AS rn, q.* FROM (%s) q)\n" +
+                    "WHERE rn >= %s AND rn <= %s", sql, start, end);
+            }
+        }
+        return sql;
     }
 
     /**
-     * Overloaded to add LIMIT clause to getSqlWithSchema(sql, schema) output.
-     */
-    public static String getSqlWithSchema(String sql, String schema, LimitOffset limitOffset) {
-        return getSqlWithSchema(sql, schema) + getLimitOffsetClause(limitOffset);
-    }
-
-    /**
-     * Overloaded to add LIMIT AND ORDER BY clause to getSqlWithSchema(sql, schema) output.
-     */
-    public static String getSqlWithSchema(String sql, String schema, OrderBy orderBy, LimitOffset limitOffset) {
-        return getSqlWithSchema(sql, schema) + getOrderByClause(orderBy) + getLimitOffsetClause(limitOffset);
-    }
-
-    /**
-     * Returns a LIMIT OFFSET sql clause using the supplied LimitOffset instance.
-     * If neither the limit nor the offset is set an empty string will be returned.
+     * Wraps the input sql query with an ORDER BY clause that is generated via the given 'orderBy' instance.
+     * Ordering of multiple column names is also supported.
      *
-     * @param limitOffset LimitOffset
+     * @param sql String - The original sql query
+     * @param orderBy OrderBy - Order by columns and sort orders should be set here.
      * @return String
      */
-    public static String getLimitOffsetClause(LimitOffset limitOffset) {
-        String clause = "";
-        // TODO: rework for Oracle
-//        if (limitOffset != null) {
-//            if (limitOffset.hasLimit()) {
-//                clause = String.format(" LIMIT %d", limitOffset.getLimit());
-//            }
-//            if (limitOffset.hasOffset()) {
-//                clause += String.format(" OFFSET %d", limitOffset.getOffsetStart());
-//            }
-//        }
-        return clause;
-    }
-
-    /**
-     * Returns an ORDER BY sql clause using the supplied orderBy clause. Supports
-     * multiple column orderings as specified in the OrderBy instance.
-     *
-     * @param orderBy OrderBy
-     * @return String
-     */
-    public static String getOrderByClause(OrderBy orderBy) {
+    public static String withOrderByClause(String sql, OrderBy orderBy) {
         String clause = "";
         if (orderBy != null) {
             ImmutableMap<String, SortOrder> sortColumns = orderBy.getSortColumns();
@@ -84,6 +67,6 @@ public abstract class SqlQueryUtils
                 clause += "\nORDER BY " + StringUtils.join(orderClauses, ", ");
             }
         }
-        return clause;
+        return sql + clause;
     }
 }

@@ -4,7 +4,7 @@ import gov.nysenate.seta.dao.accrual.mapper.LocalAccrualUsageRowMapper;
 import gov.nysenate.seta.dao.attendance.mapper.LocalEntryRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.accrual.AccrualUsage;
-import gov.nysenate.seta.model.accrual.PeriodAccrualUsage;
+import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeEntryException;
 import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
@@ -175,10 +175,10 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
         localNamedJdbc.update(UPDATE_ENTRY_SQL, param);
     }
 
-    public List<PeriodAccrualUsage> getLocalPeriodAccrualUsage(int empId, List<PayPeriod> payPeriodList) throws TimeEntryNotFoundEx {
+    public List<PeriodAccUsage> getLocalPeriodAccrualUsage(int empId, List<PayPeriod> payPeriodList) throws TimeEntryNotFoundEx {
 
         AccrualUsage au = null;
-        List<PeriodAccrualUsage> pauList = null;
+        List<PeriodAccUsage> pauList = null;
 
         try{
 
@@ -192,7 +192,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
                 au = localNamedJdbc.queryForObject(GET_SUM_OF_HOURS, param, new LocalAccrualUsageRowMapper());
 
-                PeriodAccrualUsage pau = new PeriodAccrualUsage();
+                PeriodAccUsage pau = new PeriodAccUsage();
                 pau.setPayPeriod(pp);
                 pau.setYear(new DateTime(pp.getEndDate()).getYear());
                 pau.setEmpId(au.getEmpId());

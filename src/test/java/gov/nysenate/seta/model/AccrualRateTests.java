@@ -1,7 +1,7 @@
 package gov.nysenate.seta.model;
 
 import gov.nysenate.seta.model.accrual.AccrualRate;
-import gov.nysenate.seta.model.accrual.PeriodAccrualSummary;
+import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -32,29 +32,29 @@ public class AccrualRateTests
     @Test
     public void testWorkDaysAreCorrect() throws Exception {
 //        Date d = new LocalDate(2014,6,9).toDate();
-//        int val =PeriodAccrualSummary.getWorkingDaysBetweenDates( new LocalDate(2015,6,9).toDate(),  new LocalDate(2014,6,9).toDate());
+//        int val =PeriodAccSummary.getWorkingDaysBetweenDates( new LocalDate(2015,6,9).toDate(),  new LocalDate(2014,6,9).toDate());
 //        logger.debug("WorkDay Count:"+val);
-        assertEquals(1, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,9).toDate()));
-        assertEquals(2, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,10).toDate()));
-        assertEquals(3, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,11).toDate()));
-        assertEquals(4, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,12).toDate()));
-        assertEquals(5, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,13).toDate()));
-        assertEquals(5, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,14).toDate()));
-        assertEquals(5, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,15).toDate()));
-        assertEquals(6, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,16).toDate()));
-        assertEquals(7, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,17).toDate()));
+        assertEquals(1, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 9).toDate()));
+        assertEquals(2, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 10).toDate()));
+        assertEquals(3, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 11).toDate()));
+        assertEquals(4, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 12).toDate()));
+        assertEquals(5, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 13).toDate()));
+        assertEquals(5, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 14).toDate()));
+        assertEquals(5, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 15).toDate()));
+        assertEquals(6, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 16).toDate()));
+        assertEquals(7, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 17).toDate()));
 
-        assertEquals(0, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7 ).toDate(), new LocalDate(2014,6,7).toDate()));
-        assertEquals(0, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7 ).toDate(), new LocalDate(2014,6,8).toDate()));
-        assertEquals(1, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7 ).toDate(), new LocalDate(2014,6,9).toDate()));
-        assertEquals(2, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7 ).toDate(), new LocalDate(2014,6,10).toDate()));
+        assertEquals(0, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7).toDate(), new LocalDate(2014, 6, 7).toDate()));
+        assertEquals(0, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7).toDate(), new LocalDate(2014, 6, 8).toDate()));
+        assertEquals(1, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7).toDate(), new LocalDate(2014, 6, 9).toDate()));
+        assertEquals(2, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7).toDate(), new LocalDate(2014, 6, 10).toDate()));
 
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7 ).toDate(), new LocalDate(2014,6,20).toDate()));
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 8 ).toDate(), new LocalDate(2014,6,21).toDate()));
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9 ).toDate(), new LocalDate(2014,6,22).toDate()));
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 10 ).toDate(), new LocalDate(2014,6,23).toDate()));
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 11 ).toDate(), new LocalDate(2014,6,24).toDate()));
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 12 ).toDate(), new LocalDate(2014,6,25).toDate()));
-        assertEquals(10, PeriodAccrualSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 13 ).toDate(), new LocalDate(2014,6,26).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 7).toDate(), new LocalDate(2014, 6, 20).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 8).toDate(), new LocalDate(2014, 6, 21).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 9).toDate(), new LocalDate(2014, 6, 22).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 10).toDate(), new LocalDate(2014, 6, 23).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 11).toDate(), new LocalDate(2014, 6, 24).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 12).toDate(), new LocalDate(2014, 6, 25).toDate()));
+        assertEquals(10, PeriodAccSummary.getWorkingDaysBetweenDates(new LocalDate(2014, 6, 13).toDate(), new LocalDate(2014, 6, 26).toDate()));
     }
 }

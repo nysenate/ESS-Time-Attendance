@@ -5,20 +5,14 @@ import gov.nysenate.seta.dao.base.OrderBy;
 import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.*;
-import gov.nysenate.seta.model.payroll.MiscLeaveType;
-import gov.nysenate.seta.model.payroll.PayType;
-import gov.nysenate.seta.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import static gov.nysenate.seta.util.DateUtils.toDate;
@@ -27,6 +21,11 @@ import static gov.nysenate.seta.util.DateUtils.toDate;
 public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeEntryDao.class);
+
+    @Override
+    public TimeEntry getTimeEntryById(BigInteger timeEntryId) throws TimeEntryException {
+        return null;
+    }
 
     /** {@inheritDoc}
      * @param timeRecordId*/
@@ -37,7 +36,7 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         params.addValue("status", "A");
         params.addValue("timesheetId", new BigDecimal(timeRecordId));
         try {
-            timeEntryList = remoteNamedJdbc.query(SqlRemoteTimeEntryQuery.SELECT_TIME_ENTRY_BY_TIME_RECORD_ID.getSql(
+            timeEntryList = remoteNamedJdbc.query(SqlRemoteTimeEntryQuery.SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID.getSql(
                                                                                 new OrderBy("DTDAY", SortOrder.ASC) ),
                                                   params, new RemoteEntryRowMapper());
         }
@@ -51,8 +50,8 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
     @Override
     public void updateTimeEntry(TimeEntry timeEntry) {
         MapSqlParameterSource params = getTimeEntryParams(timeEntry);
-        if (remoteNamedJdbc.update(SqlRemoteTimeEntryQuery.UPDATE_TIME_ENTRY_SQL.getSql(), params) == 0){
-            remoteNamedJdbc.update(SqlRemoteTimeEntryQuery.INSERT_TIME_ENTRY_SQL.getSql(), params);
+        if (remoteNamedJdbc.update(SqlRemoteTimeEntryQuery.UPDATE_TIME_ENTRY.getSql(), params) == 0){
+            remoteNamedJdbc.update(SqlRemoteTimeEntryQuery.INSERT_TIME_ENTRY.getSql(), params);
         }
     }
 

@@ -19,6 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static gov.nysenate.seta.util.DateUtils.toDate;
+
 @Repository("remoteTimeRecordDao")
 public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 {
@@ -56,7 +58,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("endDate", endDate);
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(SqlRemoteTimeRecordQuery.GET_TIME_REC_BY_DATES_SQL.getSql(), params, handler);
+        remoteNamedJdbc.query(SqlRemoteTimeRecordQuery.GET_TIME_REC_BY_DATES.getSql(), params, handler);
         return handler.getRecordMap();
     }
 
@@ -104,7 +106,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("empId", empId);
 
         try{
-            timeRecordList = remoteNamedJdbc.query(SqlRemoteTimeRecordQuery.GET_TREC_BY_EMPID_SQL.getSql(), params,
+            timeRecordList = remoteNamedJdbc.query(SqlRemoteTimeRecordQuery.GET_TREC_BY_EMPID.getSql(), params,
                     new RemoteRecordRowMapper());
         }catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
@@ -133,7 +135,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("excDetails", tr.getExceptionDetails());
         params.addValue("procDate", tr.getProcessedDate());
 
-        if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.SET_TIME_REC_SQL.getSql(), params)==1) {    return true;}
+        if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.INSERT_TIME_REC.getSql(), params)==1) {    return true;}
         else{   return false;}
 
     }
@@ -160,7 +162,7 @@ public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("procDate", record.getProcessedDate());
 
         if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(), params)==0) {
-            if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.SET_TIME_REC_SQL.getSql(), params)==0) {
+            if (remoteNamedJdbc.update(SqlRemoteTimeRecordQuery.INSERT_TIME_REC.getSql(), params)==0) {
                 return false;
             }
         }

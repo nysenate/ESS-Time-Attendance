@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * Helper class to store accrual summary information per pay period.
  * Also contains the accrual rates and expected hours, which are not
- * included in the AnnualAccrualSummary.
+ * included in the AnnualAccSummary.
  */
 public class PeriodAccSummary extends AccrualSummary
 {

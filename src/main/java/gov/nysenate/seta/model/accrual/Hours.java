@@ -3,11 +3,13 @@ package gov.nysenate.seta.model.accrual;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * Created by heitner on 7/23/2014.
- */
-public class Hours {
-    public final int SFMSPOSTED = 101, SFMSNOTPOSTED = 102, TIMESHEETAPPROVED = 103, TIMESHEETSUBMITTED = 104, TIMESHEETENTERED = 105;
+public class Hours
+{
+    public final int SFMSPOSTED = 101,
+                     SFMSNOTPOSTED = 102,
+                     TIMESHEETAPPROVED = 103,
+                     TIMESHEETSUBMITTED = 104,
+                     TIMESHEETENTERED = 105;
 
     protected BigDecimal Hours;
     protected Date beginDate;
@@ -15,9 +17,7 @@ public class Hours {
     protected int hourStatus;
     protected int empId;
 
-    /**
-     * --- Basic Getters/Setters ---
-     */
+    /** --- Basic Getters/Setters --- */
 
     public void setHours(BigDecimal Hours) {
         this.Hours = Hours;

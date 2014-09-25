@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.period;
 
+import com.google.common.collect.Range;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -10,7 +11,8 @@ import java.util.Objects;
  */
 public class PayPeriod
 {
-    public static int PAY_PERIOD_LENGTH =
+    /** The expected number of days in a full pay period. */
+    public static int DEFAULT_PAY_PERIOD_DAYS = 14;
 
     /** The type of pay period. The one we deal with most is Attendance Fiscal (AF). */
     protected PayPeriodType type;
@@ -49,22 +51,29 @@ public class PayPeriod
 
     /**
      * Indicates if this pay period is an end of year split pay period, which is basically a pay period
-     * that gets truncated to less than 14 days due to some pay period types (like AF) not rolling over years.
+     * that gets truncated to have fewer days due to some pay period types (like AF) not rolling over years.
      *
      * @return boolean - true if this marks an end of year split pay period.
      */
     public boolean isEndOfYearSplit() {
-        return endDate.getDayOfYear() == endDate.lengthOfYear() && getNumDaysInPeriod() != 14;
+        return endDate.getDayOfYear() == endDate.lengthOfYear() && getNumDaysInPeriod() != DEFAULT_PAY_PERIOD_DAYS;
     }
 
     /**
      * Indicates if this pay period is a start of year split pay period, which is basically a pay period
-     * that gets truncated to less than 14 days due to some pay period types (like AF) not rolling over years.
+     * that gets truncated to have fewer days due to some pay period types (like AF) not rolling over years.
      *
      * @return boolean - true if this marks a start of year split pay period.
      */
     public boolean isStartOfYearSplit() {
-        return startDate.getDayOfYear() == 1 && getNumDaysInPeriod() != 14;
+        return startDate.getDayOfYear() == 1 && getNumDaysInPeriod() != DEFAULT_PAY_PERIOD_DAYS;
+    }
+
+    public Range<LocalDate> getDateRange() {
+        if (startDate != null && endDate != null) {
+            return Range.closed(startDate, endDate);
+        }
+        throw new IllegalArgumentException("Cannot return date range since start and/or end dates are null!");
     }
 
     /** --- Overrides --- */
@@ -94,5 +103,43 @@ public class PayPeriod
 
     /** --- Basic Getters/Setters --- */
 
+    public PayPeriodType getType() {
+        return type;
+    }
 
+    public void setType(PayPeriodType type) {
+        this.type = type;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public int getPayPeriodNum() {
+        return payPeriodNum;
+    }
+
+    public void setPayPeriodNum(int payPeriodNum) {
+        this.payPeriodNum = payPeriodNum;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

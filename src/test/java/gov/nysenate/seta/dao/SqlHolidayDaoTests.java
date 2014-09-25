@@ -27,6 +27,6 @@ public class SqlHolidayDaoTests extends BaseTests
     @Test
     public void testGetHolidays() throws Exception {
         logger.info(OutputUtils.toJson(holidayDao.getHolidays(
-                Range.closedOpen(LocalDate.of(2013, 1, 1), LocalDate.of(2014, 1, 1)), SortOrder.DESC)));
+                Range.closed(LocalDate.of(2013, 1, 1), LocalDate.of(2014, 1, 1)), true, SortOrder.DESC)));
     }
 }

@@ -4,9 +4,7 @@ import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
-import org.springframework.jdbc.core.RowMapper;
 
-import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -26,7 +24,7 @@ public class RemoteEntryRowMapper extends BaseRowMapper<TimeEntry>{
         te.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET").toBigInteger());
         te.setEmpId(rs.getInt(pfx + "NUXREFEM"));
         te.setEmployeeName(rs.getString(pfx + "NAUSER"));
-        te.setDate(getLocalDate(rs, pfx + "DTDAY"));
+        te.setDate(getLocalDateFromRs(rs, pfx + "DTDAY"));
         te.setWorkHours(rs.getInt(pfx + "NUWORK"));
         te.setTravelHours(rs.getInt(pfx + "NUTRAVEL"));
         te.setHolidayHours(rs.getInt(pfx + "NUHOLIDAY"));
@@ -40,8 +38,8 @@ public class RemoteEntryRowMapper extends BaseRowMapper<TimeEntry>{
         }
         te.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
         te.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
-        te.setTxOriginalDate(getLocalDateTime(rs, pfx + "DTTXNORIGIN"));
-        te.setTxUpdateDate(getLocalDateTime(rs, pfx + "DTTXNUPDATE"));
+        te.setTxOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
+        te.setTxUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
         te.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         te.setEmpComment(rs.getString(pfx + "DECOMMENTS"));
         te.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));
