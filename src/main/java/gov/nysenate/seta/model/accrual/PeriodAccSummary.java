@@ -19,20 +19,22 @@ public class PeriodAccSummary extends AccrualSummary
 {
     private static final Logger logger = LoggerFactory.getLogger(PeriodAccSummary.class);
 
-    int year;
-
-    /** The base pay period is a previous pay period that contains the summary data for
-     *  which these accruals are based off of. Basically the accrual information for a given pay
-     *  period should reflect the hours available at the start of that pay period. Since hours are
-     *  accrued upon the completion of a pay period we need the accrued/usage totals of the
-     *  preceding pay period. Often we won't have the totals for the preceding period and will use
-     *  an earlier period and calculate the hours in between.
+    /**
+     * The base pay period is a previous pay period that contains the summary data for
+     * which these accruals are based off of. Basically the accrual information for a given pay
+     * period should reflect the hours available from the previous pay period (not including
+     * the hours accrued in the current pay period).
      */
     protected PayPeriod basePayPeriod;
 
+    protected int year;
     protected BigDecimal prevTotalHours;
     protected BigDecimal expectedTotalHours;
     protected BigDecimal expectedBiweekHours;
+
+    /**
+     * The rates should reflect the current pay period, not the base pay period.
+     */
     protected BigDecimal sickRate;
     protected BigDecimal vacRate;
 

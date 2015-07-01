@@ -22,7 +22,7 @@ public class AccrualUsage
     /** --- Functional Getters/Setters --- */
 
     /** The total hours is the sum of the hours used */
-    public BigDecimal getTotalHours() {
+    public BigDecimal getTotalHoursUsed() {
         return workHours.add(travelHoursUsed).add(vacHoursUsed).add(perHoursUsed).add(empHoursUsed)
                         .add(famHoursUsed).add(holHoursUsed).add(miscHoursUsed);
     }

@@ -1,11 +1,9 @@
 package gov.nysenate.seta.model.personnel;
 
 import gov.nysenate.seta.model.unit.Address;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.Period;
 
 /**
  * Represents basic information that is associated with a person.
@@ -21,7 +19,7 @@ public class Person
     protected String email;
     protected String workPhone;
     protected String homePhone;
-    protected Date dateOfBirth;
+    protected LocalDate dateOfBirth;
     protected Gender gender;
     protected MaritalStatus maritalStatus;
     protected Address homeAddress;
@@ -48,14 +46,14 @@ public class Person
 
     /**
      * Returns the age of the person in years based on dateOfBirth.
-     * @return int - age or null if dateOfBirth is null.
+     * @return int - age
+     * @throws NullPointerException if date of birth is not set.
      */
     public int getAge() {
         if (dateOfBirth != null) {
-            Period period = new Period(new DateTime(dateOfBirth), DateTime.now(), PeriodType.years());
-            return period.getYears();
+            return Period.between(dateOfBirth, LocalDate.now()).getYears();
         }
-        return -1;
+        throw new NullPointerException("Cannot compute age if date of birth is null");
     }
 
     /** Basic Getters/Setters */
@@ -132,11 +130,11 @@ public class Person
         this.homePhone = homePhone;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

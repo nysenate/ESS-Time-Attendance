@@ -1,35 +1,23 @@
 package gov.nysenate.seta.dao.allowances;
 
-import gov.nysenate.seta.dao.allowances.mapper.AllowanceRowMapper;
-import gov.nysenate.seta.dao.allowances.mapper.AmountExceedRowMapper;
 import gov.nysenate.seta.dao.allowances.mapper.TEHoursRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.allowances.TEHours;
-import gov.nysenate.seta.model.payroll.SalaryRec;
-import gov.nysenate.seta.model.transaction.AuditHistory;
-import gov.nysenate.seta.util.OutputUtils;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-/**
- * Created by heitner on 7/28/2014.
- */
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Repository
-public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao {
-
+public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao
+{
     protected int empId = -1;
     protected static ArrayList<TEHours> teHourses;
     protected Date beginDate;
@@ -40,13 +28,13 @@ public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao {
     /** --- SQL Queries --- */
 
     protected static final String GET_TE_HOURS_PAID_SQL =
-            "SELECT  nuxrefem, dteffect, dtendte, nuhrhrspd  " +
-                    "FROM pm21peraudit " +
-                    "WHERE nudocument like 'T%' " +
-                    " AND nuxrefem = :empId " +
-                    " AND dtendte >= :beginDate " +
-                    " AND dtendte <= :endDate " +
-                    " AND cdstatus = 'A'";
+        "SELECT  nuxrefem, dteffect, dtendte, nuhrhrspd  " +
+        "FROM pm21peraudit " +
+        "WHERE nudocument like 'T%' " +
+        " AND nuxrefem = :empId " +
+        " AND dtendte >= :beginDate " +
+        " AND dtendte <= :endDate " +
+        " AND cdstatus = 'A'";
 
     /** --- Constructors --- */
 
@@ -57,13 +45,12 @@ public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao {
     /** --- Functional Setters and Getters --- */
 
     public ArrayList<TEHours> getTEHours(int empId, int year) {
-        beginDate = new LocalDate(year, 1, 1).toDate();
-        endDate = new LocalDate(year, 12, 31).toDate();
-
+        beginDate = toDate(LocalDate.of(year, 1, 1));
+        endDate = toDate(LocalDate.of(year, 12, 31));
         return getTEHours(empId, beginDate, endDate);
     }
 
-   // @Override
+    // @Override
     public  ArrayList<TEHours> getTEHours(int empId, Date beginDate, Date endDate) {
             MapSqlParameterSource params = new MapSqlParameterSource();
             logger.debug("empId:"+empId);
@@ -78,7 +65,7 @@ public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao {
     }
 
     @Override
-    public  TEHours sumTEHours(ArrayList<TEHours> teHourses) {
+    public TEHours sumTEHours(List<TEHours> teHourses) {
 
         TEHours tEHours = new TEHours();
 
@@ -97,11 +84,7 @@ public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao {
             }
         }
         tEHours.setTEHours(totalHours);
-
         return tEHours;
     }
-
-
-
 }
 

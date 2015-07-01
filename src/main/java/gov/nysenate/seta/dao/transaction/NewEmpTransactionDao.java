@@ -44,8 +44,4 @@ public interface NewEmpTransactionDao
      */
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange,
                                               TransDaoOption options);
-
-    /** --- Transaction Search --- */
-
-    // ...
 }

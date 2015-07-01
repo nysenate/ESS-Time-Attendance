@@ -7,7 +7,6 @@ import gov.nysenate.seta.model.personnel.SupervisorChain;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Data access layer for retrieving T&A supervisor info as well as setting overrides.

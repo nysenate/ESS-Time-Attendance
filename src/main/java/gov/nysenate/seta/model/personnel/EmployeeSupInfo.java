@@ -1,7 +1,6 @@
 package gov.nysenate.seta.model.personnel;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Associates a supervisor to an employee during a specific time period.

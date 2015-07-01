@@ -4,7 +4,6 @@ import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeException;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

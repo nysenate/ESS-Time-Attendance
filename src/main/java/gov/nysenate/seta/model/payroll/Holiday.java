@@ -1,7 +1,6 @@
 package gov.nysenate.seta.model.payroll;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * A simple model for storing holiday details.

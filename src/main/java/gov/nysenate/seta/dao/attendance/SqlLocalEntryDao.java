@@ -9,7 +9,6 @@ import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeEntryException;
 import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -194,7 +193,7 @@ public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 
                 PeriodAccUsage pau = new PeriodAccUsage();
                 pau.setPayPeriod(pp);
-                pau.setYear(new DateTime(pp.getEndDate()).getYear());
+                pau.setYear(pp.getEndDate().getYear());
                 pau.setEmpId(au.getEmpId());
                 pau.setWorkHours(au.getWorkHours());
                 pau.setTravelHoursUsed(au.getTravelHoursUsed());

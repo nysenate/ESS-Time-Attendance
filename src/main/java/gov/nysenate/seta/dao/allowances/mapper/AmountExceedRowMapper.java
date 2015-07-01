@@ -1,7 +1,6 @@
 package gov.nysenate.seta.dao.allowances.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;

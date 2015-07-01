@@ -8,10 +8,11 @@ import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.Gender;
 import gov.nysenate.seta.model.personnel.MaritalStatus;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static gov.nysenate.seta.dao.base.SqlBaseDao.getLocalDate;
 
 public class EmployeeRowMapper extends BaseRowMapper<Employee>
 {
@@ -46,7 +47,7 @@ public class EmployeeRowMapper extends BaseRowMapper<Employee>
         emp.setJobTitle(rs.getString(pfx + "FFDEEMPTITLL"));
         emp.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));
         emp.setGender(Gender.valueOf(rs.getString(pfx + "CDSEX")));
-        emp.setDateOfBirth(rs.getDate(pfx + "DTBIRTH"));
+        emp.setDateOfBirth(getLocalDate(rs, pfx + "DTBIRTH"));
         emp.setMaritalStatus(MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL")));
         emp.setHomeAddress(addressRowMapper.mapRow(rs, rowNum));
         emp.setRespCenter(respCenterRowMapper.mapRow(rs, rowNum));

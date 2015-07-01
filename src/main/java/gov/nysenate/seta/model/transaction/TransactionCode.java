@@ -4,7 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-import static gov.nysenate.seta.model.transaction.TransactionType.*;
+import static gov.nysenate.seta.model.transaction.TransactionType.PAY;
+import static gov.nysenate.seta.model.transaction.TransactionType.PER;
 
 /**
  * The TransactionCode refers to a specific change made to an employee's record.

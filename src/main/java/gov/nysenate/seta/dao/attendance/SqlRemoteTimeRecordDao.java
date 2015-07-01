@@ -19,8 +19,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static gov.nysenate.seta.util.DateUtils.toDate;
-
 @Repository("remoteTimeRecordDao")
 public class SqlRemoteTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 {

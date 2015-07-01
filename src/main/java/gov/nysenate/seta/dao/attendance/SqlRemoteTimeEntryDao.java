@@ -4,7 +4,9 @@ import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
 import gov.nysenate.seta.dao.base.OrderBy;
 import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.model.attendance.*;
+import gov.nysenate.seta.model.attendance.TimeEntry;
+import gov.nysenate.seta.model.attendance.TimeEntryException;
+import gov.nysenate.seta.model.attendance.TimeEntryNotFoundEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -14,8 +16,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-
-import static gov.nysenate.seta.util.DateUtils.toDate;
 
 @Repository("remoteTimeEntry")
 public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao

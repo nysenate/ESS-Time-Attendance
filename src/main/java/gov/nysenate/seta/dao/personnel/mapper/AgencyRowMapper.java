@@ -2,7 +2,6 @@ package gov.nysenate.seta.dao.personnel.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.personnel.Agency;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

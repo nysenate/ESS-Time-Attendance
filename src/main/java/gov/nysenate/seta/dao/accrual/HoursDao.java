@@ -1,10 +1,8 @@
 package gov.nysenate.seta.dao.accrual;
 
 import gov.nysenate.seta.dao.base.BaseDao;
-import gov.nysenate.seta.model.accrual.Hours;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**

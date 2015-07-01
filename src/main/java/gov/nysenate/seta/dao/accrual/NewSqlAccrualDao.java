@@ -18,9 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.TreeMap;
 
-import static gov.nysenate.seta.dao.accrual.SqlAccrualQuery.GET_ANNUAL_ACC_SUMMARIES;
-import static gov.nysenate.seta.dao.accrual.SqlAccrualQuery.GET_PERIOD_ACCRUAL_USAGE;
-import static gov.nysenate.seta.dao.accrual.SqlAccrualQuery.GET_PERIOD_ACC_SUMMARIES;
+import static gov.nysenate.seta.dao.accrual.SqlAccrualQuery.*;
 
 /** {@inheritDoc}
  *
@@ -34,7 +32,7 @@ import static gov.nysenate.seta.dao.accrual.SqlAccrualQuery.GET_PERIOD_ACC_SUMMA
  *  the side effect is that there will likely not be accrual information for the more recent pay periods. The
  *  accruals will have to be computed to account for the missing data via the service layer.
  */
-@Service
+@Service("sqlAccrual")
 public class NewSqlAccrualDao extends SqlBaseDao implements AccrualDao
 {
     /** --- Implemented Methods --- */

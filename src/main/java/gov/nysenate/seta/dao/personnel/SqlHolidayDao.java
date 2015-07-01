@@ -17,7 +17,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static gov.nysenate.seta.dao.personnel.SqlHolidayQuery.*;
-import static gov.nysenate.seta.util.DateUtils.*;
+import static gov.nysenate.seta.util.DateUtils.endOfDateRange;
+import static gov.nysenate.seta.util.DateUtils.startOfDateRange;
 
 /** {@inheritDoc} */
 @Repository

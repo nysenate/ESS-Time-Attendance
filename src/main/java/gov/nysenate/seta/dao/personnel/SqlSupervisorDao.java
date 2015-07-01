@@ -14,7 +14,6 @@ import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
-import gov.nysenate.seta.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import java.util.*;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 import static gov.nysenate.seta.util.DateUtils.endOfDateRange;
 import static gov.nysenate.seta.util.DateUtils.startOfDateRange;
-import static gov.nysenate.seta.util.DateUtils.toDate;
 
 @Repository
 public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao

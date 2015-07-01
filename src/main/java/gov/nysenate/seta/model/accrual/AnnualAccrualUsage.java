@@ -1,8 +1,6 @@
 package gov.nysenate.seta.model.accrual;
 
-import org.joda.time.DateTime;
-
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Helper class to store accrual usage sums for a given year. Note that this class does
@@ -10,35 +8,35 @@ import java.util.Date;
  */
 public class AnnualAccrualUsage extends AccrualUsage
 {
-    protected Date latestStartDate;
-    protected Date latestEndDate;
+    protected LocalDate latestStartDate;
+    protected LocalDate latestEndDate;
 
     public AnnualAccrualUsage() {}
 
-    /** Functional Getters/Setters */
+    /** --- Functional Getters/Setters --- */
 
     public int getYear() {
         if (latestStartDate != null) {
-            return new DateTime(latestStartDate).getYear();
+            return latestStartDate.getYear();
         }
         throw new IllegalStateException("The latest start date was not set for accrual usage. Cannot retrieve year!");
     }
 
-    /** Basic Getters/Setters */
+    /** --- Basic Getters/Setters --- */
 
-    public Date getLatestStartDate() {
+    public LocalDate getLatestStartDate() {
         return latestStartDate;
     }
 
-    public void setLatestStartDate(Date latestStartDate) {
+    public void setLatestStartDate(LocalDate latestStartDate) {
         this.latestStartDate = latestStartDate;
     }
 
-    public Date getLatestEndDate() {
+    public LocalDate getLatestEndDate() {
         return latestEndDate;
     }
 
-    public void setLatestEndDate(Date latestEndDate) {
+    public void setLatestEndDate(LocalDate latestEndDate) {
         this.latestEndDate = latestEndDate;
     }
 }

@@ -5,7 +5,6 @@
     <packaging>war</packaging>
     <version>0.1-SNAPSHOT</version>
     <description>Senate Electronic Timesheet Application</description>
-
     <parent>
         <groupId>gov.nysenate</groupId>
         <artifactId>ess</artifactId>
@@ -17,7 +16,6 @@
         <commons.io.version>2.4</commons.io.version>
         <commons.lang3.version>3.1</commons.lang3.version>
         <c3p0.version>0.9.1.2</c3p0.version>
-        <joda-time.version>2.3</joda-time.version>
     </properties>
 
     <dependencies>
@@ -26,31 +24,19 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons.lang3.version}</version>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
         </dependency>
-
         <!-- cp30 connection pool -->
         <dependency>
             <groupId>c3p0</groupId>
             <artifactId>c3p0</artifactId>
             <version>${c3p0.version}</version>
         </dependency>
-
-        <!-- Date/Time helper -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>${joda-time.version}</version>
-        </dependency>
-
     </dependencies>
-
     <build>
         <finalName>timesheets</finalName>
     </build>
-
 </project>

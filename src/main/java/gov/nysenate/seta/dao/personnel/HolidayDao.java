@@ -7,7 +7,6 @@ import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**

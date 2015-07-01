@@ -2,9 +2,6 @@ package gov.nysenate.seta.dao.attendance.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordStatus;
-import org.springframework.jdbc.core.RowMapper;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

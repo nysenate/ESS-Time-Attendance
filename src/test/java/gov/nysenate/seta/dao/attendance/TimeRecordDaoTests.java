@@ -3,8 +3,6 @@ package gov.nysenate.seta.dao.attendance;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
-import gov.nysenate.seta.util.OutputUtils;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +49,4 @@ public class TimeRecordDaoTests extends BaseTests
         timeRecordDao.saveRecord(testRecord);
     }
 
-    @Test
-    public void getRecordByEmployeeId() throws Exception {
-        logger.info(
-            OutputUtils.toJson(timeRecordDao.getRecordsDuring(11423, new LocalDate(1990, 1, 1).toDate(),
-                    new LocalDate(1990, 12, 31).toDate())));
-    }
 }

@@ -1,13 +1,9 @@
 package gov.nysenate.seta;
 
-import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
-import gov.nysenate.seta.dao.transaction.TransDaoOption;
 import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.util.DateUtils;
 import org.junit.Test;
-import org.omg.CORBA.TRANSACTION_MODE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

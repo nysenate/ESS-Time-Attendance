@@ -1,19 +1,16 @@
 package gov.nysenate.seta.dao.base;
 
-import gov.nysenate.seta.util.DateUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.joda.time.DateTime;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.annotation.Resource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalTime;
 
 public abstract class SqlBaseDao
 {
@@ -36,11 +33,24 @@ public abstract class SqlBaseDao
     protected static String TS_SCHEMA = "TS_OWNER";
 
     /**
-     * For use in queries where we don't care about the start date.
-     * @return Date
+     * Convert a LocalDate to a Date. Returns null on null input.
      */
-    public static Date getBeginningOfTime() {
-        return new DateTime(0, 1, 1, 0, 0, 0).toDate();
+    public static java.sql.Date toDate(LocalDate localDate) {
+        if (localDate == null) return null;
+        return java.sql.Date.valueOf(localDate);
+    }
+
+    /**
+     * Convert a LocalDateTime to a Date. Returns null on null input.
+     */
+    public static Timestamp toDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) return null;
+        return Timestamp.valueOf(localDateTime);
+    }
+
+    public static Time toTime(LocalTime localTime) {
+        if (localTime == null) return null;
+        return Time.valueOf(localTime);
     }
 
     /**

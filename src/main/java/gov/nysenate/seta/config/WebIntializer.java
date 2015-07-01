@@ -1,7 +1,5 @@
 package gov.nysenate.seta.config;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -12,9 +10,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import java.io.IOException;
 import java.util.EnumSet;
-import java.util.Properties;
 
 import static javax.servlet.DispatcherType.*;
 

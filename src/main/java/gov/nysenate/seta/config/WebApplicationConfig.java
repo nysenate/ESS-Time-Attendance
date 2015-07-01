@@ -2,8 +2,6 @@ package gov.nysenate.seta.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import gov.nysenate.seta.dao.allowances.SqlTEHoursDao;
-import gov.nysenate.seta.dao.allowances.TEHoursDao;
 import gov.nysenate.seta.web.CommonAttributeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

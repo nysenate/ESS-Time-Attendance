@@ -2,16 +2,12 @@ package gov.nysenate.seta.dao.accrual;
 
 import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
-import gov.nysenate.seta.dao.base.SortOrder;
-import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.AnnualAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;
-import org.springframework.dao.DataAccessException;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.TreeMap;
 
 /**

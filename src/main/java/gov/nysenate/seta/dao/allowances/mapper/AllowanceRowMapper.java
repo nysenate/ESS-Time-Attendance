@@ -4,7 +4,6 @@ import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.Date;
 import java.sql.ResultSet;

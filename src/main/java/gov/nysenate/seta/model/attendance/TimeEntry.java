@@ -4,10 +4,8 @@ import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * A TimeEntry contains all the hours worked and charged for a specific date.

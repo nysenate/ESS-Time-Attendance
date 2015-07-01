@@ -2,7 +2,6 @@ package gov.nysenate.seta.dao.unit;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.unit.Address;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

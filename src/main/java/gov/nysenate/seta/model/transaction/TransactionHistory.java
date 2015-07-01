@@ -2,7 +2,6 @@ package gov.nysenate.seta.model.transaction;
 
 import com.google.common.collect.*;
 import gov.nysenate.seta.dao.base.SortOrder;
-import gov.nysenate.seta.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

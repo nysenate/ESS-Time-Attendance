@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
 
 public class OutputUtilTests
 {

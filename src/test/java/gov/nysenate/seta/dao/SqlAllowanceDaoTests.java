@@ -1,13 +1,11 @@
 package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.BaseTests;
-import gov.nysenate.seta.dao.accrual.SqlAccrualHelper;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +15,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.*;
 
-/**
- * Created by heitner on 6/27/2014.
- */
-
 public class SqlAllowanceDaoTests  extends BaseTests
 {
-
     private static final Logger logger = LoggerFactory.getLogger(SqlAllowanceDaoTests.class);
 
     @Autowired
@@ -68,13 +61,13 @@ public class SqlAllowanceDaoTests  extends BaseTests
 //       excludeValues.put("CDAGENCY", "04210");
 //        List<Map<String, String>> matchedAuditRecords = auditHistory.getMatchedAuditRecords(matchValues, false);
  //       logger.info(String.valueOf(SqlAccrualHelper.saProrate(matchedAuditRecords.get(matchedAuditRecords.size() - 1))));
-        logger.debug("Expected Hours:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+//        logger.debug("Expected Hours:" + SqlAccrualHelper.getExpectedHours(transactionHistory, toDate(LocalDate.of(2014, 1, 1)), new LocalDate(2014, 7, 15).toDate()));
 
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(6221,  allTransCodes);
-        logger.debug("Expected Hours RA:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+//        logger.debug("Expected Hours RA:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
         transactionHistory = sqlEmployeeTransactionDao.getTransHistory(11442,  allTransCodes);
-        logger.debug("Expected Hours TE:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
+//        logger.debug("Expected Hours TE:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
 
         //logger.debug("matchedAuditRecords:"+OutputUtils.toJson(matchedAuditRecords));

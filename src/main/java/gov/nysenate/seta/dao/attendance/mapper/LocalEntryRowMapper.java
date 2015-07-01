@@ -2,9 +2,6 @@ package gov.nysenate.seta.dao.attendance.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.attendance.TimeEntry;
-import gov.nysenate.seta.model.payroll.MiscLeaveType;
-import gov.nysenate.seta.model.payroll.PayType;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,13 +1,10 @@
 package gov.nysenate.seta.dao.accrual;
 
 import gov.nysenate.seta.BaseTests;
-import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.junit.Test;
 import org.slf4j.Logger;
