@@ -2,11 +2,14 @@ package gov.nysenate.seta.client.view.base;
 
 import com.google.common.collect.ImmutableList;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+@XmlRootElement
 public class ListView<ViewType> implements ViewObject
 {
-    protected ImmutableList<ViewType> items;
+    @XmlElement public ImmutableList<ViewType> items;
 
     public static <ViewType extends ViewObject> ListView<ViewType> of(List<ViewType> items) {
         return new ListView<>(items);
@@ -27,11 +30,7 @@ public class ListView<ViewType> implements ViewObject
         }
     }
 
-    public ImmutableList<ViewType> getItems() {
-        return items;
-    }
-
-    public int getSize() {
+    @XmlElement public int getSize() {
         return items.size();
     }
 

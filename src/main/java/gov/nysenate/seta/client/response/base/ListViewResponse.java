@@ -4,11 +4,12 @@ import gov.nysenate.seta.client.view.base.ListView;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.dao.base.LimitOffset;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 public class ListViewResponse<ViewType> extends PaginationResponse
 {
-    protected ListView<ViewType> result;
+    @XmlElement public ListView<ViewType> result;
 
     protected ListViewResponse(ListView<ViewType> result, int total, LimitOffset limitOffset) {
         super(total, limitOffset);
@@ -29,9 +30,5 @@ public class ListViewResponse<ViewType> extends PaginationResponse
 
     public static ListViewResponse<Integer> ofIntList(List<Integer> items, int total, LimitOffset limitOffset) {
         return new ListViewResponse<>(ListView.ofIntList(items), total, limitOffset);
-    }
-
-    public ListView<ViewType> getResult() {
-        return result;
     }
 }

@@ -49,7 +49,7 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
     @Override
     public List<PayPeriod> getPayPeriods(PayPeriodType type, Range<LocalDate> dateRange, SortOrder dateOrder) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("periodTypee", type.getCode())
+            .addValue("periodType", type.getCode())
             .addValue("startDate", toDate(startOfDateRange(dateRange)))
             .addValue("endDate", toDate(endOfDateRange(dateRange)));
         OrderBy orderBy = new OrderBy("DTBEGIN", dateOrder);
