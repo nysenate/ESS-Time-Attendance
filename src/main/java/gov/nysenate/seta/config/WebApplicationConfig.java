@@ -2,6 +2,8 @@ package gov.nysenate.seta.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import gov.nysenate.seta.web.CommonAttributeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +96,9 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.registerModule(new GuavaModule());
+        objectMapper.registerModule(new JSR310Module());
         return objectMapper;
     }
 }

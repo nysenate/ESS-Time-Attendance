@@ -1,9 +1,14 @@
 package gov.nysenate.seta.dao.base;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * The LimitOffset class is intended to be used for limiting the number of results
+ * returned by query methods.
+ */
 public class LimitOffset
 {
     /** Use this reference when no limit is desired. */
@@ -85,20 +90,28 @@ public class LimitOffset
     /** --- Overrides --- */
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        final LimitOffset other = (LimitOffset) obj;
-        return Objects.equals(this.limit, other.limit) && Objects.equals(this.offset, other.offset);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LimitOffset)) return false;
+        LimitOffset that = (LimitOffset) o;
+        if (limit != that.limit) return false;
+        if (offset != that.offset) return false;
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(limit, offset);
+        int result = limit;
+        result = 31 * result + offset;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("limit", limit)
+                .append("offset", offset)
+                .toString();
     }
 
     /** --- Basic Getters/Setters --- */

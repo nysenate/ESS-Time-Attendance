@@ -1,5 +1,6 @@
 package gov.nysenate.seta.controller.rest;
 
+import gov.nysenate.seta.client.view.AccrualsView;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
@@ -27,13 +28,13 @@ public class AccrualRestCtrl extends BaseRestCtrl
     @Autowired private AccrualService accrualService;
     @Autowired private PayPeriodDao payPeriodDao;
 
-    @RequestMapping("/period/{payPeriod}/emp/{empId}")
+//    @RequestMapping("/period/{payPeriodStr}/emp/{empId}")
     public Object getAccruals(@PathVariable String payPeriodStr, @PathVariable Integer empId) {
         LocalDate payPeriodStart = parseISODate(payPeriodStr, "pay period");
         try {
             PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, payPeriodStart);
             PeriodAccSummary periodAccSummary = accrualService.getAccruals(empId, payPeriod);
-            return periodAccSummary;
+            return periodAccSummary.getSickRate();
         }
         catch (PayPeriodException e) {
             logger.error("Failed to find pay period starting on {}", payPeriodStart);

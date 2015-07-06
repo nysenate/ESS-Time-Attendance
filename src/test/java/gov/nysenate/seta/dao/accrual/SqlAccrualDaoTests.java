@@ -20,8 +20,7 @@ public class SqlAccrualDaoTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDaoTests.class);
     protected static final Set<TransactionCode> SAL_CODES = new HashSet<>(Arrays.asList(TransactionCode.SAL, TransactionCode.RTP, TransactionCode.APP));
-    @Autowired
-    SqlAccrualDao accrualDao;
+    @Autowired AccrualDao accrualDao;
 
     @Autowired
     PayPeriodDao payPeriodDao;
@@ -44,6 +43,7 @@ public class SqlAccrualDaoTests extends BaseTests
 
     @Test
     public void testGetAccrualSummaries() throws Exception {
+        logger.info("{}", accrualDao.getPeriodAccrualSummaries(10976, 2015, LocalDate.now()));
 
     }
 }

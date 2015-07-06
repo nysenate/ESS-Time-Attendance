@@ -10,6 +10,21 @@ import java.util.Date;
 
 public class DateUtils
 {
+    /** --- Reference Dates --- */
+
+    public static final LocalDate LONG_AGO = LocalDate.of(1970, 1, 1);
+    public static final LocalDate THE_FUTURE = LocalDate.of(2999, 12, 31);
+    public static final Range<LocalDate> ALL_DATES = Range.closed(LONG_AGO, THE_FUTURE);
+    public static final Range<LocalDateTime> ALL_DATE_TIMES = Range.closed(LONG_AGO.atStartOfDay(), atEndOfDay(THE_FUTURE));
+
+    /**
+     * Returns a LocalDateTime that represents the time just before the start of the next day.
+     */
+    public static LocalDateTime atEndOfDay(LocalDate date) {
+        return date.atTime(23, 59, 59, 999999999);
+    }
+
+
     /**
      * Returns a LocalDate that is set to a date way in the past. Can't really use the LocalDate.MIN
      * value because it doesn't play nice when converting into a database date.
@@ -97,4 +112,51 @@ public class DateUtils
         if (date == null) return null;
         return getLocalDateTime(date).toLocalDate();
     }
+
+    /**
+     * Given the LocalDateTime range, extract the lower bound LocalDateTime. If the lower bound is not set,
+     * a really early date will be returned. If the bound is open, a single nanosecond will be added to the
+     * LocalDateTime. If its closed, the dateTime will remain as is.
+     *
+     * @param dateTimeRange Range<LocalDateTime>
+     * @return LocalDateTime - Lower bound in the dateTime range
+     */
+    public static LocalDateTime startOfDateTimeRange(Range<LocalDateTime> dateTimeRange) {
+        if (dateTimeRange != null) {
+            LocalDateTime lower;
+            if (dateTimeRange.hasLowerBound()) {
+                lower = (dateTimeRange.lowerBoundType().equals(BoundType.CLOSED))
+                        ? dateTimeRange.lowerEndpoint() : dateTimeRange.lowerEndpoint().plusNanos(1);
+            }
+            else {
+                lower = LONG_AGO.atStartOfDay();
+            }
+            return lower;
+        }
+        throw new IllegalArgumentException("Supplied localDateTimeRange is null.");
+    }
+
+    /**
+     * Given the LocalDateTime range, extract the upper bound LocalDateTime. If the upper bound is not set, a
+     * date far in the future will be returned. If the bound is open, a single nanosecond will be subtracted
+     * from the LocalDateTime. If its closed, the date will remain as is.
+     *
+     * @param dateTimeRange Range<LocalDateTime>
+     * @return LocalDateTime - Upper bound in the dateTime range
+     */
+    public static LocalDateTime endOfDateTimeRange(Range<LocalDateTime> dateTimeRange) {
+        if (dateTimeRange != null) {
+            LocalDateTime upper;
+            if (dateTimeRange.hasUpperBound()) {
+                upper = (dateTimeRange.upperBoundType().equals(BoundType.CLOSED))
+                        ? dateTimeRange.upperEndpoint() : dateTimeRange.upperEndpoint().minusNanos(1);
+            }
+            else {
+                upper = atEndOfDay(THE_FUTURE);
+            }
+            return upper;
+        }
+        throw new IllegalArgumentException("Supplied localDateTimeRange is null.");
+    }
+
 }
