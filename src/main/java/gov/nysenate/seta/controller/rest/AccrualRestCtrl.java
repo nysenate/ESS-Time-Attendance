@@ -1,6 +1,5 @@
 package gov.nysenate.seta.controller.rest;
 
-import gov.nysenate.seta.client.view.AccrualsView;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;

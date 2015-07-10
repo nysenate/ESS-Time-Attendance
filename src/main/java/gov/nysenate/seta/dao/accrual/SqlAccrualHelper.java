@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao.accrual;
 
-import gov.nysenate.seta.dao.base.SortOrder;
+import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.AnnualAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
@@ -12,7 +13,6 @@ import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
-import gov.nysenate.seta.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;

@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.personnel;
 
 import com.google.common.collect.Range;
-import gov.nysenate.seta.dao.base.SortOrder;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.transaction.NewEmpTransactionDao;
 import gov.nysenate.seta.dao.transaction.TransDaoOption;
@@ -29,9 +29,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static gov.nysenate.common.DateUtils.endOfDateRange;
+import static gov.nysenate.common.DateUtils.startOfDateRange;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
-import static gov.nysenate.seta.util.DateUtils.endOfDateRange;
-import static gov.nysenate.seta.util.DateUtils.startOfDateRange;
 
 @Repository
 public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao

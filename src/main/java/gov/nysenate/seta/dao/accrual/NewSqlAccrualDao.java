@@ -2,6 +2,7 @@ package gov.nysenate.seta.dao.accrual;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.accrual.mapper.AnnualAccSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccUsageRowMapper;
@@ -10,7 +11,6 @@ import gov.nysenate.seta.model.accrual.AnnualAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;
-import gov.nysenate.seta.util.DateUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Service;
 

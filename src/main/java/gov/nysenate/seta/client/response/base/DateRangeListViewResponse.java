@@ -1,10 +1,10 @@
 package gov.nysenate.seta.client.response.base;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.LimitOffset;
 import gov.nysenate.seta.client.view.base.ListView;
 import gov.nysenate.seta.client.view.base.ViewObject;
-import gov.nysenate.seta.dao.base.LimitOffset;
-import gov.nysenate.seta.util.DateUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;

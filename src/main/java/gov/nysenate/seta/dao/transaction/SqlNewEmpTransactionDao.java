@@ -1,11 +1,11 @@
 package gov.nysenate.seta.dao.transaction;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.transaction.mapper.TransHistoryHandler;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
-import gov.nysenate.seta.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;

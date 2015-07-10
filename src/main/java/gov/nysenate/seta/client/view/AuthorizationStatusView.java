@@ -8,13 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class AuthorizationStatusView
 {
-    @XmlElement
     protected boolean authorized = false;
-
-    @XmlElement
     protected String code;
-
-    @XmlElement
     protected String message;
 
     public AuthorizationStatusView(AuthorizationStatus authorizationStatus) {
@@ -25,14 +20,17 @@ public class AuthorizationStatusView
         }
     }
 
+    @XmlElement
     public boolean isAuthorized() {
         return authorized;
     }
 
+    @XmlElement
     public String getCode() {
         return code;
     }
 
+    @XmlElement
     public String getMessage() {
         return message;
     }

@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model.transaction;
 
-import gov.nysenate.seta.dao.base.SortOrder;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
 import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;

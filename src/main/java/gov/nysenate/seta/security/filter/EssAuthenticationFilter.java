@@ -1,9 +1,9 @@
 package gov.nysenate.seta.security.filter;
 
+import gov.nysenate.common.HttpResponseUtils;
 import gov.nysenate.seta.client.response.auth.AuthenticationResponse;
 import gov.nysenate.seta.model.auth.AuthenticationStatus;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
-import gov.nysenate.seta.util.HttpResponseUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;

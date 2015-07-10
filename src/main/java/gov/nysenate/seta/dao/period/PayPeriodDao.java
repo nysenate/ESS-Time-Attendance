@@ -1,8 +1,8 @@
 package gov.nysenate.seta.dao.period;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.BaseDao;
-import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;

@@ -27,8 +27,8 @@ public class RespCenterRowMapper extends BaseRowMapper<ResponsibilityCenter>
             rctr.setCode(rs.getInt(pfx + "CDRESPCTR"));
             rctr.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
             rctr.setName(rs.getString(pfx + "DERESPCTR"));
-            rctr.setEffectiveDateBegin(rs.getDate(pfx + "DTEFFECTBEG"));
-            rctr.setEffectiveDateEnd(rs.getDate(pfx + "DTEFFECTEND"));
+            rctr.setEffectiveDateBegin(getLocalDateFromRs(rs, pfx + "DTEFFECTBEG"));
+            rctr.setEffectiveDateEnd(getLocalDateFromRs(rs, pfx + "DTEFFECTEND"));
             rctr.setHead(respHeadMapper.mapRow(rs, rowNum));
             rctr.setAgency(agencyRowMapper.mapRow(rs, rowNum));
             return rctr;

@@ -140,7 +140,6 @@ public class PeriodAccSummary extends AccrualSummary
             return -1;
         }
 
-
         if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
             startCal.setTime(endDate);
             endCal.setTime(startDate);

@@ -1,8 +1,8 @@
 package gov.nysenate.seta.client.response.base;
 
+import gov.nysenate.common.LimitOffset;
 import gov.nysenate.seta.client.view.base.ListView;
 import gov.nysenate.seta.client.view.base.ViewObject;
-import gov.nysenate.seta.dao.base.LimitOffset;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;

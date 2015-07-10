@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model.personnel;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * A responsibility center is basically an organizational unit that is headed by a manager.
@@ -12,8 +12,8 @@ public class ResponsibilityCenter
     protected boolean active;
     protected int code;
     protected String name;
-    protected Date effectiveDateBegin;
-    protected Date effectiveDateEnd;
+    protected LocalDate effectiveDateBegin;
+    protected LocalDate effectiveDateEnd;
     protected Agency agency;
     protected ResponsibilityHead head;
 
@@ -43,19 +43,19 @@ public class ResponsibilityCenter
         this.name = name;
     }
 
-    public Date getEffectiveDateBegin() {
+    public LocalDate getEffectiveDateBegin() {
         return effectiveDateBegin;
     }
 
-    public void setEffectiveDateBegin(Date effectiveDateBegin) {
+    public void setEffectiveDateBegin(LocalDate effectiveDateBegin) {
         this.effectiveDateBegin = effectiveDateBegin;
     }
 
-    public Date getEffectiveDateEnd() {
+    public LocalDate getEffectiveDateEnd() {
         return effectiveDateEnd;
     }
 
-    public void setEffectiveDateEnd(Date effectiveDateEnd) {
+    public void setEffectiveDateEnd(LocalDate effectiveDateEnd) {
         this.effectiveDateEnd = effectiveDateEnd;
     }
 

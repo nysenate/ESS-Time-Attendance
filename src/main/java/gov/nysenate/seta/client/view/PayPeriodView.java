@@ -10,13 +10,13 @@ import java.time.LocalDate;
 @XmlRootElement(name = "payPeriod")
 public class PayPeriodView implements ViewObject
 {
-    @XmlElement public int payPeriodNum;
-    @XmlElement public LocalDate startDate;
-    @XmlElement public LocalDate endDate;
-    @XmlElement public String type;
-    @XmlElement public int numDays;
-    @XmlElement public boolean startYearSplit;
-    @XmlElement public boolean endYearSplit;
+    protected int payPeriodNum;
+    protected LocalDate startDate;
+    protected LocalDate endDate;
+    protected String type;
+    protected int numDays;
+    protected boolean startYearSplit;
+    protected boolean endYearSplit;
 
     public PayPeriodView(PayPeriod payPeriod) {
         if (payPeriod != null) {
@@ -31,7 +31,43 @@ public class PayPeriodView implements ViewObject
     }
 
     @Override
+    @XmlElement
     public String getViewType() {
         return "pay period";
+    }
+
+    @XmlElement
+    public int getPayPeriodNum() {
+        return payPeriodNum;
+    }
+
+    @XmlElement
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    @XmlElement
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    @XmlElement
+    public String getType() {
+        return type;
+    }
+
+    @XmlElement
+    public int getNumDays() {
+        return numDays;
+    }
+
+    @XmlElement
+    public boolean isStartYearSplit() {
+        return startYearSplit;
+    }
+
+    @XmlElement
+    public boolean isEndYearSplit() {
+        return endYearSplit;
     }
 }

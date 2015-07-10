@@ -1,5 +1,8 @@
 package gov.nysenate.seta.dao.base;
 
+import gov.nysenate.common.LimitOffset;
+import gov.nysenate.common.OrderBy;
+
 public interface BasicSqlQuery
 {
     /** TODO: get rid of these. */

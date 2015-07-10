@@ -1,6 +1,9 @@
 package gov.nysenate.seta.dao.base;
 
 import com.google.common.collect.ImmutableMap;
+import gov.nysenate.common.LimitOffset;
+import gov.nysenate.common.OrderBy;
+import gov.nysenate.common.SortOrder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

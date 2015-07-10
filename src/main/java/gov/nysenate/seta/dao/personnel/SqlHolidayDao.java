@@ -1,8 +1,8 @@
 package gov.nysenate.seta.dao.personnel;
 
 import com.google.common.collect.Range;
-import gov.nysenate.seta.dao.base.OrderBy;
-import gov.nysenate.seta.dao.base.SortOrder;
+import gov.nysenate.common.OrderBy;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.personnel.mapper.HolidayRowMapper;
 import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import static gov.nysenate.common.DateUtils.endOfDateRange;
+import static gov.nysenate.common.DateUtils.startOfDateRange;
 import static gov.nysenate.seta.dao.personnel.SqlHolidayQuery.*;
-import static gov.nysenate.seta.util.DateUtils.endOfDateRange;
-import static gov.nysenate.seta.util.DateUtils.startOfDateRange;
 
 /** {@inheritDoc} */
 @Repository

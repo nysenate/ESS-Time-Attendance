@@ -1,6 +1,6 @@
 package gov.nysenate.seta.client.response.base;
 
-import gov.nysenate.seta.dao.base.LimitOffset;
+import gov.nysenate.common.LimitOffset;
 
 public abstract class PaginationResponse extends BaseResponse
 {

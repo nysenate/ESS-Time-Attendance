@@ -1,13 +1,13 @@
 package gov.nysenate.seta.dao.allowances;
 
 
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.dao.allowances.mapper.AllowanceRowMapper;
 import gov.nysenate.seta.dao.allowances.mapper.AmountExceedRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.payroll.SalaryRec;
 import gov.nysenate.seta.model.transaction.AuditHistory;
-import gov.nysenate.seta.util.OutputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

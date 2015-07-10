@@ -10,11 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class AuthorizationResponse
 {
-    @XmlElement
-    protected AuthorizationStatusView status;
-
-    @XmlElement
-    protected String user;
+    @XmlElement protected AuthorizationStatusView status;
+    @XmlElement protected String user;
 
     public AuthorizationResponse(AuthorizationStatus status, Subject subject) {
         this.status = new AuthorizationStatusView(status);

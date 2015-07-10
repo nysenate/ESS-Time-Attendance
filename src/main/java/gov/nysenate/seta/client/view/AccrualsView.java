@@ -29,7 +29,6 @@ public class AccrualsView
 
     /** TODO: Constructor */
 
-
     public int getSick() {
         return sick;
     }

@@ -1,8 +1,8 @@
 package gov.nysenate.seta.dao.personnel;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.BaseDao;
-import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
 

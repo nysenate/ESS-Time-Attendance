@@ -1,8 +1,8 @@
 package gov.nysenate.seta.dao.attendance;
 
+import gov.nysenate.common.OrderBy;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
-import gov.nysenate.seta.dao.base.OrderBy;
-import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeEntryException;

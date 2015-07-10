@@ -1,7 +1,7 @@
 package gov.nysenate.seta.model.transaction;
 
 import com.google.common.collect.*;
-import gov.nysenate.seta.dao.base.SortOrder;
+import gov.nysenate.common.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class TransactionHistory
     /**
      * See overloaded method.
      *
-     * @see #getTransRecords(java.util.Set, gov.nysenate.seta.dao.base.SortOrder)
+     * @see #getTransRecords(java.util.Set, SortOrder)
      * @param code TransactionCode
      * @param dateSort SortOrder
      * @return LinkedList<TransactionRecord>
@@ -131,7 +131,7 @@ public class TransactionHistory
     /**
      * Shorthand method to retrieve every available transaction record.
      *
-     * @see #getTransRecords(java.util.Set, gov.nysenate.seta.dao.base.SortOrder)
+     * @see #getTransRecords(java.util.Set, SortOrder)
      * @param dateOrder SortOrder - Sort order based on the effective date
      * @return LinkedList<TransactionRecord>
      */
