@@ -16,7 +16,7 @@ essApp.directive('datepicker', [function(){
             element.datepicker({
                 inline: $scope.inline || false,
                 stepMonths: $scope.stepMonths || 1,
-                defaultDate: $scope.defaultDate || 0,
+                defaultDate: defaultDate,
                 beforeShowDay: $scope.beforeShowDay()
             });
 

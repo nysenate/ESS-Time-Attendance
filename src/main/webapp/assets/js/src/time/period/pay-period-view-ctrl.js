@@ -1,86 +1,90 @@
 var essTime = angular.module('essTime');
 
-essTime.controller('PayPeriodViewCtrl', ['$scope', '$http', function($scope, $http){
-    $scope.year = 2014;
-    $scope.months = [
-        "1/1/2014", "2/1/2014", "3/1/2014", "4/1/2014", "5/1/2014", "6/1/2014",
-        "7/1/2014", "8/1/2014", "9/1/2014", "10/1/2014", "11/1/2014", "12/1/2014"
-    ];
+essTime.controller('PayPeriodCalendarCtrl',
+    ['$scope', '$http', 'PayPeriodApi', 'HolidaysDuringYearApi',
+    function($scope, $http, PayPeriodApi, HolidaysDuringYearApi) {
 
-    $scope.periods = [
-        "1/1/2014", "1/15/2014", "1/29/2014",
-        "2/12/2014", "2/26/2014",
-        "3/12/2014", "3/26/2014",
-        "4/9/2014", "4/23/2014",
-        "5/7/2014", "5/21/2014",
-        "6/11/2014", "6/25/2014",
-        "7/2/2014", "7/16/2014", "7/30/2014",
-        "8/13/2014", "8/27/2014",
-        "9/10/2014", "9/24/2014",
-        "10/8/2014", "10/22/2014",
-        "11/5/2014","11/19/2014",
-        "12/3/2014", "12/17/2014", "12/31/2014"
-    ];
+    $scope.state = {
+        year: moment().year()
+    };
+    $scope.yearList = Array.apply(0, Array(10)).map(function (x, y) { return (($scope.state.year + 2) - y - 1); });
+    $scope.months = [];
+    $scope.periods = [];
 
-    $scope.holidays = [
-        "1/1/2014", "1/21/2014", "2/18/2014", "5/27/2014", "7/4/2014", "9/2/2014", "10/14/2014", "11/05/2014",
-        "11/11/2014", "11/28/2014", "11/29/2014", "12/25/2014"
-    ];
+    $scope.getPayPeriods = function(year, callback) {
+        $scope.periodResp = PayPeriodApi.get({
+            periodType: 'AF', startDate: moment().year(year).startOf('year').toISOString(),
+                              endDate: moment().year(year).endOf('year').toISOString()
+        }, function() {
+            $scope.periods = $scope.periodResp.result.items;
+            if (callback) callback();
+        });
+    };
+
+    $scope.getHolidays = function(year, callback) {
+        $scope.holidaysResp = HolidaysDuringYearApi.get({year: year}, function() {
+            $scope.holidays = $scope.holidaysResp.result.items;
+            if (callback) callback();
+        });
+    };
+
+    $scope.generateMonths = function(year) {
+        $scope.months = [];
+        for (var i = 0; i < 12; i++) {
+            $scope.months.push(moment().year(year).month(i).format('M/D/YYYY'));
+        }
+    };
+
+    $scope.$watch('state.year', function(year, oldYear) {
+        $scope.getPayPeriods(year, function() {
+            $scope.getHolidays(year, function() {
+                $scope.generateMonths(year);
+            });
+        });
+    });
+
+    //$scope.init = function() {
+        //$scope.getPayPeriods($scope.state.year, function() {
+        //    $scope.generateMonths($scope.state.year);
+        //});
+    //}();
 
     /**
      * Method to call for 'beforeShowDate' on the datepicker. This will mark the pay period
      * dates and other relevant dates with a specific class so that they are highlighted.
      * @returns {Function}
+     *
+     * TODO: Could probably optimize this a bit so it doesn't iterate so much.
      */
     $scope.periodHighlight = function() {
         return function(date) {
-            var dt = new Date(date.setHours(0,0,0,0));
-            var today = new Date(new Date().setHours(0,0,0,0));
-            var cssClass = "";
-            var toolTip = "";
-            var isCurrDay = false;
-            var isWeekend = false;
-            var isPeriodEndDate = false;
-            var isHoliday = false;
-            if (dt.getDay() == 6 || dt.getDay() == 0) {
-                isWeekend = true;
-            }
-            if (dt.getTime() == today.getTime()) {
-                isCurrDay = true;
-            }
-            else {
-                $.each($scope.holidays, function(i,v){
-                    if (new Date(v).getTime() == date.getTime()) {
-                        isHoliday = true;
-                    }
-                });
+            var cssClasses = [];
+            var toolTips = [];
 
-                $.each($scope.periods, function(i,v){
-                    if (new Date(v).getTime() == date.getTime()) {
-                        isPeriodEndDate = true;
+            var mDate = moment(date).startOf('day');
+            var mCurrent = moment().startOf('day');
+
+            if (mDate.isSame(mCurrent)) {
+                cssClasses.push('current-date');
+            }
+            if (mDate.day() == 6 || mDate.day() == 0) {
+                cssClasses.push('weekend-date');
+            }
+            else {
+                $.each($scope.holidays, function(i,v) {
+                    if (mDate.isSame(moment(v.date))) {
+                        toolTips.push(v.name);
+                        cssClasses.push('holiday-date');
+                    }
+                });
+                $.each($scope.periods, function(i,v) {
+                    if (mDate.isSame(moment(v.endDate))) {
+                        toolTips.push('Last Day of Pay Period ' + v.payPeriodNum);
+                        cssClasses.push('pay-period-end-date');
                     }
                 });
             }
-            if (isWeekend) {
-                cssClass = 'weekend-date';
-            }
-            else if (isHoliday && isPeriodEndDate) {
-                cssClass = 'holiday-and-pay-period-date';
-            }
-            else {
-                if (isHoliday) {
-                    cssClass = 'holiday-date';
-                    toolTip += 'Holiday';
-                }
-                if (isPeriodEndDate) {
-                    cssClass = 'pay-period-end-date';
-                    toolTip += 'Pay Period End Date';
-                }
-            }
-            if (isCurrDay) {
-                cssClass += ' current-date';
-            }
-            return [false, cssClass, toolTip];
+            return [false, cssClasses.join(' '), toolTips.join(' \\ ')];
         }
     }
 }]);

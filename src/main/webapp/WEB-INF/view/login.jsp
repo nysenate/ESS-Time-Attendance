@@ -17,7 +17,7 @@
         <section id="loginContainer" class="login-container">
             <p style="display:none" class="login-message">You have been logged out.</p>
             <div id="loginHeader">
-                <p>New York State Senate Employee Self Service</p>
+                <p class="font-weight-bold">New York State Senate Employee Self Service</p>
             </div>
             <div id="photoContainer" class="login-info-container">
                 <img src="${ctxPath}/assets/img/capital-exterior.jpg" width="400px"/>

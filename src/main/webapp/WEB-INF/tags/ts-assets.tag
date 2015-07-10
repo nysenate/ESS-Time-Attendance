@@ -11,6 +11,7 @@
 <c:choose>
     <c:when test="${runtimeLevel eq 'dev'}">
         <script type="text/javascript" src="${ctxPath}/assets/js/src/ess-app.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/ess-api.js"></script>
 
         <!-- Navigation -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/ess-nav.js"></script>
@@ -21,6 +22,7 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ess-notifications.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/odometer-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/datepicker-directive.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/moment-filter.js"></script>
 
     </c:when>
     <c:when test="${runtimeLevel eq 'test'}">

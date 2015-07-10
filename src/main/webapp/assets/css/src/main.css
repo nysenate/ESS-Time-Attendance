@@ -1266,7 +1266,7 @@ button.ui-button::-moz-focus-inner {
   background: #eee;
   cursor: pointer;
 }
-/** Defaults */
+/** --- Defaults --- */
 *,
 *:before,
 *:after {
@@ -1278,11 +1278,11 @@ html,
 body {
   margin: 0;
   padding: 0;
+  font-size: 13px;
+  background: #f1f1f1;
+  height: 100%;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
-  font-size: 13px;
-  background: #ddd;
-  height: 100%;
 }
 body {
   overflow-y: scroll;
@@ -1389,23 +1389,14 @@ h1,
 h2 {
   font-weight: 400;
 }
+h1 {
+  color: #333;
+}
 hr {
   outline: 0;
   border-width: 1px;
   border-color: #ccc;
   border-style: solid none none none;
-}
-.float-right {
-  float: right;
-}
-.float-left {
-  float: left;
-}
-.clearfix {
-  clear: both;
-}
-.hidden {
-  display: none;
 }
 button {
   border: 1px solid #aaa;
@@ -1433,10 +1424,6 @@ select {
 textarea {
   border: 1px solid #999;
 }
-/** Header Tags */
-h1 {
-  color: #333;
-}
 a {
   color: teal;
   text-decoration: none;
@@ -1444,6 +1431,19 @@ a {
 a:hover {
   cursor: pointer;
   color: #004d4d;
+}
+/** --- Utilities --- */
+.float-right {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+.clearfix {
+  clear: both;
+}
+.hidden {
+  display: none;
 }
 .bold-text {
   padding: 10px;
@@ -1478,9 +1478,13 @@ a:hover {
   margin: 0;
   font-weight: 600;
 }
-/**
-  --- Icons ---
-*/
+.margin-top-20 {
+  margin-top: 20px !important;
+}
+.padding-10 {
+  padding: 10px;
+}
+/** --- Icons --- */
 .close-red {
   background: url('/timesheets/assets/img/20px-e74c3c/cross.png');
   height: 20px;
@@ -1492,11 +1496,37 @@ a:hover {
 .close-red:hover {
   background: url('/timesheets/assets/img/20px-ff5544/cross.png');
 }
+/** --- Tables --- */
+table.simple-table {
+  width: 100%;
+  text-align: left;
+}
+table.simple-table thead tr {
+  border-bottom: 1px solid #ddd;
+}
+table.simple-table thead tr th {
+  padding: 5px;
+}
+table.simple-table tbody tr:nth-child(odd) {
+  background: #fafafa;
+}
+table.simple-table tbody tr td {
+  padding: 5px;
+}
+/** --- Main Structure --- */
 #wrapper {
   height: 100%;
 }
-/** Home Page
----------------*/
+.view-animate-container {
+  margin: 0 0 20px 270px;
+  width: 880px;
+}
+@media print {
+  .view-animate-container {
+    margin: 0 0 20px 0;
+  }
+}
+/** --- Home Page --- */
 .ess-top-header {
   position: fixed;
   width: 100%;
@@ -1622,7 +1652,6 @@ a:hover {
   display: inline;
   line-height: 40px;
   padding: 10px 20px;
-  margin-right: 7px;
   cursor: pointer;
 }
 #topNavList li.active {
@@ -1655,10 +1684,10 @@ a:hover {
   color: white;
 }
 /** Profile Square */
-/** Left Navigation
---------------------- */
+/** --- Left Navigation ---  */
 .left-nav {
-  background: #f1f1f1;
+  background: #fafafa;
+  border: 1px solid #f1f1f1;
   width: 250px;
   position: fixed;
   height: auto;
@@ -1669,6 +1698,11 @@ a:hover {
   -moz-background-clip: padding;
   border-radius: 0 0 0 2px;
   background-clip: padding-box;
+}
+@media print {
+  .left-nav {
+    display: none;
+  }
 }
 .left-nav .main-topic {
   color: #333;
@@ -1720,13 +1754,11 @@ a:hover {
   background: #a6761d;
 }
 .content-container {
-  margin: 0 0 20px 260px;
-  width: 880px;
   background: #fefefe;
   position: relative;
-  -webkit-box-shadow: 0px 1px 10px #cccccc;
-  -moz-box-shadow: 0px 1px 10px #cccccc;
-  box-shadow: 0px 1px 10px #cccccc;
+  -webkit-box-shadow: 0px 1px 2px #aaaaaa;
+  -moz-box-shadow: 0px 1px 2px #aaaaaa;
+  box-shadow: 0px 1px 2px #aaaaaa;
 }
 .content-container h1 {
   font-size: 1.1em;
@@ -1735,10 +1767,9 @@ a:hover {
   padding: 4px 10px;
   border-width: 1px;
   border-style: none none solid none;
-  background: #598283;
-  color: white;
+  color: black;
   border-color: rgba(0, 107, 128, 0.25);
-  line-height: 30px;
+  line-height: 40px;
   font-weight: 600;
 }
 .content-container h1.olive {
@@ -1773,7 +1804,6 @@ a:hover {
   border-bottom: none;
 }
 .content-info {
-  background: rgba(236, 237, 238, 0.33);
   margin-top: 0;
   padding: 10px;
   color: #222;
@@ -1784,9 +1814,7 @@ a:hover {
   margin-bottom: 0;
   border-bottom: none;
 }
-/*
-  --- Time Record Entry Page ---
-*/
+/** --- Time Record Entry Page --- */
 table#timeRecordTable thead tr th {
   width: 65px;
 }
@@ -2060,12 +2088,15 @@ table.attendance-entry-sub-table.small-text tbody tr td {
   box-shadow: none;
   /** Highlighted dates */
 }
+.pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .ui-datepicker-month {
+  font-weight: bold;
+}
 .pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .ui-datepicker-current-day {
   background: none;
 }
 .pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .current-date span {
   font-weight: 600;
-  border: 2px solid #006b80;
+  border: 2px solid #e64727;
 }
 .pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .weekend-date span {
   color: #aaa;
@@ -2073,7 +2104,10 @@ table.attendance-entry-sub-table.small-text tbody tr td {
 .pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .holiday-date span {
   background: #d4ff60;
 }
-.pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .holiday-and-pay-period-date span {
+.pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .pay-period-end-date span {
+  background: #B8E3EB;
+}
+.pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .holiday-date.pay-period-end-date span {
   background: #d4ff60;
   /* Old browsers */
   background: -moz-linear-gradient(45deg, #d4ff60 49%, #b8e3eb 52%);
@@ -2090,9 +2124,6 @@ table.attendance-entry-sub-table.small-text tbody tr td {
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d4ff60', endColorstr='#B8E3EB', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-}
-.pay-period-cal-container .pay-period-cal .pay-period-month .ui-datepicker .pay-period-end-date span {
-  background: #B8E3EB;
 }
 /**
   --- Accrual History Page ---

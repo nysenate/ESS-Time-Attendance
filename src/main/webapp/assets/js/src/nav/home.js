@@ -11,6 +11,6 @@ essApp.controller('MainCtrl', ['$scope', '$http', '$route', '$routeParams', '$lo
 
 essApp.controller('TestCtrl', ['$scope', '$http', '$routeParams',
     function($scope, $http, $routeParams) {
-        $scope.test = "Inside this view wooo!";
+        $scope.test = "Inside this view wosoo!";
     }
 ]);

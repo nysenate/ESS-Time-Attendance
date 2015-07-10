@@ -11,6 +11,7 @@ module.exports = function(grunt) {
         jsRoot: 'assets/js',
         jsSource: '<%= jsRoot %>/src',
         jsVendor: '<%= jsRoot %>/vendor',
+        bowerRoot: 'bower_components',
         jsDest: '<%= jsRoot %>/dest',
 
         /** Compile LESS into css and place it into the css source directory */
@@ -39,21 +40,23 @@ module.exports = function(grunt) {
                 },
                 files: {
                     '<%= jsDest %>/timesheets-vendor.min.js':
-                        ['<%= jsVendor %>/jquery.min.js',
-                         '<%= jsVendor %>/jquery.ui.core.min.js',
-                         '<%= jsVendor %>/jquery.ui.widget.min.js',
-                         '<%= jsVendor %>/jquery.ui.button.min.js',
-                         '<%= jsVendor %>/jquery.ui.position.min.js',
-                         '<%= jsVendor %>/jquery.ui.dialog.min.js',
-                         '<%= jsVendor %>/jquery.ui.datepicker.min.js',
-                         '<%= jsVendor %>/angular.min.js',
-                         '<%= jsVendor %>/angular-route.min.js',
-                         '<%= jsVendor %>/angular-animate.min.js',
-                         '<%= jsVendor %>/odometer.min.js',
-                         '<%= jsVendor %>/highcharts.js'
+                        ['<%= bowerRoot %>/jquery/dist/jquery.min.js',
+                         '<%= bowerRoot %>/jquery-ui/ui/minified/jquery.ui.core.min.js',
+                         '<%= bowerRoot %>/jquery-ui/ui/minified/jquery.ui.widget.min.js',
+                         '<%= bowerRoot %>/jquery-ui/ui/minified/jquery.ui.button.min.js',
+                         '<%= bowerRoot %>/jquery-ui/ui/minified/jquery.ui.position.min.js',
+                         '<%= bowerRoot %>/jquery-ui/ui/minified/jquery.ui.dialog.min.js',
+                         '<%= bowerRoot %>/jquery-ui/ui/minified/jquery.ui.datepicker.min.js',
+                         '<%= bowerRoot %>/angular/angular.min.js',
+                         '<%= bowerRoot %>/angular-route/angular-route.min.js',
+                         '<%= bowerRoot %>/angular-resource/angular-resource.min.js',
+                         '<%= bowerRoot %>/angular-animate/angular-animate.min.js',
+                         '<%= bowerRoot %>/odometer/odometer.min.js',
+                         '<%= bowerRoot %>/moment/min/moment.min.js',
+                         '<%= bowerRoot %>/highcharts.com/highcharts.src.js'
                         ],
                     '<%= jsDest %>/timesheets-vendor-ie.min.js':
-                        ['<%= jsVendor %>/json2.js']
+                        ['<%= bowerRoot %>/json2/json2.js']
                 }
             },
             dev: {
@@ -84,12 +87,32 @@ module.exports = function(grunt) {
                 tasks: ['cssmin']
             },
             jsVendor: {
-                files: ['<%= jsVendor %>/**.js'],
+                files: ['<%= bowerRoot %>/**.js'],
                 tasks: ['uglify:vendor']
             },
             jsSource: {
                 files: ['<%= jsSource %>/**.js'],
                 tasks: ['uglify:dev', 'uglify:prod']
+            }
+        },
+
+        copy: {
+            css: {
+                files: [{
+                    expand:true, cwd: '<%= cssDest %>/', src: ['**'], filter: 'isFile',
+                    dest: '<%= tomcatWeb %>/assets/css/dest/'
+                }]
+            },
+            js: {
+                files: [{
+                    expand:true, src: ['<%= jsSource %>/**', '<%= jsDest %>/**'], filter: 'isFile',
+                    dest: '<%= tomcatWeb %>'}]
+            },
+            jsp : {
+                files: [{
+                    expand:true, src: ['<%= jspSource %>/**', '<%= tagSource %>/**'], filter: 'isFile',
+                    dest: '<%= tomcatWeb %>'
+                }]
             }
         }
     });

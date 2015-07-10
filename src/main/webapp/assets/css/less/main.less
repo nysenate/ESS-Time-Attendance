@@ -12,7 +12,7 @@
   cursor: pointer;
 }
 
-/** Defaults */
+/** --- Defaults --- */
 *, *:before, *:after {
   -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
@@ -20,10 +20,10 @@
 html, body {
   margin: 0;
   padding: 0;
-  .open-sans;
   font-size: 13px;
-  background: #ddd;
+  background: #f1f1f1;
   height: 100%;
+  .open-sans;
 }
 
 body {
@@ -108,27 +108,15 @@ h1, h2 {
   .font-weight-normal;
 }
 
+h1 {
+  color: #333;
+}
+
 hr {
   outline: 0;
   border-width: 1px;
   border-color: #ccc;
   border-style: solid none none none;
-}
-
-.float-right {
-  float: right;
-}
-
-.float-left {
-  float: left;
-}
-
-.clearfix {
-  clear: both;
-}
-
-.hidden {
-  display: none;
 }
 
 button {
@@ -153,11 +141,6 @@ textarea {
   border: 1px solid #999;
 }
 
-/** Header Tags */
-h1 {
-  color: #333;
-}
-
 a {
   color: teal;
   text-decoration: none;
@@ -165,6 +148,24 @@ a {
     cursor: pointer;
     color: darken(teal, 10%);
   }
+}
+
+/** --- Utilities --- */
+
+.float-right {
+  float: right;
+}
+
+.float-left {
+  float: left;
+}
+
+.clearfix {
+  clear: both;
+}
+
+.hidden {
+  display: none;
 }
 
 .bold-text {
@@ -197,9 +198,16 @@ a {
   .bold-text;
 }
 
-/**
-  --- Icons ---
-*/
+.margin-top-20 {
+  margin-top: 20px !important;
+}
+
+.padding-10 {
+  padding: 10px;
+}
+
+/** --- Icons --- */
+
 .close-red {
   .icon-image('20px-e74c3c', 'cross.png');
   .image-size(20px);
@@ -210,12 +218,48 @@ a {
   }
 }
 
+/** --- Tables --- */
+
+table.simple-table {
+  width: 100%;
+  text-align: left;
+  thead {
+    tr {
+      border-bottom: 1px solid #ddd;
+      th {
+        padding: 5px;
+      }
+    }
+  }
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        background: #fafafa;
+      }
+      td {
+        padding: 5px;
+      }
+    }
+  }
+}
+
+/** --- Main Structure --- */
+
 #wrapper {
   height: 100%;
 }
 
-/** Home Page
----------------*/
+.view-animate-container {
+  margin: 0 0 20px 270px;
+  width: 880px;
+
+  @media print {
+    margin: 0 0 20px 0;
+  }
+}
+
+/** --- Home Page --- */
+
 .ess-top-header {
   position: fixed;
   width: 100%;
@@ -332,7 +376,6 @@ a {
     display: inline;
     line-height:40px;
     padding: 10px 20px;
-    margin-right: 7px;
     cursor: pointer;
 
     &.active {
@@ -381,10 +424,16 @@ a {
   height: @size;
 }
 
-/** Left Navigation
---------------------- */
+/** --- Left Navigation ---  */
+
 .left-nav {
-  background:#f1f1f1;
+
+  @media print {
+    display: none;
+  }
+
+  background:#fafafa;
+  border: 1px solid #f1f1f1;
   width:250px;
   position: fixed;
   height: auto;
@@ -419,7 +468,6 @@ a {
 }
 
 .content-wrapper {
- // margin-left: @nav-width;
   padding-top: 70px;
   padding-bottom: 40px;
   width: 1150px;
@@ -443,11 +491,9 @@ a {
 }
 
 .content-container {
-  margin:0 0 20px 260px;
-  width: 880px;
   background: #fefefe;
   position: relative;
-  .box-shadow(0px 1px 10px #ccc);
+  .box-shadow(0px 1px 2px #aaa);
 
   h1 {
     font-size:1.1em;
@@ -456,10 +502,10 @@ a {
     padding: 4px 10px;
     border-width: 1px;
     border-style: none none solid none;
-    background: rgb(89, 130, 131);
-    color: white;
+    //background: rgb(89, 130, 131);
+    color: black;
     border-color: fade(@teal, 25%);
-    line-height: 30px;
+    line-height: 40px;
     .font-weight-bold;
 
     &.olive {
@@ -498,7 +544,6 @@ a {
 }
 
 .content-info {
-  background: rgba(236, 237, 238, 0.33);
   margin-top: 0;
   padding: 10px;
   color: #222;
@@ -510,9 +555,7 @@ a {
   }
 }
 
-/*
-  --- Time Record Entry Page ---
-*/
+/** --- Time Record Entry Page --- */
 
 table#timeRecordTable {
   thead {
@@ -855,6 +898,10 @@ table.attendance-entry-sub-table {
       .ui-datepicker {
         .box-shadow(none);
 
+        .ui-datepicker-month {
+          font-weight: bold;
+        }
+
         .ui-datepicker-current-day {
           background: none;
         }
@@ -864,7 +911,7 @@ table.attendance-entry-sub-table {
         .current-date {
           span {
             .font-weight-bold;
-            border: 2px solid @teal;
+            border: 2px solid @redorange;
           }
         }
         .weekend-date {
@@ -879,7 +926,13 @@ table.attendance-entry-sub-table {
           }
         }
 
-        .holiday-and-pay-period-date {
+        .pay-period-end-date {
+          span {
+            background: #B8E3EB;
+          }
+        }
+
+        .holiday-date.pay-period-end-date {
           span {
             background: #d4ff60; /* Old browsers */
             background: -moz-linear-gradient(45deg,  #d4ff60 49%, #B8E3EB 52%); /* FF3.6+ */
@@ -889,12 +942,6 @@ table.attendance-entry-sub-table {
             background: -ms-linear-gradient(45deg,  #d4ff60 49%,#B8E3EB 52%); /* IE10+ */
             background: linear-gradient(45deg,  #d4ff60 49%,#B8E3EB 52%); /* W3C */
             filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4ff60', endColorstr='#B8E3EB',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-          }
-        }
-
-        .pay-period-end-date {
-          span {
-            background: #B8E3EB;
           }
         }
       }
