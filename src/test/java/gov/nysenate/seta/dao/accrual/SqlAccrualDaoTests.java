@@ -1,5 +1,7 @@
 package gov.nysenate.seta.dao.accrual;
 
+import com.google.common.collect.Range;
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -43,7 +45,8 @@ public class SqlAccrualDaoTests extends BaseTests
 
     @Test
     public void testGetAccrualSummaries() throws Exception {
-        logger.info("{}", accrualDao.getPeriodAccrualSummaries(10976, 2015, LocalDate.now()));
+//        logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccrualSummaries(10976, 2015, LocalDate.now())));
+        logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccrualUsages(10976, Range.closedOpen(LocalDate.of(2015, 1, 1), LocalDate.now()))));
 
     }
 }

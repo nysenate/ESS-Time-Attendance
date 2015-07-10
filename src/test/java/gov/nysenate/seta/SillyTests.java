@@ -68,4 +68,9 @@ public class SillyTests
         logger.info("{}", TransactionCode.SAL.getDbColumnList());
 
     }
+
+    @Test
+    public void testName() throws Exception {
+
+    }
 }

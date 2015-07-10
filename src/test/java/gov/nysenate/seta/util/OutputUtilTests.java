@@ -1,5 +1,6 @@
 package gov.nysenate.seta.util;
 
+import gov.nysenate.common.OutputUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,7 +4,7 @@ import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
-import gov.nysenate.seta.util.OutputUtils;
+import gov.nysenate.common.OutputUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

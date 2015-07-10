@@ -2,7 +2,7 @@ package gov.nysenate.seta.dao.accrual;
 
 import com.google.common.collect.Range;
 import gov.nysenate.seta.BaseTests;
-import gov.nysenate.seta.util.OutputUtils;
+import gov.nysenate.common.OutputUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
