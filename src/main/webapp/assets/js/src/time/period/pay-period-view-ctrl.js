@@ -1,8 +1,8 @@
 var essTime = angular.module('essTime');
 
 essTime.controller('PayPeriodCalendarCtrl',
-    ['$scope', '$http', 'PayPeriodApi', 'HolidaysDuringYearApi',
-    function($scope, $http, PayPeriodApi, HolidaysDuringYearApi) {
+    ['$scope', '$http', 'PayPeriodByYearApi', 'HolidaysDuringYearApi',
+    function($scope, $http, PayPeriodByYearApi, HolidaysDuringYearApi) {
 
     $scope.state = {
         year: moment().year()
@@ -12,9 +12,8 @@ essTime.controller('PayPeriodCalendarCtrl',
     $scope.periods = [];
 
     $scope.getPayPeriods = function(year, callback) {
-        $scope.periodResp = PayPeriodApi.get({
-            periodType: 'AF', startDate: moment().year(year).startOf('year').toISOString(),
-                              endDate: moment().year(year).endOf('year').toISOString()
+        $scope.periodResp = PayPeriodByYearApi.get({
+            periodType: 'AF', year: year
         }, function() {
             $scope.periods = $scope.periodResp.result.items;
             if (callback) callback();

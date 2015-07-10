@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,13 @@ import static gov.nysenate.seta.controller.rest.BaseRestCtrl.REST_PATH;
 public class PayPeriodRestCtrl extends BaseRestCtrl
 {
     @Autowired private PayPeriodDao payPeriodDao;
+
+    @RequestMapping("/{periodTypeStr}/year/{year}")
+    public BaseResponse getPayPeriodByYear(@PathVariable String periodTypeStr, @PathVariable Integer year) {
+        List<PayPeriod> payPeriods = getPayPeriodList(periodTypeStr, LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
+        return ListViewResponse.of(payPeriods.stream().map(PayPeriodView::new).collect(Collectors.toList()),
+                payPeriods.size(), new LimitOffset(payPeriods.size()));
+    }
 
     @RequestMapping("/{periodTypeStr}/date/{dateStr}")
     public BaseResponse getPayPeriod(@PathVariable String periodTypeStr, @PathVariable String dateStr) {
@@ -42,9 +50,13 @@ public class PayPeriodRestCtrl extends BaseRestCtrl
     }
 
     private List<PayPeriod> getPayPeriodList(String periodTypeStr, String fromDateStr, String toDateStr) {
-        LocalDateTime fromDate = parseISODateTime(fromDateStr, "from-date");
-        LocalDateTime toDate = parseISODateTime(toDateStr, "to-date");
+        LocalDate fromDate = parseISODate(fromDateStr, "from-date");
+        LocalDate toDate = parseISODate(toDateStr, "to-date");
+        return getPayPeriodList(periodTypeStr, fromDate, toDate);
+    }
+
+    private List<PayPeriod> getPayPeriodList(String periodTypeStr, LocalDate fromDate, LocalDate toDate) {
         PayPeriodType periodType = PayPeriodType.valueOf(periodTypeStr);
-        return payPeriodDao.getPayPeriods(periodType, Range.closed(fromDate.toLocalDate(), toDate.toLocalDate()), SortOrder.ASC);
+        return payPeriodDao.getPayPeriods(periodType, Range.closed(fromDate, toDate), SortOrder.ASC);
     }
 }
