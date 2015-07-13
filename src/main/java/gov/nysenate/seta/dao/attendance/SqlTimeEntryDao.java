@@ -18,9 +18,9 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository("remoteTimeEntry")
-public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
+public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 {
-    private static final Logger logger = LoggerFactory.getLogger(SqlRemoteTimeEntryDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlTimeEntryDao.class);
 
     @Override
     public TimeEntry getTimeEntryById(BigInteger timeEntryId) throws TimeEntryException {
@@ -36,7 +36,7 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         params.addValue("status", "A");
         params.addValue("timesheetId", new BigDecimal(timeRecordId));
         try {
-            timeEntryList = remoteNamedJdbc.query(SqlRemoteTimeEntryQuery.SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID.getSql(
+            timeEntryList = remoteNamedJdbc.query(SqlTimeEntryQuery.SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID.getSql(
                                                                                 new OrderBy("DTDAY", SortOrder.ASC) ),
                                                   params, new RemoteEntryRowMapper());
         }
@@ -50,8 +50,8 @@ public class SqlRemoteTimeEntryDao extends SqlBaseDao implements TimeEntryDao
     @Override
     public void updateTimeEntry(TimeEntry timeEntry) {
         MapSqlParameterSource params = getTimeEntryParams(timeEntry);
-        if (remoteNamedJdbc.update(SqlRemoteTimeEntryQuery.UPDATE_TIME_ENTRY.getSql(), params) == 0){
-            remoteNamedJdbc.update(SqlRemoteTimeEntryQuery.INSERT_TIME_ENTRY.getSql(), params);
+        if (remoteNamedJdbc.update(SqlTimeEntryQuery.UPDATE_TIME_ENTRY.getSql(), params) == 0){
+            remoteNamedJdbc.update(SqlTimeEntryQuery.INSERT_TIME_ENTRY.getSql(), params);
         }
     }
 

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Deprecated
 @Repository("localTimeRecordDao")
 public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao
 {

@@ -7,6 +7,7 @@ import gov.nysenate.seta.model.attendance.SyncCheck;
 /**
  * Created by riken on 4/8/14.
  */
+@Deprecated
 public interface SyncCheckDao extends BaseDao {
 
     /**

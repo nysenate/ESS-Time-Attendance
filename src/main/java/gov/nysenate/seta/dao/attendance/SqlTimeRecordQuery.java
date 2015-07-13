@@ -4,7 +4,7 @@ import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbSchema;
 import gov.nysenate.seta.dao.base.DbVendor;
 
-public enum SqlRemoteTimeRecordQuery implements BasicSqlQuery
+public enum SqlTimeRecordQuery implements BasicSqlQuery
 {
     GET_TIME_REC_SQL_TEMPLATE(
         "SELECT \n" +
@@ -62,7 +62,7 @@ public enum SqlRemoteTimeRecordQuery implements BasicSqlQuery
 
     private String sql;
 
-    SqlRemoteTimeRecordQuery(String sql) {
+    SqlTimeRecordQuery(String sql) {
         this.sql = sql;
     }
 

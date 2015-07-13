@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.List;
 
+@Deprecated
 @Repository("localTimeEntry")
 public class SqlLocalEntryDao extends SqlBaseDao implements TimeEntryDao{
 

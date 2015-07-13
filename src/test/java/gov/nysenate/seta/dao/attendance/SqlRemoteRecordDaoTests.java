@@ -12,7 +12,7 @@ public class SqlRemoteRecordDaoTests extends BaseTests
     private static final Logger logger = LoggerFactory.getLogger(SqlRemoteRecordDaoTests.class);
 
     @Resource
-    private SqlRemoteTimeRecordDao sqlRemoteTimeRecordDao;
+    private SqlTimeRecordDao sqlTimeRecordDao;
 
     @Test
     public void getRecordByEmployeeId() throws Exception {

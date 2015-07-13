@@ -6,6 +6,7 @@ import gov.nysenate.seta.model.payroll.PayType;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * A TimeEntry contains all the hours worked and charged for a specific date.
@@ -39,69 +40,9 @@ public class TimeEntry
 
     public TimeEntry() {}
 
-    /** --- Overrides --- */
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TimeEntry)) return false;
-
-        TimeEntry timeEntry = (TimeEntry) o;
-
-        if (active != timeEntry.active) return false;
-        if (empId != timeEntry.empId) return false;
-        if (holidayHours != timeEntry.holidayHours) return false;
-        if (miscHours != timeEntry.miscHours) return false;
-        if (personalHours != timeEntry.personalHours) return false;
-        if (sickEmpHours != timeEntry.sickEmpHours) return false;
-        if (sickFamHours != timeEntry.sickFamHours) return false;
-        if (travelHours != timeEntry.travelHours) return false;
-        if (vacationHours != timeEntry.vacationHours) return false;
-        if (workHours != timeEntry.workHours) return false;
-        if (!date.equals(timeEntry.date)) return false;
-        if (empComment != null ? !empComment.equals(timeEntry.empComment) : timeEntry.empComment != null) return false;
-        if (!employeeName.equals(timeEntry.employeeName)) return false;
-        if (entryId != null ? !entryId.equals(timeEntry.entryId) : timeEntry.entryId != null) return false;
-        if (miscType != timeEntry.miscType) return false;
-        if (payType != timeEntry.payType) return false;
-        if (timeRecordId != null ? !timeRecordId.equals(timeEntry.timeRecordId) : timeEntry.timeRecordId != null)
-            return false;
-        if (txOriginalDate != null ? !txOriginalDate.equals(timeEntry.txOriginalDate) : timeEntry.txOriginalDate != null)
-            return false;
-        if (txOriginalUserId != null ? !txOriginalUserId.equals(timeEntry.txOriginalUserId) : timeEntry.txOriginalUserId != null)
-            return false;
-        if (txUpdateDate != null ? !txUpdateDate.equals(timeEntry.txUpdateDate) : timeEntry.txUpdateDate != null)
-            return false;
-        if (txUpdateUserId != null ? !txUpdateUserId.equals(timeEntry.txUpdateUserId) : timeEntry.txUpdateUserId != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = entryId != null ? entryId.hashCode() : 0;
-        result = 31 * result + (timeRecordId != null ? timeRecordId.hashCode() : 0);
-        result = 31 * result + empId;
-        result = 31 * result + employeeName.hashCode();
-        result = 31 * result + date.hashCode();
-        result = 31 * result + workHours;
-        result = 31 * result + travelHours;
-        result = 31 * result + holidayHours;
-        result = 31 * result + vacationHours;
-        result = 31 * result + personalHours;
-        result = 31 * result + sickEmpHours;
-        result = 31 * result + sickFamHours;
-        result = 31 * result + miscHours;
-        result = 31 * result + (miscType != null ? miscType.hashCode() : 0);
-        result = 31 * result + (active ? 1 : 0);
-        result = 31 * result + (empComment != null ? empComment.hashCode() : 0);
-        result = 31 * result + (payType != null ? payType.hashCode() : 0);
-        result = 31 * result + (txOriginalUserId != null ? txOriginalUserId.hashCode() : 0);
-        result = 31 * result + (txUpdateUserId != null ? txUpdateUserId.hashCode() : 0);
-        result = 31 * result + (txOriginalDate != null ? txOriginalDate.hashCode() : 0);
-        result = 31 * result + (txUpdateDate != null ? txUpdateDate.hashCode() : 0);
-        return result;
+    public TimeEntry(BigInteger timeRecordId, int empId) {
+        this.timeRecordId = timeRecordId;
+        this.empId = empId;
     }
 
     /** --- Functional Getters/Setters --- */
@@ -117,6 +58,43 @@ public class TimeEntry
         total += this.getSickFamHours();
         total += this.getMiscHours();
         return total;
+    }
+
+    /** --- Overrides --- */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TimeEntry)) return false;
+        TimeEntry timeEntry = (TimeEntry) o;
+        return Objects.equals(empId, timeEntry.empId) &&
+                Objects.equals(workHours, timeEntry.workHours) &&
+                Objects.equals(travelHours, timeEntry.travelHours) &&
+                Objects.equals(holidayHours, timeEntry.holidayHours) &&
+                Objects.equals(vacationHours, timeEntry.vacationHours) &&
+                Objects.equals(personalHours, timeEntry.personalHours) &&
+                Objects.equals(sickEmpHours, timeEntry.sickEmpHours) &&
+                Objects.equals(sickFamHours, timeEntry.sickFamHours) &&
+                Objects.equals(miscHours, timeEntry.miscHours) &&
+                Objects.equals(active, timeEntry.active) &&
+                Objects.equals(entryId, timeEntry.entryId) &&
+                Objects.equals(timeRecordId, timeEntry.timeRecordId) &&
+                Objects.equals(employeeName, timeEntry.employeeName) &&
+                Objects.equals(date, timeEntry.date) &&
+                Objects.equals(miscType, timeEntry.miscType) &&
+                Objects.equals(empComment, timeEntry.empComment) &&
+                Objects.equals(payType, timeEntry.payType) &&
+                Objects.equals(txOriginalUserId, timeEntry.txOriginalUserId) &&
+                Objects.equals(txUpdateUserId, timeEntry.txUpdateUserId) &&
+                Objects.equals(txOriginalDate, timeEntry.txOriginalDate) &&
+                Objects.equals(txUpdateDate, timeEntry.txUpdateDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entryId, timeRecordId, empId, employeeName, date, workHours, travelHours, holidayHours,
+                            vacationHours, personalHours, sickEmpHours, sickFamHours, miscHours, miscType, active,
+                            empComment, payType, txOriginalUserId, txUpdateUserId, txOriginalDate, txUpdateDate);
     }
 
     /** --- Basic Getters/Setters --- */

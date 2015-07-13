@@ -4,7 +4,7 @@ import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbSchema;
 import gov.nysenate.seta.dao.base.DbVendor;
 
-public enum SqlRemoteTimeEntryQuery implements BasicSqlQuery
+public enum SqlTimeEntryQuery implements BasicSqlQuery
 {
     SELECT_TIME_ENTRY_BY_TIME_ENTRY_ID(
         "SELECT * FROM " + DbSchema.TIMESHEET_SFMS + ".PD23TIMESHEET\n" +
@@ -35,7 +35,7 @@ public enum SqlRemoteTimeEntryQuery implements BasicSqlQuery
 
     private String sql;
 
-    SqlRemoteTimeEntryQuery(String sql) {
+    SqlTimeEntryQuery(String sql) {
         this.sql = sql;
     }
 
