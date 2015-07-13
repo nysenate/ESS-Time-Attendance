@@ -19,7 +19,7 @@ public class SqlRemoteRecordDaoTests extends BaseTests
     @Test
     public void getRecordByEmployeeId() throws Exception {
         logger.info(
-            OutputUtils.toJson(sqlRemoteTimeRecordDao.getRecordsDuring(10976, LocalDate.of(2014, 1, 1),
+            OutputUtils.toJson(sqlTimeRecordDao.getRecordsDuring(10976, LocalDate.of(2014, 1, 1),
                     LocalDate.of(2014, 2, 1))));
     }
 }

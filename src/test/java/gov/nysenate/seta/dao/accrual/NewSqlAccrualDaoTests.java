@@ -17,7 +17,7 @@ public class NewSqlAccrualDaoTests extends BaseTests
     private static final Logger logger = LoggerFactory.getLogger(NewSqlAccrualDaoTests.class);
 
     @Autowired
-    private NewSqlAccrualDao accDao;
+    private SqlAccrualDao accDao;
 
     @Test
     public void testGetPeriodAccrualSummaries() throws Exception {
