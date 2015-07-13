@@ -1,5 +1,7 @@
 package gov.nysenate.seta.model.attendance;
 
+import gov.nysenate.seta.model.period.PayPeriod;
+
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,8 +19,7 @@ public class TimeRecord
     protected Integer supervisorId;
     protected String employeeName;
     protected boolean active;
-    protected LocalDate beginDate;
-    protected LocalDate endDate;
+    protected PayPeriod payPeriod;
     protected String remarks;
     protected String exceptionDetails;
     protected LocalDate processedDate;
@@ -28,6 +29,7 @@ public class TimeRecord
     protected LocalDateTime txOriginalDate;
     protected LocalDateTime txUpdateDate;
     protected List<TimeEntry> timeEntries;
+
 
     /** --- Constructors --- */
 
@@ -77,20 +79,12 @@ public class TimeRecord
         this.active = active;
     }
 
-    public LocalDate getBeginDate() {
-        return beginDate;
+    public PayPeriod getPayPeriod() {
+        return payPeriod;
     }
 
-    public void setBeginDate(LocalDate beginDate) {
-        this.beginDate = beginDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setPayPeriod(PayPeriod payPeriod) {
+        this.payPeriod = payPeriod;
     }
 
     public String getRemarks() {

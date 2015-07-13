@@ -25,12 +25,12 @@ public enum SqlTimeEntryQuery implements BasicSqlQuery
     ),
     UPDATE_TIME_ENTRY(
         "UPDATE " + DbSchema.TIMESHEET_SFMS + ".PD23TIMESHEET " + "\n" +
-        "SET NUXRTIMESHEET = :timesheetId, NUXREFEM = :empId, NAUSER = :employeeName, DTDAY = :dayDate, NUWORK = :workHR, NUTRAVEL = :travelHR, " +
+        "SET NUXRTIMESHEET = :timesheetId, NAUSER = :employeeName, NUWORK = :workHR, NUTRAVEL = :travelHR, " +
             "NUHOLIDAY = :holidayHR, NUSICKEMP = :sickEmpHR, NUSICKFAM = :sickFamilyHR, NUMISC = :miscHR, " +
             "NUXRMISC = :miscTypeId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, " +
             "DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, DECOMMENTS = :empComment, " +
             "CDPAYTYPE = :payType, NUVACATION = :vacationHR, NUPERSONAL = :personalHR " + "\n" +
-        "WHERE NUXRDAY = :tSDayId"
+        "WHERE NUXREFEM = :empId AND DTDAY = :dayDate"
     );
 
     private String sql;

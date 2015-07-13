@@ -7,7 +7,6 @@
 .settings
 .tmp
 target
-app.properties
-test.app.properties
+*.properties
 bower_components/
 node_modules/

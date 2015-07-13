@@ -4,7 +4,7 @@ import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +14,10 @@ public interface TimeRecordDao extends BaseDao
     /** --- Retrieval methods --- */
 
     /**
-     * @see #getRecordsDuring(int, java.util.Date, java.util.Date, java.util.Set)
+     * @see #getRecordsDuring(int, java.time.LocalDate, java.time.LocalDate, java.util.Set)
      * Use this overload if you don't want to filter by statuses.
      */
-    public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate);
+    List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Retrieves a list of time records for a given employee during a time range, ordered by earliest first.
@@ -27,13 +27,13 @@ public interface TimeRecordDao extends BaseDao
      * @param statuses Set<TimeRecordStatus> - The set of statuses to filter by
      * @return List<TimeRecord>
      */
-    public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate, Set<TimeRecordStatus> statuses);
+    List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses);
 
     /**
-     * @see #getRecordsDuring(java.util.List, java.util.Date, java.util.Date, java.util.Set)
+     * @see #getRecordsDuring(java.util.List, java.time.LocalDate, java.time.LocalDate, java.util.Set)
      * Use this overload if you don't want to filter by statuses.
      */
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate);
+    Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate);
 
     /**
      * Retrieves a list of time records for the employees in the given list during a time range.
@@ -43,7 +43,7 @@ public interface TimeRecordDao extends BaseDao
      * @param statuses Set<TimeRecordStatus> - The set of statuses to filter by
      * @return Map<Integer, List<TimeRecord>>
      */
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate, Set<TimeRecordStatus> statuses);
+    Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses);
 
     /** --- Insert/Update methods --- */
 
@@ -52,5 +52,5 @@ public interface TimeRecordDao extends BaseDao
      * @param record - TimeRecord class object containing data to be updated into the table
      * @return Boolean value, true if data successfully updated else false.
      */
-    public boolean saveRecord(TimeRecord record);
+    boolean saveRecord(TimeRecord record);
 }

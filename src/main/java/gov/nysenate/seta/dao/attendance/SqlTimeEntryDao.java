@@ -69,7 +69,7 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("sickFamilyHR", timeEntry.getSickFamHours());
         param.addValue("miscHR", timeEntry.getMiscHours());
         param.addValue("miscTypeId", timeEntry.getMiscType() != null ?
-                                        timeEntry.getMiscType().getCode() : "" );
+                                        new BigDecimal(timeEntry.getMiscType().getMiscLeaveId()) : new BigDecimal(BigInteger.ZERO) );
         param.addValue("tOriginalUserId", timeEntry.getTxOriginalUserId());
         param.addValue("tUpdateUserId", timeEntry.getTxUpdateUserId());
         param.addValue("tOriginalDate", toDate(timeEntry.getTxOriginalDate()));

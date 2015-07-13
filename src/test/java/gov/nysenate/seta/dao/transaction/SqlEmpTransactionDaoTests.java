@@ -1,8 +1,8 @@
 package gov.nysenate.seta.dao.transaction;
 
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
-import gov.nysenate.seta.util.OutputUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

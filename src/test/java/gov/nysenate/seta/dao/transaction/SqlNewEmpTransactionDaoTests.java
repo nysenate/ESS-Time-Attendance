@@ -1,10 +1,10 @@
 package gov.nysenate.seta.dao.transaction;
 
 import com.google.common.collect.Sets;
+import gov.nysenate.common.OutputUtils;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.BaseTests;
-import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.util.OutputUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

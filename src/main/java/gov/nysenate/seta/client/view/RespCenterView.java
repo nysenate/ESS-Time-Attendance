@@ -1,6 +1,5 @@
 package gov.nysenate.seta.client.view;
 
-import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.personnel.ResponsibilityCenter;
 

@@ -1,12 +1,12 @@
 package gov.nysenate.seta.dao;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.OutputUtils;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.BaseTests;
-import gov.nysenate.seta.dao.base.SortOrder;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.util.OutputUtils;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

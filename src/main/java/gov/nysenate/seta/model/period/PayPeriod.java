@@ -34,6 +34,14 @@ public class PayPeriod implements Comparable<PayPeriod>
 
     public PayPeriod() {}
 
+    public PayPeriod(PayPeriodType type, LocalDate startDate, LocalDate endDate, int payPeriodNum, boolean active) {
+        this.type = type;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.payPeriodNum = payPeriodNum;
+        this.active = active;
+    }
+
     /** --- Functional Getters/Setters --- */
 
     /**

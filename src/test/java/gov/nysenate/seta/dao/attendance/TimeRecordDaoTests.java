@@ -1,8 +1,11 @@
 package gov.nysenate.seta.dao.attendance;
 
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.period.PayPeriodType;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 public class TimeRecordDaoTests extends BaseTests
 {
@@ -27,16 +31,15 @@ public class TimeRecordDaoTests extends BaseTests
         testRecord.setTxOriginalUserId("STOUFFER");
         testRecord.setEmployeeName("STOUFFER");
         testRecord.setTxUpdateUserId("STOUFFER");
-        testRecord.setTxOriginalDate(java.time.LocalDate.of(1990, 8, 15).atStartOfDay());
-        testRecord.setTxUpdateDate(java.time.LocalDate.of(1990, 8, 15).atStartOfDay());
+        testRecord.setTxOriginalDate(LocalDate.of(1990, 8, 15).atStartOfDay());
+        testRecord.setTxUpdateDate(LocalDate.of(1990, 8, 15).atStartOfDay());
         testRecord.setActive(true);
         testRecord.setRecordStatus(TimeRecordStatus.SUBMITTED);
-        testRecord.setBeginDate(java.time.LocalDate.of(1990, 8, 14));
-        testRecord.setEndDate(java.time.LocalDate.of(1990, 8, 15));
         testRecord.setRemarks("Hello world");
         testRecord.setSupervisorId(9896);
         testRecord.setExceptionDetails(null);
-        testRecord.setProcessedDate(null);
+        testRecord.setProcessedDate(LocalDate.of(1990, 8, 15));
+        testRecord.setPayPeriod(new PayPeriod(PayPeriodType.AF, LocalDate.of(1990, 8, 2), LocalDate.of(1990, 8, 15), 10, true));
     }
 
     @PostConstruct
@@ -49,4 +52,10 @@ public class TimeRecordDaoTests extends BaseTests
         timeRecordDao.saveRecord(testRecord);
     }
 
+    @Test
+    public void getRecordByEmployeeId() throws Exception {
+        LocalDate fromDate = LocalDate.of(1990, 1, 1);
+        LocalDate toDate = LocalDate.of(1991, 1, 1);
+        logger.info(OutputUtils.toJson(timeRecordDao.getRecordsDuring(11423, fromDate, toDate)));
+    }
 }

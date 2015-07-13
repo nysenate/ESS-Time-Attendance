@@ -1,21 +1,23 @@
 package gov.nysenate.seta.dao.attendance.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
+import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Service
 public class RemoteRecordRowMapper extends BaseRowMapper<TimeRecord>
 {
-    private String pfx = "";
 
-    public RemoteRecordRowMapper() {}
+    @Autowired
+    PayPeriodDao payPeriodDao;
 
-    public RemoteRecordRowMapper(String pfx) {
-        this.pfx = pfx;
-    }
+    private String pfx = "";        // TODO is this necessary ??
 
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -29,8 +31,6 @@ public class RemoteRecordRowMapper extends BaseRowMapper<TimeRecord>
         record.setTxUpdateDate(getLocalDateTimeFromRs(rs, (pfx + "DTTXNUPDATE")));
         record.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         record.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "CDTSSTAT")));
-        record.setBeginDate(getLocalDateFromRs(rs, pfx + "DTBEGIN"));
-        record.setEndDate(getLocalDateFromRs(rs, "DTEND"));
         record.setRemarks(rs.getString(pfx + "DEREMARKS"));
         record.setSupervisorId(rs.getInt(pfx + "NUXREFSV"));
         record.setExceptionDetails(rs.getString(pfx + "DEEXCEPTION"));

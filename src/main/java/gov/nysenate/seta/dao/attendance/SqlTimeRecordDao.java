@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Repository("remoteTimeRecordDao")
@@ -26,34 +27,35 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     /** {@inheritDoc} */
     @Override
-    public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate) {
+    public List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate) {
         return getRecordsDuring(empId, startDate, endDate, new HashSet<>(Arrays.asList(TimeRecordStatus.values())));
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<TimeRecord> getRecordsDuring(int empId, Date startDate, Date endDate, Set<TimeRecordStatus> statuses) {
+    public List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses) {
         Map<Integer, List<TimeRecord>> res = getRecordsDuring(Arrays.asList(empId), startDate, endDate, statuses);
         return res.get(empId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate) {
+    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate) {
         return getRecordsDuring(empIds, startDate, endDate, new HashSet<>(Arrays.asList(TimeRecordStatus.values())));
     }
 
     /** {@inheritDoc} */
     @Override
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, Date startDate, Date endDate, Set<TimeRecordStatus> statuses) {
+    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate,
+                                                           Set<TimeRecordStatus> statuses) {
         Set<String> statusCodes = new HashSet<>();
         for (TimeRecordStatus status : statuses) {
             statusCodes.add(status.getCode());
         }
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empIds", empIds);
-        params.addValue("startDate", startDate);
-        params.addValue("endDate", endDate);
+        params.addValue("startDate", toDate(startDate));
+        params.addValue("endDate", toDate(endDate));
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
         remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES.getSql(), params, handler);
@@ -114,50 +116,10 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     }
 
-    public boolean setRecord(TimeRecord tr) {
-
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("timesheetId", tr.getTimeRecordId());
-        params.addValue("empId", tr.getEmployeeId());
-        params.addValue("tOriginalUserId", tr.getTxOriginalUserId());
-        params.addValue("tUpdateUserId", tr.getTxUpdateUserId());
-        params.addValue("tOriginalDate", tr.getTxOriginalDate());
-        params.addValue("tUpdateDate", tr.getTxUpdateDate());
-        if(tr.isActive()==true){params.addValue("status", "A");}
-        else{ params.addValue("status", "I");}
-        params.addValue("tSStatusId", tr.getRecordStatus().getCode());
-        params.addValue("beginDate", tr.getBeginDate());
-        params.addValue("endDate", tr.getEndDate());
-        params.addValue("remarks", tr.getRemarks());
-        params.addValue("supervisorId", tr.getSupervisorId());
-        params.addValue("excDetails", tr.getExceptionDetails());
-        params.addValue("procDate", tr.getProcessedDate());
-
-        if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(), params)==1) {    return true;}
-        else{   return false;}
-
-    }
-
     @Override
     public boolean saveRecord(TimeRecord record) {
 
-        MapSqlParameterSource params = new MapSqlParameterSource();
-
-        params.addValue("timesheetId", new BigDecimal(record.getTimeRecordId()));
-        params.addValue("empId", record.getEmployeeId());
-        params.addValue("tOriginalUserId", record.getTxOriginalUserId());
-        params.addValue("tUpdateUserId", record.getTxUpdateUserId());
-        params.addValue("employeeName", record.getEmployeeName());
-        params.addValue("tOriginalDate", toDate(record.getTxOriginalDate()));
-        params.addValue("tUpdateDate", toDate(record.getTxUpdateDate()));
-        params.addValue("status", String.valueOf(getStatusCode(record.isActive())));
-        params.addValue("tSStatusId", record.getRecordStatus().getCode());
-        params.addValue("beginDate", toDate(record.getBeginDate()));
-        params.addValue("endDate", toDate(record.getEndDate()));
-        params.addValue("remarks", record.getRemarks());
-        params.addValue("supervisorId", record.getSupervisorId());
-        params.addValue("excDetails", record.getExceptionDetails());
-        params.addValue("procDate", record.getProcessedDate());
+        MapSqlParameterSource params = getTimeRecordParams(record);
 
         if (remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(), params)==0) {
             if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(), params)==0) {
@@ -170,6 +132,27 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     public int getTimeRecordCount(BigDecimal timesheetId) throws TimeRecordNotFoundException {
         return 0;
+    }
+
+    public MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("timesheetId", new BigDecimal(timeRecord.getTimeRecordId()));
+        params.addValue("empId", timeRecord.getEmployeeId());
+        params.addValue("employeeName", timeRecord.getEmployeeName());
+        params.addValue("tOriginalUserId", timeRecord.getTxOriginalUserId());
+        params.addValue("tUpdateUserId", timeRecord.getTxUpdateUserId());
+        params.addValue("tOriginalDate", toDate(timeRecord.getTxOriginalDate()));
+        params.addValue("tUpdateDate", toDate(timeRecord.getTxUpdateDate()));
+        params.addValue("status", timeRecord.isActive() ? "A" : "I");
+        params.addValue("tSStatusId", timeRecord.getRecordStatus().getCode());
+        params.addValue("beginDate", toDate(timeRecord.getPayPeriod().getStartDate()));
+        params.addValue("endDate", toDate(timeRecord.getPayPeriod().getEndDate()));
+        params.addValue("remarks", timeRecord.getRemarks());
+        params.addValue("supervisorId", timeRecord.getSupervisorId());
+        params.addValue("excDetails", timeRecord.getExceptionDetails());
+        params.addValue("procDate", toDate(timeRecord.getProcessedDate()));
+
+        return params;
     }
 
 }
