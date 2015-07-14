@@ -1,7 +1,7 @@
 package gov.nysenate.seta.model.transaction;
 
 import gov.nysenate.common.SortOrder;
-import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.OldSqlEmpTransactionDao;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
 import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import org.slf4j.Logger;
@@ -72,7 +72,7 @@ public class AuditHistory
                 else {
                     codes = transactionCodes;
                 }
-                SqlEmpTransactionDao transHistDao = new SqlEmpTransactionDao();
+                OldSqlEmpTransactionDao transHistDao = new OldSqlEmpTransactionDao();
                 transactionHistory = transHistDao.getTransHistory(employeeId, codes, true);
             }
         }

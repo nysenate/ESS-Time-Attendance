@@ -3,8 +3,8 @@ package gov.nysenate.seta.dao.personnel;
 import com.google.common.collect.Range;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.NewEmpTransactionDao;
-import gov.nysenate.seta.dao.transaction.TransDaoOption;
+import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorMissingEmpsEx;
 import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
@@ -39,7 +39,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     private static final Logger logger = LoggerFactory.getLogger(SqlSupervisorDao.class);
 
     @Autowired
-    private NewEmpTransactionDao empTransDao;
+    private SqlEmpTransactionDao empTransDao;
 
     /**
      * This query returns a listing of all supervisor related transactions for employees that have at
@@ -119,7 +119,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
     public int getSupervisorIdForEmp(int empId, LocalDate date) throws SupervisorException {
         Set<TransactionCode> transCodes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
         TransactionHistory transHistory =
-            empTransDao.getTransHistory(empId, transCodes, Range.atMost(date), TransDaoOption.INITIALIZE_AS_APP);
+            empTransDao.getTransHistory(empId, transCodes, Range.atMost(date), EmpTransDaoOption.INITIALIZE_AS_APP);
 
         int supId = -1;
         if (transHistory.hasRecords()) {

@@ -10,8 +10,14 @@ Toggle this for temporary emps.
     </p>
 </div>  -->
 
-<section class="content-container">
+<div class="content-container content-controls">
+    <p class="content-info">Enter a time and attendance record by selecting from the list of
+        active pay periods.</p>
+</div>
+
+<div class="content-container no-top-margin">
     <h1 class="teal">Time and Attendance Record Details</h1>
+
     <div id="record-selection-container" class="content-info" style="background:none;">
         <table>
             <thead>
@@ -28,7 +34,7 @@ Toggle this for temporary emps.
                 <tr>
                     <td><input type="radio" checked="checked"/></td>
                     <td>04/24/2014 - 5/7/2014</td>
-                    <td>Kenneth J. Zalewski</td>
+                    <td>Supervisor 1</td>
                     <td>5</td>
                     <td>In Progress</td>
                     <td>04/24/2014 3:04 PM</td>
@@ -138,4 +144,4 @@ Toggle this for temporary emps.
             </div>
         </form>
     </section>
-</section>
+</div>

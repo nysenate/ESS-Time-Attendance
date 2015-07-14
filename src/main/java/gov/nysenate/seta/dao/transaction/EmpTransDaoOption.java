@@ -7,7 +7,7 @@ package gov.nysenate.seta.dao.transaction;
  *  Bit 0 : Earliest record should be the initial state.
  *  Bit 1 : Earliest record should be converted to app if not already app/rtp.
  */
-public enum TransDaoOption
+public enum EmpTransDaoOption
 {
     DEFAULT             (0),
     INITIALIZE          (1),
@@ -16,7 +16,7 @@ public enum TransDaoOption
 
     int mask;
 
-    TransDaoOption(int mask) {
+    EmpTransDaoOption(int mask) {
         this.mask = mask;
     }
 

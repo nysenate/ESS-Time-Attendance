@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.transaction.mapper;
 
 import gov.nysenate.seta.dao.base.BaseHandler;
-import gov.nysenate.seta.dao.transaction.TransDaoOption;
+import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
@@ -30,7 +30,7 @@ public class TransHistoryHandler extends BaseHandler
     protected Set<TransactionCode> transCodes;
 
     /** Options to indicate certain processing behaviors. */
-    protected TransDaoOption options;
+    protected EmpTransDaoOption options;
 
     /** Stores the valid records. */
     protected List<TransactionRecord> records = new ArrayList<>();
@@ -38,7 +38,7 @@ public class TransHistoryHandler extends BaseHandler
     /** --- Constructors --- */
 
     public TransHistoryHandler(int empId, String pfx, String auditPfx, Set<TransactionCode> transCodes,
-                               TransDaoOption options) {
+                               EmpTransDaoOption options) {
         this.empId = empId;
         this.pfx = pfx;
         this.auditPfx = auditPfx;

@@ -2,8 +2,8 @@ var essApi = angular.module('essApi');
 
 /** --- Pay Period API --- */
 
-essApi.factory('PayPeriodApi', ['$resource', 'appProps', function($resource, appProps) {
-    return $resource(appProps.apiPath + '/periods/:periodType/dates/:startDate/:endDate');
+essApi.factory('PayPeriodByYearApi', ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/periods/:periodType/year/:year');
 }]);
 
 /** --- Holiday API --- */

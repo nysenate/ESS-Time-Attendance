@@ -61,4 +61,9 @@ public class SqlPayPeriodDaoTests extends BaseTests
         Assert.assertEquals(14, marchDSTPeriod.getNumDaysInPeriod());
         Assert.assertEquals(14, novemberDSTPeriod.getNumDaysInPeriod());
     }
+
+    @Test
+    public void testOpenPayPeriods() throws Exception {
+        logger.info("{}", payPeriodDao.getOpenAttendancePayPeriods(9896, LocalDate.now(), SortOrder.ASC));
+    }
 }

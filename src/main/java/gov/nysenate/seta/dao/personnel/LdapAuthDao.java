@@ -33,11 +33,8 @@ public class LdapAuthDao extends LdapBaseDao
    */
     public Name authenticateByUid(String uid, String credentials) throws NamingException,
                                                                          IncorrectResultSizeDataAccessException {
-        return ldapTemplate.authenticate(query().where("uid").is(uid), credentials, new AuthenticatedLdapEntryContextMapper<Name>() {
-            @Override
-            public Name mapWithContext(DirContext ctx, LdapEntryIdentification ldapEntryIdentification) {
-                return ldapEntryIdentification.getAbsoluteName();
-            }
+        return ldapTemplate.authenticate(query().where("uid").is(uid), credentials, (ctx, ldapEntryIdentification) -> {
+            return ldapEntryIdentification.getAbsoluteName();
         });
     }
 }

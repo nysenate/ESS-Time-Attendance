@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.transaction.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
-import gov.nysenate.seta.dao.transaction.TransDaoOption;
+import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.model.transaction.TransactionType;
@@ -23,10 +23,10 @@ public class TransRecordRowMapper extends BaseRowMapper<TransactionRecord>
     protected String pfx = "";
     protected String auditPfx = "";
     protected Set<TransactionCode> transCodes;
-    protected TransDaoOption options;
+    protected EmpTransDaoOption options;
 
     public TransRecordRowMapper(String pfx, String auditPfx, Set<TransactionCode> transCodes,
-                                TransDaoOption options) {
+                                EmpTransDaoOption options) {
         this.pfx = pfx;
         this.auditPfx = auditPfx;
         this.transCodes = transCodes;

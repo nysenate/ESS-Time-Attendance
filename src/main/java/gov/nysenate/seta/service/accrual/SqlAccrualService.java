@@ -2,7 +2,7 @@ package gov.nysenate.seta.service.accrual;
 
 import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.accrual.AccrualDao;
-import gov.nysenate.seta.dao.transaction.NewEmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -25,7 +25,7 @@ public class SqlAccrualService implements AccrualService
     private AccrualDao accrualDao;
 
     @Autowired
-    private NewEmpTransactionDao transDao;
+    private SqlEmpTransactionDao transDao;
 
     /** --- Implemented Methods --- */
 

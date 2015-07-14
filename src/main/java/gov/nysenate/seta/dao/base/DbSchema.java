@@ -5,8 +5,8 @@ package gov.nysenate.seta.dao.base;
  */
 public enum DbSchema
 {
-    MASTER_SFMS("SASS_OWNER", DbVendor.ORACLE),
-    TIMESHEET_SFMS("TS_OWNER", DbVendor.ORACLE),
+    MASTER_SFMS("SASS_OWNER", DbVendor.ORACLE_10g),
+    TIMESHEET_SFMS("TS_OWNER", DbVendor.ORACLE_10g),
     TIMESHEET_LOCAL("ts", DbVendor.POSTGRES);
 
     private String schemaName;

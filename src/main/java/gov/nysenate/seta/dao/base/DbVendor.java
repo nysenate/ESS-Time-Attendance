@@ -2,7 +2,7 @@ package gov.nysenate.seta.dao.base;
 
 public enum DbVendor
 {
-    ORACLE("10g", false),
+    ORACLE_10g("10g", false),
     POSTGRES("9.3", true);
 
     String version;

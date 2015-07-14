@@ -73,6 +73,6 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
 
     @Override
     public DbVendor getVendor() {
-        return DbVendor.ORACLE;
+        return DbVendor.ORACLE_10g;
     }
 }

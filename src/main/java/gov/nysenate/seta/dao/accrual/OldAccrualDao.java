@@ -11,7 +11,7 @@ import gov.nysenate.seta.dao.attendance.TimeEntryDao;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.personnel.HolidayDao;
-import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.OldEmpTransactionDao;
 import gov.nysenate.seta.model.accrual.*;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -45,7 +45,7 @@ public class OldAccrualDao extends SqlBaseDao //implements AccrualDao
     private static final Logger logger = LoggerFactory.getLogger(OldAccrualDao.class);
 
     @Autowired
-    protected EmpTransactionDao empTransactionDao;
+    protected OldEmpTransactionDao oldEmpTransactionDao;
 
     @Resource(name = "localTimeEntry")
     protected TimeEntryDao localTimeEntryDao;
@@ -253,7 +253,7 @@ public class OldAccrualDao extends SqlBaseDao //implements AccrualDao
      */
     private TransactionHistory getAccrualTransactions(int empId, LocalDate startDate, LocalDate endDate) {
         Set<TransactionCode> codes = new HashSet<>(Arrays.asList(APP, RTP, TYP, MIN, EMP));
-        return empTransactionDao.getTransHistory(empId, codes, toDate(startDate), toDate(endDate), true);
+        return oldEmpTransactionDao.getTransHistory(empId, codes, toDate(startDate), toDate(endDate), true);
     }
 
     /** --- Data Retrieval Methods -- */

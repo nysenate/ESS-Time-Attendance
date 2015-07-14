@@ -1,5 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<section class="content-container">
+<div class="content-container content-controls">
+    <p class="content-info" style="margin-bottom:0;">
+        View attendance records for year &nbsp;
+        <select>
+            <option selected="selected">2015</option>
+            <option>2014</option>
+            <option>2013</option>
+            <option>2012</option>
+        </select>
+    </p>
+</div>
+
+<div class="content-container">
     <h1>Active Attendance Records</h1>
     <p class="content-info">The following time records are in progress or awaiting submission.
     <br/>You can edit a record by clicking the 'Edit' link to
@@ -30,20 +42,10 @@
             </tr>
         </tbody>
     </table>
-</section>
+</div>
 
-<section class="content-container">
-    <h1>Prior Attendance Records</h1>
-    <div class="content-controls">
-        <p class="content-info" style="margin-bottom:0;">
-            View attendance records for year &nbsp;
-            <select>
-                <option selected="selected">2014</option>
-                <option>2013</option>
-                <option>2012</option>
-            </select>
-        </p>
-    </div>
+<div class="content-container">
+    <h1>Historical Attendance Records</h1>
     <p class="content-info" style="">Time records that have been submitted for pay periods during 2014 are listed in
     the table below.<br/>You can view details about each pay period by clicking the 'View Details' link to the right.</p>
     <table id="attendance-history-table" class="ess-table attendance-listing-table">
@@ -168,4 +170,4 @@
             $("#dialog").dialog("open");
         });
     </script>
-</section>
+</div>
