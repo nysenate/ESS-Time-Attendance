@@ -31,6 +31,8 @@ import java.util.*;
 
 import static gov.nysenate.common.DateUtils.endOfDateRange;
 import static gov.nysenate.common.DateUtils.startOfDateRange;
+import static gov.nysenate.seta.dao.personnel.SqlSupervisorQuery.GET_SUP_CHAIN_EXCEPTIONS;
+import static gov.nysenate.seta.dao.personnel.SqlSupervisorQuery.GET_SUP_EMP_TRANS_SQL;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @Repository
@@ -40,58 +42,6 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
     @Autowired
     private SqlEmpTransactionDao empTransDao;
-
-    /**
-     * This query returns a listing of all supervisor related transactions for employees that have at
-     * one point been assigned the given 'supId'. The results of this query can be processed to determine
-     * valid employee groups for a supervisor.
-     */
-    protected static final String GET_SUP_EMP_TRANS_SQL =
-        "SELECT empList.*, per.NALAST, per.NUXREFSV, per.CDEMPSTATUS, " +
-        "       ptx.CDTRANS, ptx.CDTRANSTYP, ptx.DTEFFECT, per.DTTXNORIGIN,\n" +
-        "       ROW_NUMBER() " +
-        "       OVER (PARTITION BY EMP_GROUP, NUXREFEM, OVR_NUXREFSV ORDER BY DTEFFECT DESC, DTTXNORIGIN DESC) AS TRANS_RANK\n" +
-        "FROM (\n" +
-
-        /**  Fetch the ids of the supervisor's direct employees. */
-        "    SELECT DISTINCT 'PRIMARY' AS EMP_GROUP, NUXREFEM, NULL AS OVR_NUXREFSV\n" +
-        "    FROM " + MASTER_SCHEMA + ".PM21PERAUDIT WHERE NUXREFSV = :supId \n" +
-
-        /**  Combine that with the ids of the employees that are accessible through the sup overrides.
-         *   The EMP_GROUP column will either be 'SUP_OVR' or 'EMP_OVR' to indicate the type of override. */
-        "    UNION ALL\n" +
-        "    SELECT DISTINCT\n" +
-        "    CASE \n" +
-        "        WHEN ovr.NUXREFSVSUB IS NOT NULL THEN 'SUP_OVR' \n" +
-        "        WHEN ovr.NUXREFEMSUB IS NOT NULL THEN 'EMP_OVR' " +
-        "    END,\n" +
-        "    per.NUXREFEM, ovr.NUXREFSVSUB\n" +
-        "    FROM " + TS_SCHEMA + ".PM23SUPOVRRD ovr\n" +
-        "    LEFT JOIN " + MASTER_SCHEMA + ".PM21PERAUDIT per ON \n" +
-        "      CASE WHEN ovr.NUXREFSVSUB IS NOT NULL AND per.NUXREFSV = ovr.NUXREFSVSUB THEN 1\n" +
-        "           WHEN ovr.NUXREFEMSUB IS NOT NULL AND per.NUXREFEM = ovr.NUXREFEMSUB THEN 1\n" +
-        "           ELSE 0\n" +
-        "      END = 1\n" +
-        "    WHERE ovr.NUXREFEM = :supId AND ovr.CDSTATUS = 'A'\n" +
-        "    AND :endDate BETWEEN NVL(ovr.DTSTART, :endDate) AND NVL(ovr.DTEND, :endDate)\n" +
-        "    AND per.NUXREFEM IS NOT NULL\n" +
-        "  ) empList\n" +
-        "JOIN " + MASTER_SCHEMA + ".PM21PERAUDIT per ON empList.NUXREFEM = per.NUXREFEM\n" +
-        "JOIN " + MASTER_SCHEMA + ".PD21PTXNCODE ptx ON per.NUXREFEM = ptx.NUXREFEM AND per.NUCHANGE = ptx.NUCHANGE\n" +
-
-        /**  Retrieve just the APP/RTP/SUP/EMP transactions unless the employee doesn't
-         *   have any of them (some earlier employees may be missing APP for example). */
-        "WHERE \n" +
-        "    (per.NUXREFEM NOT IN (SELECT DISTINCT NUXREFEM FROM " + MASTER_SCHEMA + ".PD21PTXNCODE\n" +
-        "                          WHERE CDTRANS IN ('APP', 'RTP', 'SUP'))\n" +
-        "    OR ptx.CDTRANS IN ('APP', 'RTP', 'SUP', 'EMP'))\n" +
-        "AND ptx.CDTRANSTYP = 'PER'\n" +
-        "AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT <= :endDate\n" +
-        "ORDER BY NUXREFEM, TRANS_RANK";
-
-    protected static final String GET_SUP_CHAIN_EXCEPTIONS =
-        "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM " + MASTER_SCHEMA + ".PM23SPCHNEX\n" +
-        "WHERE CDSTATUS = 'A' AND NUXREFEM = :empId";
 
     /**
      * {@inheritDoc}
@@ -165,7 +115,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
         /** Look for any active inclusions/exclusions */
         SqlParameterSource params = new MapSqlParameterSource("empId", empId);
-        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_CHAIN_EXCEPTIONS, params, new ColumnMapRowMapper());
+        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_CHAIN_EXCEPTIONS.getSql(), params, new ColumnMapRowMapper());
         if (!res.isEmpty()) {
             for (Map<String, Object> row : res) {
                 int supId = Integer.parseInt(row.get("NUXREFSV").toString());
@@ -191,7 +141,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         params.addValue("endDate", toDate(endDate));
         List<Map<String, Object>> res;
         try {
-            res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL, params, new ColumnMapRowMapper());
+            res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL.getSql(), params, new ColumnMapRowMapper());
         }
         catch (DataRetrievalFailureException ex) {
             throw new SupervisorException("Failed to retrieve matching employees for supId: " + supId + " before: " + endDate);
