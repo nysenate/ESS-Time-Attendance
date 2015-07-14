@@ -5,10 +5,6 @@ import gov.nysenate.common.OrderBy;
 
 public interface BasicSqlQuery
 {
-    /** TODO: get rid of these. */
-    static String MASTER_SCHEMA = "SASS_OWNER";
-    static String TS_SCHEMA = "TS_OWNER";
-
     /**
      * Return the sql query as is.
      */
