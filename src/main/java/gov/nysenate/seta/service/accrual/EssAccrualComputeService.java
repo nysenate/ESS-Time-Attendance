@@ -17,9 +17,9 @@ import java.time.LocalDate;
 import java.util.TreeMap;
 
 @Service
-public class SqlAccrualService implements AccrualService
+public class EssAccrualComputeService implements AccrualComputeService
 {
-    private static final Logger logger = LoggerFactory.getLogger(SqlAccrualService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EssAccrualComputeService.class);
 
     @Resource(name = "sqlAccrual")
     private AccrualDao accrualDao;

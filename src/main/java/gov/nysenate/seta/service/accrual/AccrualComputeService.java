@@ -10,7 +10,7 @@ import java.util.TreeMap;
 /**
  * Service interface to provide accrual related functionality.
  */
-public interface AccrualService
+public interface AccrualComputeService
 {
     /**
      * Computes the accruals for an employee at the start of the given pay period.

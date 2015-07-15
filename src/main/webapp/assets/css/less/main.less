@@ -263,156 +263,121 @@ table.simple-table {
 .ess-top-header {
   position: fixed;
   width: 100%;
-  //background: #fafafa;
-  background: #3d3d3d;
-  border-bottom: 1px solid #222;
-  height:40px;
+  background: #fafafa;
+  box-shadow: 0 1px 1px #ccc;
+  //background: #3d3d3d;
+  //border-bottom: 1px solid #222;
+  height:45px;
   z-index: 100;
   color: white;
   overflow: hidden;
 
-  .left-header-area {
-    display: inline-block;
+  .fixed-width-header {
+    width: 1150px;
+    margin: auto;
+    position: relative;
+    top: 2px;
 
-    .nysslogo {
-      .nysslogo(35px);
-      float: left;
-      margin-top: 2px;
-      margin-left: 10px;
-    }
-
-    #logoTextSection {
-      padding: 0;
-      margin-top: 0px;
+    .left-header-area {
       display: inline-block;
-
-      #logoText {
-        .font-weight-light;
-        font-size: 1.6em;
-        line-height: 40px;
-        margin-left: 10px;
-
-        #subLogoText {
-          .font-weight-normal;
-        }
-      }
-    }
-
-  }
-
-  .right-header-area {
-    display: inline-block;
-    vertical-align: top;
-    position: absolute;
-    right: 0;
-
-    #profileSection {
-      float:left;
-      padding: 0;
-      line-height: 40px;
-
-      &:hover {
-        background: lighten(#323232, 5%);
-      }
-
-      #headerProfileSquare {
-        margin-right: 0px;
-        margin-top: 3px;
-        .profile-square(40px);
-        .transform(rotateY(0deg));
+      .nysslogo {
+        .nysslogo(35px);
         float: left;
-        #headerProfileImg {
-          background: url("https://avatars0.githubusercontent.com/u/2687188?s=140");
-          .image-size(35px);
-        }
-      }
-
-      #headerProfileName {
-        font-size: 1em;
+        margin-top: 2px;
         margin-left: 10px;
       }
-    }
-
-    #logoutSection {
-      float:left;
-      font-size: 1.1em;
-      width: 120px;
-      border-left: 1px solid #222;
-
-      &:hover {
-        background: lighten(#323232, 10%);
-        a .logout-icon {
-          .transform(rotateY(-40deg));
+      #logoTextSection {
+        padding: 0;
+        margin-top: 0;
+        display: inline-block;
+        #logoText {
+          .font-weight-light;
+          color: #333;
+          font-size: 1.6em;
+          line-height: 40px;
+          margin-left: 10px;
+          #subLogoText {
+            .font-weight-normal;
+          }
         }
       }
-
-      a {
-        padding: 11px;
-        display: block;
-        text-decoration: none !important;
-        color: white;
-
-        .logout-icon {
-          .transform-origin(0 0);
-          .transition(.3s);
-          margin-right: 5px;
-          float: left;
-          .icon-image('20px-ffffff', 'logout.png');
-          .image-size(20px);
+      #topNavList {
+        padding: 0;
+        display: inline-block;
+        vertical-align: top;
+        margin: 0 0 0 20px;
+        li {
+          display: inline;
+          line-height:40px;
+          padding: 10px 20px;
+          cursor: pointer;
+          &.active {
+            font-weight: 600;
+          }
+          &.teal {
+            &.active {
+              background: fade(@light-teal, 40%);
+            }
+            &:hover {
+              background: fade(@light-teal, 20%);
+            }
+          }
+          &.orange {
+            &.active {
+              background: fade(@orange, 40%);
+            }
+            &:hover {
+              background: fade(@orange, 20%);
+            }
+          }
+          .nav-icon {
+            margin-right:5px;
+            vertical-align: middle;
+            height: 16px;
+            position: relative;
+            top: -1px;
+            display: none;    /** Hidden for now.. */
+          }
+          a {
+            color: rgb(66, 81, 81);
+            font-size: 1.1em;
+            &:hover {
+              color: teal;
+            }
+          }
         }
       }
     }
-  }
-}
 
-#topNavList {
-  padding: 0;
-  margin: 0;
-  display: inline-block;
-  vertical-align: top;
-  margin-left: 20px;
-
-  li {
-    display: inline;
-    line-height:40px;
-    padding: 10px 20px;
-    cursor: pointer;
-
-    &.active {
-      font-weight: 600;
-    }
-
-    &.teal {
-      &.active {
-        background: fade(@light-teal, 40%);
-      }
-      &:hover {
-        background: fade(@light-teal, 20%);
-      }
-    }
-
-    &.orange {
-      &.active {
-        background: fade(@orange, 40%);
-      }
-      &:hover {
-        background: fade(@orange, 20%);
-      }
-    }
-
-    .nav-icon {
-      margin-right:5px;
-      vertical-align: middle;
-      height: 16px;
-      position: relative;
-      top: -1px;
-    }
-
-    a {
-      color: white;
-      font-size: 1.1em;
-      &:hover {
-        color: white;
+    .right-header-area {
+      display: inline-block;
+      vertical-align: top;
+      position: absolute;
+      right: 0;
+      #logoutSection {
+        float:left;
+        font-size: 1.1em;
+        width: 120px;
+        &:hover {
+          background: #ddd;
+          a .logout-icon {
+            .transform(rotateY(-40deg));
+          }
+        }
+        a {
+          padding: 11px;
+          display: block;
+          text-decoration: none !important;
+          color: #333;
+          .logout-icon {
+            .transform-origin(0 0);
+            .transition(.3s);
+            margin-right: 5px;
+            float: left;
+            .icon-image('20px-ffffff', 'logout.png');
+            .image-size(20px);
+          }
+        }
       }
     }
   }
