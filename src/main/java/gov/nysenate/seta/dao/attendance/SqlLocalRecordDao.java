@@ -1,21 +1,14 @@
 package gov.nysenate.seta.dao.attendance;
 
-import gov.nysenate.seta.dao.attendance.mapper.LocalRecordRowMapper;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Deprecated
@@ -23,22 +16,22 @@ import java.util.Set;
 public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao
 {
     @Override
-    public List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate) {
+    public List<TimeRecord> getRecordsDuring(int empId, Range<LocalDate> dateRange) {
         return null;
     }
 
     @Override
-    public List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses) {
+    public List<TimeRecord> getRecordsDuring(int empId, Range<LocalDate> dateRange, Set<TimeRecordStatus> statuses) {
         return null;
     }
 
     @Override
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate) {
+    public ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange) {
         return null;
     }
 
     @Override
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses) {
+    public ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange, Set<TimeRecordStatus> statuses) {
         return null;
     }
 

@@ -2,6 +2,7 @@ package gov.nysenate.seta.dao;
 
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
+import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
@@ -44,7 +45,7 @@ public class SqlAllowanceDaoTests  extends BaseTests
     @Test
     public void testGetAllowanceUsage() throws Exception {
         Set<TransactionCode> allTransCodes = new HashSet<TransactionCode>(Arrays.asList(TransactionCode.values()));
-        TransactionHistory transactionHistory = sqlEmployeeTransactionDao.getTransHistory(443,  allTransCodes);
+        TransactionHistory transactionHistory = sqlEmployeeTransactionDao.getTransHistory(443, EmpTransDaoOption.DEFAULT);
         //auditHistory = new AuditHistory();
         //auditHistory.setTransactionHistory(transactionHistory);
 
@@ -63,10 +64,10 @@ public class SqlAllowanceDaoTests  extends BaseTests
  //       logger.info(String.valueOf(SqlAccrualHelper.saProrate(matchedAuditRecords.get(matchedAuditRecords.size() - 1))));
 //        logger.debug("Expected Hours:" + SqlAccrualHelper.getExpectedHours(transactionHistory, toDate(LocalDate.of(2014, 1, 1)), new LocalDate(2014, 7, 15).toDate()));
 
-        transactionHistory = sqlEmployeeTransactionDao.getTransHistory(6221,  allTransCodes);
+        transactionHistory = sqlEmployeeTransactionDao.getTransHistory(6221, EmpTransDaoOption.DEFAULT);
 //        logger.debug("Expected Hours RA:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
-        transactionHistory = sqlEmployeeTransactionDao.getTransHistory(11442,  allTransCodes);
+        transactionHistory = sqlEmployeeTransactionDao.getTransHistory(11442, EmpTransDaoOption.DEFAULT);
 //        logger.debug("Expected Hours TE:" + SqlAccrualHelper.getExpectedHours(transactionHistory, new LocalDate(2014, 1, 1).toDate(), new LocalDate(2014, 7, 15).toDate()));
 
 

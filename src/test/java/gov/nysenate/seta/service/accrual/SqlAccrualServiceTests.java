@@ -19,7 +19,7 @@ public class SqlAccrualServiceTests extends BaseTests
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualServiceTests.class);
 
     @Autowired
-    private SqlAccrualService accService;
+    private EssAccrualComputeService accService;
 
     @Autowired
     private PayPeriodDao payPeriodDao;

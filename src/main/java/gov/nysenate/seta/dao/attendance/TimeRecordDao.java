@@ -1,49 +1,50 @@
 package gov.nysenate.seta.dao.attendance;
 
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface TimeRecordDao extends BaseDao
 {
     /** --- Retrieval methods --- */
 
     /**
-     * @see #getRecordsDuring(int, java.time.LocalDate, java.time.LocalDate, java.util.Set)
-     * Use this overload if you don't want to filter by statuses.
-     */
-    List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate);
-
-    /**
-     * Retrieves a list of time records for a given employee during a time range, ordered by earliest first.
-     * @param empId int - Employee id
-     * @param startDate Date - The start date
-     * @param endDate Date - The end date
-     * @param statuses Set<TimeRecordStatus> - The set of statuses to filter by
-     * @return List<TimeRecord>
-     */
-    List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses);
-
-    /**
-     * @see #getRecordsDuring(java.util.List, java.time.LocalDate, java.time.LocalDate, java.util.Set)
-     * Use this overload if you don't want to filter by statuses.
-     */
-    Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate);
-
-    /**
      * Retrieves a list of time records for the employees in the given list during a time range.
      * @param empIds List<Integer> - List of employee ids
-     * @param startDate Date - The start date
-     * @param endDate Date - The end date
-     * @param statuses Set<TimeRecordStatus> - The set of statuses to filter by
-     * @return Map<Integer, List<TimeRecord>>
+     * @param dateRange Range<LocalDate> - date range for which to  retrieve records
+     *@param statuses Set<TimeRecordStatus> - The set of statuses to filter by  @return ListMultimap<Integer, TimeRecord>
      */
-    Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses);
+    ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange,
+                                                       Set<TimeRecordStatus> statuses);
+
+    /**
+     * @see #getRecordsDuring(Set, Range, Set)
+     * Use this overload if you don't want to filter by statuses.
+     */
+    default ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange) {
+        return getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class));
+    }
+
+    /**
+     * @see #getRecordsDuring(Set, Range, Set)
+     * Use this overload if you just want the records of a single employee
+     */
+    default List<TimeRecord> getRecordsDuring(int empId, Range<LocalDate> dateRange, Set<TimeRecordStatus> statuses) {
+        return getRecordsDuring(Collections.singleton(empId), dateRange, statuses).get(empId);
+    }
+
+    /**
+     * @see #getRecordsDuring(int, Range, Set)
+     * Use this overload if you don't want to filter by statuses and want records from a single employee.
+     */
+    default List<TimeRecord> getRecordsDuring(int empId, Range<LocalDate> dateRange) {
+        return getRecordsDuring(empId, dateRange, EnumSet.allOf(TimeRecordStatus.class));
+    }
 
     /** --- Insert/Update methods --- */
 

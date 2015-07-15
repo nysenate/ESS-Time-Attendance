@@ -1,5 +1,9 @@
 package gov.nysenate.seta.dao.attendance;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteRecordRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
@@ -19,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository("remoteTimeRecordDao")
 public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
@@ -27,35 +32,15 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     /** {@inheritDoc} */
     @Override
-    public List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate) {
-        return getRecordsDuring(empId, startDate, endDate, new HashSet<>(Arrays.asList(TimeRecordStatus.values())));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<TimeRecord> getRecordsDuring(int empId, LocalDate startDate, LocalDate endDate, Set<TimeRecordStatus> statuses) {
-        Map<Integer, List<TimeRecord>> res = getRecordsDuring(Arrays.asList(empId), startDate, endDate, statuses);
-        return res.get(empId);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate) {
-        return getRecordsDuring(empIds, startDate, endDate, new HashSet<>(Arrays.asList(TimeRecordStatus.values())));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Map<Integer, List<TimeRecord>> getRecordsDuring(List<Integer> empIds, LocalDate startDate, LocalDate endDate,
-                                                           Set<TimeRecordStatus> statuses) {
-        Set<String> statusCodes = new HashSet<>();
-        for (TimeRecordStatus status : statuses) {
-            statusCodes.add(status.getCode());
-        }
+    public ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange,
+                                                              Set<TimeRecordStatus> statuses) {
+        Set<String> statusCodes = statuses.stream()
+                .map(TimeRecordStatus::getCode)
+                .collect(Collectors.toSet());
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empIds", empIds);
-        params.addValue("startDate", toDate(startDate));
-        params.addValue("endDate", toDate(endDate));
+        params.addValue("startDate", toDate(DateUtils.startOfDateRange(dateRange)));
+        params.addValue("endDate", toDate(DateUtils.endOfDateRange(dateRange)));
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
         remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES.getSql(), params, handler);
@@ -87,14 +72,9 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             record.getTimeEntries().add(entry);
         }
 
-        public Map<Integer, List<TimeRecord>> getRecordMap() {
-            Map<Integer, List<TimeRecord>> empRecordMap = new HashMap<>();
-            for (TimeRecord record : recordList) {
-                if (!empRecordMap.containsKey(record.getEmployeeId())) {
-                    empRecordMap.put(record.getEmployeeId(), new ArrayList<TimeRecord>());
-                }
-                empRecordMap.get(record.getEmployeeId()).add(record);
-            }
+        public ListMultimap<Integer, TimeRecord> getRecordMap() {
+            ListMultimap<Integer, TimeRecord> empRecordMap = ArrayListMultimap.create();
+            recordList.forEach(record -> empRecordMap.put(record.getEmployeeId(), record));
             return empRecordMap;
         }
     }
@@ -127,11 +107,6 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             }
         }
         return true;
-    }
-
-
-    public int getTimeRecordCount(BigDecimal timesheetId) throws TimeRecordNotFoundException {
-        return 0;
     }
 
     public MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {

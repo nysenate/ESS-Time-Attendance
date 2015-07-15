@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.attendance;
 
+import com.google.common.collect.Range;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class SqlRemoteRecordDaoTests extends BaseTests
     @Test
     public void getRecordByEmployeeId() throws Exception {
         logger.info(
-            OutputUtils.toJson(sqlTimeRecordDao.getRecordsDuring(10976, LocalDate.of(2014, 1, 1),
-                    LocalDate.of(2014, 2, 1))));
+            OutputUtils.toJson(sqlTimeRecordDao.getRecordsDuring(10976, Range.closed(LocalDate.of(2014, 1, 1), LocalDate.of(2014, 2, 1))
+            )));
     }
 }

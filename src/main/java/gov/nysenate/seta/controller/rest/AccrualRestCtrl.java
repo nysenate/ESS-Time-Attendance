@@ -6,7 +6,7 @@ import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.exception.PayPeriodException;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.service.accrual.AccrualService;
+import gov.nysenate.seta.service.accrual.AccrualComputeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class AccrualRestCtrl extends BaseRestCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(AccrualRestCtrl.class);
 
-    @Autowired private AccrualService accrualService;
+    @Autowired private AccrualComputeService accrualService;
     @Autowired private PayPeriodDao payPeriodDao;
 
 //    @RequestMapping("/period/{payPeriodStr}/emp/{empId}")

@@ -1,6 +1,7 @@
 package gov.nysenate.seta.model.transaction;
 
 import gov.nysenate.seta.BaseTests;
+import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.common.OutputUtils;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class TransactionHistoryTests extends BaseTests
 
     @Test
     public void testHasRecords() throws Exception {
-        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10976)));
+        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10976, EmpTransDaoOption.DEFAULT)));
     }
 
     @Test
