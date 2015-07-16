@@ -2,6 +2,7 @@ package gov.nysenate.seta.service.accrual;
 
 import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.accrual.AccrualDao;
+import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
@@ -21,11 +22,11 @@ public class EssAccrualComputeService implements AccrualComputeService
 {
     private static final Logger logger = LoggerFactory.getLogger(EssAccrualComputeService.class);
 
-    @Resource(name = "sqlAccrual")
+    @Autowired
     private AccrualDao accrualDao;
 
     @Autowired
-    private SqlEmpTransactionDao transDao;
+    private EmpTransactionDao transDao;
 
     /** --- Implemented Methods --- */
 

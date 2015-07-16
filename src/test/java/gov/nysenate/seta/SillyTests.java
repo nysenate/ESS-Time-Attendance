@@ -1,6 +1,7 @@
 package gov.nysenate.seta;
 
 import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
 import com.google.common.collect.Sets;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import org.junit.Test;

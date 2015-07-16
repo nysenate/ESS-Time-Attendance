@@ -2,8 +2,8 @@ package gov.nysenate.seta.model.transaction;
 
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
-import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.common.OutputUtils;
+import gov.nysenate.seta.dao.transaction.OldEmpTransactionDao;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +14,11 @@ public class TransactionHistoryTests extends BaseTests
     private static final Logger logger = LoggerFactory.getLogger(TransactionHistoryTests.class);
 
     @Autowired
-    private EmpTransactionDao transactionDao;
+    private OldEmpTransactionDao transactionDao;
 
     @Test
     public void testHasRecords() throws Exception {
-        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10976, EmpTransDaoOption.DEFAULT)));
+        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10976)));
     }
 
     @Test

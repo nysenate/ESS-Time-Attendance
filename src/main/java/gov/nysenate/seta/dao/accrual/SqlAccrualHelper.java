@@ -177,7 +177,8 @@ public class SqlAccrualHelper
     }
 
     /**
-     * Returns the expected employee hours given a period of time
+     * Returns the expected employee hours given a period of time.
+     * FIX ME PLOX
      */
     public static int getExpectedHours(TransactionHistory transHistory, Date dtstart, Date dtend) {
         int expectedHours = 0;

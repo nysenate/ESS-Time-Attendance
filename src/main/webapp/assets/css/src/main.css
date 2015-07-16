@@ -1530,17 +1530,23 @@ table.simple-table tbody tr td {
 .ess-top-header {
   position: fixed;
   width: 100%;
-  background: #3d3d3d;
-  border-bottom: 1px solid #222;
-  height: 40px;
+  background: #fafafa;
+  box-shadow: 0 1px 1px #ccc;
+  height: 45px;
   z-index: 100;
   color: white;
   overflow: hidden;
 }
-.ess-top-header .left-header-area {
+.ess-top-header .fixed-width-header {
+  width: 1150px;
+  margin: auto;
+  position: relative;
+  top: 2px;
+}
+.ess-top-header .fixed-width-header .left-header-area {
   display: inline-block;
 }
-.ess-top-header .left-header-area .nysslogo {
+.ess-top-header .fixed-width-header .left-header-area .nysslogo {
   background: url('/timesheets/assets/img/nysslogo.png');
   height: 35px;
   width: 35px;
@@ -1550,80 +1556,92 @@ table.simple-table tbody tr td {
   margin-top: 2px;
   margin-left: 10px;
 }
-.ess-top-header .left-header-area #logoTextSection {
+.ess-top-header .fixed-width-header .left-header-area #logoTextSection {
   padding: 0;
-  margin-top: 0px;
+  margin-top: 0;
   display: inline-block;
 }
-.ess-top-header .left-header-area #logoTextSection #logoText {
+.ess-top-header .fixed-width-header .left-header-area #logoTextSection #logoText {
   font-weight: 300;
+  color: #333;
   font-size: 1.6em;
   line-height: 40px;
   margin-left: 10px;
 }
-.ess-top-header .left-header-area #logoTextSection #logoText #subLogoText {
+.ess-top-header .fixed-width-header .left-header-area #logoTextSection #logoText #subLogoText {
   font-weight: 400;
 }
-.ess-top-header .right-header-area {
+.ess-top-header .fixed-width-header .left-header-area #topNavList {
+  padding: 0;
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0 0 20px;
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li {
+  display: inline;
+  line-height: 40px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li.active {
+  font-weight: 600;
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li.teal.active {
+  background: rgba(65, 150, 167, 0.4);
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li.teal:hover {
+  background: rgba(65, 150, 167, 0.2);
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li.orange.active {
+  background: rgba(209, 149, 37, 0.4);
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li.orange:hover {
+  background: rgba(209, 149, 37, 0.2);
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li .nav-icon {
+  margin-right: 5px;
+  vertical-align: middle;
+  height: 16px;
+  position: relative;
+  top: -1px;
+  display: none;
+  /** Hidden for now.. */
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li a {
+  color: #425151;
+  font-size: 1.1em;
+}
+.ess-top-header .fixed-width-header .left-header-area #topNavList li a:hover {
+  color: teal;
+}
+.ess-top-header .fixed-width-header .right-header-area {
   display: inline-block;
   vertical-align: top;
   position: absolute;
   right: 0;
 }
-.ess-top-header .right-header-area #profileSection {
-  float: left;
-  padding: 0;
-  line-height: 40px;
-}
-.ess-top-header .right-header-area #profileSection:hover {
-  background: #3f3f3f;
-}
-.ess-top-header .right-header-area #profileSection #headerProfileSquare {
-  margin-right: 0px;
-  margin-top: 3px;
-  width: 40px;
-  height: 40px;
-  -webkit-transform: rotateY(0deg);
-  -moz-transform: rotateY(0deg);
-  -o-transform: rotateY(0deg);
-  -ms-transform: rotateY(0deg);
-  transform: rotateY(0deg);
-  float: left;
-}
-.ess-top-header .right-header-area #profileSection #headerProfileSquare #headerProfileImg {
-  background: url("https://avatars0.githubusercontent.com/u/2687188?s=140");
-  height: 35px;
-  width: 35px;
-  background-size: 35px;
-  background-repeat: no-repeat;
-}
-.ess-top-header .right-header-area #profileSection #headerProfileName {
-  font-size: 1em;
-  margin-left: 10px;
-}
-.ess-top-header .right-header-area #logoutSection {
+.ess-top-header .fixed-width-header .right-header-area #logoutSection {
   float: left;
   font-size: 1.1em;
   width: 120px;
-  border-left: 1px solid #222;
 }
-.ess-top-header .right-header-area #logoutSection:hover {
-  background: #4c4c4c;
+.ess-top-header .fixed-width-header .right-header-area #logoutSection:hover {
+  background: #ddd;
 }
-.ess-top-header .right-header-area #logoutSection:hover a .logout-icon {
+.ess-top-header .fixed-width-header .right-header-area #logoutSection:hover a .logout-icon {
   -webkit-transform: rotateY(-40deg);
   -moz-transform: rotateY(-40deg);
   -o-transform: rotateY(-40deg);
   -ms-transform: rotateY(-40deg);
   transform: rotateY(-40deg);
 }
-.ess-top-header .right-header-area #logoutSection a {
+.ess-top-header .fixed-width-header .right-header-area #logoutSection a {
   padding: 11px;
   display: block;
   text-decoration: none !important;
-  color: white;
+  color: #333;
 }
-.ess-top-header .right-header-area #logoutSection a .logout-icon {
+.ess-top-header .fixed-width-header .right-header-area #logoutSection a .logout-icon {
   -webkit-transform-origin: 0 0;
   -moz-transform-origin: 0 0;
   -o-transform-origin: 0 0;
@@ -1640,48 +1658,6 @@ table.simple-table tbody tr td {
   width: 20px;
   background-size: 20px;
   background-repeat: no-repeat;
-}
-#topNavList {
-  padding: 0;
-  margin: 0;
-  display: inline-block;
-  vertical-align: top;
-  margin-left: 20px;
-}
-#topNavList li {
-  display: inline;
-  line-height: 40px;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-#topNavList li.active {
-  font-weight: 600;
-}
-#topNavList li.teal.active {
-  background: rgba(65, 150, 167, 0.4);
-}
-#topNavList li.teal:hover {
-  background: rgba(65, 150, 167, 0.2);
-}
-#topNavList li.orange.active {
-  background: rgba(209, 149, 37, 0.4);
-}
-#topNavList li.orange:hover {
-  background: rgba(209, 149, 37, 0.2);
-}
-#topNavList li .nav-icon {
-  margin-right: 5px;
-  vertical-align: middle;
-  height: 16px;
-  position: relative;
-  top: -1px;
-}
-#topNavList li a {
-  color: white;
-  font-size: 1.1em;
-}
-#topNavList li a:hover {
-  color: white;
 }
 /** Profile Square */
 /** --- Left Navigation ---  */

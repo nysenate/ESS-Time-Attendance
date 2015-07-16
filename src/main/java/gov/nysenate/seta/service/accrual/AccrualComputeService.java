@@ -13,7 +13,7 @@ import java.util.TreeMap;
 public interface AccrualComputeService
 {
     /**
-     * Computes the accruals for an employee at the start of the given pay period.
+     * Computes the accruals available for an employee at the start of the given pay period.
      *
      * @param empId int - Employee id to get accruals for.
      * @param payPeriod PayPeriod - Accruals will be valid at the start of this pay period.

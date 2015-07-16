@@ -4,6 +4,8 @@ import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbSchema;
 import gov.nysenate.seta.dao.base.DbVendor;
 
+import static gov.nysenate.seta.dao.base.DbSchema.MASTER_SFMS;
+
 public enum SqlAccrualQuery implements BasicSqlQuery
 {
     GET_ANNUAL_ACC_SUMMARIES(
@@ -15,7 +17,7 @@ public enum SqlAccrualQuery implements BasicSqlQuery
         "    NUEMPHRSTOT AS EMP_HRS_USED, NUFAMHRSTOT AS FAM_HRS_USED, NUEMPHRSYTD AS EMP_HRS_ACCRUED, \n" +
         "    NUEMPHRSBSD AS EMP_HRS_BANKED, NUHOLHRSTOT AS HOL_HRS_USED, NUMISCHRSTOT AS MISC_HRS_USED, \n" +
         "    NUPAYCTRYTD AS PAY_PERIODS_YTD, NUPAYCTRBSD AS PAY_PERIODS_BANKED\n" +
-        "FROM " + DbSchema.MASTER_SFMS + ".PM23ATTEND WHERE NUXREFEM = :empId AND DTPERIODYEAR <= :endYear"
+        "FROM " + MASTER_SFMS + ".PM23ATTEND WHERE NUXREFEM = :empId AND DTPERIODYEAR <= :endYear"
     ),
     GET_PERIOD_ACC_SUMMARIES(
         "SELECT \n" +
@@ -27,8 +29,8 @@ public enum SqlAccrualQuery implements BasicSqlQuery
         "    NUVACHRSBSD AS VAC_HRS_BANKED, NUEMPHRSBSD AS EMP_HRS_BANKED, NUBIWHRSEXP AS EXPECTED_BIWEEK_HRS, " +
         "    NUBIWSICRATE AS SICK_RATE, NUBIWVACRATE AS VAC_RATE,\n" +
         "    per.CDPERIOD, per.CDSTATUS, per.DTBEGIN, per.DTEND, per.DTPERIODYEAR, per.NUPERIOD\n" +
-        "FROM " + DbSchema.MASTER_SFMS + ".PD23ACCUSAGE acc\n" +
-        "JOIN (SELECT * FROM " + DbSchema.MASTER_SFMS + ".SL16PERIOD WHERE CDPERIOD = 'AF') per ON acc.DTEND = per.DTEND\n" +
+        "FROM " + MASTER_SFMS + ".PD23ACCUSAGE acc\n" +
+        "JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16PERIOD WHERE CDPERIOD = 'AF') per ON acc.DTEND = per.DTEND\n" +
         "WHERE acc.NUXREFEM = :empId AND acc.DTPERIODYEAR >= :prevYear AND acc.DTEND < :beforeDate\n"
     ),
     GET_PERIOD_ACCRUAL_USAGE(
@@ -37,8 +39,8 @@ public enum SqlAccrualQuery implements BasicSqlQuery
         "    NUEMPHRS AS EMP_HRS_USED, NUFAMHRS AS FAM_HRS_USED, NUVACHRS AS VAC_HRS_USED,\n" +
         "    NUMISCHRS AS MISC_HRS_USED, att.DTPERIODYEAR AS YEAR,\n" +
         "    per.CDPERIOD, per.CDSTATUS, per.DTBEGIN, per.DTEND, per.DTPERIODYEAR, per.NUPERIOD\n" +
-        "FROM " + DbSchema.MASTER_SFMS + ".PD23ATTEND att\n" +
-        "JOIN (SELECT * FROM " + DbSchema.MASTER_SFMS + ".SL16PERIOD WHERE CDPERIOD = 'AF') per ON att.DTEND = per.DTEND\n" +
+        "FROM " + MASTER_SFMS + ".PD23ATTEND att\n" +
+        "JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16PERIOD WHERE CDPERIOD = 'AF') per ON att.DTEND = per.DTEND\n" +
         "WHERE att.NUXREFEM = :empId AND per.DTBEGIN >= :startDate AND per.DTEND <= :endDate\n"
     );
 
