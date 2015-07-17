@@ -1,5 +1,6 @@
 package gov.nysenate.seta.client.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
@@ -7,15 +8,16 @@ import gov.nysenate.seta.model.payroll.PayType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.lang.String;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@XmlRootElement(name = "timeEntry")
+@XmlRootElement
 public class TimeEntryView implements ViewObject {
 
-    protected BigInteger entryId;
-    protected BigInteger timeRecordId;
+    protected String entryId;
+    protected String timeRecordId;
     protected int empId;
     protected String employeeName;
     protected LocalDate date;
@@ -27,19 +29,21 @@ public class TimeEntryView implements ViewObject {
     protected int sickEmpHours;
     protected int sickFamHours;
     protected int miscHours;
-    protected MiscLeaveType miscType;
+    protected String miscType;
     protected boolean active;
     protected String empComment;
-    protected PayType payType;
+    protected String payType;
     protected String txOriginalUserId;
     protected String txUpdateUserId;
     protected LocalDateTime txOriginalDate;
     protected LocalDateTime txUpdateDate;
 
+    public TimeEntryView() {}
+
     public TimeEntryView(TimeEntry entry) {
         if (entry != null) {
-            this.entryId = entry.getEntryId();
-            this.timeRecordId = entry.getTimeRecordId();
+            this.entryId = entry.getEntryId() != null ? entry.getEntryId().toString() : null;
+            this.timeRecordId = entry.getEntryId() != null ? entry.getTimeRecordId().toString() : null;
             this.empId = entry.getEmpId();
             this.employeeName = entry.getEmployeeName();
             this.date = entry.getDate();
@@ -51,10 +55,10 @@ public class TimeEntryView implements ViewObject {
             this.sickEmpHours = entry.getSickEmpHours();
             this.sickFamHours = entry.getSickFamHours();
             this.miscHours = entry.getMiscHours();
-            this.miscType = entry.getMiscType();
+            this.miscType = entry.getMiscType() != null ? entry.getMiscType().name() : null;
             this.active = entry.isActive();
             this.empComment = entry.getEmpComment();
-            this.payType = entry.getPayType();
+            this.payType = entry.getPayType() != null ? entry.getPayType().name() : null;
             this.txOriginalUserId = entry.getTxOriginalUserId();
             this.txUpdateUserId = entry.getTxUpdateUserId();
             this.txOriginalDate = entry.getTxOriginalDate();
@@ -62,13 +66,38 @@ public class TimeEntryView implements ViewObject {
         }
     }
 
+    @JsonIgnore
+    public TimeEntry toTimeEntry() {
+        TimeEntry entry = new TimeEntry(new BigInteger(timeRecordId), empId);
+        entry.setEntryId(new BigInteger(entryId));
+        entry.setEmployeeName(employeeName);
+        entry.setDate(date);
+        entry.setWorkHours(workHours);
+        entry.setTravelHours(travelHours);
+        entry.setHolidayHours(holidayHours);
+        entry.setVacationHours(vacationHours);
+        entry.setPersonalHours(personalHours);
+        entry.setSickEmpHours(sickEmpHours);
+        entry.setSickFamHours(sickFamHours);
+        entry.setMiscHours(miscHours);
+        entry.setMiscType(miscType != null ? MiscLeaveType.valueOf(miscType) : null);
+        entry.setActive(active);
+        entry.setEmpComment(empComment);
+        entry.setPayType(payType != null ? PayType.valueOf(payType) : null);
+        entry.setTxOriginalUserId(txOriginalUserId);
+        entry.setTxUpdateUserId(txUpdateUserId);
+        entry.setTxOriginalDate(txOriginalDate);
+        entry.setTxUpdateDate(txUpdateDate);
+        return entry;
+    }
+
     @XmlElement
-    public BigInteger getEntryId() {
+    public String getEntryId() {
         return entryId;
     }
 
     @XmlElement
-    public BigInteger getTimeRecordId() {
+    public String getTimeRecordId() {
         return timeRecordId;
     }
 
@@ -128,7 +157,7 @@ public class TimeEntryView implements ViewObject {
     }
 
     @XmlElement
-    public MiscLeaveType getMiscType() {
+    public String getMiscType() {
         return miscType;
     }
 
@@ -143,7 +172,7 @@ public class TimeEntryView implements ViewObject {
     }
 
     @XmlElement
-    public PayType getPayType() {
+    public String getPayType() {
         return payType;
     }
 

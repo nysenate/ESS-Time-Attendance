@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
-@Repository("remoteTimeEntry")
+@Repository("remoteTimeEntryDao")
 public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlTimeEntryDao.class);

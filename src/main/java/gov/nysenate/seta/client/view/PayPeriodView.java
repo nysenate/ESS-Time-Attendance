@@ -1,7 +1,9 @@
 package gov.nysenate.seta.client.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.period.PayPeriodType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -17,6 +19,9 @@ public class PayPeriodView implements ViewObject
     protected int numDays;
     protected boolean startYearSplit;
     protected boolean endYearSplit;
+    protected boolean active;
+
+    public PayPeriodView() {}
 
     public PayPeriodView(PayPeriod payPeriod) {
         if (payPeriod != null) {
@@ -27,7 +32,17 @@ public class PayPeriodView implements ViewObject
             this.numDays = payPeriod.getNumDaysInPeriod();
             this.startYearSplit = payPeriod.isStartOfYearSplit();
             this.endYearSplit = payPeriod.isEndOfYearSplit();
+            this.active = payPeriod.isActive();
         }
+    }
+
+    @JsonIgnore
+    public PayPeriod toPayPeriod() {
+        return new PayPeriod(
+                PayPeriodType.valueOf(type),
+                startDate, endDate,
+                payPeriodNum, active
+        );
     }
 
     @Override
