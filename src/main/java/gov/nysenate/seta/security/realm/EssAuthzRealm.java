@@ -4,7 +4,10 @@ import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.service.auth.LdapAuthService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
-import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +20,9 @@ import org.springframework.stereotype.Component;
  * we're using Spring LDAP to handle low level LDAP operations it wasn't necessary to extend that class.
  */
 @Component
-public class EssLdapRealm extends AuthenticatingRealm
+public class EssAuthzRealm extends AuthorizingRealm
 {
-    private static final Logger logger = LoggerFactory.getLogger(EssLdapRealm.class);
+    private static final Logger logger = LoggerFactory.getLogger(EssAuthzRealm.class);
 
     @Autowired
     private LdapAuthService essLdapAuthService;
@@ -65,5 +68,17 @@ public class EssLdapRealm extends AuthenticatingRealm
             default:
                 throw new AuthenticationException("An unknown exception occurred while authenticating against LDAP.");
         }
+    }
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        String user = getUsername(principals);
+        SimpleAuthorizationInfo authInfo = new SimpleAuthorizationInfo();
+//        authInfo.addStringPermission("api:employees:view:" + users.get(user));
+        return authInfo;
+    }
+
+    protected String getUsername(PrincipalCollection principals) {
+        return getAvailablePrincipal(principals).toString();
     }
 }
