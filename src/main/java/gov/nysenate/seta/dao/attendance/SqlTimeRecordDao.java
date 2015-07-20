@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,6 +30,9 @@ import java.util.stream.Collectors;
 public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
+
+    @Resource(name = "remoteTimeEntryDao")
+    private TimeEntryDao timeEntryDao;
 
     /** {@inheritDoc} */
     @Override
@@ -106,6 +110,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
                 return false;
             }
         }
+        // Insert each entry from the time record
+        record.getTimeEntries().forEach(timeEntryDao::updateTimeEntry);
         return true;
     }
 
@@ -120,8 +126,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("tUpdateDate", toDate(timeRecord.getTxUpdateDate()));
         params.addValue("status", timeRecord.isActive() ? "A" : "I");
         params.addValue("tSStatusId", timeRecord.getRecordStatus().getCode());
-        params.addValue("beginDate", toDate(timeRecord.getPayPeriod().getStartDate()));
-        params.addValue("endDate", toDate(timeRecord.getPayPeriod().getEndDate()));
+        params.addValue("beginDate", toDate(timeRecord.getBeginDate()));
+        params.addValue("endDate", toDate(timeRecord.getEndDate()));
         params.addValue("remarks", timeRecord.getRemarks());
         params.addValue("supervisorId", timeRecord.getSupervisorId());
         params.addValue("excDetails", timeRecord.getExceptionDetails());

@@ -36,9 +36,6 @@ public class RemoteTimeRecordValidationService implements TimeRecordValidationSe
     }
 
     private void validateAccruals(TimeRecord timeRecord) throws InvalidTimeRecordException {
-        PeriodAccSummary pacSum = accrualDao.getPeriodAccrualSummaries(timeRecord.getEmployeeId(),
-                                                timeRecord.getPayPeriod().getEndDate().getYear(),
-                                                timeRecord.getPayPeriod().getEndDate()).get(timeRecord.getPayPeriod());
     }
 
     private void validateAllowances(TimeRecord timeRecord) throws InvalidTimeRecordException {

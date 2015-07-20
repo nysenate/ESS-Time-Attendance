@@ -19,7 +19,8 @@ public class TimeRecord
     protected Integer supervisorId;
     protected String employeeName;
     protected boolean active;
-    protected PayPeriod payPeriod;
+    protected LocalDate beginDate;
+    protected LocalDate endDate;
     protected String remarks;
     protected String exceptionDetails;
     protected LocalDate processedDate;
@@ -79,12 +80,20 @@ public class TimeRecord
         this.active = active;
     }
 
-    public PayPeriod getPayPeriod() {
-        return payPeriod;
+    public LocalDate getBeginDate() {
+        return beginDate;
     }
 
-    public void setPayPeriod(PayPeriod payPeriod) {
-        this.payPeriod = payPeriod;
+    public void setBeginDate(LocalDate beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public String getRemarks() {

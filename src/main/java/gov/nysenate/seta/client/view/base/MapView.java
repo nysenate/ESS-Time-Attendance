@@ -2,11 +2,15 @@ package gov.nysenate.seta.client.view.base;
 
 import com.google.common.collect.ImmutableMap;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Map;
 
+@XmlRootElement
 public class MapView<KeyType, ViewType> implements ViewObject
 {
-    protected ImmutableMap<KeyType, ViewType> items;
+    @XmlElement
+    public final ImmutableMap<KeyType, ViewType> items;
 
     public static <KeyType, ViewType extends ViewObject> MapView<KeyType, ViewType> of(Map<KeyType, ViewType> items) {
         return new MapView<>(items);
@@ -19,18 +23,10 @@ public class MapView<KeyType, ViewType> implements ViewObject
     }
 
     private MapView(Map<KeyType, ViewType> map) {
-        if (map != null) {
-            items = ImmutableMap.copyOf(map);
-        }
-        else {
-            items = ImmutableMap.of();
-        }
+        this.items = map != null ? ImmutableMap.copyOf(map) : ImmutableMap.of();
     }
 
-    public Map<KeyType, ViewType> getItems() {
-        return items;
-    }
-
+    @XmlElement
     public int getSize() {
         return items.size();
     }

@@ -1,9 +1,12 @@
 package gov.nysenate.seta.dao.attendance.mapper;
 
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.period.PayPeriodType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,8 @@ public class RemoteRecordRowMapper extends BaseRowMapper<TimeRecord>
     @Override
     public TimeRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         TimeRecord record = new TimeRecord();
+        record.setBeginDate(DateUtils.getLocalDate(rs.getDate("DTBEGIN")));
+        record.setEndDate(DateUtils.getLocalDate(rs.getDate("DTEND")));
         record.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET").toBigInteger());
         record.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
         record.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));

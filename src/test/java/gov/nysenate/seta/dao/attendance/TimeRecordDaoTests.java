@@ -40,7 +40,8 @@ public class TimeRecordDaoTests extends BaseTests
         testRecord.setSupervisorId(9896);
         testRecord.setExceptionDetails(null);
         testRecord.setProcessedDate(LocalDate.of(1990, 8, 15));
-        testRecord.setPayPeriod(new PayPeriod(PayPeriodType.AF, LocalDate.of(1990, 8, 2), LocalDate.of(1990, 8, 15), 10, true));
+        testRecord.setBeginDate(LocalDate.of(1990, 8, 2));
+        testRecord.setEndDate(LocalDate.of(1990, 8, 15));
     }
 
     @PostConstruct

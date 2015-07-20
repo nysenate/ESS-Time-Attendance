@@ -1,5 +1,6 @@
 package gov.nysenate.seta.client.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
@@ -12,37 +13,41 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@XmlRootElement
+@XmlRootElement(name = "timeRecord")
 public class TimeRecordView implements ViewObject {
 
-    protected BigInteger timeRecordId;
+    protected String timeRecordId;
     protected Integer employeeId;
     protected Integer supervisorId;
     protected String employeeName;
     protected boolean active;
-    protected PayPeriodView payPeriod;
+    protected LocalDate beginDate;
+    protected LocalDate endDate;
     protected String remarks;
     protected String exceptionDetails;
     protected LocalDate processedDate;
-    protected TimeRecordStatus recordStatus;
+    protected String recordStatus;
     protected String txOriginalUserId;
     protected String txUpdateUserId;
     protected LocalDateTime txOriginalDate;
     protected LocalDateTime txUpdateDate;
     protected List<TimeEntryView> timeEntries;
 
+    public TimeRecordView() {}
+
     public TimeRecordView(TimeRecord record) {
         if (record != null) {
-            this.timeRecordId = record.getTimeRecordId();
+            this.timeRecordId = String.valueOf(record.getTimeRecordId());
             this.employeeId = record.getEmployeeId();
             this.supervisorId = record.getSupervisorId();
             this.employeeName = record.getEmployeeName();
             this.active = record.isActive();
-            this.payPeriod = new PayPeriodView(record.getPayPeriod());
+            this.beginDate = record.getBeginDate();
+            this.endDate = record.getEndDate();
             this.remarks = record.getRemarks();
             this.exceptionDetails = record.getExceptionDetails();
             this.processedDate = record.getProcessedDate();
-            this.recordStatus = record.getRecordStatus();
+            this.recordStatus = record.getRecordStatus() != null ? record.getRecordStatus().name() : null;
             this.txOriginalUserId = record.getTxOriginalUserId();
             this.txUpdateUserId = record.getTxUpdateUserId();
             this.txOriginalDate = record.getTxOriginalDate();
@@ -53,8 +58,32 @@ public class TimeRecordView implements ViewObject {
         }
     }
 
+    @JsonIgnore
+    public TimeRecord toTimeRecord() {
+        TimeRecord record = new TimeRecord();
+        record.setTimeRecordId(new BigInteger(timeRecordId));
+        record.setEmployeeId(employeeId);
+        record.setSupervisorId(supervisorId);
+        record.setEmployeeName(employeeName);
+        record.setActive(active);
+        record.setBeginDate(beginDate);
+        record.setEndDate(endDate);
+        record.setRemarks(remarks);
+        record.setExceptionDetails(exceptionDetails);
+        record.setProcessedDate(processedDate);
+        record.setRecordStatus(recordStatus != null ? TimeRecordStatus.valueOf(recordStatus) : null);
+        record.setTxOriginalUserId(txOriginalUserId);
+        record.setTxUpdateUserId(txUpdateUserId);
+        record.setTxOriginalDate(txOriginalDate);
+        record.setTxUpdateDate(txUpdateDate);
+        record.setTimeEntries(timeEntries.stream()
+                .map(TimeEntryView::toTimeEntry)
+                .collect(Collectors.toList()));
+        return record;
+    }
+
     @XmlElement
-    public BigInteger getTimeRecordId() {
+    public String getTimeRecordId() {
         return timeRecordId;
     }
 
@@ -79,8 +108,13 @@ public class TimeRecordView implements ViewObject {
     }
 
     @XmlElement
-    public PayPeriodView getPayPeriod() {
-        return payPeriod;
+    public LocalDate getBeginDate() {
+        return beginDate;
+    }
+
+    @XmlElement
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     @XmlElement
@@ -99,7 +133,7 @@ public class TimeRecordView implements ViewObject {
     }
 
     @XmlElement
-    public TimeRecordStatus getRecordStatus() {
+    public String getRecordStatus() {
         return recordStatus;
     }
 
