@@ -45,7 +45,7 @@ public class SqlAccrualDaoTests extends BaseTests
 
     @Test
     public void testGetAccrualSummaries() throws Exception {
-//        logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccrualSummaries(10976, 2015, LocalDate.now())));
+//        logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccruals(10976, 2015, LocalDate.now())));
         logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccrualUsages(10976, Range.closedOpen(LocalDate.of(2015, 1, 1), LocalDate.now()))));
 
     }

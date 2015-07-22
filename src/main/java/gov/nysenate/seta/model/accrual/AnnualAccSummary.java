@@ -7,12 +7,12 @@ import java.time.LocalDate;
  */
 public class AnnualAccSummary extends AccrualSummary
 {
-    int year;
-    LocalDate endDate;
-    LocalDate closeDate;
-    LocalDate contServiceDate;
-    int payPeriodsYtd;
-    int payPeriodsBanked;
+    protected int year;
+    protected LocalDate endDate;
+    protected LocalDate closeDate;
+    protected LocalDate contServiceDate;
+    protected int payPeriodsYtd;
+    protected int payPeriodsBanked;
 
     /** --- Constructors --- */
 

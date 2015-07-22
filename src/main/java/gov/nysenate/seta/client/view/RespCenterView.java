@@ -19,6 +19,8 @@ public class RespCenterView implements ViewObject
     protected String agencyName;
     protected RespCenterHeadView respCenterHead;
 
+    public RespCenterView() {}
+
     public RespCenterView(ResponsibilityCenter respCtr) {
         if (respCtr != null) {
             this.active = respCtr.isActive();

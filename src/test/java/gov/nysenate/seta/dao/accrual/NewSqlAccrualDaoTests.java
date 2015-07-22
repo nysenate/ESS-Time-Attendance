@@ -22,13 +22,13 @@ public class NewSqlAccrualDaoTests extends BaseTests
     @Test
     public void testGetPeriodAccrualSummaries() throws Exception {
         logger.info("{}", OutputUtils.toJson(
-                accDao.getPeriodAccrualSummaries(10976, 2015, LocalDate.of(2015, 12, 1))));
+                accDao.getPeriodAccruals(10976, 2015, LocalDate.of(2015, 12, 1))));
     }
 
     @Test
     public void testGetAnnualAccrualSummaries() throws Exception {
         logger.info("{}", OutputUtils.toJson(
-            accDao.getAnnualAccrualSummaries(10976, 2015)
+            accDao.getAnnualAccruals(10976, 2015)
         ));
     }
 

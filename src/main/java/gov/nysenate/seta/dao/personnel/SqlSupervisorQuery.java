@@ -33,7 +33,7 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "        WHEN ovr.NUXREFEMSUB IS NOT NULL THEN 'EMP_OVR' " +
         "    END,\n" +
         "    per.NUXREFEM, ovr.NUXREFSVSUB\n" +
-        "    FROM " + TIMESHEET_SFMS + ".PM23SUPOVRRD ovr\n" +
+        "    FROM " + MASTER_SFMS + ".PM23SUPOVRRD ovr\n" +
         "    LEFT JOIN " + MASTER_SFMS + ".PM21PERAUDIT per ON \n" +
         "      CASE WHEN ovr.NUXREFSVSUB IS NOT NULL AND per.NUXREFSV = ovr.NUXREFSVSUB THEN 1\n" +
         "           WHEN ovr.NUXREFEMSUB IS NOT NULL AND per.NUXREFEM = ovr.NUXREFEMSUB THEN 1\n" +

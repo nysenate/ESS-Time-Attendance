@@ -14,6 +14,8 @@ public class DetailedEmployeeView extends EmployeeView
     protected RespCenterView respCtr;
     protected AddressView workAddress;
 
+    public DetailedEmployeeView() {}
+
     public DetailedEmployeeView(Employee employee) {
         super(employee);
         this.supervisorId = employee.getSupervisorId();

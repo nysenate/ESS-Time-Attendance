@@ -29,7 +29,6 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     private static final Logger logger = LoggerFactory.getLogger(SqlEmployeeDao.class);
 
     /** {@inheritDoc} */
-    @Cacheable(value = "employees")
     @Override
     public Employee getEmployeeById(int empId) throws EmployeeException {
         Employee employee;

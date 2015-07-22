@@ -4,6 +4,8 @@ import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbSchema;
 import gov.nysenate.seta.dao.base.DbVendor;
 
+import static gov.nysenate.seta.dao.base.DbSchema.TIMESHEET_SFMS;
+
 public enum SqlTimeRecordQuery implements BasicSqlQuery
 {
     GET_TIME_REC_SQL_TEMPLATE(
@@ -19,8 +21,8 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "    ent.NUSICKFAM AS ENT_NUSICKFAM, ent.NUMISC AS ENT_NUMISC, ent.NUXRMISC AS ENT_NUXRMISC, ent.NATXNORGUSER AS ENT_NATXNORGUSER," +
         "    ent.NATXNUPDUSER AS ENT_NATXNUPDUSER, ent.DTTXNORIGIN AS ENT_DTTXNORIGIN, ent.DTTXNUPDATE AS ENT_DTTXNUPDATE, " +
         "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE " + "\n" +
-        "FROM " + DbSchema.TIMESHEET_SFMS + ".PM23TIMESHEET rec " +
-        "LEFT JOIN " + DbSchema.TIMESHEET_SFMS + ".PD23TIMESHEET ent ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET \n" +
+        "FROM " + TIMESHEET_SFMS + ".PM23TIMESHEET rec " +
+        "LEFT JOIN " + TIMESHEET_SFMS + ".PD23TIMESHEET ent ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET \n" +
         "WHERE rec.CDSTATUS = 'A' AND ent.CDSTATUS = 'A' %s" + "\n" +
         "ORDER BY rec.NUXREFEM ASC, rec.DTBEGIN ASC, ent.DTDAY ASC"
     ),
@@ -43,14 +45,14 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     ),
     INSERT_TIME_REC(
         "INSERT \n" +
-        "INTO " + DbSchema.TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
+        "INTO " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
         "(NUXRTIMESHEET, NUXREFEM, NATXNORGUSER, NATXNUPDUSER, NAUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS," +
         " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS) \n" +
         "VALUES (:timesheetId,  :empId, :tOriginalUserId, :tUpdateUserId, :employeeName, :tOriginalDate, :tUpdateDate, :status, " +
                 ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n"
     ),
     UPDATE_TIME_REC_SQL (
-        "UPDATE " + DbSchema.TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
+        "UPDATE " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
         "SET \n" +
         "  NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, " +
         "  DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId, " +
