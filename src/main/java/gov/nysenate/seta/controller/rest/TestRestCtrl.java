@@ -68,7 +68,7 @@ public class TestRestCtrl extends BaseRestCtrl
         LocalDate payPeriodStart = parseISODate(payPeriodStr, "pay period");
         try {
             PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, payPeriodStart);
-            return accrualDao.getPeriodAccrualSummaries(empId, 2015, payPeriod.getEndDate());
+            return accrualDao.getPeriodAccruals(empId, 2015, payPeriod.getEndDate());
         }
         catch (PayPeriodException e) {
             logger.error("Failed to find pay period starting on {}", payPeriodStart);
@@ -83,7 +83,7 @@ public class TestRestCtrl extends BaseRestCtrl
 
     @RequestMapping(BaseRestCtrl.REST_PATH + "/accruals/annual/{endYear}/emp/{empId}")
     public Object getAccrualAnnual(@PathVariable Integer endYear, @PathVariable Integer empId) {
-        return accrualDao.getAnnualAccrualSummaries(empId, endYear);
+        return accrualDao.getAnnualAccruals(empId, endYear);
     }
 
 

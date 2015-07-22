@@ -25,7 +25,7 @@ public interface AccrualDao extends BaseDao
      * @param beforeDate LocalDate - The retrieved period summaries will be effective prior to this date.
      * @return TreeMap<LocalDate, PeriodAccSummary>
      */
-    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccrualSummaries(int empId, int year, LocalDate beforeDate);
+    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, int year, LocalDate beforeDate);
 
     /**
      * Retrieve the running annual accrual summaries for the given employee for all years before or on the 'endYear'.
@@ -34,7 +34,7 @@ public interface AccrualDao extends BaseDao
      * @param endYear int - The year to retrieve annual summaries until.
      * @return TreeMap<Integer, AnnualAccSummary>
      */
-    public TreeMap<Integer, AnnualAccSummary> getAnnualAccrualSummaries(int empId, int endYear);
+    public TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int empId, int endYear);
 
     /**
      * Retrieve the period accrual usage objects that represent the hours charged during a given pay period.

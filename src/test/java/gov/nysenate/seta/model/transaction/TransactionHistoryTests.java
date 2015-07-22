@@ -1,13 +1,17 @@
 package gov.nysenate.seta.model.transaction;
 
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.OldEmpTransactionDao;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static gov.nysenate.seta.dao.transaction.EmpTransDaoOption.DEFAULT;
 
 public class TransactionHistoryTests extends BaseTests
 {
@@ -18,7 +22,7 @@ public class TransactionHistoryTests extends BaseTests
 
     @Test
     public void testHasRecords() throws Exception {
-        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(11423, EmpTransDaoOption.DEFAULT)));
+        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10645, DEFAULT).getAllTransRecords(SortOrder.ASC)));
     }
 
     @Test

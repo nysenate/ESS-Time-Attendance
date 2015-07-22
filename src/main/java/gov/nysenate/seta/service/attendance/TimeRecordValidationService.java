@@ -5,8 +5,8 @@ import gov.nysenate.seta.model.attendance.TimeRecord;
 /**
  * A service that validates time records according to NY Senate rules
  */
-public interface TimeRecordValidationService {
-
+public interface TimeRecordValidationService
+{
     /**
      * Checks the given TimeRecord for incongruencies with NY Senate time and attendence policy
      * Ensures that :

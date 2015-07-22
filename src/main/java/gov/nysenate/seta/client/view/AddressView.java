@@ -16,6 +16,8 @@ public class AddressView implements ViewObject
     protected String zip5 = "";
     protected String zip4 = "";
 
+    public AddressView() {}
+
     public AddressView(Address address) {
         this.addr1 = address.getAddr1();
         this.addr2 = address.getAddr2();

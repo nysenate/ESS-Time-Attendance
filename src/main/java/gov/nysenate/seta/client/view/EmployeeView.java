@@ -25,6 +25,8 @@ public class EmployeeView implements ViewObject
     protected LocalDate dateOfBirth;
     protected String gender;
 
+    public EmployeeView() {}
+
     public EmployeeView(Employee employee) {
         if (employee != null) {
             this.employeeId = employee.getEmployeeId();

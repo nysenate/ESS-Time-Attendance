@@ -30,7 +30,7 @@ public class HolidayRestCtrl extends BaseRestCtrl
 
     @Autowired private HolidayDao holidayDao;
 
-    @RequestMapping("/year/{year}")
+    @RequestMapping("/year/{year}" )
     public BaseResponse getHolidays(@PathVariable Integer year, WebRequest request) {
         LocalDate fromDate = LocalDate.of(year, 1, 1);
         LocalDate toDate = LocalDate.of(year, 12, 31);

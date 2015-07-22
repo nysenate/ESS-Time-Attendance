@@ -15,6 +15,8 @@ public class RespCenterHeadView implements ViewObject
     protected String name;
     protected String affiliateCode;
 
+    public RespCenterHeadView() {}
+
     public RespCenterHeadView(ResponsibilityHead head) {
         if (head != null) {
             this.active = head.isActive();

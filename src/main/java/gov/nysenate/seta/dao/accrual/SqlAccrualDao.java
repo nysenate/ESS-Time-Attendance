@@ -39,7 +39,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
     /** {@inheritDoc} */
     @Override
-    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccrualSummaries(int empId, int year, LocalDate beforeDate) {
+    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, int year, LocalDate beforeDate) {
         MapSqlParameterSource params = getPeriodAccSummaryParams(empId, year, beforeDate);
         List<PeriodAccSummary> periodAccSummaries =
             remoteNamedJdbc.query(GET_PERIOD_ACC_SUMMARIES.getSql(), params, new PeriodAccSummaryRowMapper("",""));
@@ -48,7 +48,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
     /** {@inheritDoc} */
     @Override
-    public TreeMap<Integer, AnnualAccSummary> getAnnualAccrualSummaries(int empId, int endYear) {
+    public TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int empId, int endYear) {
         MapSqlParameterSource params = getAnnualAccSummaryParams(empId, endYear);
         List<AnnualAccSummary> annualAccRecs =
             remoteNamedJdbc.query(GET_ANNUAL_ACC_SUMMARIES.getSql(), params, new AnnualAccSummaryRowMapper());
