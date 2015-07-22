@@ -24,6 +24,9 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "WHERE rec.CDSTATUS = 'A' AND ent.CDSTATUS = 'A' %s" + "\n" +
         "ORDER BY rec.NUXREFEM ASC, rec.DTBEGIN ASC, ent.DTDAY ASC"
     ),
+    GET_TIME_REC_BY_ID(
+        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(), "AND rec.NUXRTIMESHEET = :timesheetId")
+    ),
     GET_TIME_REC_BY_DATES(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
                 "AND rec.NUXREFEM IN (:empIds) AND (:startDate <= TRUNC(rec.DTBEGIN)) AND (:endDate >= TRUNC(rec.DTEND)) " +

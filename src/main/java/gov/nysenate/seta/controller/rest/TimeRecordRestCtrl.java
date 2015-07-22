@@ -2,8 +2,8 @@ package gov.nysenate.seta.controller.rest;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
-import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.client.response.base.BaseResponse;
+import gov.nysenate.seta.client.response.base.SimpleResponse;
 import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.view.TimeRecordView;
 import gov.nysenate.seta.client.view.base.ListView;
@@ -11,14 +11,14 @@ import gov.nysenate.seta.client.view.base.MapView;
 import gov.nysenate.seta.dao.attendance.TimeRecordDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
+import gov.nysenate.seta.service.attendance.TimeRecordValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -34,6 +34,9 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
 
     @Resource(name = "remoteTimeRecordDao")
     private TimeRecordDao timeRecordDao;
+
+    @Autowired
+    private TimeRecordValidationService validationService;
 
     /**
      * Get Time Record API
@@ -74,10 +77,15 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      */
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
     public void saveRecord(@RequestBody TimeRecordView record) {
-        /*
-        TODO validate time record
-         */
-        timeRecordDao.saveRecord(record.toTimeRecord());
+        TimeRecord newRecord = record.toTimeRecord();
+        validationService.validateTimeRecord(newRecord);
+        timeRecordDao.saveRecord(newRecord);
+    }
+
+    @ExceptionHandler(InvalidTimeRecordException.class)
+    public BaseResponse handleInvalidTimeRecordException(InvalidTimeRecordException ex) {
+        // TODO: create response from invalid record ex
+        return new SimpleResponse(false, "uh oh D:", "invalid time record");
     }
 
     /** --- Internal Methods --- */

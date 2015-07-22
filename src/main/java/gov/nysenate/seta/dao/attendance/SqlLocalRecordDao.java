@@ -5,14 +5,15 @@ import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 @Deprecated
-@Repository("localTimeRecordDao")
 public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao
 {
     @Override
@@ -27,6 +28,11 @@ public class SqlLocalRecordDao extends SqlBaseDao implements TimeRecordDao
 
     @Override
     public ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange) {
+        return null;
+    }
+
+    @Override
+    public TimeRecord getTimeRecord(BigInteger timeRecordId) throws EmptyResultDataAccessException {
         return null;
     }
 

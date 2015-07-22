@@ -1,7 +1,7 @@
 package gov.nysenate.seta.config;
 
 import gov.nysenate.seta.security.filter.EssAuthenticationFilter;
-import gov.nysenate.seta.security.realm.EssLdapRealm;
+import gov.nysenate.seta.security.realm.EssAuthzRealm;
 import gov.nysenate.seta.security.xsrf.XsrfTokenValidator;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.apache.shiro.config.Ini;
@@ -38,7 +38,7 @@ public class SecurityConfig
     @Value("${xsrf.token.bytes:128}") private int xsrfBytesSize;
 
     @Autowired
-    private EssLdapRealm essLdapRealm;
+    private EssAuthzRealm essAuthzRealm;
 
     /**
      * Shiro Filter factory that sets up the url authentication mechanism and applies the security
@@ -60,7 +60,7 @@ public class SecurityConfig
     @Bean(name = "securityManager")
     public WebSecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(essLdapRealm);
+        securityManager.setRealm(essAuthzRealm);
         return securityManager;
     }
 
