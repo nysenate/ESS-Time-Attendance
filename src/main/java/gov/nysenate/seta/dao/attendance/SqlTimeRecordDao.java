@@ -16,12 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -34,6 +36,19 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
     private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
 
     @Autowired private TimeEntryDao timeEntryDao;
+
+    /** {@inheritDoc} */
+    @Override
+    public TimeRecord getTimeRecord(BigInteger timeRecordId) throws EmptyResultDataAccessException {
+        MapSqlParameterSource params = new MapSqlParameterSource("timesheetId", String.valueOf(timeRecordId));
+        TimeRecordRowCallbackHandler rowHandler = new TimeRecordRowCallbackHandler();
+        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_ID.getSql(), params, rowHandler);
+        List<TimeRecord> records = rowHandler.getRecordList();
+        if (records.isEmpty()) {
+            throw new EmptyResultDataAccessException("could not find time record with id: " + timeRecordId, 1);
+        }
+        return records.get(0);
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -83,6 +98,10 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             ListMultimap<Integer, TimeRecord> empRecordMap = ArrayListMultimap.create();
             recordList.forEach(record -> empRecordMap.put(record.getEmployeeId(), record));
             return empRecordMap;
+        }
+
+        public List<TimeRecord> getRecordList() {
+            return recordList;
         }
     }
 

@@ -5,13 +5,23 @@ import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
 public interface TimeRecordDao extends BaseDao
 {
     /** --- Retrieval methods --- */
+
+    /**
+     * Retrieves the time record with the given time record id
+     * @param timeRecordId BigInteger
+     * @return Time Record
+     * @throws EmptyResultDataAccessException if no time record exists with the given id
+     */
+    TimeRecord getTimeRecord(BigInteger timeRecordId) throws EmptyResultDataAccessException;
 
     /**
      * Retrieves a list of time records for the employees in the given list during a time range.

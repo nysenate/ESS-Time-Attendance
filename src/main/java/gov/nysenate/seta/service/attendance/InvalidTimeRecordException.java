@@ -1,4 +1,4 @@
 package gov.nysenate.seta.service.attendance;
 
-public class InvalidTimeRecordException extends Exception {
+public class InvalidTimeRecordException extends RuntimeException {
 }

@@ -37,7 +37,8 @@ public class SecurityConfig
     @Value("${login.success.url:/}") private String loginSuccessUrl;
     @Value("${xsrf.token.bytes:128}") private int xsrfBytesSize;
 
-    @Autowired private EssAuthzRealm essAuthzRealm;
+    @Autowired
+    private EssAuthzRealm essAuthzRealm;
 
     /**
      * Shiro Filter factory that sets up the url authentication mechanism and applies the security

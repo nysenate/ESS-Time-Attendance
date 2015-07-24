@@ -17,8 +17,8 @@ public interface TimeRecordValidationService
      *  - A time record for this pay period has not already been submitted
      *  - The pay period for this time record is valid
      *
-     * @param timeRecord
+     * @param record
      * @throws InvalidTimeRecordException if the given time record is not valid
      */
-    public void validateTimeRecord(TimeRecord timeRecord) throws InvalidTimeRecordException;
+    public void validateTimeRecord(TimeRecord record) throws InvalidTimeRecordException;
 }
