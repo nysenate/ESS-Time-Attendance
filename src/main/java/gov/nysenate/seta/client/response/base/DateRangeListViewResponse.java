@@ -16,7 +16,7 @@ public class DateRangeListViewResponse<ViewType> extends ListViewResponse<ViewTy
 
     protected DateRangeListViewResponse(ListView<ViewType> result, Range<LocalDateTime> dateTimeRange,
                                         int total, LimitOffset limitOffset) {
-        super(result, total, limitOffset);
+        super(result, "result", total, limitOffset);
         this.fromDateTime = DateUtils.startOfDateTimeRange(dateTimeRange);
         this.toDateTime = DateUtils.endOfDateTimeRange(dateTimeRange);
     }

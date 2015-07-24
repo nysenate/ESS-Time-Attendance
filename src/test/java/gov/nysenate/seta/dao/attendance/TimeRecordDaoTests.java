@@ -10,6 +10,7 @@ import gov.nysenate.seta.model.period.PayPeriodType;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -20,8 +21,7 @@ public class TimeRecordDaoTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(TimeRecordDaoTests.class);
 
-    @Resource(name = "remoteTimeRecordDao")
-    private TimeRecordDao timeRecordDao;
+    @Autowired private TimeRecordDao timeRecordDao;
 
     public static TimeRecord testRecord;
 
@@ -59,5 +59,11 @@ public class TimeRecordDaoTests extends BaseTests
         LocalDate fromDate = LocalDate.of(1990, 1, 1);
         LocalDate toDate = LocalDate.of(1991, 1, 1);
         logger.info(OutputUtils.toJson(timeRecordDao.getRecordsDuring(11423, Range.closed(fromDate, toDate))));
+    }
+
+    @Test
+    public void testGetRecord() throws Exception {
+        logger.info("{}", OutputUtils.toJson(timeRecordDao.getRecordsDuring(10976, Range.atLeast(LocalDate.of(2015, 5, 1)))));
+
     }
 }

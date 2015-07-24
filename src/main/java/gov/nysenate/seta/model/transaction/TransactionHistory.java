@@ -1,7 +1,11 @@
 package gov.nysenate.seta.model.transaction;
 
 import com.google.common.collect.*;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
+import gov.nysenate.seta.model.payroll.PayType;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +13,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 /**
- * The TransactionHistory provides an ordered collection of TransactionRecords. This class is intended to be
+ * The TransactionHistory maintains an ordered collection of TransactionRecords. This class is intended to be
  * used in methods that need to know about the history of a specific TransactionCode for an employee.
  */
 public class TransactionHistory
@@ -59,6 +63,32 @@ public class TransactionHistory
      */
     public boolean hasRecords(TransactionCode code) {
         return !recordsByCode.get(code).isEmpty();
+    }
+
+    /** --- Helper Methods --- */
+
+    public TreeMap<LocalDate, Integer> getEffectiveSupervisorIds(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, Integer> supIds = new TreeMap<>();
+        getEffectiveEntriesDuring("NUXREFSV", dateRange, true).forEach((k,v) -> supIds.put(k, Integer.parseInt(v)));
+        return supIds;
+    }
+
+    public TreeMap<LocalDate, PayType> getEffectivePayTypes(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, PayType> payTypes = new TreeMap<>();
+        getEffectiveEntriesDuring("CDPAYTYPE", dateRange, true).forEach((k,v) -> payTypes.put(k, PayType.valueOf(v)));
+        return payTypes;
+    }
+
+    public TreeMap<LocalDate, Boolean> getEffectiveEmpStatus(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, Boolean> empStatuses = new TreeMap<>();
+        getEffectiveEntriesDuring("CDEMPSTATUS", dateRange, true).forEach((k,v) -> empStatuses.put(k, v.equals("A")));
+        return empStatuses;
+    }
+
+    public TreeMap<LocalDate, Integer> getEffectiveMinHours(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, Integer> minHrs = new TreeMap<>();
+        getEffectiveEntriesDuring("NUMINTOTHRS", dateRange, true).forEach((k,v) -> minHrs.put(k, Integer.parseInt(v)));
+        return minHrs;
     }
 
     /** --- Functional Getters/Setters --- */
@@ -140,11 +170,49 @@ public class TransactionHistory
     }
 
     /**
-     * @see #getLatestValueOf(String, boolean)
+     * Obtains a mapping of LocalDate -> String for the values associated with the given key during the specified
+     * date range. For example given the key 'NUXREFSV', a map will be returned containing the value of that field
+     * before/on the start of the date range, and any modifications of that value up until the end of the date range.
+     *
+     * @param key String - The audit record column name
+     * @param dateRange LocalDate - The date range for the values to be effective during.
+     * @param skipNulls boolean - If true, null values will be exluded from the map.
+     * @return TreeMap<LocalDate, String>
+     */
+    public TreeMap<LocalDate, String> getEffectiveEntriesDuring(String key, Range<LocalDate> dateRange, boolean skipNulls) {
+        TreeMap<LocalDate, String> values = Maps.newTreeMap();
+        String lastValue = null;
+        Optional<ImmutablePair<LocalDate, String>> firstEntry = getLatestEntryOf(key, DateUtils.startOfDateRange(dateRange), skipNulls);
+        if (firstEntry.isPresent()) {
+            values.put(firstEntry.get().getLeft(), firstEntry.get().getRight());
+            lastValue = firstEntry.get().getRight();
+        }
+        NavigableMap<LocalDate, Map<String, String>> subMap =
+            recordSnapshots.subMap(DateUtils.startOfDateRange(dateRange), false, DateUtils.endOfDateRange(dateRange), true);
+        for (Map.Entry<LocalDate, Map<String, String>> entry : subMap.entrySet()) {
+            String currValue = entry.getValue().get(key);
+            if ((!skipNulls || currValue != null) && !StringUtils.equals(lastValue, currValue)) {
+                values.put(entry.getKey(), currValue);
+                lastValue = currValue;
+            }
+        }
+        return values;
+    }
+
+    public Optional<ImmutablePair<LocalDate, String>> getLatestEntryOf(String key, LocalDate latestDate, boolean skipNulls) {
+        return this.recordSnapshots.headMap(latestDate, true)
+            .descendingMap().entrySet().stream()
+            .filter(e -> (!skipNulls || e.getValue().get(key) != null))       // Skip null values if requested
+            .map(e -> new ImmutablePair<>(e.getKey(), e.getValue().get(key)))
+            .findFirst();                                                     // Return most recent one
+    }
+
+    /**
+     * @see #latestValueOf(String, boolean)
      * 'latestDate' defaults to a date far in the future.
      */
-    public Optional<String> getLatestValueOf(String key, boolean skipNulls) {
-        return getLatestValueOf(key, LocalDate.MAX, skipNulls);
+    public Optional<String> latestValueOf(String key, boolean skipNulls) {
+        return latestValueOf(key, LocalDate.MAX, skipNulls);
     }
 
     /**
@@ -158,12 +226,12 @@ public class TransactionHistory
      * @param skipNulls boolean - Set to true if you want to find the latest non-null value.
      * @return Optional<String> - If the value is found, it will be set, otherwise an empty Optional is returned.
      */
-    public Optional<String> getLatestValueOf(String key, LocalDate latestDate, boolean skipNulls) {
-        return this.recordSnapshots.headMap(latestDate, true)
-            .descendingMap().entrySet().stream()
-            .filter(e -> (!skipNulls || e.getValue().get(key) != null)) // Skip null values if requested
-            .map(e -> e.getValue().get(key))                            // Extract the value for the given 'key'
-            .findFirst();                                               // Return most recent one
+    public Optional<String> latestValueOf(String key, LocalDate latestDate, boolean skipNulls) {
+        Optional<ImmutablePair<LocalDate, String>> entry = getLatestEntryOf(key, latestDate, skipNulls);
+        if (entry.isPresent()) {
+            return Optional.ofNullable(entry.get().getValue());
+        }
+        return Optional.empty();
     }
 
     /**
@@ -207,8 +275,8 @@ public class TransactionHistory
      *
      * @return ImmutableMap<LocalDate, Map<String, String>>
      */
-    public ImmutableMap<LocalDate, Map<String, String>> getRecordSnapshots() {
-        return ImmutableMap.copyOf(recordSnapshots);
+    public ImmutableSortedMap<LocalDate, Map<String, String>> getRecordSnapshots() {
+        return ImmutableSortedMap.copyOf(recordSnapshots);
     }
 
     /** --- Local classes --- */

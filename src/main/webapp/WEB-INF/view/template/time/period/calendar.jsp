@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="grid margin-top-20">
+    <div class="grid margin-top-20 hidden">
         <div class="col-1-2">
             <div class="content-container padding-10">
                 <h1 class="content-info">Pay Periods during {{state.year}}</h1>

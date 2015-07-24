@@ -7,12 +7,14 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteRecordRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
+import gov.nysenate.seta.dao.period.mapper.PayPeriodRowMapper;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -26,13 +28,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("remoteTimeRecordDao")
+@Repository
 public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
 
-    @Resource(name = "remoteTimeEntryDao")
-    private TimeEntryDao timeEntryDao;
+    @Autowired private TimeEntryDao timeEntryDao;
 
     /** {@inheritDoc} */
     @Override
@@ -53,10 +54,11 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     /** --- Helper Classes --- */
 
-    private class TimeRecordRowCallbackHandler implements RowCallbackHandler
+    private static class TimeRecordRowCallbackHandler implements RowCallbackHandler
     {
         private RemoteRecordRowMapper remoteRecordRowMapper = new RemoteRecordRowMapper();
         private RemoteEntryRowMapper remoteEntryRowMapper = new RemoteEntryRowMapper("ENT_");
+        private PayPeriodRowMapper periodRowMapper = new PayPeriodRowMapper("PER_");
         private Map<BigDecimal, TimeRecord> recordMap = new HashMap<>();
         private List<TimeRecord> recordList = new ArrayList<>();
 
@@ -66,6 +68,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             TimeRecord record;
             if (!recordMap.containsKey(recordId)) {
                 record = remoteRecordRowMapper.mapRow(rs, 0);
+                record.setPayPeriod(periodRowMapper.mapRow(rs, 0));
                 recordMap.put(recordId, record);
                 recordList.add(record);
             }

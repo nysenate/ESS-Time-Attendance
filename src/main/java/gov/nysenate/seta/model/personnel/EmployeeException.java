@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model.personnel;
 
-public class EmployeeException extends Exception
+public class EmployeeException extends RuntimeException
 {
     public EmployeeException() {}
 

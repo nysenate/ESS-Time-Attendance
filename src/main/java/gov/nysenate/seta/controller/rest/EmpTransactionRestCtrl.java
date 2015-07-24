@@ -44,7 +44,7 @@ public class EmpTransactionRestCtrl extends BaseRestCtrl
             empTransactionDao.getTransHistory(empId, codeSet, range, EmpTransDaoOption.DEFAULT)
                 .getAllTransRecords(SortOrder.ASC).stream()
                     .map(EmpTransRecordView::new)
-                    .collect(toList()));
+                    .collect(toList()), "transactions");
     }
 
     private Set<TransactionCode> getCodesFromParam(WebRequest request) {

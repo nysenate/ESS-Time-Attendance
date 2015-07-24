@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
-
 public class EssTimeRecordServiceTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordServiceTests.class);
@@ -19,11 +17,26 @@ public class EssTimeRecordServiceTests extends BaseTests
 
     @Test
     public void testGetActiveRecords() throws Exception {
-        logger.info("{}", OutputUtils.toJson(timeRecordService.getActiveRecords(10976, LocalDate.now()).asMap()));
+//        logger.info("{}", OutputUtils.toJson(timeRecordService.getTimeRecords(10976, LocalDate.now())));
     }
 
     @Test
     public void testSaveRecord() throws Exception {
+
+    }
+
+    @Test
+    public void testGetActiveRecords1() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateEmptyTimeRecords() throws Exception {
+
+    }
+
+    @Test
+    public void testSaveRecord1() throws Exception {
 
     }
 }

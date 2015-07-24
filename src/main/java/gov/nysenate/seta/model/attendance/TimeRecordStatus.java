@@ -5,39 +5,41 @@ import com.google.common.collect.TreeMultimap;
 
 import java.util.Set;
 
+import static gov.nysenate.seta.model.attendance.TimeRecordScope.*;
+
 /**
  * The TimeRecordStatus enum represents the possible states that a time record can be in.
  */
 public enum TimeRecordStatus
 {
-    SUBMITTED("S", "Submitted", "S"),
-    NOT_SUBMITTED("W","Not Submitted","E"),
-    APPROVED("A","Approved by Supervisor", "P"),
-    DISAPPROVED("D","Disapproved by Supervisor","E"),
-    SUBMITTED_PERSONNEL("SP","Submitted to Personnel","P"),
-    APPROVED_PERSONNEL("AP","Approved by Personnel","P"),
-    DISAPPROVED_PERSONNEL("DP","Disapproved by Personnel","E"), ;
+    SUBMITTED("S", "Submitted", SUPERVISOR),
+    NOT_SUBMITTED("W","Not Submitted", EMPLOYEE),
+    APPROVED("A","Approved by Supervisor", PERSONNEL),
+    DISAPPROVED("D","Disapproved by Supervisor", EMPLOYEE),
+    SUBMITTED_PERSONNEL("SP","Submitted to Personnel", PERSONNEL),
+    APPROVED_PERSONNEL("AP","Approved by Personnel", PERSONNEL),
+    DISAPPROVED_PERSONNEL("DP","Disapproved by Personnel", EMPLOYEE), ;
 
     protected String code;
     protected String name;
 
-    /** The unlockedFor string indicates who can perform an action on the time record at that given stage.
-     *  For example when the status is 'Submitted' the supervisor 'S' can take action (i.e approve/disapprove).
-     *  Possible values: 'E' = Employee, 'S' = Supervisor, 'P' = Personnel */
-    protected String unlockedFor;
+    /** The scope indicates who can perform an action on the time record at that given stage.
+     *  For example when the status is 'Submitted' the supervisor scope 'S' can only take action (i.e approve/disapprove).
+     */
+    protected TimeRecordScope scope;
 
     /** Mapping of unlockedFor values (E,S,P) to a set of corresponding time record statuses. */
-    private static SetMultimap<String, TimeRecordStatus> unlockedForMap = TreeMultimap.create();
+    private static SetMultimap<TimeRecordScope, TimeRecordStatus> unlockedForMap = TreeMultimap.create();
     static {
         for (TimeRecordStatus trs : TimeRecordStatus.values()) {
-            unlockedForMap.put(trs.unlockedFor, trs);
+            unlockedForMap.put(trs.scope, trs);
         }
     }
 
-    private TimeRecordStatus(String code, String name, String unlockedFor) {
+    private TimeRecordStatus(String code, String name, TimeRecordScope scope) {
         this.code = code;
         this.name = name;
-        this.unlockedFor = unlockedFor;
+        this.scope = scope;
     }
 
     public static TimeRecordStatus valueOfCode(String code){
@@ -49,27 +51,27 @@ public enum TimeRecordStatus
     }
 
     public boolean isUnlockedForEmployee() {
-        return unlockedFor.equals("E");
+        return scope.equals(EMPLOYEE);
     }
 
     public boolean isUnlockedForSupervisor() {
-        return unlockedFor.equals("S");
+        return scope.equals(SUPERVISOR);
     }
 
     public boolean isUnlockedForPersonnel() {
-        return unlockedFor.equals("P");
+        return scope.equals(PERSONNEL);
     }
 
     public static Set<TimeRecordStatus> unlockedForEmployee() {
-        return unlockedForMap.get("E");
+        return unlockedForMap.get(EMPLOYEE);
     }
 
     public static Set<TimeRecordStatus> unlockedForSupervisor() {
-        return unlockedForMap.get("S");
+        return unlockedForMap.get(SUPERVISOR);
     }
 
     public static Set<TimeRecordStatus> unlockedForPersonnel() {
-        return unlockedForMap.get("P");
+        return unlockedForMap.get(PERSONNEL);
     }
 
     public String getCode() {
@@ -80,7 +82,7 @@ public enum TimeRecordStatus
         return name;
     }
 
-    public String getUnlockedFor() {
-        return unlockedFor;
+    public TimeRecordScope getScope() {
+        return scope;
     }
 }

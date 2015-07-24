@@ -50,6 +50,6 @@ public class HolidayRestCtrl extends BaseRestCtrl
 
     private BaseResponse getListViewResponse(List<Holiday> holidays) {
         return ListViewResponse.of(
-                holidays.stream().map(HolidayView::new).collect(toList()), holidays.size(), new LimitOffset(holidays.size()));
+                holidays.stream().map(HolidayView::new).collect(toList()), "holidays");
     }
 }

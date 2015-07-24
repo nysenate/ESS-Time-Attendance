@@ -1,7 +1,6 @@
 package gov.nysenate.seta.dao.personnel;
 
 import com.google.common.collect.Range;
-import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
@@ -13,7 +12,6 @@ import gov.nysenate.seta.model.personnel.SupervisorChain;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
-import gov.nysenate.seta.model.transaction.TransactionRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,18 +68,11 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         Set<TransactionCode> transCodes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
         TransactionHistory transHistory =
             empTransDao.getTransHistory(empId, transCodes, Range.atMost(date), EmpTransDaoOption.INITIALIZE_AS_APP);
-
-        int supId = -1;
         if (transHistory.hasRecords()) {
-            TransactionRecord latestSupRec = transHistory.getAllTransRecords(SortOrder.DESC).getFirst();
-            String supIdStr = latestSupRec.getValueMap().get("NUXREFSV");
-            if (StringUtils.isNumeric(supIdStr)) {
-                supId = Integer.parseInt(supIdStr);
+            Optional<String> supIdStr = transHistory.latestValueOf("NUXREFSV", true);
+            if (supIdStr.isPresent() && StringUtils.isNumeric(supIdStr.get())) {
+                return Integer.parseInt(supIdStr.get());
             }
-        }
-
-        if (supId != -1) {
-            return supId;
         }
         throw new SupervisorNotFoundEx("Supervisor id not found for empId: " + empId + " for date: " + date);
     }

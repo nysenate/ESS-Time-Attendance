@@ -19,6 +19,7 @@ public class TimeRecordView implements ViewObject {
     protected String timeRecordId;
     protected Integer employeeId;
     protected Integer supervisorId;
+    protected String scope;
     protected String employeeName;
     protected boolean active;
     protected LocalDate beginDate;
@@ -41,6 +42,7 @@ public class TimeRecordView implements ViewObject {
             this.employeeId = record.getEmployeeId();
             this.supervisorId = record.getSupervisorId();
             this.employeeName = record.getEmployeeName();
+            this.scope = (record.getRecordStatus() != null) ? record.getRecordStatus().getScope().getCode() : null;
             this.active = record.isActive();
             this.beginDate = record.getBeginDate();
             this.endDate = record.getEndDate();
@@ -95,6 +97,11 @@ public class TimeRecordView implements ViewObject {
     @XmlElement
     public Integer getSupervisorId() {
         return supervisorId;
+    }
+
+    @XmlElement
+    public String getScope() {
+        return scope;
     }
 
     @XmlElement

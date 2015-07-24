@@ -13,6 +13,7 @@ import gov.nysenate.seta.model.period.PayPeriodType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -28,25 +29,23 @@ public class PayPeriodRestCtrl extends BaseRestCtrl
 {
     @Autowired private PayPeriodDao payPeriodDao;
 
-    @RequestMapping("/{periodTypeStr}/year/{year}")
-    public BaseResponse getPayPeriodByYear(@PathVariable String periodTypeStr, @PathVariable Integer year) {
-        List<PayPeriod> payPeriods = getPayPeriodList(periodTypeStr, LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
-        return ListViewResponse.of(payPeriods.stream().map(PayPeriodView::new).collect(Collectors.toList()),
-                payPeriods.size(), new LimitOffset(payPeriods.size()));
-    }
-
-    @RequestMapping("/{periodTypeStr}/date/{dateStr}")
-    public BaseResponse getPayPeriod(@PathVariable String periodTypeStr, @PathVariable String dateStr) {
-        List<PayPeriod> payPeriods = getPayPeriodList(periodTypeStr, dateStr, dateStr);
-        return new ViewObjectResponse<>(new PayPeriodView(payPeriods.get(0)));
-    }
-
-    @RequestMapping("/{periodTypeStr}/dates/{fromDateStr}/{toDateStr}")
-    public BaseResponse getPayPeriods(@PathVariable String periodTypeStr, @PathVariable String fromDateStr,
-                                      @PathVariable String toDateStr) {
-        List<PayPeriod> payPeriods = getPayPeriodList(periodTypeStr, fromDateStr, toDateStr);
-        return ListViewResponse.of(payPeriods.stream().map(PayPeriodView::new).collect(Collectors.toList()),
-                payPeriods.size(), new LimitOffset(payPeriods.size()));
+    @RequestMapping("/{periodTypeStr}")
+    public BaseResponse getPayPeriods(@PathVariable String periodTypeStr,
+                                      @RequestParam(required = false) Integer year,
+                                      @RequestParam(required = false) String fromDate,
+                                      @RequestParam(required = false) String toDate) {
+        List<PayPeriod> payPeriods;
+        if (year != null) {
+            payPeriods = getPayPeriodList(periodTypeStr, LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
+        }
+        else if (fromDate != null) {
+            if (toDate == null) toDate = fromDate;
+            payPeriods = getPayPeriodList(periodTypeStr, fromDate, toDate);
+        }
+        else {
+            payPeriods = getPayPeriodList(periodTypeStr, LocalDate.ofYearDay(LocalDate.now().getYear(), 1), LocalDate.now());
+        }
+        return ListViewResponse.of(payPeriods.stream().map(PayPeriodView::new).collect(Collectors.toList()), "periods");
     }
 
     private List<PayPeriod> getPayPeriodList(String periodTypeStr, String fromDateStr, String toDateStr) {

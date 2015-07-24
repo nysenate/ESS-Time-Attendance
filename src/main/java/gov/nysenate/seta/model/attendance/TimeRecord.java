@@ -21,6 +21,7 @@ public class TimeRecord
     protected boolean active;
     protected LocalDate beginDate;
     protected LocalDate endDate;
+    protected PayPeriod payPeriod;
     protected String remarks;
     protected String exceptionDetails;
     protected LocalDate processedDate;
@@ -94,6 +95,14 @@ public class TimeRecord
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public PayPeriod getPayPeriod() {
+        return payPeriod;
+    }
+
+    public void setPayPeriod(PayPeriod payPeriod) {
+        this.payPeriod = payPeriod;
     }
 
     public String getRemarks() {

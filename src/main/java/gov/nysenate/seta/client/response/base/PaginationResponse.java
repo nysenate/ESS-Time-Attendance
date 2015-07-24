@@ -1,6 +1,11 @@
 package gov.nysenate.seta.client.response.base;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import gov.nysenate.common.LimitOffset;
+
+import java.io.IOException;
 
 public abstract class PaginationResponse extends BaseResponse
 {
@@ -18,6 +23,14 @@ public abstract class PaginationResponse extends BaseResponse
 
     public PaginationResponse(int total, LimitOffset limitOffset) {
         this(total, limitOffset.getOffsetStart(), Math.min(limitOffset.getOffsetEnd(), total), limitOffset.getLimit());
+    }
+
+    public void serialize(PaginationResponse pr, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+        super.serialize(pr, jsonGenerator, serializerProvider);
+        jsonGenerator.writeNumberField("total", pr.getTotal());
+        jsonGenerator.writeNumberField("offsetStart", pr.getOffsetStart());
+        jsonGenerator.writeNumberField("offsetEnd", pr.getOffsetEnd());
+        jsonGenerator.writeNumberField("limit", pr.getLimit());
     }
 
     public int getTotal() {
