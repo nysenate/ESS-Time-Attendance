@@ -3,6 +3,7 @@ package gov.nysenate.seta.dao.accrual;
 import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.accrual.AnnualAccSummary;
+import gov.nysenate.seta.model.accrual.AnnualAccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -25,7 +26,7 @@ public interface AccrualDao extends BaseDao
      * @param beforeDate LocalDate - The retrieved period summaries will be effective prior to this date.
      * @return TreeMap<LocalDate, PeriodAccSummary>
      */
-    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, int year, LocalDate beforeDate);
+    TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, int year, LocalDate beforeDate);
 
     /**
      * Retrieve the running annual accrual summaries for the given employee for all years before or on the 'endYear'.
@@ -34,7 +35,7 @@ public interface AccrualDao extends BaseDao
      * @param endYear int - The year to retrieve annual summaries until.
      * @return TreeMap<Integer, AnnualAccSummary>
      */
-    public TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int empId, int endYear);
+    TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int empId, int endYear);
 
     /**
      * Retrieve the period accrual usage objects that represent the hours charged during a given pay period.
@@ -43,5 +44,6 @@ public interface AccrualDao extends BaseDao
      * @param dateRange Range<LocalDate> - The date range to obtain usages within
      * @return TreeMap<PayPeriod, PeriodAccUsage>
      */
-    public TreeMap<PayPeriod, PeriodAccUsage> getPeriodAccrualUsages(int empId, Range<LocalDate> dateRange);
+    TreeMap<PayPeriod, PeriodAccUsage> getPeriodAccrualUsages(int empId, Range<LocalDate> dateRange);
+
 }

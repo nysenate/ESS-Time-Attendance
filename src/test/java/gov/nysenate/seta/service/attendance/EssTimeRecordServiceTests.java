@@ -1,13 +1,17 @@
 package gov.nysenate.seta.service.attendance;
 
+import com.google.common.collect.Range;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
+import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.EnumSet;
 
 public class EssTimeRecordServiceTests extends BaseTests
 {
@@ -17,7 +21,8 @@ public class EssTimeRecordServiceTests extends BaseTests
 
     @Test
     public void testGetActiveRecords() throws Exception {
-//        logger.info("{}", OutputUtils.toJson(timeRecordService.getTimeRecords(10976, LocalDate.now())));
+        logger.info("{}", OutputUtils.toJson(timeRecordService.getTimeRecords(Collections.singleton(10976),
+                Range.closed(LocalDate.of(2015, 1, 1), LocalDate.now()), EnumSet.allOf(TimeRecordStatus.class), true)));
     }
 
     @Test

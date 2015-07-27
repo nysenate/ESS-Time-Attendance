@@ -12,6 +12,10 @@ import java.util.List;
 /**
  * Created by heitner on 6/26/2014.
  */
+
+/**
+ * Contains information relating to yearly allowances.
+ */
 public class AllowanceUsage {
     int empId;
     int year;

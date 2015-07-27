@@ -2,9 +2,13 @@ package gov.nysenate.seta.model.period;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeSet;
+import gov.nysenate.seta.model.attendance.TimeRecord;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -40,6 +44,17 @@ public class PayPeriod implements Comparable<PayPeriod>
         this.endDate = endDate;
         this.payPeriodNum = payPeriodNum;
         this.active = active;
+    }
+
+    /** --- Functions --- */
+
+    public boolean isEnclosedBy(Collection<TimeRecord> records) {
+        if (records != null) {
+            RangeSet<LocalDate> rangeSet = TreeRangeSet.create();
+            records.forEach(rec -> rangeSet.add(rec.getDateRange()));
+            return rangeSet.encloses(this.getDateRange());
+        }
+        return false;
     }
 
     /** --- Functional Getters/Setters --- */

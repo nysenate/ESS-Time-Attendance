@@ -1,6 +1,10 @@
 package gov.nysenate.seta.model.attendance;
 
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.model.period.PayPeriod;
+import gov.nysenate.seta.model.personnel.Employee;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -12,7 +16,7 @@ import java.util.List;
  * A Time Record is the biweekly collection of daily time entries. The time record
  * is typically created in accordance with the attendance pay periods.
  */
-public class TimeRecord
+public class TimeRecord implements Comparable<TimeRecord>
 {
     protected BigInteger timeRecordId;
     protected Integer employeeId;
@@ -30,13 +34,47 @@ public class TimeRecord
     protected String txUpdateUserId;
     protected LocalDateTime txOriginalDate;
     protected LocalDateTime txUpdateDate;
-    protected List<TimeEntry> timeEntries;
+    protected List<TimeEntry> timeEntries = new ArrayList<>();
 
 
     /** --- Constructors --- */
 
-    public TimeRecord() {
-        this.timeEntries = new ArrayList<>();
+    public TimeRecord() {}
+
+    public TimeRecord(Employee employee, Range<LocalDate> dateRange, PayPeriod payPeriod, int supervisorId) {
+        this.employeeId = employee.getEmployeeId();
+        this.supervisorId = supervisorId;
+        this.employeeName = employee.getUid().toUpperCase();
+        this.active = true;
+        this.beginDate = DateUtils.startOfDateRange(dateRange);
+        this.endDate = DateUtils.endOfDateRange(dateRange);
+        this.payPeriod = payPeriod;
+        this.recordStatus = TimeRecordStatus.NOT_SUBMITTED;
+        this.txOriginalUserId = this.employeeName;
+        this.txUpdateUserId = this.employeeName;
+        this.txOriginalDate = LocalDateTime.now();
+        this.txUpdateDate = txOriginalDate;
+    }
+
+    @Override
+    public int compareTo(TimeRecord o) {
+        return ComparisonChain.start()
+                .compare(this.beginDate, o.beginDate)
+                .compare(this.endDate, o.endDate)
+                .compare(this.employeeId, o.employeeId)
+                .result();
+    }
+
+    /** --- Functions --- */
+
+    public boolean encloses(PayPeriod period) {
+        return Range.closed(beginDate, endDate).encloses(period.getDateRange());
+    }
+
+    /** --- Functional Getters / Setters --- */
+
+    public Range<LocalDate> getDateRange() {
+        return Range.closed(beginDate, endDate);
     }
 
     /** --- Basic Getters/Setters --- */

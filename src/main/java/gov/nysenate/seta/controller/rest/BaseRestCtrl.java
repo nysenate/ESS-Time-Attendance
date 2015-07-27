@@ -18,6 +18,8 @@ public class BaseRestCtrl
 {
     protected static final String REST_PATH = "/api/v1/";
 
+    /** --- Request Parsers / Getters --- */
+
     protected Subject getSubject() {
         return SecurityUtils.getSubject();
     }
@@ -118,10 +120,10 @@ public class BaseRestCtrl
     protected <T extends Enum<T>> T getEnumParameter(String paramName, String paramValue, Class<T> enumType)
             throws InvalidRequestParamEx {
         T result = getEnumParameter(paramValue, enumType, null);
-        if (result != null) {
-            return result;
+        if (result == null) {
+            throw getEnumParamEx(enumType, Enum::toString, paramName, paramValue);
         }
-        throw getEnumParamEx(enumType, Enum::toString, paramName, paramValue);
+        return result;
     }
     /**
      * Attempts to map the given request parameter to an enum by finding an enum instance whose name matches the parameter
@@ -144,10 +146,10 @@ public class BaseRestCtrl
                                                             Function<T, String> valueFunction,
                                                             String paramName, String paramValue) {
         T result = getEnumParameterByValue(enumType, mapFunction, paramValue, null);
-        if (result != null) {
-            return result;
+        if (result == null) {
+            throw getEnumParamEx(enumType, valueFunction, paramName, paramValue);
         }
-        throw getEnumParamEx(enumType, valueFunction, paramName, paramValue);
+        return result;
     }
     /**
      * Attempts to map the given request parameter to an enum by finding an enum using the given mapFunction

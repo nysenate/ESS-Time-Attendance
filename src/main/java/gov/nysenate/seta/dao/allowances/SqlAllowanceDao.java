@@ -30,43 +30,57 @@ public class SqlAllowanceDao extends SqlBaseDao implements AllowanceDao
     /** --- SQL Queries --- */
 
     protected static final String GET_ALLOWANCE_USAGE_SQL =
-        "WITH TE_PAY AS \n" +
-         "            (SELECT /*+ MATERIALIZE */  A.NUXREFEM, A.NUDOCUMENT, A.DTEFFECT, A.DTENDTE, A.NUHRHRSPD, A.MOTOTHRSPD, A.MOPRIORYRTE, C.MOAMTEXCEED, A.MOSALBIWKLY, A.DTTXNORIGIN, B.DTEND, C.DTAPPOINTFRM, C.DTAPPOINT, C.DTCONTSERV, A.ROWID ROWIDCUR,  LAST_VALUE(A.DTENDTE) OVER (PARTITION BY A.NUXREFEM,A.NUDOCUMENT ORDER BY  A.DTENDTE, A.DTTXNORIGIN ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) DTENDTELAST, LAST_VALUE(A.ROWID) OVER (PARTITION BY A.NUXREFEM,A.NUDOCUMENT ORDER BY  A.DTENDTE, A.DTTXNORIGIN  ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)  ROWIDMAX, A.NULINE, LAST_VALUE(A.NULINE) OVER (PARTITION BY A.NUXREFEM ORDER BY  A.DTTXNORIGIN  ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) NULINELAST\n "+
-         "    FROM SASS_OWNER.PM21PERAUDIT A\n "+
-         "    JOIN SASS_OWNER.SL16PERIOD B ON (     A.DTEFFECT BETWEEN B.DTBEGIN AND B.DTEND\n"+
-         "            AND B.CDPERIOD = 'PF'\n"+
-         "            AND B.CDSTATUS = 'A')\n"+
-         "    JOIN SASS_OWNER.PM21PERSONN C ON (C.NUXREFEM = A.NUXREFEM)\n"+
-         "    WHERE A.NUXREFEM = :empId\n"+
-         "    AND A.NUDOCUMENT LIKE 'T%'\n"+
-         "    AND A.DTENDTE >= :janDate\n"+
-         "    AND A.CDSTATUS = 'A'\n"+
-         "            )\n"+
-         "    SELECT MIN(NUXREFEM) NUXREFEM, SUM(NUHRHRSPD) AS TE_HRS_PAID, SUM(NVL(MOTOTHRSPD, 0)) - SUM(NVL(MOPRIORYRTE,0)) AS TE_AMOUNT_PAID, (SUM(NVL(MOTOTHRSPD, 0)) -  SUM(NVL(MOPRIORYRTE,0)) ) MOTESPEND,  MAX(DTENDTE) DTENDTE\n"+
-         "    FROM TE_PAY\n"+
-         "    WHERE ROWIDMAX = ROWIDCUR\n"+
-         "    AND NULINE = NULINELAST";
+        "WITH TE_PAY AS (\n" +
+        "   SELECT /*+ MATERIALIZE */  paud.NUXREFEM, paud.NUDOCUMENT, paud.DTEFFECT, paud.DTENDTE, paud.NUHRHRSPD,\n" +
+        "       paud.MOTOTHRSPD, paud.MOPRIORYRTE, pers.MOAMTEXCEED, paud.MOSALBIWKLY, paud.DTTXNORIGIN, period.DTEND,\n" +
+        "       pers.DTAPPOINTFRM, pers.DTAPPOINT, pers.DTCONTSERV, paud.ROWID ROWIDCUR, paud.NULINE,\n" +
+        "       LAST_VALUE(paud.DTENDTE) OVER (\n" +
+        "           PARTITION BY paud.NUXREFEM,paud.NUDOCUMENT\n" +
+        "           ORDER BY  paud.DTENDTE, paud.DTTXNORIGIN \n" +
+        "           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) DTENDTELAST,\n" +
+        "       LAST_VALUE(paud.ROWID) OVER (\n" +
+        "           PARTITION BY paud.NUXREFEM,paud.NUDOCUMENT\n" +
+        "           ORDER BY  paud.DTENDTE, paud.DTTXNORIGIN\n" +
+        "           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) ROWIDMAX,\n" +
+        "       LAST_VALUE(paud.NULINE) OVER (\n" +
+        "           PARTITION BY paud.NUXREFEM\n" +
+        "           ORDER BY  paud.DTTXNORIGIN\n" +
+        "           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) NULINELAST\n"+
+        "   FROM SASS_OWNER.PM21PERAUDIT paud\n"+
+        "   JOIN SASS_OWNER.SL16PERIOD period ON (\n" +
+        "       paud.DTEFFECT BETWEEN period.DTBEGIN AND period.DTEND\n"+
+        "       AND period.CDPERIOD = 'PF'\n"+
+        "       AND period.CDSTATUS = 'A')\n"+
+        "   JOIN SASS_OWNER.PM21PERSONN pers ON (pers.NUXREFEM = paud.NUXREFEM)\n"+
+        "   WHERE paud.NUXREFEM = :empId AND paud.NUDOCUMENT LIKE 'T%'\n"+
+        "       AND paud.DTENDTE >= :janDate AND paud.CDSTATUS = 'A'\n"+
+        ")\n"+
+        "SELECT MIN(NUXREFEM) NUXREFEM, SUM(NUHRHRSPD) AS TE_HRS_PAID,\n" +
+        "       SUM(NVL(MOTOTHRSPD, 0)) - SUM(NVL(MOPRIORYRTE,0)) AS TE_AMOUNT_PAID,\n" +
+        "       (SUM(NVL(MOTOTHRSPD, 0)) -  SUM(NVL(MOPRIORYRTE,0)) ) MOTESPEND,  MAX(DTENDTE) DTENDTE\n"+
+        "FROM TE_PAY\n"+
+        "WHERE ROWIDMAX = ROWIDCUR AND NULINE = NULINELAST";
 
     protected static final String GET_AMOUNT_EXCEED_POT_SQL =
-        " SELECT b.moamtexceed, b.dteffect, b.dttxnorigin, a.nuxrefem " +
-        "   FROM SASS_OWNER.pd21ptxncode a" +
-        "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange) " +
-        "  WHERE A.NUXREFEM = :empId " +
-        "    AND a.dteffect <= :decDate " +
-        "    AND a.cdtrans = 'EXC'" +
-        "    AND a.cdstatus = 'A'" +
-        "    AND b.cdstatus = 'A'" +
-        " ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
+        "SELECT b.moamtexceed, b.dteffect, b.dttxnorigin, a.nuxrefem\n" +
+        "FROM SASS_OWNER.pd21ptxncode a\n" +
+        "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange)\n" +
+        "WHERE A.NUXREFEM = :empId\n" +
+        "   AND a.dteffect <= :decDate\n" +
+        "   AND a.cdtrans = 'EXC'\n" +
+        "   AND a.cdstatus = 'A'\n" +
+        "   AND b.cdstatus = 'A'\n" +
+        "ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
 
     protected static final String GET_SALARY_POT_SQL =
-        " SELECT b.mosalbiwkly, b.dteffect, b.dttxnorigin, a.nuxrefem " +
-        "   FROM SASS_OWNER.pd21ptxncode a" +
-        "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange) " +
-        "  WHERE A.NUXREFEM = :empId " +
-        "    AND a.cdtrans = 'SAL'" +
-        "    AND a.cdstatus = 'A'" +
-        "    AND b.cdstatus = 'A'" +
-        " ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
+        "SELECT b.mosalbiwkly, b.dteffect, b.dttxnorigin, a.nuxrefem\n" +
+        "   FROM SASS_OWNER.pd21ptxncode a\n" +
+        "   JOIN SASS_OWNER.PM21PERAUDIT b ON (a.nuxrefem = b.nuxrefem AND a.nuchange = b.nuchange)\n" +
+        "WHERE A.NUXREFEM = :empId\n" +
+        "   AND a.cdtrans = 'SAL'\n" +
+        "   AND a.cdstatus = 'A'\n" +
+        "   AND b.cdstatus = 'A'\n" +
+        "ORDER BY b.dteffect DESC, b.dttxnorigin DESC";
 
 //    protected static final String GET_ALLOWANCE_USAGE_SQL =
 

@@ -1,12 +1,14 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.allowances.AllowanceDao;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
+import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.dao.transaction.OldSqlEmpTransactionDao;
+import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.transaction.AuditHistory;
 import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.model.transaction.TransactionHistory;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,17 @@ public class SqlAllowanceDaoTests  extends BaseTests
     @Autowired
     private OldSqlEmpTransactionDao sqlEmployeeTransactionDao;
 
+    @Autowired
+    EmpTransactionDao etd;
+
     AuditHistory auditHistory;
+
+    @Test
+    public void getAllowanceUsageTest2() throws Exception {
+        AllowanceUsage usige = allowanceDao.getAllowanceUsage(6399, 2015,
+                new AuditHistory(etd.getTransHistory(6399, EmpTransDaoOption.DEFAULT)));
+        logger.info(OutputUtils.toJson(usige));
+    }
 
     @Test
     public void testBigDecimalAddition() {

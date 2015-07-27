@@ -19,6 +19,8 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
@@ -128,9 +130,12 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         MapSqlParameterSource params = getTimeRecordParams(record);
 
         if (remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(), params)==0) {
-            if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(), params)==0) {
+            KeyHolder tsIdHolder = new GeneratedKeyHolder();
+            if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(), params,
+                    tsIdHolder, new String[] {"NUXRTIMESHEET"}) == 0) {
                 return false;
             }
+            record.setTimeRecordId(((BigDecimal) tsIdHolder.getKeys().get("NUXRTIMESHEET")).toBigInteger());
         }
         // Insert each entry from the time record
         record.getTimeEntries().forEach(timeEntryDao::updateTimeEntry);
@@ -139,7 +144,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     public MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("timesheetId", new BigDecimal(timeRecord.getTimeRecordId()));
+        params.addValue("timesheetId", timeRecord.getTimeRecordId() != null ?
+                new BigDecimal(timeRecord.getTimeRecordId()) : null);
         params.addValue("empId", timeRecord.getEmployeeId());
         params.addValue("employeeName", timeRecord.getEmployeeName());
         params.addValue("tOriginalUserId", timeRecord.getTxOriginalUserId());

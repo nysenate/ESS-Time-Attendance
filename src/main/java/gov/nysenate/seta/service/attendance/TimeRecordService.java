@@ -1,19 +1,22 @@
 package gov.nysenate.seta.service.attendance;
 
 import com.google.common.collect.Range;
+import com.google.common.collect.TreeMultimap;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordScope;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 
 import java.time.LocalDate;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface TimeRecordService
 {
-    Map<TimeRecordScope, TimeRecord> getTimeRecords(int empId, Range<LocalDate> dateRange,
-                                                    EnumSet<TimeRecordStatus> statuses, boolean fillMissingRecords)
-        throws Exception;
+    List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
+                                    Set<TimeRecordStatus> statuses,
+                                    boolean fillMissingRecords);
 
     /**
      *

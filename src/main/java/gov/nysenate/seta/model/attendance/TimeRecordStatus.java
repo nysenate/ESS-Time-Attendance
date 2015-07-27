@@ -18,7 +18,8 @@ public enum TimeRecordStatus
     DISAPPROVED("D","Disapproved by Supervisor", EMPLOYEE),
     SUBMITTED_PERSONNEL("SP","Submitted to Personnel", PERSONNEL),
     APPROVED_PERSONNEL("AP","Approved by Personnel", PERSONNEL),
-    DISAPPROVED_PERSONNEL("DP","Disapproved by Personnel", EMPLOYEE), ;
+    DISAPPROVED_PERSONNEL("DP","Disapproved by Personnel", EMPLOYEE),
+    ;
 
     protected String code;
     protected String name;
@@ -36,7 +37,7 @@ public enum TimeRecordStatus
         }
     }
 
-    private TimeRecordStatus(String code, String name, TimeRecordScope scope) {
+    TimeRecordStatus(String code, String name, TimeRecordScope scope) {
         this.code = code;
         this.name = name;
         this.scope = scope;
@@ -51,15 +52,15 @@ public enum TimeRecordStatus
     }
 
     public boolean isUnlockedForEmployee() {
-        return scope.equals(EMPLOYEE);
+        return EMPLOYEE.equals(scope);
     }
 
     public boolean isUnlockedForSupervisor() {
-        return scope.equals(SUPERVISOR);
+        return SUPERVISOR.equals(scope);
     }
 
     public boolean isUnlockedForPersonnel() {
-        return scope.equals(PERSONNEL);
+        return PERSONNEL.equals(scope);
     }
 
     public static Set<TimeRecordStatus> unlockedForEmployee() {

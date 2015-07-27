@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.transaction;
 
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.transaction.OldSqlEmpTransactionDao;
 import gov.nysenate.seta.model.exception.TransactionHistoryException;
@@ -7,7 +8,8 @@ import gov.nysenate.seta.model.exception.TransactionHistoryNotFoundEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -21,7 +23,7 @@ public class AuditHistory
     protected Map<TransactionCode, List<TransactionRecord>> recordHistory;
     protected List<Map> auditRecords;
     TransactionHistory transactionHistory;
-    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+    DateTimeFormatter auditDateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     private static final Logger logger = LoggerFactory.getLogger(AuditHistory.class);
 
     public AuditHistory() {
@@ -105,7 +107,7 @@ public class AuditHistory
             for (TransactionRecord curTrans : transactionHistory.getAllTransRecords(SortOrder.ASC)) {
                 if (holdValues==null) {
                     holdValues = new HashMap<String, String>();
-                    holdValues.put("EffectDate",sdf.format(curTrans.getEffectDate()));
+                    holdValues.put("EffectDate", auditDateFormat.format(curTrans.getEffectDate()));
                     holdValues.putAll(curTrans.getValueMap());
 // commented out by ash                   effectDate = curTrans.getEffectDate();
                     auditRecords.add(holdValues);
@@ -115,7 +117,7 @@ public class AuditHistory
                     Map<String, String>  changedValues = curTrans.getValueMap();
                     Map<String, String> newValues = new HashMap<String, String>(holdValues);
                     // copyMap(holdValues);
-                    newValues.put("EffectDate",sdf.format(curTrans.getEffectDate()));
+                    newValues.put("EffectDate", auditDateFormat.format(curTrans.getEffectDate()));
                     for (String curKey : changedValues.keySet()) {
                         newValues.put(curKey, changedValues.get(curKey));
                     }
@@ -135,7 +137,7 @@ public class AuditHistory
             }
         }
         catch (Exception e) {
-            throw new TransactionHistoryException(e.getMessage(),e.getCause());
+            throw new TransactionHistoryException(e.getMessage(),e);
         }
     }
 
@@ -300,7 +302,7 @@ public class AuditHistory
         for (int x = 0; x < auditRecords.size(); x++) {
             Map<String, String> latestAuditRec = auditRecords.get(x);
             try {
-                Date currentEffectDate = sdf.parse(latestAuditRec.get("EffectDate"));
+                Date currentEffectDate = DateUtils.toDate(LocalDateTime.parse(latestAuditRec.get("EffectDate"), auditDateFormat));
                 if (currentEffectDate.after(dtpot)) {
                     return holdAuditRec;
                 }
@@ -519,12 +521,12 @@ public class AuditHistory
         for (int x = 0; x < auditRecords.size(); x++) {
             Map<String, String> latestAuditRec = auditRecords.get(x);
             try {
-                Date currentEffectDate = sdf.parse(latestAuditRec.get("EffectDate"));
+                Date currentEffectDate = DateUtils.toDate(LocalDateTime.parse(latestAuditRec.get("EffectDate"), auditDateFormat));
 
-                if (!(currentEffectDate.before(dtstart)||currentEffectDate.after(dtend))) {
+                if (!(currentEffectDate.before(dtstart) || currentEffectDate.after(dtend))) {
                     if (alwaysStartDateRecord) {
-                        if (x>0 && currentEffectDate.after(dtstart) && recordHistoryReturned.size()==0) {
-                            recordHistoryReturned.add(auditRecords.get(x-1));
+                        if (x > 0 && currentEffectDate.after(dtstart) && recordHistoryReturned.size() == 0) {
+                            recordHistoryReturned.add(auditRecords.get(x - 1));
                         }
                     }
                     recordHistoryReturned.add(latestAuditRec);
