@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.time.LocalDate;
 
 public class TimeRecordDaoTests extends BaseTests
@@ -27,7 +25,7 @@ public class TimeRecordDaoTests extends BaseTests
 
     public static void initTestRecord() {
         testRecord = new TimeRecord();
-        testRecord.setTimeRecordId(new BigInteger("11111111111111111111111111111111111111"));
+//        testRecord.setTimeRecordId(new BigInteger("11111111111111111111111111111111111111"));
         testRecord.setEmployeeId(11423);
         testRecord.setTxOriginalUserId("STOUFFER");
         testRecord.setEmployeeName("STOUFFER");
@@ -42,6 +40,11 @@ public class TimeRecordDaoTests extends BaseTests
         testRecord.setProcessedDate(LocalDate.of(1990, 8, 15));
         testRecord.setBeginDate(LocalDate.of(1990, 8, 2));
         testRecord.setEndDate(LocalDate.of(1990, 8, 15));
+
+        testRecord.setRespHeadCode("STSBAC");
+        testRecord.setPayPeriod(new PayPeriod(PayPeriodType.AF,
+                LocalDate.of(1990, 8, 2), LocalDate.of(1990, 8, 15),
+                10, true));
     }
 
     @PostConstruct
@@ -52,6 +55,12 @@ public class TimeRecordDaoTests extends BaseTests
     @Test
     public void insertTimeRecord() {
         timeRecordDao.saveRecord(testRecord);
+    }
+
+    @Test
+    public void updateTimeRecordTest() {
+        insertTimeRecord();
+        insertTimeRecord();
     }
 
     @Test

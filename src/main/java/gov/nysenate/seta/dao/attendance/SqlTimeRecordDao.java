@@ -23,7 +23,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.ResultSet;
@@ -92,8 +91,12 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             else {
                 record = recordMap.get(recordId);
             }
-            TimeEntry entry = remoteEntryRowMapper.mapRow(rs, 0);
-            record.getTimeEntries().add(entry);
+            rs.getDate("ENT_DTDAY");
+            // If the day column was null, there was no entry because that column has a not null constraint
+            if (!rs.wasNull()) {
+                TimeEntry entry = remoteEntryRowMapper.mapRow(rs, 0);
+                record.getTimeEntries().add(entry);
+            }
         }
 
         public ListMultimap<Integer, TimeRecord> getRecordMap() {
@@ -160,6 +163,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("supervisorId", timeRecord.getSupervisorId());
         params.addValue("excDetails", timeRecord.getExceptionDetails());
         params.addValue("procDate", toDate(timeRecord.getProcessedDate()));
+        params.addValue("respCtr", timeRecord.getRespHeadCode());
 
         return params;
     }

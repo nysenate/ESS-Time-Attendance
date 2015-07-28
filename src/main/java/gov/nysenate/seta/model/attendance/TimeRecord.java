@@ -22,6 +22,7 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected Integer employeeId;
     protected Integer supervisorId;
     protected String employeeName;
+    protected String respHeadCode;
     protected boolean active;
     protected LocalDate beginDate;
     protected LocalDate endDate;
@@ -45,6 +46,7 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.employeeId = employee.getEmployeeId();
         this.supervisorId = supervisorId;
         this.employeeName = employee.getUid().toUpperCase();
+        this.respHeadCode = employee.getRespCenter().getHead().getCode();
         this.active = true;
         this.beginDate = DateUtils.startOfDateRange(dateRange);
         this.endDate = DateUtils.endOfDateRange(dateRange);
@@ -213,5 +215,13 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public void setTimeEntries(List<TimeEntry> timeEntries) {
         this.timeEntries = timeEntries;
+    }
+
+    public String getRespHeadCode() {
+        return respHeadCode;
+    }
+
+    public void setRespHeadCode(String respHeadCode) {
+        this.respHeadCode = respHeadCode;
     }
 }

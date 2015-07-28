@@ -24,6 +24,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
 {
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordService.class);
 
+    /** {@inheritDoc} */
     @Override
     public List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
                                            Set<TimeRecordStatus> statuses,
@@ -37,7 +38,13 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         return new ArrayList<>(records.values());
     }
 
+    /**
+     * Detects pay periods that are not fully covered by time records for a single employee during a given date range
+     * Creates and saves new records to fill these pay periods
+     */
     private void fillMissingRecords(int empId, TreeMultimap<PayPeriod, TimeRecord> records, Range<LocalDate> dateRange) {
+        // Todo: what if a split-triggering transaction is posted within a pay period that already has a record created
+        //       eg. a record is initially created for 7/16 - 7/29, but a supervisor change occurs on 7/22
         TreeSet<PayPeriod> incompletePeriods =
                 payPeriodDao.getOpenAttendancePayPeriods(empId, DateUtils.endOfDateRange(dateRange), SortOrder.ASC)
                         .stream()
@@ -47,13 +54,13 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         if (!incompletePeriods.isEmpty()) {
             Employee employee = employeeDao.getEmployeeById(empId);
             TransactionHistory history = empTransactionDao.getTransHistory(empId, EmpTransDaoOption.DEFAULT);
-//            incompletePeriods.forEach(period ->
-//                    records.putAll(period, createEmptyTimeRecords(empId, period, history, records.get(period))));
+            incompletePeriods.forEach(period ->
+                    records.putAll(period, createEmptyTimeRecords(employee, period, history, records.get(period))));
         }
     }
 
     /**
-     * TODO.. WIP
+     * Creates and saves new time records as needed for a single employee over a single pay period
      */
     protected Set<TimeRecord> createEmptyTimeRecords(Employee employee, PayPeriod period, TransactionHistory fullHistory,
                                                      Set<TimeRecord> existingRecords) {
@@ -66,6 +73,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
             return Collections.singleton(record);
         }
         else {
+            // TODO handle splits
             throw new UnsupportedOperationException("Cannot handle splits yet.");
         }
     }

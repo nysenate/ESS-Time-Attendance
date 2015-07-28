@@ -1,7 +1,6 @@
 package gov.nysenate.seta.dao.attendance;
 
 import gov.nysenate.seta.dao.base.BasicSqlQuery;
-import gov.nysenate.seta.dao.base.DbSchema;
 import gov.nysenate.seta.dao.base.DbVendor;
 
 import static gov.nysenate.seta.dao.base.DbSchema.MASTER_SFMS;
@@ -12,24 +11,25 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     GET_TIME_REC_SQL_TEMPLATE(
         "SELECT \n" +
         /**   PM23TIMESHEET columns (no alias needed) */
-        "    rec.NUXRTIMESHEET, rec.NUXREFEM, rec.NATXNORGUSER, rec.NATXNUPDUSER, rec.NAUSER, rec.DTTXNORIGIN, rec.DTTXNUPDATE, " +
-        "    rec.CDSTATUS, rec.CDTSSTAT, rec.DTBEGIN, rec.DTEND, rec.DEREMARKS, rec.NUXREFSV, rec.DEEXCEPTION, " +
-        "    rec.DTPROCESS, " +
+        "    rec.NUXRTIMESHEET, rec.NUXREFEM, rec.NATXNORGUSER, rec.NATXNUPDUSER, rec.NAUSER, rec.DTTXNORIGIN, rec.DTTXNUPDATE,\n" +
+        "    rec.CDSTATUS, rec.CDTSSTAT, rec.DTBEGIN, rec.DTEND, rec.DEREMARKS, rec.NUXREFSV, rec.DEEXCEPTION,\n" +
+        "    rec.DTPROCESS, rec.CDRESPCTRHD,\n" +
         /**   SL16PERIOD columns (aliased with PER_) */
-        "    per.DTBEGIN AS PER_DTBEGIN, per.DTEND AS PER_DTEND, per.CDSTATUS AS PER_CDSTATUS, per.CDPERIOD AS PER_CDPERIOD," +
-        "    per.NUPERIOD AS PER_NUPERIOD, per.DTPERIODYEAR AS PER_DTPERIODYEAR, \n" +
+        "    per.DTBEGIN AS PER_DTBEGIN, per.DTEND AS PER_DTEND, per.CDSTATUS AS PER_CDSTATUS, per.CDPERIOD AS PER_CDPERIOD,\n" +
+        "    per.NUPERIOD AS PER_NUPERIOD, per.DTPERIODYEAR AS PER_DTPERIODYEAR,\n" +
         /**   PD23TIMESHEET columns (aliased with ENT_) */
-        "    ent.NUXRDAY AS ENT_NUXRDAY, ent.NUXRTIMESHEET, ent.NUXRTIMESHEET AS ENT_NUXRTIMESHEET, ent.NUXREFEM AS ENT_NUXREFEM, " +
-        "    ent.DTDAY AS ENT_DTDAY, ent.NUWORK AS ENT_NUWORK, ent.NUTRAVEL AS ENT_NUTRAVEL, ent.NUHOLIDAY AS ENT_NUHOLIDAY, " +
-        "    ent.NUVACATION AS ENT_NUVACATION, ent.NAUSER AS ENT_NAUSER, ent.NUPERSONAL AS ENT_NUPERSONAL, ent.NUSICKEMP AS ENT_NUSICKEMP, " +
-        "    ent.NUSICKFAM AS ENT_NUSICKFAM, ent.NUMISC AS ENT_NUMISC, ent.NUXRMISC AS ENT_NUXRMISC, ent.NATXNORGUSER AS ENT_NATXNORGUSER," +
-        "    ent.NATXNUPDUSER AS ENT_NATXNUPDUSER, ent.DTTXNORIGIN AS ENT_DTTXNORIGIN, ent.DTTXNUPDATE AS ENT_DTTXNUPDATE, " +
+        "    ent.NUXRDAY AS ENT_NUXRDAY, ent.NUXRTIMESHEET, ent.NUXRTIMESHEET AS ENT_NUXRTIMESHEET, ent.NUXREFEM AS ENT_NUXREFEM,\n" +
+        "    ent.DTDAY AS ENT_DTDAY, ent.NUWORK AS ENT_NUWORK, ent.NUTRAVEL AS ENT_NUTRAVEL, ent.NUHOLIDAY AS ENT_NUHOLIDAY,\n" +
+        "    ent.NUVACATION AS ENT_NUVACATION, ent.NAUSER AS ENT_NAUSER, ent.NUPERSONAL AS ENT_NUPERSONAL, ent.NUSICKEMP AS ENT_NUSICKEMP,\n" +
+        "    ent.NUSICKFAM AS ENT_NUSICKFAM, ent.NUMISC AS ENT_NUMISC, ent.NUXRMISC AS ENT_NUXRMISC, ent.NATXNORGUSER AS ENT_NATXNORGUSER,\n" +
+        "    ent.NATXNUPDUSER AS ENT_NATXNUPDUSER, ent.DTTXNORIGIN AS ENT_DTTXNORIGIN, ent.DTTXNUPDATE AS ENT_DTTXNUPDATE,\n" +
         "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE " + "\n" +
-        "FROM " + TIMESHEET_SFMS + ".PM23TIMESHEET rec \n" +
-        "LEFT JOIN " + MASTER_SFMS + ".SL16PERIOD per " +
-        "    ON (TRUNC(rec.DTBEGIN) BETWEEN TRUNC(per.DTBEGIN) AND TRUNC(per.DTEND)) AND per.CDPERIOD = 'AF' AND per.CDSTATUS = 'A' \n" +
-        "LEFT JOIN " + TIMESHEET_SFMS + ".PD23TIMESHEET ent ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET \n" +
-        "WHERE rec.CDSTATUS = 'A' AND ent.CDSTATUS = 'A' %s" + "\n" +
+        "FROM " + TIMESHEET_SFMS + ".PM23TIMESHEET rec\n" +
+        "LEFT JOIN " + MASTER_SFMS + ".SL16PERIOD per\n" +
+        "    ON (TRUNC(rec.DTBEGIN) BETWEEN TRUNC(per.DTBEGIN) AND TRUNC(per.DTEND)) AND per.CDPERIOD = 'AF' AND per.CDSTATUS = 'A'\n" +
+        "LEFT JOIN " + TIMESHEET_SFMS + ".PD23TIMESHEET ent\n" +
+        "    ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET AND ent.CDSTATUS = 'A'\n" +
+        "WHERE rec.CDSTATUS = 'A' %s" + "\n" +
         "ORDER BY rec.NUXREFEM ASC, rec.DTBEGIN ASC, ent.DTDAY ASC"
     ),
     GET_TIME_REC_BY_ID(
@@ -37,8 +37,10 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     ),
     GET_TIME_REC_BY_DATES(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-                "AND rec.NUXREFEM IN (:empIds) AND (:startDate <= TRUNC(rec.DTBEGIN)) AND (:endDate >= TRUNC(rec.DTEND)) " +
-                        "AND rec.CDTSSTAT IN (:statuses)")
+                "AND rec.NUXREFEM IN (:empIds)\n" +
+                "   AND (TRUNC(rec.DTBEGIN) BETWEEN :startDate AND :endDate\n" +
+                "       OR TRUNC(rec.DTEND) BETWEEN :startDate AND :endDate)\n" +
+                "   AND rec.CDTSSTAT IN (:statuses)")
     ),
     GET_TREC_BY_EMPID(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
@@ -55,18 +57,18 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     INSERT_TIME_REC(
         "INSERT \n" +
         "INTO " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
-        "(NUXRTIMESHEET, NUXREFEM, NATXNORGUSER, NATXNUPDUSER, NAUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS," +
-        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS) \n" +
-        "VALUES (:timesheetId,  :empId, :tOriginalUserId, :tUpdateUserId, :employeeName, :tOriginalDate, :tUpdateDate, :status, " +
-                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate) \n"
+        "(NUXRTIMESHEET, NUXREFEM, NATXNORGUSER, NATXNUPDUSER, NAUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS,\n" +
+        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD) \n" +
+        "VALUES (:timesheetId,  :empId, :tOriginalUserId, :tUpdateUserId, :employeeName, :tOriginalDate, :tUpdateDate, :status,\n" +
+                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr) \n"
     ),
     UPDATE_TIME_REC_SQL (
         "UPDATE " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
         "SET \n" +
-        "  NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, " +
-        "  DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId, " +
-        "  DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId, " +
-        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName \n" +
+        "  NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId,\n" +
+        "  DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId,\n" +
+        "  DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId,\n" +
+        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr \n" +
         "WHERE NUXRTIMESHEET = :timesheetId"
     )
     ;
