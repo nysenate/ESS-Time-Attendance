@@ -12,6 +12,7 @@ import gov.nysenate.seta.dao.attendance.TimeRecordDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
 import gov.nysenate.seta.service.attendance.TimeRecordService;
 import gov.nysenate.seta.service.attendance.TimeRecordValidationService;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static gov.nysenate.seta.controller.rest.BaseRestCtrl.*;
@@ -48,13 +48,13 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      *      (GET) /api/v1/timerecords[.json]
      *
      * Request Parameters: empId - int[] - required - Records will be retrieved for these employee ids
-     *                     from - Date - required - Gets time records that begin on or after this date
      *                     to - Date - default current date - Gets time records that end before or on this date
+     *                     from - Date - default Jan 1 on year of 'to' Date - Gets time records that begin on or after this date
      *                     status - String[] - default all statuses - Will only get time records with one of these statuses
      */
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/xml")
     public BaseResponse getRecordsXml(@RequestParam Integer[] empId,
-                                      @RequestParam String from,
+                                      @RequestParam(required = false) String from,
                                       @RequestParam(required = false) String to,
                                       @RequestParam(required = false) String[] status) {
         return getRecordResponse(
@@ -63,7 +63,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     public BaseResponse getRecordsJson(@RequestParam Integer[] empId,
-                                       @RequestParam String from,
+                                       @RequestParam(required = false) String from,
                                        @RequestParam(required = false) String to,
                                        @RequestParam(required = false) String[] status) {
         return getRecordResponse(
@@ -73,7 +73,18 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = "application/json")
     public BaseResponse getActiveRecordsJson(@RequestParam Integer[] empId,
                                              @RequestParam(required = false) String[] status) {
-        return getRecordResponse(getActiveRecords(empId, status), true);
+        return getRecordResponse(getActiveRecords(empId, status), false);
+    }
+
+    @RequestMapping(value = "/supervisor", method = RequestMethod.GET, produces = "application/json")
+    public BaseResponse getActiveSupervisorRecords(@RequestParam int supId,
+                                                   @RequestParam(required = false) String from,
+                                                   @RequestParam(required = false) String to,
+                                                   @RequestParam(required = false) String[] status)
+            throws SupervisorException {
+        Range<LocalDate> dateRange = parseDateRange(from, to);
+        Set<TimeRecordStatus> statuses = parseStatuses(status, TimeRecordStatus.inProgress());
+        return getRecordResponse(timeRecordService.getSupervisorRecords(supId, dateRange, statuses), true);
     }
 
     /**
@@ -107,11 +118,9 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
                 .forEach(record -> records.put(record.getEmployeeId(), record));
         return records;
     }
-
     private ListMultimap<Integer, TimeRecord> getRecords(Integer[] empId, String from, String to, String[] status) {
         return getRecords(new HashSet<>(Arrays.asList(empId)), parseDateRange(from, to), parseStatuses(status));
     }
-
     private ListMultimap<Integer, TimeRecord> getActiveRecords(Integer[] empId, String[] status) {
         RangeSet<LocalDate> activePeriods = TreeRangeSet.create();
         Set<Integer> empIds = new HashSet<>(Arrays.asList(empId));
@@ -123,17 +132,21 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
 
     private Range<LocalDate> parseDateRange(String from, String to) {
         LocalDate toDate = to != null ? parseISODate(to, "to") : LocalDate.now();
-        LocalDate fromDate = parseISODate(from, "from");
+        LocalDate fromDate = to != null ? parseISODate(from, "from") : LocalDate.of(toDate.getYear(), 1, 1);
         return getClosedRange(fromDate, toDate, "from", "to");
     }
 
-    private Set<TimeRecordStatus> parseStatuses(String[] status) {
+    private Set<TimeRecordStatus> parseStatuses(String[] status, Set<TimeRecordStatus> defaultValue) {
         if (status != null && status.length > 0) {
             return Arrays.asList(status).stream()
                     .map(recordStatus -> getEnumParameter("status", recordStatus, TimeRecordStatus.class))
                     .collect(Collectors.toSet());
         }
-        return EnumSet.allOf(TimeRecordStatus.class);
+        return defaultValue;
+    }
+
+    private Set<TimeRecordStatus> parseStatuses(String[] status) {
+        return parseStatuses(status, EnumSet.allOf(TimeRecordStatus.class));
     }
 
     /**
@@ -141,18 +154,23 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      * time records
      * @param records ListMultimap<Integer, TimeRecord> records
      * @param xml boolean
+     * @param supervisor boolean
      * @return ViewObjectResponse
      */
-    private ViewObjectResponse<?> getRecordResponse(ListMultimap<Integer, TimeRecord> records, boolean xml) {
+    private ViewObjectResponse<?> getRecordResponse(ListMultimap<Integer, TimeRecord> records, boolean supervisor, boolean xml) {
         return new ViewObjectResponse<>(MapView.of(
-                records.asMap().values().stream()
-                        .map(recordList -> ListView.of(recordList.stream()
-                                .map(TimeRecordView::new)
-                                .collect(Collectors.toList())))
-                        .collect(Collectors.toMap(
-                                recordList -> xml ? (Object) ("empId-" + recordList.items.get(0).getEmployeeId())
-                                        : (Object) (recordList.items.get(0).getEmployeeId()),
-                                Function.identity()))
+                records.keySet().stream()
+                        .map(id -> new AbstractMap.SimpleEntry<>(
+                                        xml ? (supervisor ? "sup" : "emp") + "Id-" + id : id,
+                                        ListView.of(records.get(id).stream()
+                                                .map(TimeRecordView::new)
+                                                .collect(Collectors.toList()))
+                                )
+                        )
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         ));
+    }
+    private ViewObjectResponse<?> getRecordResponse(ListMultimap<Integer, TimeRecord> records, boolean supervisor) {
+        return getRecordResponse(records, supervisor, false);
     }
 }

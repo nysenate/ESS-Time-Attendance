@@ -14,7 +14,7 @@ import java.util.List;
  */
 
 /**
- * Contains information relating to yearly allowances.
+ * Contains information relating to yearly allowances for temporary employees.
  */
 public class AllowanceUsage {
     int empId;

@@ -21,6 +21,7 @@ public class TimeRecordView implements ViewObject {
     protected Integer supervisorId;
     protected String scope;
     protected String employeeName;
+    protected String respHeadCode;
     protected boolean active;
     protected LocalDate beginDate;
     protected LocalDate endDate;
@@ -42,6 +43,7 @@ public class TimeRecordView implements ViewObject {
             this.employeeId = record.getEmployeeId();
             this.supervisorId = record.getSupervisorId();
             this.employeeName = record.getEmployeeName();
+            this.respHeadCode = record.getRespHeadCode();
             this.scope = (record.getRecordStatus() != null) ? record.getRecordStatus().getScope().getCode() : null;
             this.active = record.isActive();
             this.beginDate = record.getBeginDate();
@@ -67,6 +69,7 @@ public class TimeRecordView implements ViewObject {
         record.setEmployeeId(employeeId);
         record.setSupervisorId(supervisorId);
         record.setEmployeeName(employeeName);
+        record.setRespHeadCode(respHeadCode);
         record.setActive(active);
         record.setBeginDate(beginDate);
         record.setEndDate(endDate);

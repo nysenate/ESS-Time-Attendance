@@ -27,6 +27,9 @@ public class MapView<KeyType, ViewType> implements ViewObject
     public static <KeyType> MapView<KeyType, Integer> ofIntMap(Map<KeyType, Integer> items) {
         return new MapView<>(items);
     }
+    public static <KeyType> MapView<KeyType, Long> ofLongMap(Map<KeyType, Long> items) {
+        return new MapView<>(items);
+    }
 
     private MapView(Map<KeyType, ViewType> map) {
         this.items = map != null ? ImmutableMap.copyOf(map) : ImmutableMap.of();

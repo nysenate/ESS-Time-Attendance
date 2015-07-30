@@ -6,9 +6,12 @@ import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
+import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
+import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
 import org.slf4j.Logger;
@@ -38,6 +41,38 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         return new ArrayList<>(records.values());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public ListMultimap<Integer, TimeRecord> getSupervisorRecords(int supId, Range<LocalDate> dateRange,
+                                                                  Set<TimeRecordStatus> statuses)
+            throws SupervisorException {
+        SupervisorEmpGroup empGroup = supervisorDao.getSupervisorEmpGroup(supId, dateRange);
+        ListMultimap<Integer, TimeRecord> records = ArrayListMultimap.create();
+
+        // Get and add primary employee time records
+        records.putAll(supId,
+                getTimeRecordsForSupInfos(empGroup.getPrimaryEmployees().values(), dateRange, statuses));
+
+        // Get and add override employee time records
+        empGroup.getOverrideSupIds().forEach(overrideSupId ->
+                records.putAll(overrideSupId,
+                        getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
+                                                  dateRange, statuses))
+        );
+
+        return records;
+    }
+
+    /**
+     * TODO.. WIP
+     */
+    @Override
+    public boolean saveRecord(TimeRecord record) {
+        return false;
+    }
+
+    /** --- Internal Methods --- */
+
     /**
      * Detects pay periods that are not fully covered by time records for a single employee during a given date range
      * Creates and saves new records to fill these pay periods
@@ -62,7 +97,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     /**
      * Creates and saves new time records as needed for a single employee over a single pay period
      */
-    protected Set<TimeRecord> createEmptyTimeRecords(Employee employee, PayPeriod period, TransactionHistory fullHistory,
+    private Set<TimeRecord> createEmptyTimeRecords(Employee employee, PayPeriod period, TransactionHistory fullHistory,
                                                      Set<TimeRecord> existingRecords) {
         TreeMap<LocalDate, Integer> supIds = fullHistory.getEffectiveSupervisorIds(period.getDateRange());
         TreeMap<LocalDate, PayType> payTypes = fullHistory.getEffectivePayTypes(period.getDateRange());
@@ -79,10 +114,16 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     }
 
     /**
-     * TODO.. WIP
+     * Gets time records for the employees and durations specified by the given collection of supervisor infos
      */
-    @Override
-    public boolean saveRecord(TimeRecord record) {
-        return false;
+    private List<TimeRecord> getTimeRecordsForSupInfos(Collection<EmployeeSupInfo> supInfos,
+                                                       Range<LocalDate> dateRange, Set<TimeRecordStatus> statuses) {
+        // Group employee ids by date range to reduce number of queries
+        SetMultimap<Range<LocalDate>, Integer> periods = HashMultimap.create();
+        supInfos.forEach(supInfo ->
+                periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
+        return periods.keys().stream()
+                .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, true).stream())
+                .collect(Collectors.toList());
     }
 }

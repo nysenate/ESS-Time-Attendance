@@ -21,7 +21,7 @@ public interface SupervisorDao extends BaseDao
      * @return boolean - true if 'empId' had subordinates during the date range and was thus
      *                   a supervisor, false otherwise.
      */
-    public boolean isSupervisor(int empId, Range<LocalDate> dateRange);
+    boolean isSupervisor(int empId, Range<LocalDate> dateRange);
 
     /**
      * Retrieve the effective T&A supervisor id for the given employee id during the supplied date.
@@ -31,7 +31,7 @@ public interface SupervisorDao extends BaseDao
      * @return int - Supervisor id
      * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
      */
-    public int getSupervisorIdForEmp(int empId, LocalDate date) throws SupervisorException;
+    int getSupervisorIdForEmp(int empId, LocalDate date) throws SupervisorException;
 
     /**
      * Computes and returns a listing of the hierarchy of supervisors starting from the given empId
@@ -43,7 +43,7 @@ public interface SupervisorDao extends BaseDao
      * @throws SupervisorException - SupervisorNotFoundEx if a supervisor could not be found for any
      *                                                    employee that is encountered in the chain.
      */
-    public SupervisorChain getSupervisorChain(int empId, LocalDate date) throws SupervisorException;
+    SupervisorChain getSupervisorChain(int empId, LocalDate date) throws SupervisorException;
 
     /**
      * Retrieves the collection of employees that are managed by the given supervisor during any time in
@@ -54,7 +54,7 @@ public interface SupervisorDao extends BaseDao
      * @return SupervisorEmpGroup if successful, throws SupervisorException otherwise
      * @throws SupervisorException - SupervisorNotFoundEx if the supervisor could not be found
      */
-    public SupervisorEmpGroup getSupervisorEmpGroup(int supId, Range<LocalDate> dateRange) throws SupervisorException;
+    SupervisorEmpGroup getSupervisorEmpGroup(int supId, Range<LocalDate> dateRange) throws SupervisorException;
 
     /**
      * Sets an override so that 'ovrSupId' can have access to the primary employees of 'supId' during the
@@ -66,5 +66,5 @@ public interface SupervisorDao extends BaseDao
      * @throws SupervisorException - SupervisorNotFoundEx if either supervisor could not be found
      *                               SupervisorNotInChainEx if 'ovrSupId' is not in 'supId's' chain
      */
-    public void setSupervisorOverride(int supId, int ovrSupId, Range<LocalDate> dateRange) throws SupervisorException;
+    void setSupervisorOverride(int supId, int ovrSupId, Range<LocalDate> dateRange) throws SupervisorException;
 }

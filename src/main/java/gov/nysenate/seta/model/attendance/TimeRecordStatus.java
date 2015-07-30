@@ -3,7 +3,9 @@ package gov.nysenate.seta.model.attendance;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.TreeMultimap;
 
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static gov.nysenate.seta.model.attendance.TimeRecordScope.*;
 
@@ -45,8 +47,7 @@ public enum TimeRecordStatus
 
     public static TimeRecordStatus valueOfCode(String code){
         for (TimeRecordStatus status : TimeRecordStatus.values()) {
-            if (status.code.equals(code))
-            return status;
+            if (status.code.equals(code)) return status;
         }
         return null;
     }
@@ -73,6 +74,12 @@ public enum TimeRecordStatus
 
     public static Set<TimeRecordStatus> unlockedForPersonnel() {
         return unlockedForMap.get(PERSONNEL);
+    }
+
+    public static Set<TimeRecordStatus> inProgress() {
+        return Arrays.asList(TimeRecordStatus.values()).stream()
+                .filter(status -> !APPROVED_PERSONNEL.equals(status))
+                .collect(Collectors.toSet());
     }
 
     public String getCode() {

@@ -1,5 +1,7 @@
 package gov.nysenate.seta.model.personnel;
 
+import com.google.common.collect.Range;
+
 import java.time.LocalDate;
 
 /**
@@ -23,6 +25,13 @@ public class EmployeeSupInfo
         this.empId = empId;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    /** --- Functional Getters/Setters --- */
+
+    //TODO : what is the difference between startDate and supStartDate
+    public Range<LocalDate> getEffectiveDateRange() {
+        return Range.closed(startDate, endDate);
     }
 
     /** --- Basic Getters/Setters --- */

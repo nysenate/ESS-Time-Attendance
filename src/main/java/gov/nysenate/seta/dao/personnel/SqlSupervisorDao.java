@@ -1,6 +1,8 @@
 package gov.nysenate.seta.dao.personnel;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Range;
+import com.google.common.collect.Table;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
@@ -147,10 +149,10 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
             Set<TransactionCode> supTransCodes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
             Map<Integer, EmployeeSupInfo> primaryEmps = new HashMap<>();
             Map<Integer, EmployeeSupInfo> overrideEmps = new HashMap<>();
-            Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmps = new HashMap<>();
+            Table<Integer, Integer, EmployeeSupInfo> supOverrideEmps = HashBasedTable.create();
 
             Map<Integer, LocalDate> possiblePrimaryEmps = new HashMap<>();
-            Map<Integer, Map<Integer, LocalDate>> possibleSupOvrEmps = new HashMap<>();
+            Table<Integer, Integer, LocalDate> possibleSupOvrEmps = HashBasedTable.create();
 
             for (Map<String,Object> colMap : res) {
                 logger.trace(colMap.toString());
@@ -211,16 +213,10 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                         case "SUP_OVR": {
                             int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
                             if (currSupId == ovrSupId && !empTerminated) {
-                                if (!supOverrideEmps.containsKey(ovrSupId)) {
-                                    supOverrideEmps.put(ovrSupId, new HashMap<>());
-                                }
-                                supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
+                                supOverrideEmps.put(ovrSupId, empId, empSupInfo);
                             }
                             else if (!effectDateIsPast) {
-                                if (!possibleSupOvrEmps.containsKey(ovrSupId)) {
-                                    possibleSupOvrEmps.put(ovrSupId, new HashMap<>());
-                                }
-                                possibleSupOvrEmps.get(ovrSupId).put(empId, effectDate);
+                                possibleSupOvrEmps.put(ovrSupId, empId, effectDate);
                             }
                             break;
                         }
@@ -251,16 +247,16 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                         }
                         case "SUP_OVR": {
                             int ovrSupId = Integer.parseInt(colMap.get("OVR_NUXREFSV").toString());
-                            if (possibleSupOvrEmps.containsKey(ovrSupId) && possibleSupOvrEmps.get(ovrSupId).containsKey(empId)) {
+                            if (possibleSupOvrEmps.contains(ovrSupId, empId)) {
                                 if (currSupId == ovrSupId && !empTerminated) {
-                                    empSupInfo.setSupEndDate(possibleSupOvrEmps.get(ovrSupId).get(empId));
-                                    supOverrideEmps.get(ovrSupId).put(empId, empSupInfo);
+                                    empSupInfo.setSupEndDate(possibleSupOvrEmps.get(ovrSupId, empId));
+                                    supOverrideEmps.put(ovrSupId, empId, empSupInfo);
                                 }
                                 else if (!effectDateIsPast) {
-                                    possibleSupOvrEmps.get(ovrSupId).put(empId, effectDate);
+                                    possibleSupOvrEmps.put(ovrSupId, empId, effectDate);
                                 }
                                 else {
-                                    possibleSupOvrEmps.get(ovrSupId).remove(empId);
+                                    possibleSupOvrEmps.remove(ovrSupId, empId);
                                 }
                             }
                             break;

@@ -1,7 +1,10 @@
 package gov.nysenate.seta.model.personnel;
 
+import com.google.common.collect.Table;
+
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents the employees that are managed by the certain supervisor.
@@ -29,8 +32,8 @@ public class SupervisorEmpGroup
 
     /** Supervisor override employees are all the primary employees for the supervisors that
      *  granted override access.
-     *  Mapping of the override granter supId -> (Map of empId -> EmployeeInfo) */
-    protected Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmployees;
+     *  Mapping of the (override granter supId, empId) -> EmployeeInfo */
+    protected Table<Integer, Integer, EmployeeSupInfo> supOverrideEmployees;
 
     /** --- Constructors --- */
 
@@ -51,6 +54,19 @@ public class SupervisorEmpGroup
         return (primaryEmployees != null && !primaryEmployees.isEmpty()) ||
                (overrideEmployees != null && !overrideEmployees.isEmpty()) ||
                (supOverrideEmployees != null && !supOverrideEmployees.isEmpty());
+    }
+
+    /** --- Functional Getters/Setters --- */
+
+    public Set<Integer> getOverrideSupIds() {
+        return supOverrideEmployees.rowKeySet();
+    }
+
+    /**
+     * Get overridden employees granted by the given supervisor id
+     */
+    public Map<Integer, EmployeeSupInfo> getSupOverrideEmployees(int supId) {
+        return supOverrideEmployees.columnMap().get(supId);
     }
 
     /** --- Basic Getters/Setters --- */
@@ -95,11 +111,11 @@ public class SupervisorEmpGroup
         this.overrideEmployees = overrideEmployees;
     }
 
-    public Map<Integer, Map<Integer, EmployeeSupInfo>> getSupOverrideEmployees() {
+    public Table<Integer, Integer, EmployeeSupInfo> getSupOverrideEmployees() {
         return supOverrideEmployees;
     }
 
-    public void setSupOverrideEmployees(Map<Integer, Map<Integer, EmployeeSupInfo>> supOverrideEmployees) {
+    public void setSupOverrideEmployees(Table<Integer, Integer, EmployeeSupInfo> supOverrideEmployees) {
         this.supOverrideEmployees = supOverrideEmployees;
     }
 }

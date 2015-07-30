@@ -26,6 +26,13 @@ public class EssTimeRecordServiceTests extends BaseTests
     }
 
     @Test
+    public void testGetSupervisorRecordsTest() throws Exception {
+        LocalDate now = LocalDate.now();
+        logger.info("{}", OutputUtils.toJson(timeRecordService.getSupervisorRecords(9896,
+                Range.closed(LocalDate.of(now.getYear(), 1, 1), now))));
+    }
+
+    @Test
     public void testSaveRecord() throws Exception {
 
     }

@@ -37,10 +37,16 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     ),
     GET_TIME_REC_BY_DATES(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-                "AND rec.NUXREFEM IN (:empIds)\n" +
-                "   AND (TRUNC(rec.DTBEGIN) BETWEEN :startDate AND :endDate\n" +
-                "       OR TRUNC(rec.DTEND) BETWEEN :startDate AND :endDate)\n" +
-                "   AND rec.CDTSSTAT IN (:statuses)")
+            "AND (TRUNC(rec.DTBEGIN) BETWEEN :startDate AND :endDate\n" +
+            "       OR TRUNC(rec.DTEND) BETWEEN :startDate AND :endDate)\n" +
+            "   AND rec.CDTSSTAT IN (:statuses)\n" +
+            "   %s")
+    ),
+    GET_TIME_REC_BY_DATES_EMP_ID(
+            String.format(GET_TIME_REC_BY_DATES.getSql(), "AND rec.NUXREFEM IN (:empIds)")
+    ),
+    GET_TIME_REC_BY_DATES_SUP(
+            String.format(GET_TIME_REC_BY_DATES.getSql(), "AND :supId IN (rec.NUXREFSV, ")
     ),
     GET_TREC_BY_EMPID(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),

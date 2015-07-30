@@ -64,7 +64,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("endDate", toDate(DateUtils.endOfDateRange(dateRange)));
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES.getSql(), params, handler);
+        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES_EMP_ID.getSql(), params, handler);
         return handler.getRecordMap();
     }
 
@@ -119,7 +119,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         try{
             timeRecordList = remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_BY_EMPID.getSql(), params,
                     new RemoteRecordRowMapper());
-        }catch (DataRetrievalFailureException ex){
+        } catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
             throw new TimeRecordNotFoundException("No matching Time Records for employee id: " + empId);
         }
