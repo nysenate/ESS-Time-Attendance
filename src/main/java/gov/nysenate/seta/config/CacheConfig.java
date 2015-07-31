@@ -1,15 +1,18 @@
 package gov.nysenate.seta.config;
 
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.SizeOfPolicyConfiguration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,12 +23,36 @@ import java.util.List;
 @EnableCaching
 public class CacheConfig implements CachingConfigurer
 {
-    @Bean
+
+    @Value("${cache.max.size}") private String cacheMaxHeapSize;
+
+    @Bean(destroyMethod = "shutdown")
+    public net.sf.ehcache.CacheManager pooledCacheManger() {
+        // Set the upper limit when computing heap size for objects. Once it reaches the limit
+        // it stops computing further. Some objects can contain many references so we set the limit
+        // fairly high.
+        SizeOfPolicyConfiguration sizeOfConfig = new SizeOfPolicyConfiguration();
+        sizeOfConfig.setMaxDepth(100000);
+        sizeOfConfig.setMaxDepthExceededBehavior("continue");
+
+        // Configure the default cache to be used as a template for actual caches.
+        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        cacheConfiguration.setMemoryStoreEvictionPolicy("LRU");
+        cacheConfiguration.addSizeOfPolicy(sizeOfConfig);
+
+        // Configure the cache manager.
+        net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration();
+        config.setMaxBytesLocalHeap(cacheMaxHeapSize + "M");
+        config.addDefaultCache(cacheConfiguration);
+        config.setUpdateCheck(false);
+
+        return net.sf.ehcache.CacheManager.newInstance(config);
+    }
+
     @Override
+    @Bean
     public CacheManager cacheManager() {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(springCaches());
-        return cacheManager;
+        return new EhCacheCacheManager(pooledCacheManger());
     }
 
     @Override

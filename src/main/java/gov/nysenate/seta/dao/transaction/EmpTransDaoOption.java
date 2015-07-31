@@ -5,7 +5,7 @@ package gov.nysenate.seta.dao.transaction;
  *  Available Options: (set to 1 to enable)
  *
  *  Bit 0 : Earliest record should be the initial state.
- *  Bit 1 : Earliest record should be converted to app if not already app/rtp.
+ *  Bit 1 : Earliest record should be assigned a transaction code of APP if not already APP/RTP.
  */
 public enum EmpTransDaoOption
 {

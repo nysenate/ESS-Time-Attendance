@@ -122,7 +122,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         SetMultimap<Range<LocalDate>, Integer> periods = HashMultimap.create();
         supInfos.forEach(supInfo ->
                 periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
-        return periods.keys().stream()
+        return periods.keySet().stream()
                 .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, true).stream())
                 .collect(Collectors.toList());
     }
