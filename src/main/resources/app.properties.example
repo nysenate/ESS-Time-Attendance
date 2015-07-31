@@ -12,6 +12,8 @@ ldap.dn.template = CN={0},O=senate
 # Number of bytes generated for XSRF token
 xsrf.token.bytes = 128
 
+# --- Database Configuration --------------------------------------------------
+
 # Local Postgres Database
 db.local.driver = org.postgresql.Driver
 db.local.type = postgresql:
@@ -27,6 +29,15 @@ db.remote.host = nysdbdev
 db.remote.name = dev
 db.remote.user =
 db.remote.pass =
+
+# --- Eh Cache Configuration --------------------------------------------------
+
+# The amount of memory to allocate to Eh Cache for all heap based caches (in MB).
+# This value cannot exceed the maximum jvm heap size or the application will fail
+# to startup. (Recommended: 600)
+cache.max.size = 600
+
+# --- URL Configuration -------------------------------------------------------
 
 # The url path to be used for accessing resources (css/js)
 resource.path = /assets/**
