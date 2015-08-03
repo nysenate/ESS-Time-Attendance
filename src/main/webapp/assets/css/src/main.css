@@ -1680,6 +1680,10 @@ table.simple-table tbody tr td {
     display: none;
   }
 }
+.left-nav .user-heading {
+  margin-left: 20px;
+  color: #666;
+}
 .left-nav .main-topic {
   color: #333;
   margin-left: 20px;

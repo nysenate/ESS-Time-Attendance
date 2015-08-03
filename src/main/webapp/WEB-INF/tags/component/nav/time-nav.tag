@@ -4,6 +4,7 @@
 
 <section class="left-nav" ess-navigation>
     <ess-component-nav:nav-header topicTitle="Time And Attendance Menu" colorClass="teal"/>
+    <p class="user-heading">Welcome, ${principal.getFullName()}</p>
     <h3 class="main-topic">My Attendance</h3>
     <ul class="sub-topic-list">
         <li class="sub-topic"><a href="${ctxPath}/time/record/entry">Enter Time Record</a></li>

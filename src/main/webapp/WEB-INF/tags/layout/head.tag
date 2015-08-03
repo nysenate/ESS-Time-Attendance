@@ -12,8 +12,8 @@
             runtimeLevel: '${runtimeLevel}',
             loginUrl: '${loginUrl}'
         };
-        <c:if test="${not empty principal}">
-            window.globalProps.user = ${principal};
+        <c:if test="${not empty principalJson}">
+            window.globalProps.user = ${principalJson};
         </c:if>
     </script>
     <jsp:doBody/>
