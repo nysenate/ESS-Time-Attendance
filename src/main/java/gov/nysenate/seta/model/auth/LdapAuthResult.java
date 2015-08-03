@@ -11,15 +11,17 @@ public class LdapAuthResult
     private final LdapAuthStatus authStatus;
     private final String uid;
     private final Name name;
+    private final SenateLdapPerson person;
 
     public LdapAuthResult(LdapAuthStatus status, String uid) {
-        this(status, uid, null);
+        this(status, uid, null, null);
     }
 
-    public LdapAuthResult(LdapAuthStatus status, String uid, Name name) {
+    public LdapAuthResult(LdapAuthStatus status, String uid, Name name, SenateLdapPerson person) {
         this.authStatus = status;
         this.uid = uid;
         this.name = name;
+        this.person = person;
     }
 
     public boolean isAuthenticated() {
@@ -36,5 +38,9 @@ public class LdapAuthResult
 
     public Name getName() {
         return name;
+    }
+
+    public SenateLdapPerson getPerson() {
+        return person;
     }
 }

@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.DnAttribute;
 import org.springframework.ldap.odm.annotations.Entry;
@@ -69,8 +70,16 @@ public final class SenateLdapPerson
 
     public SenateLdapPerson() {}
 
+    /** --- Overrides --- */
+
+    @Override
+    public String toString() {
+        return uid;
+    }
+
     /** --- Basic Getters/Setters --- */
 
+    @JsonIgnore
     public Name getDn() {
         return dn;
     }

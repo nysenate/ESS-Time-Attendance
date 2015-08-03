@@ -1,5 +1,6 @@
 <%@tag description="ESS Base Template" pageEncoding="UTF-8"%>
 <%@attribute name="pageTitle" fragment="true" required="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!doctype html>
 <html id="ng-app" ng-app="ess">
@@ -11,6 +12,9 @@
             runtimeLevel: '${runtimeLevel}',
             loginUrl: '${loginUrl}'
         };
+        <c:if test="${not empty principal}">
+            window.globalProps.user = ${principal};
+        </c:if>
     </script>
     <jsp:doBody/>
 </head>

@@ -3,6 +3,7 @@ package gov.nysenate.seta.service.auth;
 import gov.nysenate.seta.dao.personnel.LdapAuthDao;
 import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.model.auth.LdapAuthStatus;
+import gov.nysenate.seta.model.auth.SenateLdapPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +42,13 @@ public class EssLdapAuthService implements LdapAuthService
         try {
             Name name = ldapAuthDao.authenticateByUid(uid, credentials);
             if (name != null) {
-                return new LdapAuthResult(LdapAuthStatus.AUTHENTICATED, uid, name);
+                SenateLdapPerson person = ldapAuthDao.getPerson(name);
+                return new LdapAuthResult(LdapAuthStatus.AUTHENTICATED, uid, name, person);
             }
         }
         catch(NamingException ex) {
             logger.debug("Authentication exception thrown when trying to authenticate {}", uid);
+            logger.error(ex.getMessage(), ex.getExplanation());
             authStatus = LdapAuthStatus.AUTHENTICATION_EXCEPTION;
         }
         catch(IncorrectResultSizeDataAccessException ex) {

@@ -10,7 +10,7 @@ public enum LdapAuthStatus
     MULTIPLE_MATCH_EXCEPTION(false, "There were multiple matches for the given LDAP user."),
     EMPTY_USERNAME(false, "The uid was empty."),
     EMPTY_CREDENTIALS(false, "The credentials were empty."),
-    UNKNOWN_EXCEPTION(false, "An exception occured while attempting to authenticate LDAP user.");
+    UNKNOWN_EXCEPTION(false, "An exception occurred while attempting to authenticate LDAP user.");
 
     private boolean authenticated;
     private String message;

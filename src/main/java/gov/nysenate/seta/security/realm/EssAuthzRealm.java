@@ -1,5 +1,7 @@
 package gov.nysenate.seta.security.realm;
 
+import com.google.common.collect.Lists;
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.service.auth.LdapAuthService;
 import org.apache.shiro.authc.*;
@@ -8,6 +10,7 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,7 @@ public class EssAuthzRealm extends AuthorizingRealm
 
         LdapAuthResult authResult = essLdapAuthService.authenticateUserByUid(username, password);
         if (authResult.isAuthenticated()) {
-            return new SimpleAuthenticationInfo(username, password, getName());
+            return new SimpleAuthenticationInfo(authResult.getPerson(), password, getName());
         }
         switch(authResult.getAuthStatus()) {
             case EMPTY_USERNAME:

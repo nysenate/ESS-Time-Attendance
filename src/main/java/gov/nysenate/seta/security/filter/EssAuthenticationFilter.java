@@ -3,6 +3,7 @@ package gov.nysenate.seta.security.filter;
 import gov.nysenate.common.HttpResponseUtils;
 import gov.nysenate.seta.client.response.auth.AuthenticationResponse;
 import gov.nysenate.seta.model.auth.AuthenticationStatus;
+import gov.nysenate.seta.model.auth.SenateLdapPerson;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.Subject;
@@ -142,10 +143,10 @@ public class EssAuthenticationFilter extends AuthenticationFilter
     protected boolean onLoginSuccess(AuthenticationToken token, AuthenticationStatus authStatus, Subject subject,
                                      ServletRequest request, ServletResponse response) {
 
-        String user = (String) subject.getPrincipal();
+        SenateLdapPerson user = (SenateLdapPerson) subject.getPrincipal();
         String redirectUrl = getSuccessRedirectUrl(request);
 
-        AuthenticationResponse authResponse = new AuthenticationResponse(authStatus, user, redirectUrl);
+        AuthenticationResponse authResponse = new AuthenticationResponse(authStatus, user.getUid(), redirectUrl);
         HttpResponseUtils.writeHttpResponse((HttpServletRequest) request, (HttpServletResponse) response, authResponse);
 
         logger.debug("Login for user {} was successful.", user);
