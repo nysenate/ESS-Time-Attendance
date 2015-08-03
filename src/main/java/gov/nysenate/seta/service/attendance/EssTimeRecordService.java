@@ -33,12 +33,14 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                                            Set<TimeRecordStatus> statuses,
                                            boolean fillMissingRecords) {
         TreeMultimap<PayPeriod, TimeRecord> records = TreeMultimap.create();
-        timeRecordDao.getRecordsDuring(empIds, dateRange, statuses).values()
+        timeRecordDao.getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class)).values()
                 .forEach(rec -> records.put(rec.getPayPeriod(), rec));
         if (fillMissingRecords && statuses.contains(TimeRecordStatus.NOT_SUBMITTED)) {
             empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
         }
-        return new ArrayList<>(records.values());
+        return records.values().stream()
+                .filter(record -> statuses.contains(record.getRecordStatus()))
+                .collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */
