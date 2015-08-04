@@ -1,6 +1,22 @@
 var essApp = angular.module('ess');
 
-essApp.controller('RecordEntryController', ['$scope', '$http', function($scope, $http){
+essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'ActiveTimeRecordsApi',
+function($scope, $http, appProps, recordsApi){
+
+    $scope.getRecords = function () {
+        console.log(appProps);
+        var empId = appProps.user.employeeId;
+        recordsApi.get({
+            empId: empId,
+            status: ['NOT_SUBMITTED', 'DISAPPROVED', 'DISAPPROVED_PERSONNEL']
+        }, function (response) {
+            $scope.records = [];
+            if (empId in response.result.items) {
+                $scope.records = response.result.items[empId];
+            }
+        });
+    };
+
     $scope.payPeriod = {
         range: '04/24/2014 - 05/07/2014',
         start: new Date('04/24/2014'),
@@ -79,6 +95,7 @@ essApp.controller('RecordEntryController', ['$scope', '$http', function($scope, 
                 misc: ''
             };
         }
+        $scope.getRecords();
     };
 
     $scope.init();

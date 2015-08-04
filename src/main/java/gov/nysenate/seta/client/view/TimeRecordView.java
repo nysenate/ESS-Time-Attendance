@@ -19,20 +19,22 @@ public class TimeRecordView implements ViewObject {
     protected String timeRecordId;
     protected Integer employeeId;
     protected Integer supervisorId;
+    protected EmployeeView supervisor;
     protected String scope;
     protected String employeeName;
     protected String respHeadCode;
     protected boolean active;
+    protected PayPeriodView payPeriod;
     protected LocalDate beginDate;
     protected LocalDate endDate;
     protected String remarks;
     protected String exceptionDetails;
     protected LocalDate processedDate;
     protected String recordStatus;
-    protected String txOriginalUserId;
-    protected String txUpdateUserId;
-    protected LocalDateTime txOriginalDate;
-    protected LocalDateTime txUpdateDate;
+    protected String originalUserId;
+    protected String updateUserId;
+    protected LocalDateTime originalDate;
+    protected LocalDateTime updateDate;
     protected List<TimeEntryView> timeEntries;
 
     public TimeRecordView() {}
@@ -42,20 +44,22 @@ public class TimeRecordView implements ViewObject {
             this.timeRecordId = String.valueOf(record.getTimeRecordId());
             this.employeeId = record.getEmployeeId();
             this.supervisorId = record.getSupervisorId();
+            this.supervisor = new EmployeeView(record.getSupervisor());
             this.employeeName = record.getEmployeeName();
             this.respHeadCode = record.getRespHeadCode();
             this.scope = (record.getRecordStatus() != null) ? record.getRecordStatus().getScope().getCode() : null;
             this.active = record.isActive();
+            this.payPeriod = new PayPeriodView(record.getPayPeriod());
             this.beginDate = record.getBeginDate();
             this.endDate = record.getEndDate();
             this.remarks = record.getRemarks();
             this.exceptionDetails = record.getExceptionDetails();
             this.processedDate = record.getProcessedDate();
             this.recordStatus = record.getRecordStatus() != null ? record.getRecordStatus().name() : null;
-            this.txOriginalUserId = record.getTxOriginalUserId();
-            this.txUpdateUserId = record.getTxUpdateUserId();
-            this.txOriginalDate = record.getTxOriginalDate();
-            this.txUpdateDate = record.getTxUpdateDate();
+            this.originalUserId = record.getOriginalUserId();
+            this.updateUserId = record.getUpdateUserId();
+            this.originalDate = record.getCreatedDate();
+            this.updateDate = record.getUpdateDate();
             this.timeEntries = record.getTimeEntries().stream()
                     .map(TimeEntryView::new)
                     .collect(Collectors.toList());
@@ -68,19 +72,21 @@ public class TimeRecordView implements ViewObject {
         record.setTimeRecordId(new BigInteger(timeRecordId));
         record.setEmployeeId(employeeId);
         record.setSupervisorId(supervisorId);
+        record.setSupervisor(supervisor.toEmployee());
         record.setEmployeeName(employeeName);
         record.setRespHeadCode(respHeadCode);
         record.setActive(active);
+        record.setPayPeriod(payPeriod.toPayPeriod());
         record.setBeginDate(beginDate);
         record.setEndDate(endDate);
         record.setRemarks(remarks);
         record.setExceptionDetails(exceptionDetails);
         record.setProcessedDate(processedDate);
         record.setRecordStatus(recordStatus != null ? TimeRecordStatus.valueOf(recordStatus) : null);
-        record.setTxOriginalUserId(txOriginalUserId);
-        record.setTxUpdateUserId(txUpdateUserId);
-        record.setTxOriginalDate(txOriginalDate);
-        record.setTxUpdateDate(txUpdateDate);
+        record.setOriginalUserId(originalUserId);
+        record.setUpdateUserId(updateUserId);
+        record.setCreatedDate(originalDate);
+        record.setUpdateDate(updateDate);
         record.setTimeEntries(timeEntries.stream()
                 .map(TimeEntryView::toTimeEntry)
                 .collect(Collectors.toList()));
@@ -148,28 +154,43 @@ public class TimeRecordView implements ViewObject {
     }
 
     @XmlElement
-    public String getTxOriginalUserId() {
-        return txOriginalUserId;
+    public String getOriginalUserId() {
+        return originalUserId;
     }
 
     @XmlElement
-    public String getTxUpdateUserId() {
-        return txUpdateUserId;
+    public String getUpdateUserId() {
+        return updateUserId;
     }
 
     @XmlElement
-    public LocalDateTime getTxOriginalDate() {
-        return txOriginalDate;
+    public LocalDateTime getOriginalDate() {
+        return originalDate;
     }
 
     @XmlElement
-    public LocalDateTime getTxUpdateDate() {
-        return txUpdateDate;
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
     }
 
     @XmlElement
     public List<TimeEntryView> getTimeEntries() {
         return timeEntries;
+    }
+
+    @XmlElement
+    public String getRespHeadCode() {
+        return respHeadCode;
+    }
+
+    @XmlElement
+    public PayPeriodView getPayPeriod() {
+        return payPeriod;
+    }
+
+    @XmlElement
+    public EmployeeView getSupervisor() {
+        return supervisor;
     }
 
     @Override

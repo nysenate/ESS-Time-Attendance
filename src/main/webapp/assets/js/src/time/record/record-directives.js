@@ -1,5 +1,26 @@
 var essApp = angular.module('ess');
 
+/** --- Filters --- */
+
+essApp.filter('timeRecordStatus', function () {
+    var statusDispMap = {
+        SUBMITTED: "Submitted",
+        NOT_SUBMITTED: "Not Submitted",
+        APPROVED: "Supervisor Approved",
+        DISAPPROVED: "Supervisor Disapproved",
+        SUBMITTED_PERSONNEL: "Personnel Approved",
+        DISAPPROVED_PERSONNEL: "Personnel Disapproved"
+    };
+    return function (status) {
+        if (statusDispMap.hasOwnProperty(status)) {
+            return statusDispMap[status];
+        }
+        return status + "?!";
+    };
+});
+
+/** --- Directives --- */
+
 essApp.directive('timeRecordInput', [function(){
     return {
         restrict: 'A',

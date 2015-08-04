@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.attendance;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
@@ -31,12 +32,14 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected String exceptionDetails;
     protected LocalDate processedDate;
     protected TimeRecordStatus recordStatus;
-    protected String txOriginalUserId;
-    protected String txUpdateUserId;
-    protected LocalDateTime txOriginalDate;
-    protected LocalDateTime txUpdateDate;
+    protected String originalUserId;
+    protected String updateUserId;
+    protected LocalDateTime createdDate;
+    protected LocalDateTime updateDate;
     protected List<TimeEntry> timeEntries = new ArrayList<>();
 
+    // Initialized via service layer (not dao) based on employeeId
+    protected Employee supervisor;
 
     /** --- Constructors --- */
 
@@ -52,10 +55,26 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.endDate = DateUtils.endOfDateRange(dateRange);
         this.payPeriod = payPeriod;
         this.recordStatus = TimeRecordStatus.NOT_SUBMITTED;
-        this.txOriginalUserId = this.employeeName;
-        this.txUpdateUserId = this.employeeName;
-        this.txOriginalDate = LocalDateTime.now();
-        this.txUpdateDate = txOriginalDate;
+        this.originalUserId = this.employeeName;
+        this.updateUserId = this.employeeName;
+        this.createdDate = LocalDateTime.now();
+        this.updateDate = createdDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TimeRecord)) return false;
+        TimeRecord record = (TimeRecord) o;
+        return Objects.equal(employeeId, record.employeeId) &&
+                Objects.equal(beginDate, record.beginDate) &&
+                Objects.equal(endDate, record.endDate) &&
+                Objects.equal(payPeriod, record.payPeriod);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(employeeId, beginDate, endDate, payPeriod);
     }
 
     @Override
@@ -177,36 +196,36 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.recordStatus = recordStatus;
     }
 
-    public String getTxOriginalUserId() {
-        return txOriginalUserId;
+    public String getOriginalUserId() {
+        return originalUserId;
     }
 
-    public void setTxOriginalUserId(String txOriginalUserId) {
-        this.txOriginalUserId = txOriginalUserId;
+    public void setOriginalUserId(String originalUserId) {
+        this.originalUserId = originalUserId;
     }
 
-    public String getTxUpdateUserId() {
-        return txUpdateUserId;
+    public String getUpdateUserId() {
+        return updateUserId;
     }
 
-    public void setTxUpdateUserId(String txUpdateUserId) {
-        this.txUpdateUserId = txUpdateUserId;
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
     }
 
-    public LocalDateTime getTxOriginalDate() {
-        return txOriginalDate;
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
     }
 
-    public void setTxOriginalDate(LocalDateTime txOriginalDate) {
-        this.txOriginalDate = txOriginalDate;
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 
-    public LocalDateTime getTxUpdateDate() {
-        return txUpdateDate;
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
     }
 
-    public void setTxUpdateDate(LocalDateTime txUpdateDate) {
-        this.txUpdateDate = txUpdateDate;
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
     }
 
     public List<TimeEntry> getTimeEntries() {
@@ -223,5 +242,13 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public void setRespHeadCode(String respHeadCode) {
         this.respHeadCode = respHeadCode;
+    }
+
+    public Employee getSupervisor() {
+        return supervisor;
+    }
+
+    public void setSupervisor(Employee supervisor) {
+        this.supervisor = supervisor;
     }
 }

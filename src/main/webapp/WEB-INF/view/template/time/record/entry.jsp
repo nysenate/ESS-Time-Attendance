@@ -15,7 +15,7 @@ Toggle this for temporary emps.
         active pay periods.</p>
 </div>
 
-<div class="content-container no-top-margin">
+<div class="content-container no-top-margin" ng-controller="RecordEntryController">
     <h1 class="teal">Time and Attendance Record Details</h1>
 
     <div id="record-selection-container" class="content-info" style="background:none;">
@@ -25,19 +25,24 @@ Toggle this for temporary emps.
                     <th>Select</th>
                     <th>Pay Period</th>
                     <th>Supervisor</th>
-                    <th>Days Remaining</th>
+                    <th>Period End</th>
                     <th>Status</th>
                     <th>Last Updated</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><input type="radio" checked="checked"/></td>
-                    <td>04/24/2014 - 5/7/2014</td>
-                    <td>Supervisor 1</td>
-                    <td>5</td>
-                    <td>In Progress</td>
-                    <td>04/24/2014 3:04 PM</td>
+                <tr ng-repeat="record in records">
+                    <td><input type="radio" name="recordSelect" ng-model="selectedRecord"/></td>
+                    <td>{{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}</td>
+                    <td>{{record.supervisor.fullName}}</td>
+                    <td>{{record.endDate | momentFromNow}}</td>
+                    <td>{{record.recordStatus | timeRecordStatus}}</td>
+                    <td>
+                        <span ng-show="record.updateDate | momentEquals:record.createdDate:'second'">
+                            {{record.updateDate | moment: 'lll'}}
+                        </span>
+                        <span ng-show="record.updateDate | momentEquals:record.createdDate:'second' | not">New</span>
+                    </td>
                 </tr>
             </tbody>
         </table>

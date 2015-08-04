@@ -20,10 +20,10 @@ public class LocalRecordRowMapper extends BaseRowMapper<TimeRecord>
         // TODO update for changes in TimeRecord
 //        record.setTimeRecordId(rs.getString(pfx + "time_record_id"));
 //        record.setEmployeeId(rs.getInt(pfx + "emp_id"));
-//        record.setTxOriginalUserId(rs.getString(pfx + "t_original_user"));
-//        record.setTxUpdateUserId(rs.getString(pfx + "t_update_user"));
-//        record.setTxOriginalDate(rs.getTimestamp(pfx + "t_original_date"));
-//        record.setTxUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
+//        record.setOriginalUserId(rs.getString(pfx + "t_original_user"));
+//        record.setUpdateUserId(rs.getString(pfx + "t_update_user"));
+//        record.setCreatedDate(rs.getTimestamp(pfx + "t_original_date"));
+//        record.setUpdateDate(rs.getTimestamp(pfx + "t_update_date"));
 //        record.setActive(rs.getString(pfx + "status").equals("A"));
 //        record.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "ts_status_id")));
 //        record.setBeginDate(rs.getDate(pfx + "begin_date"));

@@ -7,7 +7,6 @@ import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
-import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
@@ -33,11 +32,12 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                                            Set<TimeRecordStatus> statuses,
                                            boolean fillMissingRecords) {
         TreeMultimap<PayPeriod, TimeRecord> records = TreeMultimap.create();
-        timeRecordDao.getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class)).values()
+        timeRecordDao.getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class)).values().stream()
                 .forEach(rec -> records.put(rec.getPayPeriod(), rec));
         if (fillMissingRecords && statuses.contains(TimeRecordStatus.NOT_SUBMITTED)) {
             empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
         }
+        addSupervisors(records.values());
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .collect(Collectors.toList());
@@ -102,17 +102,10 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     private Set<TimeRecord> createEmptyTimeRecords(Employee employee, PayPeriod period, TransactionHistory fullHistory,
                                                      Set<TimeRecord> existingRecords) {
         TreeMap<LocalDate, Integer> supIds = fullHistory.getEffectiveSupervisorIds(period.getDateRange());
-        TreeMap<LocalDate, PayType> payTypes = fullHistory.getEffectivePayTypes(period.getDateRange());
-        if (supIds.size() == 1 && payTypes.size() == 1) {
-            TimeRecord record = new TimeRecord(employee, period.getDateRange(), period, supIds.firstEntry().getValue());
-            timeRecordDao.saveRecord(record);
-            logger.info("Created new record: {}", record.getDateRange());
-            return Collections.singleton(record);
-        }
-        else {
-            // TODO handle splits
-            throw new UnsupportedOperationException("Cannot handle splits yet.");
-        }
+        TimeRecord record = new TimeRecord(employee, period.getDateRange(), period, supIds.firstEntry().getValue());
+        timeRecordDao.saveRecord(record);
+        logger.info("Created new record: {}", record.getDateRange());
+        return Collections.singleton(record);
     }
 
     /**
@@ -127,5 +120,18 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         return periods.keySet().stream()
                 .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, true).stream())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Adds more detailed supervisor information to each of the given time records
+     */
+    private void addSupervisors(Collection<TimeRecord> timeRecords) {
+        ListMultimap<Integer, TimeRecord> supervisorMap = LinkedListMultimap.create();
+        timeRecords.forEach(record -> supervisorMap.put(record.getSupervisorId(), record));
+        supervisorMap.keySet().stream()
+                .map(employeeDao::getEmployeeById)
+                .forEach(supervisor ->
+                        supervisorMap.get(supervisor.getEmployeeId())
+                                .forEach(record -> record.setSupervisor(supervisor)));
     }
 }
