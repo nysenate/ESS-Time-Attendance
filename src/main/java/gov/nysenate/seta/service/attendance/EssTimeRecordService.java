@@ -51,11 +51,11 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         SupervisorEmpGroup empGroup = supervisorDao.getSupervisorEmpGroup(supId, dateRange);
         ListMultimap<Integer, TimeRecord> records = ArrayListMultimap.create();
 
-        // Get and add primary employee time records
+        // Get and addUsage primary employee time records
         records.putAll(supId,
                 getTimeRecordsForSupInfos(empGroup.getPrimaryEmployees().values(), dateRange, statuses));
 
-        // Get and add override employee time records
+        // Get and addUsage override employee time records
         empGroup.getOverrideSupIds().forEach(overrideSupId ->
                 records.putAll(overrideSupId,
                         getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),

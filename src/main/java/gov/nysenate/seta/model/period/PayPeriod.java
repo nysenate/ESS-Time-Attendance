@@ -6,6 +6,7 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collection;
@@ -60,9 +61,7 @@ public class PayPeriod implements Comparable<PayPeriod>
     /** --- Functional Getters/Setters --- */
 
     /**
-     * Returns the number of days between the start date (inclusive) and end date (inclusive)
-     * of this pay period.
-     *
+     * Returns the number of days between the start date and end date (inclusive) of this pay period.
      * @return int
      */
     public int getNumDaysInPeriod() {
@@ -71,6 +70,27 @@ public class PayPeriod implements Comparable<PayPeriod>
         }
         throw new IllegalStateException("Start date and/or end date is null. " +
                                         "Cannot compute number of pay period days");
+    }
+
+    /**
+     * Returns the number of week days between the start date and end date (inclusive) of this pay period.
+     * @return int
+     */
+    public int getNumWeekDaysInPeriod() {
+        if (startDate != null && endDate != null) {
+            LocalDate date = startDate;
+            int workDays = 0;
+            while (!date.isAfter(endDate)) {
+                DayOfWeek dayOfWeek = date.getDayOfWeek();
+                if (!dayOfWeek.equals(DayOfWeek.SATURDAY) && !dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                    workDays++;
+                }
+                date = date.plusDays(1);
+            }
+            return workDays;
+        }
+        throw new IllegalStateException("Start date and/or end date is null. " +
+                                        "Cannot compute number of pay period work days");
     }
 
     /**

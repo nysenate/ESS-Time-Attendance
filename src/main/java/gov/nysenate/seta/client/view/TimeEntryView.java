@@ -9,6 +9,7 @@ import gov.nysenate.seta.model.payroll.PayType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.lang.String;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,14 +22,14 @@ public class TimeEntryView implements ViewObject {
     protected int empId;
     protected String employeeName;
     protected LocalDate date;
-    protected int workHours;
-    protected int travelHours;
-    protected int holidayHours;
-    protected int vacationHours;
-    protected int personalHours;
-    protected int sickEmpHours;
-    protected int sickFamHours;
-    protected int miscHours;
+    protected BigDecimal workHours;
+    protected BigDecimal travelHours;
+    protected BigDecimal holidayHours;
+    protected BigDecimal vacationHours;
+    protected BigDecimal personalHours;
+    protected BigDecimal sickEmpHours;
+    protected BigDecimal sickFamHours;
+    protected BigDecimal miscHours;
     protected String miscType;
     protected boolean active;
     protected String empComment;
@@ -117,42 +118,42 @@ public class TimeEntryView implements ViewObject {
     }
 
     @XmlElement
-    public int getWorkHours() {
+    public BigDecimal getWorkHours() {
         return workHours;
     }
 
     @XmlElement
-    public int getTravelHours() {
+    public BigDecimal getTravelHours() {
         return travelHours;
     }
 
     @XmlElement
-    public int getHolidayHours() {
+    public BigDecimal getHolidayHours() {
         return holidayHours;
     }
 
     @XmlElement
-    public int getVacationHours() {
+    public BigDecimal getVacationHours() {
         return vacationHours;
     }
 
     @XmlElement
-    public int getPersonalHours() {
+    public BigDecimal getPersonalHours() {
         return personalHours;
     }
 
     @XmlElement
-    public int getSickEmpHours() {
+    public BigDecimal getSickEmpHours() {
         return sickEmpHours;
     }
 
     @XmlElement
-    public int getSickFamHours() {
+    public BigDecimal getSickFamHours() {
         return sickFamHours;
     }
 
     @XmlElement
-    public int getMiscHours() {
+    public BigDecimal getMiscHours() {
         return miscHours;
     }
 

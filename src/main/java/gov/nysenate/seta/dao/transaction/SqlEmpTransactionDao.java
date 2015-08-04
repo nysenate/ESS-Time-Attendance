@@ -59,12 +59,12 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
     /** --- Internal Methods --- */
 
     /**
-     * Helper method to add audit columns to the select sql statement. This is done because the columns need to be
+     * Helper method to addUsage audit columns to the select sql statement. This is done because the columns need to be
      * explicitly added to prevent name clashes and we don't want to manually write them out.
      *
      * Note: The replacement string cannot be the first entry in the select clause due to commas.
      *
-     * @param selectSql String - The sql with a select statement to add the audit columns to.
+     * @param selectSql String - The sql with a select statement to addUsage the audit columns to.
      * @param replaceKey String - The key used for replacement. e.g ${auditCols} where 'auditCols' is the key.
      * @param pfx String - A prefix to apply to each column name. Leave empty if you just want the column name as is.
      * @param restrictSet Set<TransactionCode> - Only the columns for the desired codes will be added. If null then

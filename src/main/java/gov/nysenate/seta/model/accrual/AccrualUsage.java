@@ -9,14 +9,14 @@ import java.util.Collection;
 public class AccrualUsage
 {
     int empId;
-    BigDecimal workHours = new BigDecimal(0);
-    BigDecimal travelHoursUsed = new BigDecimal(0);
-    BigDecimal vacHoursUsed = new BigDecimal(0);
-    BigDecimal perHoursUsed = new BigDecimal(0);
-    BigDecimal empHoursUsed = new BigDecimal(0);
-    BigDecimal famHoursUsed = new BigDecimal(0);
-    BigDecimal holHoursUsed = new BigDecimal(0);
-    BigDecimal miscHoursUsed = new BigDecimal(0);
+    BigDecimal workHours = BigDecimal.ZERO;
+    BigDecimal travelHoursUsed = BigDecimal.ZERO;
+    BigDecimal vacHoursUsed = BigDecimal.ZERO;
+    BigDecimal perHoursUsed = BigDecimal.ZERO;
+    BigDecimal empHoursUsed = BigDecimal.ZERO;
+    BigDecimal famHoursUsed = BigDecimal.ZERO;
+    BigDecimal holHoursUsed = BigDecimal.ZERO;
+    BigDecimal miscHoursUsed = BigDecimal.ZERO;
 
     public AccrualUsage() {}
 
@@ -37,31 +37,32 @@ public class AccrualUsage
     }
 
     public AccrualUsage(int empId, Collection<AccrualUsage> usages) {
-        this(usages.stream().reduce(new AccrualUsage(empId), AccrualUsage::add));
+        this(usages.stream().reduce(new AccrualUsage(empId), AccrualUsage::addUsages));
     }
 
     /** --- Public Methods --- */
 
     /**
-     * Adds the hours of one accrual usage to another.  The usages must be for the same employee
-     * @param rhs AccrualUsage
-     * @param lhs AccrualUsage
-     * @return AccrualUsage
+     * Adds the hours of one accrual usage to this usage. The usages must be for the same employee.
+     * @param usage AccrualUsage
      */
-    public static AccrualUsage add(AccrualUsage lhs, AccrualUsage rhs) {
-        if (lhs.empId != rhs.empId) {
-            throw new IllegalArgumentException("You cannot add accrual usages from two different employees");
+    public void addUsage(AccrualUsage usage) {
+        if (this.empId != usage.empId) {
+            throw new IllegalArgumentException("You cannot addUsage accrual usages from two different employees");
         }
-        AccrualUsage result = new AccrualUsage(lhs);
-        result.workHours = result.workHours.add(rhs.workHours);
-        result.travelHoursUsed = result.travelHoursUsed.add(rhs.travelHoursUsed);
-        result.vacHoursUsed = result.vacHoursUsed.add(rhs.vacHoursUsed);
-        result.perHoursUsed = result.perHoursUsed.add(rhs.perHoursUsed);
-        result.empHoursUsed = result.empHoursUsed.add(rhs.empHoursUsed);
-        result.famHoursUsed = result.famHoursUsed.add(rhs.famHoursUsed);
-        result.holHoursUsed = result.holHoursUsed.add(rhs.holHoursUsed);
-        result.miscHoursUsed = result.miscHoursUsed.add(rhs.miscHoursUsed);
-        return result;
+        this.workHours = this.workHours.add(usage.workHours);
+        this.travelHoursUsed = this.travelHoursUsed.add(usage.travelHoursUsed);
+        this.vacHoursUsed = this.vacHoursUsed.add(usage.vacHoursUsed);
+        this.perHoursUsed = this.perHoursUsed.add(usage.perHoursUsed);
+        this.empHoursUsed = this.empHoursUsed.add(usage.empHoursUsed);
+        this.famHoursUsed = this.famHoursUsed.add(usage.famHoursUsed);
+        this.holHoursUsed = this.holHoursUsed.add(usage.holHoursUsed);
+        this.miscHoursUsed = this.miscHoursUsed.add(usage.miscHoursUsed);
+    }
+
+    public static AccrualUsage addUsages(AccrualUsage lhs, AccrualUsage rhs) {
+        lhs.addUsage(rhs);
+        return lhs;
     }
 
     /** --- Functional Getters/Setters --- */

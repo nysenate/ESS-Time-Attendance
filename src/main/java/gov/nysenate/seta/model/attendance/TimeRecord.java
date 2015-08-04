@@ -3,14 +3,17 @@ package gov.nysenate.seta.model.attendance;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * A Time Record is the biweekly collection of daily time entries. The time record
@@ -36,7 +39,6 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected LocalDateTime txOriginalDate;
     protected LocalDateTime txUpdateDate;
     protected List<TimeEntry> timeEntries = new ArrayList<>();
-
 
     /** --- Constructors --- */
 
@@ -77,6 +79,30 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public Range<LocalDate> getDateRange() {
         return Range.closed(beginDate, endDate);
+    }
+
+    /**
+     * Constructs and returns a PeriodAccUsage by summing the values from the time entries.
+     * @return PeriodAccUsage
+     */
+    public PeriodAccUsage getPeriodAccUsage() {
+        PeriodAccUsage usage = new PeriodAccUsage();
+        usage.setEmpId(employeeId);
+        usage.setPayPeriod(payPeriod);
+        usage.setYear(payPeriod.getEndDate().getYear());
+        usage.setWorkHours(getSumOfTimeEntries(TimeEntry::getWorkHours));
+        usage.setEmpHoursUsed(getSumOfTimeEntries(TimeEntry::getSickEmpHours));
+        usage.setFamHoursUsed(getSumOfTimeEntries(TimeEntry::getSickFamHours));
+        usage.setHolHoursUsed(getSumOfTimeEntries(TimeEntry::getHolidayHours));
+        usage.setMiscHoursUsed(getSumOfTimeEntries(TimeEntry::getMiscHours));
+        usage.setPerHoursUsed(getSumOfTimeEntries(TimeEntry::getPersonalHours));
+        usage.setTravelHoursUsed(getSumOfTimeEntries(TimeEntry::getTravelHours));
+        usage.setVacHoursUsed(getSumOfTimeEntries(TimeEntry::getVacationHours));
+        return usage;
+    }
+
+    public BigDecimal getSumOfTimeEntries(Function<? super TimeEntry, BigDecimal> mapper) {
+        return timeEntries.stream().map(mapper).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /** --- Basic Getters/Setters --- */

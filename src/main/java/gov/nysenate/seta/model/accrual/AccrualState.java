@@ -1,10 +1,14 @@
 package gov.nysenate.seta.model.accrual;
 
 import gov.nysenate.seta.model.payroll.PayType;
+import gov.nysenate.seta.model.period.PayPeriod;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
+
+import static gov.nysenate.seta.model.accrual.AccrualRate.SICK;
+import static gov.nysenate.seta.model.accrual.AccrualRate.VACATION;
 
 /**
  * This class is intended for use within the accrual dao layer. It contains the necessary information
@@ -13,7 +17,11 @@ import java.time.LocalDate;
  */
 public class AccrualState extends AccrualSummary
 {
+    private static MathContext FOUR_DIGITS_MAX = new MathContext(4);
+    private static BigDecimal MAX_YTD_HOURS = new BigDecimal("1820");
+
     protected LocalDate endDate;
+    protected int payPeriodCount;
     protected boolean employeeActive;
     protected PayType payType;
     protected BigDecimal minTotalHours;
@@ -21,63 +29,105 @@ public class AccrualState extends AccrualSummary
     protected BigDecimal sickRate;
     protected BigDecimal vacRate;
     protected BigDecimal ytdHoursExpected;
-    int periodCounter = 0;
 
-    public AccrualState(AccrualSummary summary) {
-        super(summary);
+    public AccrualState(AnnualAccSummary annualAccSummary) {
+        super(annualAccSummary);
+        this.endDate = annualAccSummary.getEndDate();
+        this.payPeriodCount = annualAccSummary.getPayPeriodsYtd() + annualAccSummary.getPayPeriodsBanked();
     }
 
-    /** --- Functional Getters/Setters --- */
+    /** --- Methods --- */
 
-    private static MathContext FOUR_DIGITS_MAX = new MathContext(4);
+    public PeriodAccSummary toPeriodAccrualSummary(PayPeriod basePeriod, PayPeriod currPeriod) {
+        PeriodAccSummary periodAccSummary = new PeriodAccSummary(this);
+        periodAccSummary.setBasePayPeriod(basePeriod);
+        periodAccSummary.setExpectedTotalHours(this.getYtdHoursExpected());
+        periodAccSummary.setExpectedBiweekHours(getHoursExpectedInPeriod(currPeriod.getNumWeekDaysInPeriod()));
+        periodAccSummary.setPrevTotalHours(this.getTotalHoursUsed());
+        periodAccSummary.setSickRate(this.getSickRate());
+        periodAccSummary.setVacRate(this.getVacRate());
+        return periodAccSummary;
+    }
+
+    /**
+     * Computes the vacation and sick accrual rates based on the current minimum hours to work per year.
+     */
+    public void computeRates() {
+        if (minTotalHours == null) throw new IllegalStateException("Min total hours needs to be set first!");
+        this.sickRate = SICK.getRate(payPeriodCount, getProratePercentage());
+        this.vacRate = VACATION.getRate(payPeriodCount, getProratePercentage());
+    }
 
     public BigDecimal getProratePercentage() {
         if (this.minTotalHours != null) {
-            return this.minTotalHours.divide(new BigDecimal(1820), FOUR_DIGITS_MAX);
+            return this.minTotalHours.divide(MAX_YTD_HOURS, FOUR_DIGITS_MAX);
         }
         return BigDecimal.ZERO;
     }
 
+    /**
+     * Helper method which increment the pay periods worked by 1.
+     */
+    public void incrementPayPeriodCount() {
+        this.payPeriodCount++;
+    }
+
+    /**
+     * Increments the accrued vacation and sick time based on the currently set vac/sick accrual rates.
+     */
     public void incrementAccrualsEarned() {
         this.setVacHoursAccrued(this.getVacHoursAccrued().add(this.vacRate));
         this.setEmpHoursAccrued(this.getEmpHoursAccrued().add(this.sickRate));
     }
 
-    public void incrementYtdHoursExpected(BigDecimal expectedDaysInPeriod, BigDecimal totalDaysInPeriod) {
-        BigDecimal daysPercentage = expectedDaysInPeriod.divide(totalDaysInPeriod);
-        BigDecimal hoursExpectedInPeriod = getProratePercentage().multiply(new BigDecimal(70)).multiply(daysPercentage);
+    /**
+     * Increments the year to date expected hours by computing how many hours are required for the number of week
+     * days in the pay period and prorating it based on the minimum hours required per year.
+     *
+     * @param period PayPeriod
+     */
+    public void incrementYtdHoursExpected(PayPeriod period) {
+        BigDecimal hoursExpectedInPeriod = getHoursExpectedInPeriod(period.getNumWeekDaysInPeriod());
         if (ytdHoursExpected == null) {
             throw new IllegalStateException("YtdHoursExpected needs to be initialized before incrementing it.");
         }
         this.setYtdHoursExpected(this.getYtdHoursExpected().add(hoursExpectedInPeriod));
     }
 
-    public void applyYearRollover() {
-        resetUsage();
-        this.setVacHoursBanked(this.getVacHoursBanked().add(this.getVacHoursAccrued()));
-        this.setVacHoursAccrued(BigDecimal.ZERO);
-        this.setEmpHoursBanked(this.getEmpHoursBanked().add(this.getEmpHoursAccrued()));
-        this.setEmpHoursAccrued(BigDecimal.ZERO);
+    private BigDecimal getHoursExpectedInPeriod(int numWeekDaysInPeriod) {
+        BigDecimal bdNumWeekDays = new BigDecimal(numWeekDaysInPeriod);
+        return getProratePercentage().multiply(new BigDecimal(7)).multiply(bdNumWeekDays);
     }
 
-    public void resetUsage() {
+    /**
+     * At the start of a new year the following operations must take place on the recorded accruals:
+     * - Year to date accrual usages and hours worked are set back to 0.
+     * - Personal hours are reset to their initial state (35 hours prorated based on min hours required).
+     * - Excess vacation and sick hours are banked, ensuring they are capped to their maximum values.
+     * - Year to date Vacation and sick accruals are reset.
+     * - Year to date expected hours are reset.
+     */
+    public void applyYearRollover() {
+        resetCurrentYearUsage();
+        this.setVacHoursBanked(this.getVacHoursBanked().add(this.getVacHoursAccrued()).min(VACATION.getMaxHoursBanked()));
+        this.setVacHoursAccrued(BigDecimal.ZERO);
+        this.setEmpHoursBanked(this.getEmpHoursBanked().add(this.getEmpHoursAccrued()).min(SICK.getMaxHoursBanked()));
+        this.setEmpHoursAccrued(BigDecimal.ZERO);
+        this.setYtdHoursExpected(BigDecimal.ZERO);
+    }
+
+    /**
+     * Reset accrual usage for the current year.
+     */
+    public void resetCurrentYearUsage() {
         this.setVacHoursUsed(BigDecimal.ZERO);
         this.setPerHoursUsed(BigDecimal.ZERO);
         this.setEmpHoursUsed(BigDecimal.ZERO);
+        this.setFamHoursUsed(BigDecimal.ZERO);
         this.setHolHoursUsed(BigDecimal.ZERO);
         this.setMiscHoursUsed(BigDecimal.ZERO);
         this.setWorkHours(BigDecimal.ZERO);
         this.setTravelHoursUsed(BigDecimal.ZERO);
-    }
-
-    public void applyUsage(PeriodAccUsage usage) {
-        this.setVacHoursUsed(this.getVacHoursUsed().add(usage.getVacHoursUsed()));
-        this.setPerHoursUsed(this.getPerHoursUsed().add(usage.getPerHoursUsed()));
-        this.setEmpHoursUsed(this.getEmpHoursUsed().add(usage.getEmpHoursUsed()));
-        this.setHolHoursUsed(this.getHolHoursUsed().add(usage.getHolHoursUsed()));
-        this.setMiscHoursUsed(this.getMiscHoursUsed().add(usage.getMiscHoursUsed()));
-        this.setWorkHours(this.getWorkHours().add(usage.getWorkHours()));
-        this.setTravelHoursUsed(this.getTravelHoursUsed().add(usage.getTravelHoursUsed()));
     }
 
     /** --- Basic Getters/Setters --- */
@@ -138,12 +188,12 @@ public class AccrualState extends AccrualSummary
         this.vacRate = vacRate;
     }
 
-    public int getPeriodCounter() {
-        return periodCounter;
+    public int getPayPeriodCount() {
+        return payPeriodCount;
     }
 
-    public void setPeriodCounter(int periodCounter) {
-        this.periodCounter = periodCounter;
+    public void setPayPeriodCount(int payPeriodCount) {
+        this.payPeriodCount = payPeriodCount;
     }
 
     public BigDecimal getYtdHoursExpected() {

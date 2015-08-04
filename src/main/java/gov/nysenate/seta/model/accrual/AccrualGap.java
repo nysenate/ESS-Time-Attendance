@@ -43,7 +43,7 @@ public class AccrualGap
             /** FIXME 09/12
             if (rec.getEffectDate().compareTo(payPeriod.getStartDate()) >= 0 &&
                     rec.getEffectDate().compareTo(payPeriod.getEndDate()) <= 0) {
-                recs.add(rec);
+                recs.addUsage(rec);
             }
             else {
                 break;

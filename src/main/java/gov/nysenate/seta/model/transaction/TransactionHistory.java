@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -85,9 +86,9 @@ public class TransactionHistory
         return empStatuses;
     }
 
-    public TreeMap<LocalDate, Integer> getEffectiveMinHours(Range<LocalDate> dateRange) {
-        TreeMap<LocalDate, Integer> minHrs = new TreeMap<>();
-        getEffectiveEntriesDuring("NUMINTOTHRS", dateRange, true).forEach((k,v) -> minHrs.put(k, Integer.parseInt(v)));
+    public TreeMap<LocalDate, BigDecimal> getEffectiveMinHours(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, BigDecimal> minHrs = new TreeMap<>();
+        getEffectiveEntriesDuring("NUMINTOTHRS", dateRange, true).forEach((k,v) -> minHrs.put(k, new BigDecimal(v)));
         return minHrs;
     }
 
@@ -114,7 +115,7 @@ public class TransactionHistory
             }
         }
         else {
-            throw new IllegalArgumentException("Cannot add a null record to the transaction history!");
+            throw new IllegalArgumentException("Cannot addUsage a null record to the transaction history!");
         }
     }
 

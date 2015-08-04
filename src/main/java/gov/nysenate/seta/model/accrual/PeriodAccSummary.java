@@ -145,7 +145,7 @@ public class PeriodAccSummary extends AccrualSummary
             endCal.setTime(startDate);
         }
         /*
-        * Subtracting dates leaves one day lower than actual work days. We simply add one day
+        * Subtracting dates leaves one day lower than actual work days. We simply addUsage one day
         * to the end date to get the correct work days.
         * EX:   Subtracting Dates        Subtract Value    Real Work Days
         *        1/1/14 - 1/1/14         0                 1  (0 +1)
@@ -155,7 +155,7 @@ public class PeriodAccSummary extends AccrualSummary
         *        6/9/14(Mo)-6/15/14(Mo)  6                 6  (5 + 1)
         *
          */
-        //endCal.add(Calendar.DATE, 1);
+        //endCal.addUsage(Calendar.DATE, 1);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E");
         SimpleDateFormat simpleDateFormat0 = new SimpleDateFormat("MM/dd/yyyy");
         SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");

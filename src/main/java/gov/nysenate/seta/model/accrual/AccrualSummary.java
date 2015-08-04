@@ -8,9 +8,6 @@ import java.math.BigDecimal;
  */
 public class AccrualSummary extends AccrualUsage
 {
-    protected static final BigDecimal MAX_VAC_ACCRUED = new BigDecimal(210);
-    protected static final BigDecimal MAX_EMP_ACCRUED = new BigDecimal(1400);
-
     /** The number of vacation hours accrued within a certain time frame. */
     protected BigDecimal vacHoursAccrued;
 

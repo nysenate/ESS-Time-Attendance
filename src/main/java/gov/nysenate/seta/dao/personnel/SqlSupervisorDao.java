@@ -225,7 +225,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                 else {
                     /**
                      * Process the records of employees that had a supervisor change during the date range.
-                     * If a supervisor match is found to occur on/before the 'start' date, we add them to their
+                     * If a supervisor match is found to occur on/before the 'start' date, we addUsage them to their
                      * respective supervisor group. Otherwise if we can't find a match and the effect date has
                      * occurred before the 'start' date, we know that they don't belong in the group for this range.
                      */

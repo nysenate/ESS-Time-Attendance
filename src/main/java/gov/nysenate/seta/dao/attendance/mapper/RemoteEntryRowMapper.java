@@ -25,14 +25,14 @@ public class RemoteEntryRowMapper extends BaseRowMapper<TimeEntry>{
         te.setEmpId(rs.getInt(pfx + "NUXREFEM"));
         te.setEmployeeName(rs.getString(pfx + "NAUSER"));
         te.setDate(getLocalDateFromRs(rs, pfx + "DTDAY"));
-        te.setWorkHours(rs.getInt(pfx + "NUWORK"));
-        te.setTravelHours(rs.getInt(pfx + "NUTRAVEL"));
-        te.setHolidayHours(rs.getInt(pfx + "NUHOLIDAY"));
-        te.setVacationHours(rs.getInt(pfx + "NUVACATION"));
-        te.setPersonalHours(rs.getInt(pfx + "NUPERSONAL"));
-        te.setSickEmpHours(rs.getInt(pfx + "NUSICKEMP"));
-        te.setSickFamHours(rs.getInt(pfx + "NUSICKFAM"));
-        te.setMiscHours(rs.getInt(pfx + "NUMISC"));
+        te.setWorkHours(rs.getBigDecimal(pfx + "NUWORK"));
+        te.setTravelHours(rs.getBigDecimal(pfx + "NUTRAVEL"));
+        te.setHolidayHours(rs.getBigDecimal(pfx + "NUHOLIDAY"));
+        te.setVacationHours(rs.getBigDecimal(pfx + "NUVACATION"));
+        te.setPersonalHours(rs.getBigDecimal(pfx + "NUPERSONAL"));
+        te.setSickEmpHours(rs.getBigDecimal(pfx + "NUSICKEMP"));
+        te.setSickFamHours(rs.getBigDecimal(pfx + "NUSICKFAM"));
+        te.setMiscHours(rs.getBigDecimal(pfx + "NUMISC"));
         if (rs.getString(pfx + "NUXRMISC") != null) {
             te.setMiscType(MiscLeaveType.valueOfId(rs.getBigDecimal(pfx + "NUXRMISC").toBigInteger()));
         }

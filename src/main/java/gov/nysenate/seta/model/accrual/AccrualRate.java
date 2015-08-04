@@ -14,17 +14,21 @@ public enum AccrualRate
 {
     /** Vacation rates increase as you work longer until you reach 5.5 */
     VACATION (Arrays.asList(new BigDecimal(0), new BigDecimal("31.5"), new BigDecimal("3.5"),
-                            new BigDecimal("3.75"), new BigDecimal("4"), new BigDecimal("5.5"))),
+                            new BigDecimal("3.75"), new BigDecimal("4"), new BigDecimal("5.5")),
+              new BigDecimal("210")),
 
     /** Sick rates are fixed at 3.5 */
     SICK     (Arrays.asList(new BigDecimal("3.5"), new BigDecimal("3.5"), new BigDecimal("3.5"),
-                            new BigDecimal("3.5"), new BigDecimal("3.5"), new BigDecimal("3.5")));
+                            new BigDecimal("3.5"), new BigDecimal("3.5"), new BigDecimal("3.5")),
+              new BigDecimal("1400"));
 
     private ArrayList<BigDecimal> accRates;
+    private BigDecimal maxHoursBanked;
 
-    AccrualRate(List<BigDecimal> accRates) {
+    AccrualRate(List<BigDecimal> accRates, BigDecimal maxHoursBanked) {
         assert accRates.size() == 6;
         this.accRates = new ArrayList<>(accRates);
+        this.maxHoursBanked = maxHoursBanked;
     }
 
     /**
@@ -53,6 +57,14 @@ public enum AccrualRate
      */
     public BigDecimal getRate(int payPeriods, BigDecimal proratePercentage) {
         return roundToNearestQuarter(getRate(payPeriods).multiply(proratePercentage));
+    }
+
+    /**
+     * Returns the maximum number of hours that can be rolled over to the next year.
+     * @return BigDecimal
+     */
+    public BigDecimal getMaxHoursBanked() {
+        return maxHoursBanked;
     }
 
     /**

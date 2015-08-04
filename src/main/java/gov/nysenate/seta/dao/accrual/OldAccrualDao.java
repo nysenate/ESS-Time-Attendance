@@ -202,9 +202,9 @@ public class OldAccrualDao extends SqlBaseDao //implements AccrualDao
             boolean isEndOfYearSplit = gapPeriod.isEndOfYearSplit();
 
             if (!isTemp && !isEndOfYearSplit) {
-                accrualState.setPeriodCounter(accrualState.getPeriodCounter() + 1);
-                accrualState.setVacRate(AccrualRate.VACATION.getRate(accrualState.getPeriodCounter(), accrualState.getProratePercentage()));
-                accrualState.setSickRate(AccrualRate.SICK.getRate(accrualState.getPeriodCounter(), accrualState.getProratePercentage()));
+//                accrualState.setPeriodCounter(accrualState.getPeriodCounter() + 1);
+//                accrualState.setVacRate(AccrualRate.VACATION.getRate(accrualState.getPeriodCounter(), accrualState.getProratePercentage()));
+//                accrualState.setSickRate(AccrualRate.SICK.getRate(accrualState.getPeriodCounter(), accrualState.getProratePercentage()));
                 accrualState.incrementAccrualsEarned();
             }
 
@@ -229,7 +229,7 @@ public class OldAccrualDao extends SqlBaseDao //implements AccrualDao
 
         AccrualState accState = new AccrualState(annSummary);
         accState.setEndDate(endDate);
-        accState.setPeriodCounter(annSummary.getPayPeriodsBanked());
+//        accState.setPeriodCounter(annSummary.getPayPeriodsBanked());
         accState.setEmployeeActive(hasEndDate && !isEmployeeTerminated(empRecords));
         accState.setPayType(getPayType(payTypeRecords));
         accState.setMinTotalHours(getMinTotalHours(minRecords));
