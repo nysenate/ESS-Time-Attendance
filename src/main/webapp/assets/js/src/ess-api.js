@@ -15,3 +15,9 @@ essApi.factory('HolidaysDuringYearApi', ['$resource', 'appProps', function($reso
 essApi.factory('HolidaysDuringDatesApi', ['$resource', 'appProps', function($resource, appProps) {
     return $resource(appProps.apiPath + '/holidays/dates/:startDate/:endDate');
 }]);
+
+/** --- Time Record API --- */
+
+essApi.factory('ActiveTimeRecordsApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/timerecords/active');
+}]);

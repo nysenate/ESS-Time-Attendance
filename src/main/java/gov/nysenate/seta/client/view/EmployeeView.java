@@ -1,7 +1,9 @@
 package gov.nysenate.seta.client.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.personnel.Employee;
+import gov.nysenate.seta.model.personnel.Gender;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -44,6 +46,26 @@ public class EmployeeView implements ViewObject
             this.dateOfBirth = employee.getDateOfBirth();
             this.gender = employee.getGender().name();
         }
+    }
+
+    @JsonIgnore
+    public Employee toEmployee() {
+        Employee emp = new Employee();
+        emp.setEmployeeId(employeeId);
+        emp.setUid(uid);
+        emp.setTitle(title);
+        emp.setFirstName(firstName);
+        emp.setLastName(lastName);
+        emp.setInitial(initial);
+        emp.setSuffix(suffix);
+        emp.setFullName(fullName);
+        emp.setActive(active);
+        emp.setEmail(email);
+        emp.setWorkPhone(workPhone);
+        emp.setHomePhone(homePhone);
+        emp.setDateOfBirth(dateOfBirth);
+        emp.setGender(Gender.valueOf(gender));
+        return emp;
     }
 
     @Override

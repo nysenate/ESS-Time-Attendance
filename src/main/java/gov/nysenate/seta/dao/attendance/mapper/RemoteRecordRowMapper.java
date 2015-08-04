@@ -27,11 +27,11 @@ public class RemoteRecordRowMapper extends BaseRowMapper<TimeRecord>
         record.setEndDate(DateUtils.getLocalDate(rs.getDate("DTEND")));
         record.setTimeRecordId(rs.getBigDecimal(pfx + "NUXRTIMESHEET").toBigInteger());
         record.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
-        record.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
+        record.setOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
         record.setEmployeeName(rs.getString(pfx + "NAUSER"));
-        record.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
-        record.setTxOriginalDate(getLocalDateTimeFromRs(rs, (pfx + "DTTXNORIGIN")));
-        record.setTxUpdateDate(getLocalDateTimeFromRs(rs, (pfx + "DTTXNUPDATE")));
+        record.setUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
+        record.setCreatedDate(getLocalDateTimeFromRs(rs, (pfx + "DTTXNORIGIN")));
+        record.setUpdateDate(getLocalDateTimeFromRs(rs, (pfx + "DTTXNUPDATE")));
         record.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         record.setRecordStatus(TimeRecordStatus.valueOfCode(rs.getString(pfx + "CDTSSTAT")));
         record.setRemarks(rs.getString(pfx + "DEREMARKS"));

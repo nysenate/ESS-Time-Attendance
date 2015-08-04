@@ -31,10 +31,10 @@ public class LocalEntryRowMapper extends BaseRowMapper<TimeEntry>
 //        if (rs.getString(pfx + "misc_type") != null) {
 //            entry.setMiscType(MiscLeaveType.valueOf(rs.getString(pfx + "misc_type")));
 //        }
-//        entry.setTxOriginalUserId(rs.getString(pfx + "tx_original_user"));
-//        entry.setTxUpdateUserId(rs.getString(pfx + "tx_update_user"));
-//        entry.setTxOriginalDate(rs.getTimestamp(pfx + "tx_original_date"));
-//        entry.setTxUpdateDate(rs.getTimestamp(pfx + "tx_update_date"));
+//        entry.setOriginalUserId(rs.getString(pfx + "tx_original_user"));
+//        entry.setUpdateUserId(rs.getString(pfx + "tx_update_user"));
+//        entry.setCreatedDate(rs.getTimestamp(pfx + "tx_original_date"));
+//        entry.setUpdateDate(rs.getTimestamp(pfx + "tx_update_date"));
 //        entry.setActive(rs.getString(pfx + "status").equals("A"));
 //        entry.setEmpComment(rs.getString(pfx + "emp_comment"));
 //        entry.setPayType(PayType.valueOf(rs.getString(pfx + "pay_type")));

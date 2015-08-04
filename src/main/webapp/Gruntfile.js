@@ -11,8 +11,11 @@ module.exports = function(grunt) {
         jsRoot: 'assets/js',
         jsSource: '<%= jsRoot %>/src',
         jsVendor: '<%= jsRoot %>/vendor',
+        jspSource: 'WEB-INF/view',
+        tagSource: 'WEB-INF/tags',
         bowerRoot: 'bower_components',
         jsDest: '<%= jsRoot %>/dest',
+        tomcatWeb: '/usr/share/tomcat/webapps/timesheets',
 
         /** Compile LESS into css and place it into the css source directory */
         less: {
@@ -92,7 +95,7 @@ module.exports = function(grunt) {
             },
             jsSource: {
                 files: ['<%= jsSource %>/**.js'],
-                tasks: ['uglify:dev', 'uglify:prod']
+                tasks: ['uglify:dev', 'uglify:prod', 'copy:js']
             }
         },
 
@@ -125,5 +128,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
-    grunt.registerTask('default', ['less', 'cssmin', 'uglify']);
+    grunt.registerTask('default', ['less', 'cssmin', 'uglify', 'copy']);
 };

@@ -151,10 +151,10 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
                 new BigDecimal(timeRecord.getTimeRecordId()) : null);
         params.addValue("empId", timeRecord.getEmployeeId());
         params.addValue("employeeName", timeRecord.getEmployeeName());
-        params.addValue("tOriginalUserId", timeRecord.getTxOriginalUserId());
-        params.addValue("tUpdateUserId", timeRecord.getTxUpdateUserId());
-        params.addValue("tOriginalDate", toDate(timeRecord.getTxOriginalDate()));
-        params.addValue("tUpdateDate", toDate(timeRecord.getTxUpdateDate()));
+        params.addValue("tOriginalUserId", timeRecord.getOriginalUserId());
+        params.addValue("tUpdateUserId", timeRecord.getUpdateUserId());
+        params.addValue("tOriginalDate", toDate(timeRecord.getCreatedDate()));
+        params.addValue("tUpdateDate", toDate(timeRecord.getUpdateDate()));
         params.addValue("status", timeRecord.isActive() ? "A" : "I");
         params.addValue("tSStatusId", timeRecord.getRecordStatus().getCode());
         params.addValue("beginDate", toDate(timeRecord.getBeginDate()));

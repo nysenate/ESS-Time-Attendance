@@ -27,11 +27,11 @@ public class TimeRecordDaoTests extends BaseTests
         testRecord = new TimeRecord();
 //        testRecord.setTimeRecordId(new BigInteger("11111111111111111111111111111111111111"));
         testRecord.setEmployeeId(11423);
-        testRecord.setTxOriginalUserId("STOUFFER");
+        testRecord.setOriginalUserId("STOUFFER");
         testRecord.setEmployeeName("STOUFFER");
-        testRecord.setTxUpdateUserId("STOUFFER");
-        testRecord.setTxOriginalDate(LocalDate.of(1990, 8, 15).atStartOfDay());
-        testRecord.setTxUpdateDate(LocalDate.of(1990, 8, 15).atStartOfDay());
+        testRecord.setUpdateUserId("STOUFFER");
+        testRecord.setCreatedDate(LocalDate.of(1990, 8, 15).atStartOfDay());
+        testRecord.setUpdateDate(LocalDate.of(1990, 8, 15).atStartOfDay());
         testRecord.setActive(true);
         testRecord.setRecordStatus(TimeRecordStatus.SUBMITTED);
         testRecord.setRemarks("Hello world");
