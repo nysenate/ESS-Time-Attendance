@@ -44,7 +44,7 @@ public class TimeEntryView implements ViewObject {
     public TimeEntryView(TimeEntry entry) {
         if (entry != null) {
             this.entryId = entry.getEntryId() != null ? entry.getEntryId().toString() : null;
-            this.timeRecordId = entry.getEntryId() != null ? entry.getTimeRecordId().toString() : null;
+            this.timeRecordId = entry.getTimeRecordId() != null ? entry.getTimeRecordId().toString() : null;
             this.empId = entry.getEmpId();
             this.employeeName = entry.getEmployeeName();
             this.date = entry.getDate();
@@ -60,10 +60,10 @@ public class TimeEntryView implements ViewObject {
             this.active = entry.isActive();
             this.empComment = entry.getEmpComment();
             this.payType = entry.getPayType() != null ? entry.getPayType().name() : null;
-            this.txOriginalUserId = entry.getTxOriginalUserId();
-            this.txUpdateUserId = entry.getTxUpdateUserId();
-            this.txOriginalDate = entry.getTxOriginalDate();
-            this.txUpdateDate = entry.getTxUpdateDate();
+            this.txOriginalUserId = entry.getOriginalUserId();
+            this.txUpdateUserId = entry.getUpdateUserId();
+            this.txOriginalDate = entry.getOriginalDate();
+            this.txUpdateDate = entry.getUpdateDate();
         }
     }
 
@@ -85,10 +85,10 @@ public class TimeEntryView implements ViewObject {
         entry.setActive(active);
         entry.setEmpComment(empComment);
         entry.setPayType(payType != null ? PayType.valueOf(payType) : null);
-        entry.setTxOriginalUserId(txOriginalUserId);
-        entry.setTxUpdateUserId(txUpdateUserId);
-        entry.setTxOriginalDate(txOriginalDate);
-        entry.setTxUpdateDate(txUpdateDate);
+        entry.setOriginalUserId(txOriginalUserId);
+        entry.setUpdateUserId(txUpdateUserId);
+        entry.setOriginalDate(txOriginalDate);
+        entry.setUpdateDate(txUpdateDate);
         return entry;
     }
 

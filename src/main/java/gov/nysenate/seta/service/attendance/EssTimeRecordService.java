@@ -4,9 +4,11 @@ import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
+import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
+import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
@@ -40,6 +42,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         addSupervisors(records.values());
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
+                .peek(EssTimeRecordService::initializeEntries)
                 .collect(Collectors.toList());
     }
 
@@ -102,7 +105,9 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     private Set<TimeRecord> createEmptyTimeRecords(Employee employee, PayPeriod period, TransactionHistory fullHistory,
                                                      Set<TimeRecord> existingRecords) {
         TreeMap<LocalDate, Integer> supIds = fullHistory.getEffectiveSupervisorIds(period.getDateRange());
-        TimeRecord record = new TimeRecord(employee, period.getDateRange(), period, supIds.firstEntry().getValue());
+        TreeMap<LocalDate, PayType> payTypes = fullHistory.getEffectivePayTypes(period.getDateRange());
+        TimeRecord record = new TimeRecord(employee, period.getDateRange(), period,
+                payTypes.firstEntry().getValue(), supIds.firstEntry().getValue());
         timeRecordDao.saveRecord(record);
         logger.info("Created new record: {}", record.getDateRange());
         return Collections.singleton(record);
@@ -133,5 +138,21 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                 .forEach(supervisor ->
                         supervisorMap.get(supervisor.getEmployeeId())
                                 .forEach(record -> record.setSupervisor(supervisor)));
+    }
+
+    /**
+     * Ensures that the given time record contains entries for each day covered
+     */
+    private static void initializeEntries(TimeRecord timeRecord) {
+        if (timeRecord.getPayType() == null && !timeRecord.getTimeEntries().isEmpty()) {
+            timeRecord.setPayType(timeRecord.getTimeEntries().get(0).getPayType());
+        }
+
+        for (LocalDate entryDate = timeRecord.getBeginDate(); !entryDate.isAfter(timeRecord.getEndDate());
+             entryDate = entryDate.plusDays(1)) {
+            if (!timeRecord.containsEntry(entryDate)) {
+                timeRecord.addTimeEntry(new TimeEntry(timeRecord, entryDate));
+            }
+        }
     }
 }

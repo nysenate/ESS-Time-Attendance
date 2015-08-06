@@ -1,6 +1,10 @@
 package gov.nysenate.seta.model.payroll;
 
+import gov.nysenate.common.OutputUtils;
+
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Miscellaneous leave time must be accompanied by a code representing the type of leave.
@@ -50,6 +54,14 @@ public enum MiscLeaveType
             }
         }
         return null;
+    }
+
+    public static String getJsonLabels() {
+        Map<String, String> labelMap = new HashMap<>();
+        for (MiscLeaveType leaveType : MiscLeaveType.values()) {
+            labelMap.put(leaveType.name(), leaveType.shortName);
+        }
+        return OutputUtils.toJson(labelMap);
     }
 
     public String getCode() {

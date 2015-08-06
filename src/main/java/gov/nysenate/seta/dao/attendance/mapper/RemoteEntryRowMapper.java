@@ -36,10 +36,10 @@ public class RemoteEntryRowMapper extends BaseRowMapper<TimeEntry>{
         if (rs.getString(pfx + "NUXRMISC") != null) {
             te.setMiscType(MiscLeaveType.valueOfId(rs.getBigDecimal(pfx + "NUXRMISC").toBigInteger()));
         }
-        te.setTxOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
-        te.setTxUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
-        te.setTxOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
-        te.setTxUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
+        te.setOriginalUserId(rs.getString(pfx + "NATXNORGUSER"));
+        te.setUpdateUserId(rs.getString(pfx + "NATXNUPDUSER"));
+        te.setOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
+        te.setUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
         te.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
         te.setEmpComment(rs.getString(pfx + "DECOMMENTS"));
         te.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));

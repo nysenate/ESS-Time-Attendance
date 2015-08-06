@@ -32,10 +32,10 @@ public class TimeEntry
     protected boolean active;
     protected String empComment;
     protected PayType payType;
-    protected String txOriginalUserId;
-    protected String txUpdateUserId;
-    protected LocalDateTime txOriginalDate;
-    protected LocalDateTime txUpdateDate;
+    protected String originalUserId;
+    protected String updateUserId;
+    protected LocalDateTime originalDate;
+    protected LocalDateTime updateDate;
 
     /** --- Constructors --- */
 
@@ -44,6 +44,19 @@ public class TimeEntry
     public TimeEntry(BigInteger timeRecordId, int empId) {
         this.timeRecordId = timeRecordId;
         this.empId = empId;
+    }
+
+    public TimeEntry(TimeRecord record, LocalDate date) {
+        this.timeRecordId = record.getTimeRecordId();
+        this.empId = record.getEmployeeId();
+        this.employeeName = record.getEmployeeName();
+        this.date = date;
+        this.active = true;
+        this.payType = record.getPayType();
+        this.originalUserId = record.getOriginalUserId();
+        this.updateUserId = this.originalUserId;
+        this.originalDate = LocalDateTime.now();
+        this.updateDate = this.originalDate;
     }
 
     /** --- Functional Getters/Setters --- */
@@ -84,17 +97,17 @@ public class TimeEntry
                 Objects.equals(miscType, timeEntry.miscType) &&
                 Objects.equals(empComment, timeEntry.empComment) &&
                 Objects.equals(payType, timeEntry.payType) &&
-                Objects.equals(txOriginalUserId, timeEntry.txOriginalUserId) &&
-                Objects.equals(txUpdateUserId, timeEntry.txUpdateUserId) &&
-                Objects.equals(txOriginalDate, timeEntry.txOriginalDate) &&
-                Objects.equals(txUpdateDate, timeEntry.txUpdateDate);
+                Objects.equals(originalUserId, timeEntry.originalUserId) &&
+                Objects.equals(updateUserId, timeEntry.updateUserId) &&
+                Objects.equals(originalDate, timeEntry.originalDate) &&
+                Objects.equals(updateDate, timeEntry.updateDate);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(entryId, timeRecordId, empId, employeeName, date, workHours, travelHours, holidayHours,
                             vacationHours, personalHours, sickEmpHours, sickFamHours, miscHours, miscType, active,
-                            empComment, payType, txOriginalUserId, txUpdateUserId, txOriginalDate, txUpdateDate);
+                            empComment, payType, originalUserId, updateUserId, originalDate, updateDate);
     }
 
     /** --- Basic Getters/Setters --- */
@@ -235,35 +248,35 @@ public class TimeEntry
         this.payType = payType;
     }
 
-    public String getTxOriginalUserId() {
-        return txOriginalUserId;
+    public String getOriginalUserId() {
+        return originalUserId;
     }
 
-    public void setTxOriginalUserId(String txOriginalUserId) {
-        this.txOriginalUserId = txOriginalUserId;
+    public void setOriginalUserId(String originalUserId) {
+        this.originalUserId = originalUserId;
     }
 
-    public String getTxUpdateUserId() {
-        return txUpdateUserId;
+    public String getUpdateUserId() {
+        return updateUserId;
     }
 
-    public void setTxUpdateUserId(String txUpdateUserId) {
-        this.txUpdateUserId = txUpdateUserId;
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
     }
 
-    public LocalDateTime getTxOriginalDate() {
-        return txOriginalDate;
+    public LocalDateTime getOriginalDate() {
+        return originalDate;
     }
 
-    public void setTxOriginalDate(LocalDateTime txOriginalDate) {
-        this.txOriginalDate = txOriginalDate;
+    public void setOriginalDate(LocalDateTime originalDate) {
+        this.originalDate = originalDate;
     }
 
-    public LocalDateTime getTxUpdateDate() {
-        return txUpdateDate;
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
     }
 
-    public void setTxUpdateDate(LocalDateTime txUpdateDate) {
-        this.txUpdateDate = txUpdateDate;
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
     }
 }

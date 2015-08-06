@@ -70,10 +70,10 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("miscHR", timeEntry.getMiscHours());
         param.addValue("miscTypeId", timeEntry.getMiscType() != null ?
                                         new BigDecimal(timeEntry.getMiscType().getMiscLeaveId()) : new BigDecimal(BigInteger.ZERO) );
-        param.addValue("tOriginalUserId", timeEntry.getTxOriginalUserId());
-        param.addValue("tUpdateUserId", timeEntry.getTxUpdateUserId());
-        param.addValue("tOriginalDate", toDate(timeEntry.getTxOriginalDate()));
-        param.addValue("tUpdateDate", toDate(timeEntry.getTxUpdateDate()));
+        param.addValue("tOriginalUserId", timeEntry.getOriginalUserId());
+        param.addValue("tUpdateUserId", timeEntry.getUpdateUserId());
+        param.addValue("tOriginalDate", toDate(timeEntry.getOriginalDate()));
+        param.addValue("tUpdateDate", toDate(timeEntry.getUpdateDate()));
         param.addValue("status", String.valueOf(getStatusCode(timeEntry.isActive())));
         param.addValue("empComment", timeEntry.getEmpComment());
         param.addValue("payType", timeEntry.getPayType().name());

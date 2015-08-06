@@ -13,7 +13,7 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         /**   PM23TIMESHEET columns (no alias needed) */
         "    rec.NUXRTIMESHEET, rec.NUXREFEM, rec.NATXNORGUSER, rec.NATXNUPDUSER, rec.NAUSER, rec.DTTXNORIGIN, rec.DTTXNUPDATE,\n" +
         "    rec.CDSTATUS, rec.CDTSSTAT, rec.DTBEGIN, rec.DTEND, rec.DEREMARKS, rec.NUXREFSV, rec.DEEXCEPTION,\n" +
-        "    rec.DTPROCESS, rec.CDRESPCTRHD,\n" +
+        "    rec.DTPROCESS, rec.CDRESPCTRHD, rec.CDPAYTYPE,\n" +
         /**   SL16PERIOD columns (aliased with PER_) */
         "    per.DTBEGIN AS PER_DTBEGIN, per.DTEND AS PER_DTEND, per.CDSTATUS AS PER_CDSTATUS, per.CDPERIOD AS PER_CDPERIOD,\n" +
         "    per.NUPERIOD AS PER_NUPERIOD, per.DTPERIODYEAR AS PER_DTPERIODYEAR,\n" +
@@ -64,9 +64,9 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "INSERT \n" +
         "INTO " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
         "(NUXRTIMESHEET, NUXREFEM, NATXNORGUSER, NATXNUPDUSER, NAUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS,\n" +
-        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD) \n" +
+        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD, CDPAYTYPE) \n" +
         "VALUES (:timesheetId,  :empId, :tOriginalUserId, :tUpdateUserId, :employeeName, :tOriginalDate, :tUpdateDate, :status,\n" +
-                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr) \n"
+                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr, :payType) \n"
     ),
     UPDATE_TIME_REC_SQL (
         "UPDATE " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
@@ -74,7 +74,8 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "  NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId,\n" +
         "  DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId,\n" +
         "  DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId,\n" +
-        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr \n" +
+        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr," +
+        "  CDPAYTYPE = :payType\n" +
         "WHERE NUXRTIMESHEET = :timesheetId"
     )
     ;

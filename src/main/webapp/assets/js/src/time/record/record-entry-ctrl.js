@@ -1,103 +1,102 @@
 var essApp = angular.module('ess');
 
-essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'ActiveTimeRecordsApi',
-function($scope, $http, appProps, recordsApi){
+essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
+function($scope, $http, appProps, activeRecordsApi, recordsApi){
 
     $scope.getRecords = function () {
-        console.log(appProps);
         var empId = appProps.user.employeeId;
-        recordsApi.get({
+        activeRecordsApi.get({
             empId: empId,
             status: ['NOT_SUBMITTED', 'DISAPPROVED', 'DISAPPROVED_PERSONNEL']
         }, function (response) {
             $scope.records = [];
             if (empId in response.result.items) {
                 $scope.records = response.result.items[empId];
+                console.log($scope.records);
             }
         });
     };
 
-    $scope.payPeriod = {
-        range: '04/24/2014 - 05/07/2014',
-        start: new Date('04/24/2014'),
-        end: new Date('05/07/2014')
+    $scope.setDisplayEntries = function() {
+        var record = $scope.selectedRecord;
+        console.log('setDisplayEntries:', record);
+        $scope.displayEntries = [];
+        var entryIndex = 0;
+        for (var date = moment(record.payPeriod.startDate), periodEnd = moment(record.payPeriod.endDate);
+                !date.isAfter(periodEnd); date = date.add(1, 'days')) {
+            var entry;
+            if (entryIndex < record.timeEntries.length && date.isSame(record.timeEntries[entryIndex].date, 'day')) {
+                entry = record.timeEntries[entryIndex++];
+            } else {
+                entry = {dummyEntry: true};
+            }
+            $scope.displayEntries.push(entry);
+        }
     };
-
-    $scope.dates = [
-        new Date('04/24/2014'), new Date('04/25/2014'), new Date('04/26/2014'), new Date('04/27/2014'), new Date('04/28/2014'),
-        new Date('04/29/2014'), new Date('04/30/2014'), new Date('05/01/2014'), new Date('05/02/2014'), new Date('05/03/2014'),
-        new Date('05/04/2014'), new Date('05/05/2014'), new Date('05/06/2014'), new Date('05/07/2014')
-    ];
 
     $scope.getTotal = function(type) {
         var total = 0;
-        if ($scope.record) {
-            for (var i = 0; i < $scope.dates.length; i++) {
-                total += +($scope.record[i][type] || 0);
+        if ($scope.records) {
+            for (var i = 0; i < $scope.records.length; i++) {
+                total += +($scope.records[i][type] || 0);
             }
         }
         return total;
     };
 
-    $scope.getDailyTotal = function(index) {
-        var total = 0;
-        if ($scope.record && $scope.record[index]) {
-            total = +($scope.record[index].work) + +($scope.record[index].holiday) + +($scope.record[index].vac) +
-                    +($scope.record[index].personal) + +($scope.record[index].sickEmp) + +($scope.record[index].sickFam) +
-                    +($scope.record[index].misc)
-        }
-        return total;
+    $scope.getDailyTotal = function(entry) {
+        return +(entry.workHours) + +(entry.travelHours) + +(entry.holidayHours) + +(entry.vacationHours) +
+                +(entry.personalHours) + +(entry.sickEmpHours) + +(entry.sickFamHours) + +(entry.miscHours);
     };
 
     $scope.refreshDailyTotals = function() {
-        for (var i = 0; i < $scope.dates.length; i++) {
-            $scope.record[i].total = $scope.getDailyTotal(i);
+        console.log($scope.selectedRecord);
+        for (var i = 0, entries = $scope.selectedRecord.timeEntries; i < entries.length; i++) {
+            entries[i].total = $scope.getDailyTotal(entries[i]);
         }
     };
 
     $scope.refreshTotals = function() {
         $scope.totals = {
-            work: $scope.getTotal('work'),
+            work: $scope.getTotal('workHours'),
+            travel: $scope.getTotal('travelHours'),
             holiday: $scope.getTotal('holiday'),
-            vac: $scope.getTotal('vac'),
-            personal: $scope.getTotal('personal'),
-            sickEmp: $scope.getTotal('sickEmp'),
-            sickFam: $scope.getTotal('sickFam'),
-            misc: $scope.getTotal('misc'),
+            vac: $scope.getTotal('vacationHours'),
+            personal: $scope.getTotal('personalHours'),
+            sickEmp: $scope.getTotal('sickEmpHours'),
+            sickFam: $scope.getTotal('sickFamHours'),
+            misc: $scope.getTotal('miscHours'),
             total: $scope.getTotal('total')
         };
     };
 
-    $scope.lastSaveTime = null;
-    $scope.showSaveButton = true;
-
     $scope.setDirty = function() {
-        $scope.showSaveButton = true;
+        $scope.selectedRecord.dirty = true;
         $scope.refreshDailyTotals();
         $scope.refreshTotals();
     };
 
+    $scope.$watch('selectedRecord', function() {
+        if ($scope.selectedRecord) {
+            $scope.setDisplayEntries();
+            $scope.refreshDailyTotals();
+            $scope.refreshTotals();
+        }
+    });
+
     $scope.saveRecord = function() {
-        this.lastSaveTime = new Date();
-        this.showSaveButton = false;
+        var record = $scope.selectedRecord;
+        recordsApi.save(record, function (response) {
+            record.updateDate = moment().toISOString();
+            record.savedDate = record.updateDate;
+        }, function (response) {
+            // todo invalid record response
+        });
     };
 
-    $scope.init = function() {
-        $scope.record = [];
-        for (var i = 0; i < $scope.dates.length; i++) {
-            $scope.record[i] = {
-                work: '',
-                holiday: '',
-                vac: '',
-                personal : '',
-                sickEmp: '',
-                sickFam: '',
-                misc: ''
-            };
-        }
+    $scope.init = function(miscLeaveMap) {
+        $scope.miscLeaves = miscLeaveMap;
         $scope.getRecords();
     };
-
-    $scope.init();
 
 }]);

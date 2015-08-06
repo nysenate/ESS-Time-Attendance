@@ -23,6 +23,6 @@ essApp.filter('momentFromNow', function () {
 
 essApp.filter('momentEquals', function () {
     return function (lhs, rhs, precision) {
-        return moment(lhs).isSame(moment(rhs), precision);
+        return moment(lhs).isSame(rhs, precision);
     };
 });

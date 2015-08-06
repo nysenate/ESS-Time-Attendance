@@ -95,7 +95,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             // If the day column was null, there was no entry because that column has a not null constraint
             if (!rs.wasNull()) {
                 TimeEntry entry = remoteEntryRowMapper.mapRow(rs, 0);
-                record.getTimeEntries().add(entry);
+                record.addTimeEntry(entry);
             }
         }
 
@@ -145,7 +145,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         return true;
     }
 
-    public MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {
+    public static MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("timesheetId", timeRecord.getTimeRecordId() != null ?
                 new BigDecimal(timeRecord.getTimeRecordId()) : null);
@@ -164,6 +164,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("excDetails", timeRecord.getExceptionDetails());
         params.addValue("procDate", toDate(timeRecord.getProcessedDate()));
         params.addValue("respCtr", timeRecord.getRespHeadCode());
+        params.addValue("payType", timeRecord.getPayType().name());
 
         return params;
     }
