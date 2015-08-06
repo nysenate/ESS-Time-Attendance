@@ -286,22 +286,22 @@ table.simple-table {
         margin-top: 2px;
         margin-left: 10px;
       }
-      #logoTextSection {
+      .nysslogo-text-container {
         padding: 0;
         margin-top: 0;
         display: inline-block;
-        #logoText {
+        .nysslogo-text {
           .font-weight-light;
           color: #333;
           font-size: 1.6em;
           line-height: 40px;
           margin-left: 10px;
-          #subLogoText {
+          .highlight {
             .font-weight-normal;
           }
         }
       }
-      #topNavList {
+      .top-nav-list {
         padding: 0;
         display: inline-block;
         vertical-align: top;
@@ -357,7 +357,6 @@ table.simple-table {
       #logoutSection {
         float:left;
         font-size: 1.1em;
-        width: 120px;
         &:hover {
           background: #ddd;
           a .logout-icon {
@@ -429,6 +428,7 @@ table.simple-table {
     &.sub-topic.active {
       border-left: 4px solid teal;
       padding-left: 16px;
+      background: #F4F4F4;
       a {
         .font-weight-bold;
         color: darken(teal, 10%);
@@ -613,22 +613,21 @@ table#timeRecordTable {
   }
 }
 
-#hourlyAccrualContainer {
-  width: 650px;
+.accrual-hours-container {
   margin: auto;
   text-align: center;
-  padding-bottom: 10px;
+  padding: 0 20px;
 }
 
 .accrual-component {
-  display: inline-block;
+  display: block;
+  float: left;
   text-align: center;
 
   .captioned-hour-square {
-    width: 105px;
-    height: 40px;
+    width: 150px;
     margin: 5px auto;
-    padding: 0 10px;
+    padding: 0 3px;
 
     .hours-caption {
       font-size: 1em;
@@ -654,13 +653,13 @@ table#timeRecordTable {
 
     .hours-display {
       font-size: 1.2em;
+      background: white;
       .font-weight-bold;
       line-height: 30px;
       font-weight: 600;
       color: @navy;
-      border-width: 1px;
-      border-style: none solid solid solid;
-      border-color: #ddd;
+      border: 1px solid #ddd;
+      border-top-style: none;
       .border-radius(0 0 2px 2px);
 
       &.sick {
@@ -683,13 +682,6 @@ table#timeRecordTable {
     margin: 10px auto;
     font-size: 1em;
     .font-weight-normal;
-  }
-
-  &:nth-child(1), &:nth-child(2), &:nth-child(3) {
-    width: 15%;
-  }
-  &:nth-child(4) {
-    width: 50%;
   }
 }
 

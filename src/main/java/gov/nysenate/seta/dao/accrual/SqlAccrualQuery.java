@@ -31,7 +31,7 @@ public enum SqlAccrualQuery implements BasicSqlQuery
         "    per.CDPERIOD, per.CDSTATUS, per.DTBEGIN, per.DTEND, per.DTPERIODYEAR, per.NUPERIOD\n" +
         "FROM " + MASTER_SFMS + ".PD23ACCUSAGE acc\n" +
         "JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16PERIOD WHERE CDPERIOD = 'AF') per ON acc.DTEND = per.DTEND\n" +
-        "WHERE acc.NUXREFEM = :empId AND acc.DTPERIODYEAR >= :prevYear AND acc.DTEND < :beforeDate\n"
+        "WHERE acc.NUXREFEM = :empId AND acc.DTEND < :beforeDate\n"
     ),
     GET_PERIOD_ACCRUAL_USAGE(
         "SELECT \n" +

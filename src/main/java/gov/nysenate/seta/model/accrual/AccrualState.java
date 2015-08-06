@@ -38,9 +38,12 @@ public class AccrualState extends AccrualSummary
 
     /** --- Methods --- */
 
-    public PeriodAccSummary toPeriodAccrualSummary(PayPeriod basePeriod, PayPeriod currPeriod) {
+    public PeriodAccSummary toPeriodAccrualSummary(PayPeriod refPeriod, PayPeriod currPeriod) {
         PeriodAccSummary periodAccSummary = new PeriodAccSummary(this);
-        periodAccSummary.setBasePayPeriod(basePeriod);
+        periodAccSummary.setYear(currPeriod.getEndDate().getYear());
+        periodAccSummary.setComputed(true);
+        periodAccSummary.setRefPayPeriod(refPeriod);
+        periodAccSummary.setPayPeriod(currPeriod);
         periodAccSummary.setExpectedTotalHours(this.getYtdHoursExpected());
         periodAccSummary.setExpectedBiweekHours(getHoursExpectedInPeriod(currPeriod.getNumWeekDaysInPeriod()));
         periodAccSummary.setPrevTotalHours(this.getTotalHoursUsed());

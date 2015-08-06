@@ -29,18 +29,6 @@ public class AccrualSummary extends AccrualUsage
 
     /** --- Functional Getters/Setters --- */
 
-    public BigDecimal getVacHoursAvailable() {
-        return getTotalVacHoursAccrued().subtract(vacHoursUsed);
-    }
-
-    public BigDecimal getPerHoursAvailable() {
-        return perHoursAccrued.subtract(perHoursUsed);
-    }
-
-    public BigDecimal getEmpHoursAvailable() {
-        return getTotalEmpHoursAccrued().subtract(empHoursUsed).subtract(famHoursUsed);
-    }
-
     public BigDecimal getTotalVacHoursAccrued() {
         return vacHoursAccrued.add(vacHoursBanked);
     }

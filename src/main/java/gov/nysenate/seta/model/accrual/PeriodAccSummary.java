@@ -14,18 +14,16 @@ import java.util.Date;
  * Helper class to store accrual summary information per pay period.
  * Also contains the accrual rates and expected hours, which are not
  * included in the AnnualAccSummary.
+ *
+ * Holds PD23ACCUSAGE data.
  */
 public class PeriodAccSummary extends AccrualSummary
 {
     private static final Logger logger = LoggerFactory.getLogger(PeriodAccSummary.class);
 
-    /**
-     * The base pay period is a previous pay period that contains the summary data for
-     * which these accruals are based off of. Basically the accrual information for a given pay
-     * period should reflect the hours available from the previous pay period (not including
-     * the hours accrued in the current pay period).
-     */
-    protected PayPeriod basePayPeriod;
+    protected boolean computed = false;
+    protected PayPeriod refPayPeriod;
+    protected PayPeriod payPeriod;
 
     protected int year;
     protected BigDecimal prevTotalHours;
@@ -49,8 +47,8 @@ public class PeriodAccSummary extends AccrualSummary
     /** --- Functional Getters/Setters --- */
 
     public LocalDate getEndDate() {
-        if (basePayPeriod != null) {
-            return basePayPeriod.getEndDate();
+        if (refPayPeriod != null) {
+            return refPayPeriod.getEndDate();
         }
         throw new IllegalStateException("Base pay period was not set in period accrual summary.");
     }
@@ -65,12 +63,28 @@ public class PeriodAccSummary extends AccrualSummary
         this.year = year;
     }
 
-    public PayPeriod getBasePayPeriod() {
-        return basePayPeriod;
+    public boolean isComputed() {
+        return computed;
     }
 
-    public void setBasePayPeriod(PayPeriod basePayPeriod) {
-        this.basePayPeriod = basePayPeriod;
+    public void setComputed(boolean computed) {
+        this.computed = computed;
+    }
+
+    public PayPeriod getRefPayPeriod() {
+        return refPayPeriod;
+    }
+
+    public void setRefPayPeriod(PayPeriod refPayPeriod) {
+        this.refPayPeriod = refPayPeriod;
+    }
+
+    public PayPeriod getPayPeriod() {
+        return payPeriod;
+    }
+
+    public void setPayPeriod(PayPeriod payPeriod) {
+        this.payPeriod = payPeriod;
     }
 
     public BigDecimal getPrevTotalHours() {

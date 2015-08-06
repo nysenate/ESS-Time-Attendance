@@ -1,52 +1,43 @@
 package gov.nysenate.seta.dao.accrual;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.LimitOffset;
 import gov.nysenate.common.OutputUtils;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.BaseTests;
-import gov.nysenate.seta.dao.period.PayPeriodDao;
-import gov.nysenate.seta.model.period.PayPeriod;
-import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
+@Component
 public class SqlAccrualDaoTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlAccrualDaoTests.class);
-    protected static final Set<TransactionCode> SAL_CODES = new HashSet<>(Arrays.asList(TransactionCode.SAL, TransactionCode.RTP, TransactionCode.APP));
-    @Autowired AccrualDao accrualDao;
 
     @Autowired
-    PayPeriodDao payPeriodDao;
-
-    @Autowired
-    XsrfValidator xsrfValidator;
+    private SqlAccrualDao accDao;
 
     @Test
-    public void testGetAccuralSummary() throws Exception {
-        PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2014, 5, 27));
-
-                //logger.info(OutputUtils.toJson(accrualDao.getAccuralSummary(10976, payPeriod)));
+    public void testGetPeriodAccrualSummaries() throws Exception {
+        logger.info("{}", OutputUtils.toJson(
+                accDao.getPeriodAccruals(10976, LocalDate.of(2015, 12, 1), new LimitOffset(2), SortOrder.DESC)));
     }
 
     @Test
-    public void testGetAccrualSummary_ReappointmentWithinLessThanAYear() throws Exception {
-        PayPeriod payPeriod = payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2011,12,27));
-        //logger.info(OutputUtils.toJson(accrualDao.getAccuralSummary(11384, payPeriod)));
+    public void testGetAnnualAccrualSummaries() throws Exception {
+        logger.info("{}", OutputUtils.toJson(
+            accDao.getAnnualAccruals(10976, 2015)
+        ));
     }
 
     @Test
-    public void testGetAccrualSummaries() throws Exception {
-//        logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccruals(10976, 2015, LocalDate.now())));
-        logger.info("{}", OutputUtils.toJson(accrualDao.getPeriodAccrualUsages(10976, Range.closedOpen(LocalDate.of(2015, 1, 1), LocalDate.now()))));
-
+    public void testGetPeriodAccrualUsages() throws Exception {
+        logger.info("{}", OutputUtils.toJson(
+            accDao.getPeriodAccrualUsages(10976, Range.all())
+        ));
     }
 }

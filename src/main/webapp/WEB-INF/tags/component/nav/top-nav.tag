@@ -4,15 +4,15 @@
 
 <header class="ess-top-header">
     <div class="fixed-width-header">
-        <section class="left-header-area">
+        <div class="left-header-area">
             <div class="nysslogo"></div>
-            <section id="logoTextSection">
-                <div id="logoText">
-                    <span id="subLogoText">NYSS </span>
+            <div class="nysslogo-text-container">
+                <div class="nysslogo-text">
+                    <span class="highlight">NYSS </span>
                     <span>ESS</span>
                 </div>
-            </section>
-            <ul id="topNavList">
+            </div>
+            <ul class="top-nav-list">
                 <li id="dashboardLink" class="main-topic orange <c:if test='${activeTopic == "myinfo"}'>active</c:if>">
                     <a target="_self" href="${ctxPath}/myinfo"><img class="nav-icon" src="${ctxPath}/assets/img/user.png"/>My Info</a>
                 </li>
@@ -26,11 +26,11 @@
                     <a target="_self"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/question.png"/>Help</a>
                 </li>
             </ul>
-        </section>
-        <section class="right-header-area">
-            <section id="logoutSection">
+        </div>
+        <div class="right-header-area">
+            <div id="logoutSection">
                 <a target="_self" href="${ctxPath}/logout">Sign Out</a>
-            </section>
-        </section>
+            </div>
+        </div>
     </div>
 </header>

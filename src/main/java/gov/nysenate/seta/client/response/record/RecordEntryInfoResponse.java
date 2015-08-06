@@ -15,7 +15,7 @@ public class RecordEntryInfoResponse
     protected AccrualsView accruals;
 
     public RecordEntryInfoResponse() {
-        this.accruals = new AccrualsView();
+//        this.accruals = new AccrualsView();
     }
 
     public boolean isStatus() {

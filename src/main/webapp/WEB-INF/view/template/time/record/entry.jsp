@@ -11,14 +11,14 @@ Toggle this for temporary emps.
 </div>  -->
 
 <div class="content-container content-controls">
-    <p class="content-info">Enter a time and attendance record by selecting from the list of
-        active pay periods.</p>
+
 </div>
 
-<div class="content-container no-top-margin" ng-controller="RecordEntryController">
-    <h1 class="teal">Time and Attendance Record Details</h1>
-
-    <div id="record-selection-container" class="content-info" style="background:none;">
+<div class="" ng-controller="RecordEntryController">
+    <div id="record-selection-container" class="content-container content-controls">
+        <p class="content-info">Enter a time and attendance record by selecting from the list of
+            active pay periods.
+        </p>
         <table>
             <thead>
                 <tr>
@@ -47,42 +47,44 @@ Toggle this for temporary emps.
             </tbody>
         </table>
     </div>
-    <div id="hourlyAccrualContainer" style="margin-top:5px;margin-bottom:5px;">
-        <section id="accrualsListing">
-            <div class="accrual-component">
-                <div class="captioned-hour-square" style="float:left;">
-                    <div class="hours-caption personal">Personal</div>
-                    <div class="hours-display">32</div>
-                </div>
-            </div>
-            <div class="accrual-component">
-                <div class="captioned-hour-square" style="float:left;">
-                    <div class="hours-caption vacation">Vacation</div>
-                    <div class="hours-display">34</div>
-                </div>
-            </div>
-            <div class="accrual-component">
-                <div class="captioned-hour-square" style="float:left;">
-                    <div class="hours-caption sick">Sick</div>
-                    <div class="odometer hours-display">232</div>
-                </div>
-            </div>
-            <div class="accrual-component">
-                <div style="width:350px;float:left;padding:0;" class="captioned-hour-square">
-                    <div style="background:rgb(92, 116, 116);color:white"
-                         class="hours-caption">Year To Date Hours Of Service</div>
-                    <div class="hours-display" style="font-size:1em">
-                        <div style="border-right:1px solid #ddd;width:110px;display:inline-block;">Expected: 435 </div>
-                        <div style="border-right:1px solid #ddd;width:110px;display:inline-block;">Actual: 445 </div>
-                        <div style="width:110px;display:inline-block;">Difference: +10 </div>
+    <div class="content-container">
+        <p class="content-info">All hours available need approval from appointing authority.</p>
+        <div class="accrual-hours-container">
+            <div>
+                <div class="accrual-component">
+                    <div class="captioned-hour-square" style="float:left;">
+                        <div class="hours-caption personal">Personal Hours</div>
+                        <div class="hours-display">32</div>
                     </div>
-
                 </div>
+                <div class="accrual-component">
+                    <div class="captioned-hour-square" style="float:left;">
+                        <div class="hours-caption vacation">Vacation Hours</div>
+                        <div class="hours-display">34</div>
+                    </div>
+                </div>
+                <div class="accrual-component">
+                    <div class="captioned-hour-square" style="float:left;">
+                        <div class="hours-caption sick">Sick Hours</div>
+                        <div class="odometer hours-display">232</div>
+                    </div>
+                </div>
+                <div class="accrual-component">
+                    <div class="captioned-hour-square" style="width:390px;">
+                        <div style="background:rgb(92, 116, 116);color:white"
+                             class="hours-caption">Year To Date Hours Of Service</div>
+                        <div class="hours-display" style="font-size:1em">
+                            <div style="border-right:1px solid #ddd;width:110px;display:inline-block;">Expected: 435 </div>
+                            <div style="border-right:1px solid #ddd;width:110px;display:inline-block;">Actual: 445 </div>
+                            <div style="width:110px;display:inline-block;">Difference: +10 </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
             </div>
-            <div style="clear:both;"></div>
-        </section>
-    </div>
-    <section style="border-top:1px solid #155C69">
+        </div>
+        <hr/>
         <form id="timeRecordForm" method="post" action="">
             <table class="ess-table" id="timeRecordTable">
                 <thead>
@@ -148,5 +150,7 @@ Toggle this for temporary emps.
                 <div class="clearfix"></div>
             </div>
         </form>
-    </section>
+    </div>
+    <div class="content-container">
+    </div>
 </div>

@@ -3,6 +3,9 @@ package gov.nysenate.seta.dao.accrual;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.LimitOffset;
+import gov.nysenate.common.OrderBy;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.accrual.mapper.AnnualAccSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccSummaryRowMapper;
 import gov.nysenate.seta.dao.accrual.mapper.PeriodAccUsageRowMapper;
@@ -39,11 +42,13 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
 
     /** {@inheritDoc} */
     @Override
-    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, int year, LocalDate beforeDate) {
-        MapSqlParameterSource params = getPeriodAccSummaryParams(empId, year, beforeDate);
+    public TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, LocalDate beforeDate,
+                                                                  LimitOffset limOff, SortOrder order) {
+        MapSqlParameterSource params = getPeriodAccSummaryParams(empId, beforeDate);
+        OrderBy orderBy = new OrderBy("DTEND", order);
         List<PeriodAccSummary> periodAccSummaries =
-            remoteNamedJdbc.query(GET_PERIOD_ACC_SUMMARIES.getSql(), params, new PeriodAccSummaryRowMapper("",""));
-        return new TreeMap<>(Maps.uniqueIndex(periodAccSummaries, PeriodAccSummary::getBasePayPeriod));
+            remoteNamedJdbc.query(GET_PERIOD_ACC_SUMMARIES.getSql(orderBy, limOff), params, new PeriodAccSummaryRowMapper("",""));
+        return new TreeMap<>(Maps.uniqueIndex(periodAccSummaries, PeriodAccSummary::getRefPayPeriod));
     }
 
     /** {@inheritDoc} */
@@ -73,10 +78,9 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
             .addValue("endYear", endYear);
     }
 
-    protected MapSqlParameterSource getPeriodAccSummaryParams(int empId, int year, LocalDate endDate) {
+    protected MapSqlParameterSource getPeriodAccSummaryParams(int empId, LocalDate endDate) {
         return new MapSqlParameterSource()
             .addValue("empId", empId)
-            .addValue("prevYear", year - 1)
             .addValue("beforeDate", DateUtils.toDate(endDate));
     }
 

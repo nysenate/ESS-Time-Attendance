@@ -11,6 +11,7 @@ import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

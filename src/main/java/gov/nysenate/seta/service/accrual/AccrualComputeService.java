@@ -5,6 +5,7 @@ import gov.nysenate.seta.model.accrual.AccrualException;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.period.PayPeriod;
 
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -23,12 +24,12 @@ public interface AccrualComputeService
     public PeriodAccSummary getAccruals(int empId, PayPeriod payPeriod) throws AccrualException;
 
     /**
-     * Retrieves a collection of accrual summaries for each of the pay periods within the given 'payPeriodRange'.
+     * Retrieves a collection of accrual summaries for each of the pay periods within the given 'payPeriods'.
      *
      * @param empId int - Employee id to get accruals for.
-     * @param payPeriodRange - PeriodAccSummaries will be valid at the start of each contained period in this range.
+     * @param payPeriods - PeriodAccSummaries will be valid at the start of each period in this list.
      * @return TreeMap<PayPeriod, PeriodAccSummary>
      * @throws AccrualException
      */
-    public TreeMap<PayPeriod, PeriodAccSummary> getAccruals(int empId, Range<PayPeriod> payPeriodRange) throws AccrualException;
+    public TreeMap<PayPeriod, PeriodAccSummary> getAccruals(int empId, List<PayPeriod> payPeriods) throws AccrualException;
 }

@@ -39,7 +39,7 @@ public abstract class SqlQueryUtils
             // Otherwise use ORACLE's subquery approach
             else {
                 Integer start = (limitOffset.hasOffset()) ? limitOffset.getOffsetStart() : 1;
-                Integer end = (limitOffset.hasLimit()) ? start + limitOffset.getLimit() : 100000;
+                Integer end = (limitOffset.hasLimit()) ? start + limitOffset.getLimit() - 1 : 100000;
                 return String.format(
                     "SELECT * FROM (SELECT ROWNUM AS rn, q.* FROM (%s) q)\n" +
                     "WHERE rn >= %s AND rn <= %s", sql, start, end);

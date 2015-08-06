@@ -120,6 +120,14 @@ public class PayPeriod implements Comparable<PayPeriod>
         throw new IllegalArgumentException("Cannot return date range since start and/or end dates are null!");
     }
 
+    /**
+     * Returns the year this pay period ends on.
+     * @return int
+     */
+    public int getYear() {
+        return endDate.getYear();
+    }
+
     /** --- Overrides --- */
 
     @Override

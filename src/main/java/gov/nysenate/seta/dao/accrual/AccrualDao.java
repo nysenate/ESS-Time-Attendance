@@ -1,6 +1,8 @@
 package gov.nysenate.seta.dao.accrual;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.LimitOffset;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.accrual.AnnualAccSummary;
 import gov.nysenate.seta.model.accrual.AnnualAccrualUsage;
@@ -22,11 +24,13 @@ public interface AccrualDao extends BaseDao
      * A TreeMap is returned which maps the PeriodAccSummary object with it's associated 'basePayPeriod'.
      *
      * @param empId int - Employee id
-     * @param year int - The year to retrieve accruals for
      * @param beforeDate LocalDate - The retrieved period summaries will be effective prior to this date.
+     * @param limOff LimitOffset - Limit the result set
+     * @param order SortOrder - Order by pay period end date
      * @return TreeMap<LocalDate, PeriodAccSummary>
      */
-    TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, int year, LocalDate beforeDate);
+    TreeMap<PayPeriod, PeriodAccSummary> getPeriodAccruals(int empId, LocalDate beforeDate, LimitOffset limOff,
+                                                           SortOrder order);
 
     /**
      * Retrieve the running annual accrual summaries for the given employee for all years before or on the 'endYear'.
