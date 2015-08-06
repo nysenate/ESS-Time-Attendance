@@ -16,5 +16,6 @@ public class TimeEntryTest extends BaseTests
     public void testGetDailyTotal() throws Exception {
         BigDecimal bd = new BigDecimal("0.00");
         Assert.assertEquals(0.0,bd);
+        bd.add(null);
     }
 }

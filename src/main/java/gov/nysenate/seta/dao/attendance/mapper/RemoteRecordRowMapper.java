@@ -5,6 +5,7 @@ import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.payroll.PayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class RemoteRecordRowMapper extends BaseRowMapper<TimeRecord>
         record.setExceptionDetails(rs.getString(pfx + "DEEXCEPTION"));
         record.setProcessedDate(getLocalDateFromRs(rs, pfx + "DTPROCESS"));
         record.setRespHeadCode(rs.getString(pfx + "CDRESPCTRHD"));
+        record.setPayType(rs.getString(pfx + "CDPAYTYPE") != null ? PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")) : null);
         return record;
     }
 }

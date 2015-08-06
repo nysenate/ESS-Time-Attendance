@@ -2,9 +2,11 @@ package gov.nysenate.seta.model.attendance;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.model.accrual.PeriodAccUsage;
+import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
 
@@ -13,7 +15,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
@@ -30,6 +34,7 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected boolean active;
     protected LocalDate beginDate;
     protected LocalDate endDate;
+    protected PayType payType;
     protected PayPeriod payPeriod;
     protected String remarks;
     protected String exceptionDetails;
@@ -39,16 +44,16 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected String updateUserId;
     protected LocalDateTime createdDate;
     protected LocalDateTime updateDate;
-    protected List<TimeEntry> timeEntries = new ArrayList<>();
+    protected TreeMap<LocalDate, TimeEntry> timeEntryMap = new TreeMap<>();
 
-    // Initialized via service layer (not dao) based on employeeId
+    // Initialized via service layer (not dao) based on supervisorId
     protected Employee supervisor;
 
     /** --- Constructors --- */
 
     public TimeRecord() {}
 
-    public TimeRecord(Employee employee, Range<LocalDate> dateRange, PayPeriod payPeriod, int supervisorId) {
+    public TimeRecord(Employee employee, Range<LocalDate> dateRange, PayPeriod payPeriod, PayType payType, int supervisorId) {
         this.employeeId = employee.getEmployeeId();
         this.supervisorId = supervisorId;
         this.employeeName = employee.getUid().toUpperCase();
@@ -56,6 +61,7 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.active = true;
         this.beginDate = DateUtils.startOfDateRange(dateRange);
         this.endDate = DateUtils.endOfDateRange(dateRange);
+        this.payType = payType;
         this.payPeriod = payPeriod;
         this.recordStatus = TimeRecordStatus.NOT_SUBMITTED;
         this.originalUserId = this.employeeName;
@@ -101,6 +107,26 @@ public class TimeRecord implements Comparable<TimeRecord>
         return Range.closed(beginDate, endDate);
     }
 
+    public ImmutableList<TimeEntry> getTimeEntries() {
+        return ImmutableList.copyOf(timeEntryMap.values());
+    }
+
+    public void addTimeEntry(TimeEntry entry) {
+        this.timeEntryMap.put(entry.getDate(), entry);
+    }
+
+    public void addTimeEntries(Collection<TimeEntry> timeEntries) {
+        timeEntries.forEach(this::addTimeEntry);
+    }
+
+    public boolean containsEntry(LocalDate date) {
+        return timeEntryMap.containsKey(date);
+    }
+
+    public TimeEntry getEntry(LocalDate date) {
+        return timeEntryMap.get(date);
+    }
+
     /**
      * Constructs and returns a PeriodAccUsage by summing the values from the time entries.
      * @return PeriodAccUsage
@@ -122,7 +148,7 @@ public class TimeRecord implements Comparable<TimeRecord>
     }
 
     public BigDecimal getSumOfTimeEntries(Function<? super TimeEntry, BigDecimal> mapper) {
-        return timeEntries.stream().map(mapper).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return timeEntryMap.values().stream().map(mapper).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /** --- Basic Getters/Setters --- */
@@ -255,14 +281,6 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.updateDate = updateDate;
     }
 
-    public List<TimeEntry> getTimeEntries() {
-        return timeEntries;
-    }
-
-    public void setTimeEntries(List<TimeEntry> timeEntries) {
-        this.timeEntries = timeEntries;
-    }
-
     public String getRespHeadCode() {
         return respHeadCode;
     }
@@ -277,5 +295,13 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public void setSupervisor(Employee supervisor) {
         this.supervisor = supervisor;
+    }
+
+    public PayType getPayType() {
+        return payType;
+    }
+
+    public void setPayType(PayType payType) {
+        this.payType = payType;
     }
 }

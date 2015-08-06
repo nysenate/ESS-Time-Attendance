@@ -94,8 +94,12 @@ module.exports = function(grunt) {
                 tasks: ['uglify:vendor']
             },
             jsSource: {
-                files: ['<%= jsSource %>/**.js'],
+                files: ['<%= jsSource %>/**/*.js'],
                 tasks: ['uglify:dev', 'uglify:prod', 'copy:js']
+            },
+            jsp: {
+                files: ['<%= jspSource %>/**/*.jsp', '<%= tagSource %>/**/*.tag'],
+                tasks: ['copy:jsp']
             }
         },
 
