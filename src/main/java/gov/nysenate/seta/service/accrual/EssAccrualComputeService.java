@@ -103,12 +103,6 @@ public class EssAccrualComputeService implements AccrualComputeService
         verifyValidPayPeriod(payPeriod);
         LocalDate periodStartDate = payPeriod.getStartDate();
 
-        // If a period accrual usage record exists for the previous pay period, most of the work is done.
-        if (periodAccSum.isPresent() && periodAccSum.get().getEndDate().isEqual(periodStartDate.minusDays(1))) {
-            logger.debug("Accrual summary found for previous pay period: {}", periodAccSum.get().getEndDate());
-            return periodAccSum.get();
-        }
-
         // If no PM23ATTEND record exists, we cannot compute accruals. For new employees a record will exist since
         // it is created initially by personnel.
         if (annualAcc == null) {
@@ -136,7 +130,7 @@ public class EssAccrualComputeService implements AccrualComputeService
         // Generate a list of all the pay periods between the period immediately following the DTPERLSPOST and
         // before the pay period we are trying to compute available accruals for. We will call these the accrual
         // gap periods.
-        Range<LocalDate> gapDateRange = Range.open(accrualState.getEndDate(), periodStartDate);
+        Range<LocalDate> gapDateRange = Range.openClosed(accrualState.getEndDate(), periodStartDate);
         LinkedList<PayPeriod> gapPeriods = new LinkedList<>(
             periodDao.getPayPeriods(PayPeriodType.AF, gapDateRange, SortOrder.ASC));
 

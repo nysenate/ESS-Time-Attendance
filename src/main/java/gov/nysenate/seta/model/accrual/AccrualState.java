@@ -33,7 +33,7 @@ public class AccrualState extends AccrualSummary
     public AccrualState(AnnualAccSummary annualAccSummary) {
         super(annualAccSummary);
         this.endDate = annualAccSummary.getEndDate();
-        this.payPeriodCount = annualAccSummary.getPayPeriodsYtd() + annualAccSummary.getPayPeriodsBanked();
+        this.payPeriodCount = annualAccSummary.getPayPeriodsBanked();
     }
 
     /** --- Methods --- */
@@ -46,7 +46,7 @@ public class AccrualState extends AccrualSummary
         periodAccSummary.setPayPeriod(currPeriod);
         periodAccSummary.setExpectedTotalHours(this.getYtdHoursExpected());
         periodAccSummary.setExpectedBiweekHours(getHoursExpectedInPeriod(currPeriod.getNumWeekDaysInPeriod()));
-        periodAccSummary.setPrevTotalHours(this.getTotalHoursUsed());
+        periodAccSummary.setPrevTotalHoursYtd(this.getTotalHoursUsed());
         periodAccSummary.setSickRate(this.getSickRate());
         periodAccSummary.setVacRate(this.getVacRate());
         return periodAccSummary;

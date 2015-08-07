@@ -22,7 +22,7 @@ public class PeriodAccSummaryRowMapper extends BaseRowMapper<PeriodAccSummary>
         PeriodAccSummary perAccSum = new PeriodAccSummary();
         perAccSum.setComputed(false);
         perAccSum.setYear(rs.getInt(pfx + "YEAR"));
-        perAccSum.setPrevTotalHours(rs.getBigDecimal(pfx + "PREV_TOTAL_HRS"));
+        perAccSum.setPrevTotalHoursYtd(rs.getBigDecimal(pfx + "PREV_TOTAL_HRS"));
         perAccSum.setExpectedTotalHours(rs.getBigDecimal(pfx + "EXPECTED_TOTAL_HRS"));
         perAccSum.setExpectedBiweekHours(rs.getBigDecimal(pfx + "EXPECTED_BIWEEK_HRS"));
         perAccSum.setSickRate(rs.getBigDecimal(pfx + "SICK_RATE"));

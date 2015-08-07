@@ -1,7 +1,11 @@
 var essApp = angular.module('ess');
 
 essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
-function($scope, $http, appProps, activeRecordsApi, recordsApi){
+                                            'AccrualPeriodApi',
+                  function($scope, $http, appProps, activeRecordsApi, recordsApi, accrualPeriodApi){
+    $scope.state = {
+        accrual: null
+    };
 
     $scope.getRecords = function () {
         var empId = appProps.user.employeeId;
@@ -13,6 +17,16 @@ function($scope, $http, appProps, activeRecordsApi, recordsApi){
             if (empId in response.result.items) {
                 $scope.records = response.result.items[empId];
                 console.log($scope.records);
+            }
+        });
+    };
+
+    $scope.getAccrualForSelectedRecord = function() {
+        var empId = appProps.user.employeeId;
+        var periodStartMoment = moment($scope.selectedRecord.payPeriod.startDate);
+        accrualPeriodApi.get({empId: empId, beforeDate: periodStartMoment.format('YYYY-MM-DD')}, function(resp){
+            if (resp.success) {
+                $scope.state.accrual = resp.result;
             }
         });
     };
@@ -78,6 +92,7 @@ function($scope, $http, appProps, activeRecordsApi, recordsApi){
 
     $scope.$watch('selectedRecord', function() {
         if ($scope.selectedRecord) {
+            $scope.getAccrualForSelectedRecord();
             $scope.setDisplayEntries();
             $scope.refreshDailyTotals();
             $scope.refreshTotals();

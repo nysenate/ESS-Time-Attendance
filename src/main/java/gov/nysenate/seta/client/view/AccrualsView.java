@@ -40,7 +40,7 @@ public class AccrualsView implements ViewObject
             this.sickAccruedYtd = pac.getEmpHoursAccrued();
             this.personalAccruedYtd = pac.getPerHoursAccrued();
             this.vacationAccruedYtd = pac.getVacHoursAccrued();
-//            this.serviceYtd = periodAccSummary.getPrevTotalHours();
+            this.serviceYtd = pac.getTotalHoursYtd();
             this.serviceYtdExpected = pac.getExpectedTotalHours();
             this.sickBanked = pac.getEmpHoursBanked();
             this.vacationBanked = pac.getVacHoursBanked();

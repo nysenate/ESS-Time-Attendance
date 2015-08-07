@@ -56,19 +56,19 @@ Toggle this for temporary emps.
                 <div class="accrual-component">
                     <div class="captioned-hour-square" style="float:left;">
                         <div class="hours-caption personal">Personal Hours</div>
-                        <div class="hours-display">32</div>
+                        <div class="hours-display">{{state.accrual.personalAvailable}}</div>
                     </div>
                 </div>
                 <div class="accrual-component">
                     <div class="captioned-hour-square" style="float:left;">
                         <div class="hours-caption vacation">Vacation Hours</div>
-                        <div class="hours-display">34</div>
+                        <div class="hours-display">{{state.accrual.vacationAvailable}}</div>
                     </div>
                 </div>
                 <div class="accrual-component">
                     <div class="captioned-hour-square" style="float:left;">
                         <div class="hours-caption sick">Sick Hours</div>
-                        <div class="odometer hours-display">232</div>
+                        <div class="odometer hours-display">{{state.accrual.sickAvailable}}</div>
                     </div>
                 </div>
                 <div class="accrual-component">
@@ -76,11 +76,14 @@ Toggle this for temporary emps.
                         <div style="background:rgb(92, 116, 116);color:white"
                              class="hours-caption">Year To Date Hours Of Service</div>
                         <div class="hours-display" style="font-size:1em">
-                            <div style="border-right:1px solid #ddd;width:110px;display:inline-block;">Expected: 435 </div>
-                            <div style="border-right:1px solid #ddd;width:110px;display:inline-block;">Actual: 445 </div>
-                            <div style="width:110px;display:inline-block;">Difference: +10 </div>
+                            <div class="ytd-hours">
+                                Expected: {{state.accrual.serviceYtdExpected}}
+                            </div>
+                            <div class="ytd-hours">Actual: {{state.accrual.serviceYtd}}</div>
+                            <div class="ytd-hours" style="border-right:none;">
+                                Difference: {{state.accrual.serviceYtd - state.accrual.serviceYtdExpected}}
+                            </div>
                         </div>
-
                     </div>
                 </div>
                 <div style="clear:both;"></div>

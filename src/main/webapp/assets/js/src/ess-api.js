@@ -25,3 +25,13 @@ essApi.factory('TimeRecordsApi', ['$resource', 'appProps', function ($resource, 
 essApi.factory('ActiveTimeRecordsApi', ['$resource', 'appProps', function ($resource, appProps) {
     return $resource(appProps.apiPath + '/timerecords/active');
 }]);
+
+/** --- Accrual API --- */
+
+essApi.factory('AccrualPeriodApi', ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/accruals');
+}]);
+
+essApi.factory('AccrualHistoryApi', ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/accruals/history');
+}]);

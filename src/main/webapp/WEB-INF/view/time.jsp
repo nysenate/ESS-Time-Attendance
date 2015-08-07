@@ -18,6 +18,9 @@
         <!-- Pay Period Viewer -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/period/pay-period-view-ctrl.js"></script>
 
+        <!-- Accruals -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/accrual/accrual-history-ctrl.js"></script>
+
     </jsp:body>
 </ess-layout:head>
 

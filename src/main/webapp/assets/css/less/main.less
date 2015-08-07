@@ -613,6 +613,32 @@ table#timeRecordTable {
   }
 }
 
+/** --- Accruals --- */
+
+.sick, .personal, .vacation, .misc {
+  color: white;
+}
+
+.sick {
+  background: #d19525;
+  border-color: #d19525;
+}
+
+.personal {
+  background: @teal;
+  border-color: @teal;
+}
+
+.vacation {
+  background: #799933;
+  border-color: #799933;
+}
+
+.misc {
+  background: #e64727;
+  border-color: #e64727;
+}
+
 .accrual-hours-container {
   margin: auto;
   text-align: center;
@@ -634,21 +660,6 @@ table#timeRecordTable {
       line-height: 20px;
       padding: .2em;
       .font-weight-bold;
-
-      &.sick {
-        background: #d19525;
-        color: white;
-      }
-
-      &.personal {
-        background: @teal;
-        color: white;
-      }
-
-      &.vacation {
-        background: #799933;
-        color: white;
-      }
     }
 
     .hours-display {
@@ -674,6 +685,13 @@ table#timeRecordTable {
         border-color: #799933;
       }
     }
+
+    .ytd-hours {
+      border-right:1px solid #ddd;
+      width:110px;
+      display:inline-block;
+    }
+
   }
 
   .hour-label {
@@ -920,7 +938,7 @@ table.attendance-entry-sub-table {
   --- Accrual History Page ---
 */
 
-.accruals-table, #detail-acc-history-table, #accrual-usage-details-table {
+.accruals-table, .detail-acc-history-table, #accrual-usage-details-table {
   width: 100%;
   thead {
     tr {

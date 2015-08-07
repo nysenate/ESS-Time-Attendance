@@ -26,7 +26,7 @@ public class PeriodAccSummary extends AccrualSummary
     protected PayPeriod payPeriod;
 
     protected int year;
-    protected BigDecimal prevTotalHours;
+    protected BigDecimal prevTotalHoursYtd;
     protected BigDecimal expectedTotalHours;
     protected BigDecimal expectedBiweekHours;
 
@@ -51,6 +51,10 @@ public class PeriodAccSummary extends AccrualSummary
             return refPayPeriod.getEndDate();
         }
         throw new IllegalStateException("Base pay period was not set in period accrual summary.");
+    }
+
+    public BigDecimal getTotalHoursYtd() {
+        return getTotalHoursUsed();
     }
 
     /** --- Basic Getters/Setters --- */
@@ -87,12 +91,12 @@ public class PeriodAccSummary extends AccrualSummary
         this.payPeriod = payPeriod;
     }
 
-    public BigDecimal getPrevTotalHours() {
-        return prevTotalHours;
+    public BigDecimal getPrevTotalHoursYtd() {
+        return prevTotalHoursYtd;
     }
 
-    public void setPrevTotalHours(BigDecimal prevTotalHours) {
-        this.prevTotalHours = prevTotalHours;
+    public void setPrevTotalHoursYtd(BigDecimal prevTotalHoursYtd) {
+        this.prevTotalHoursYtd = prevTotalHoursYtd;
     }
 
     public BigDecimal getExpectedTotalHours() {
