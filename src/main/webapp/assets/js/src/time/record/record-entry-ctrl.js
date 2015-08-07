@@ -1,19 +1,20 @@
 var essApp = angular.module('ess');
 
-essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
+essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
                                             'AccrualPeriodApi',
-                  function($scope, $http, appProps, activeRecordsApi, recordsApi, accrualPeriodApi){
+                  function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrualPeriodApi){
     $scope.state = {
         accrual: null
     };
 
     $scope.getRecords = function () {
         var empId = appProps.user.employeeId;
+        $scope.records = [];
+        $scope.iSelectedRecord = 0;
         activeRecordsApi.get({
             empId: empId,
             status: ['NOT_SUBMITTED', 'DISAPPROVED', 'DISAPPROVED_PERSONNEL']
         }, function (response) {
-            $scope.records = [];
             if (empId in response.result.items) {
                 $scope.records = response.result.items[empId];
                 console.log($scope.records);
@@ -23,7 +24,8 @@ essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'Acti
 
     $scope.getAccrualForSelectedRecord = function() {
         var empId = appProps.user.employeeId;
-        var periodStartMoment = moment($scope.selectedRecord.payPeriod.startDate);
+        var record = $scope.records[$scope.iSelectedRecord];
+        var periodStartMoment = moment(record.payPeriod.startDate);
         accrualPeriodApi.get({empId: empId, beforeDate: periodStartMoment.format('YYYY-MM-DD')}, function(resp){
             if (resp.success) {
                 $scope.state.accrual = resp.result;
@@ -32,7 +34,7 @@ essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'Acti
     };
 
     $scope.setDisplayEntries = function() {
-        var record = $scope.selectedRecord;
+        var record = $scope.records[$scope.iSelectedRecord];
         console.log('setDisplayEntries:', record);
         $scope.displayEntries = [];
         var entryIndex = 0;
@@ -44,15 +46,21 @@ essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'Acti
             } else {
                 entry = {dummyEntry: true};
             }
+            entry.unavailable = date.isAfter(moment(), 'day');
             $scope.displayEntries.push(entry);
         }
     };
 
+    $scope.isWeekend = function(date) {
+        return $filter('momentIsDOW')(date, [0, 6]);
+    };
+
     $scope.getTotal = function(type) {
         var total = 0;
-        if ($scope.records) {
-            for (var i = 0; i < $scope.records.length; i++) {
-                total += +($scope.records[i][type] || 0);
+        var entries = $scope.records[$scope.iSelectedRecord].timeEntries;
+        if (entries) {
+            for (var i = 0; i < entries.length; i++) {
+                total += +(entries[i][type] || 0);
             }
         }
         return total;
@@ -64,8 +72,7 @@ essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'Acti
     };
 
     $scope.refreshDailyTotals = function() {
-        console.log($scope.selectedRecord);
-        for (var i = 0, entries = $scope.selectedRecord.timeEntries; i < entries.length; i++) {
+        for (var i = 0, entries = $scope.records[$scope.iSelectedRecord].timeEntries; i < entries.length; i++) {
             entries[i].total = $scope.getDailyTotal(entries[i]);
         }
     };
@@ -85,27 +92,45 @@ essApp.controller('RecordEntryController', ['$scope', '$http', 'appProps', 'Acti
     };
 
     $scope.setDirty = function() {
-        $scope.selectedRecord.dirty = true;
+        $scope.records[$scope.iSelectedRecord].dirty = true;
         $scope.refreshDailyTotals();
         $scope.refreshTotals();
     };
 
-    $scope.$watch('selectedRecord', function() {
-        if ($scope.selectedRecord) {
+    $scope.$watchGroup(['records', 'iSelectedRecord'], function() {
+        if ($scope.records && $scope.records[$scope.iSelectedRecord]) {
             $scope.getAccrualForSelectedRecord();
             $scope.setDisplayEntries();
             $scope.refreshDailyTotals();
             $scope.refreshTotals();
+            console.log($scope.records[$scope.iSelectedRecord]);
         }
     });
 
-    $scope.saveRecord = function() {
-        var record = $scope.selectedRecord;
+    // A map of employee record statuses to the logical next status upon record submission
+    var nextStatusMap = {
+        NOT_SUBMITTED: "SUBMITTED",
+        DISAPPROVED: "SUBMITTED",
+        DISAPPROVED_PERSONNEL: "SUBMITTED_PERSONNEL"
+    };
+
+    $scope.saveRecord = function(submit) {
+        var record = $scope.records[$scope.iSelectedRecord];
+        if (submit) {
+            // todo ensure totals + accruals are in line
+            record.recordStatus = nextStatusMap[record.recordStatus];
+        }
+        // todo some basic validation for saving e.g. accrual usage,
         recordsApi.save(record, function (response) {
-            record.updateDate = moment().toISOString();
-            record.savedDate = record.updateDate;
+            if (submit) {
+                $scope.getRecords();
+            } else {
+                record.updateDate = moment().toISOString();
+                record.savedDate = record.updateDate;
+                record.dirty = false;
+            }
         }, function (response) {
-            // todo invalid record response
+            // todo handle invalid record response
         });
     };
 
