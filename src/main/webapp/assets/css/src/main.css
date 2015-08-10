@@ -45,6 +45,10 @@ table.ess-table tbody tr {
 table.ess-table tbody tr td {
   text-align: center;
 }
+table.ess-table tbody tr td.invalid,
+table.ess-table tbody tr td input.ng-invalid {
+  background: #ffbcbc;
+}
 table.ess-table tbody tr.active {
   background: #DAE5EE;
 }
@@ -777,6 +781,10 @@ table.ess-table tbody tr {
 table.ess-table tbody tr td {
   text-align: center;
 }
+table.ess-table tbody tr td.invalid,
+table.ess-table tbody tr td input.ng-invalid {
+  background: #ffbcbc;
+}
 table.ess-table tbody tr.active {
   background: #DAE5EE;
 }
@@ -1331,11 +1339,13 @@ input[type="button"].submit-button {
   border-width: 2px;
   border-color: #5b7326;
 }
-input[type="button"][disabled="disabled"].submit-button {
+input[type="button"].submit-button.inactive,
+input[type="button"].submit-button[disabled="disabled"] {
   background: none;
   color: #333;
 }
-input[type="button"][disabled="disabled"].submit-button:hover {
+input[type="button"].submit-button.inactive:hover,
+input[type="button"].submit-button[disabled="disabled"]:hover {
   background: #eee;
 }
 input[type="button"].submit-button:hover {
@@ -1350,11 +1360,13 @@ input[type="button"].reject-button {
   border-width: 2px;
   border-color: #c33417;
 }
-input[type="button"].reject-button.inactive {
+input[type="button"].reject-button.inactive,
+input[type="button"].reject-button[disabled="disabled"] {
   background: none;
   color: #333;
 }
-input[type="button"].reject-button.inactive:hover {
+input[type="button"].reject-button.inactive:hover,
+input[type="button"].reject-button[disabled="disabled"]:hover {
   background: #eee;
 }
 input[type="button"].reject-button:hover {
@@ -1369,11 +1381,13 @@ input[type="button"].neutral-button {
   border-width: 2px;
   border-color: #00404d;
 }
-input[type="button"].neutral-button.inactive {
+input[type="button"].neutral-button.inactive,
+input[type="button"].neutral-button[disabled="disabled"] {
   background: none;
   color: #333;
 }
-input[type="button"].neutral-button.inactive:hover {
+input[type="button"].neutral-button.inactive:hover,
+input[type="button"].neutral-button[disabled="disabled"]:hover {
   background: #eee;
 }
 input[type="button"].neutral-button:hover {

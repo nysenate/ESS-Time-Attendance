@@ -2,10 +2,21 @@ var essApp = angular.module('ess');
 
 essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
                                             'AccrualPeriodApi',
-                  function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrualPeriodApi){
+function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrualPeriodApi){
     $scope.state = {
         accrual: null
     };
+
+    function getDefaultValidation() {
+        return {
+            accruals: {
+                sick: true,
+                vacation: true,
+                personal: true
+            }
+        }
+    }
+    $scope.validation = getDefaultValidation();
 
     $scope.getRecords = function () {
         var empId = appProps.user.employeeId;
@@ -35,7 +46,7 @@ essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appPr
 
     $scope.setDisplayEntries = function() {
         var record = $scope.records[$scope.iSelectedRecord];
-        console.log('setDisplayEntries:', record);
+        console.log('new selected record:', moment(record.beginDate).format('l'), record);
         $scope.displayEntries = [];
         var entryIndex = 0;
         for (var date = moment(record.payPeriod.startDate), periodEnd = moment(record.payPeriod.endDate);
@@ -91,21 +102,50 @@ essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appPr
         };
     };
 
+    function allTrue(object) {
+        if (typeof object === 'boolean') {
+            return object;
+        }
+        for (var prop in object) {
+            if (object.hasOwnProperty(prop) && !allTrue(object[prop])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    $scope.recordValid = function() {
+        return allTrue($scope.validation);
+    };
+
+    $scope.validateRecord = function() {
+        $scope.validateAccruals();
+        // todo validate more things
+    };
+
+    $scope.validateAccruals = function() {
+        var accValidation = $scope.validation.accruals;
+        var accrual = $scope.state.accrual;
+
+        if (accrual) {
+            var sickUsage = $scope.totals.sickEmp + $scope.totals.sickFam;
+            accValidation.sick = sickUsage <= accrual.sickAvailable;
+            accValidation.personal = $scope.totals.personal <= accrual.personalAvailable;
+            accValidation.vacation = $scope.totals.vac <= accrual.vacationAvailable;
+        }
+    };
+
     $scope.setDirty = function() {
         $scope.records[$scope.iSelectedRecord].dirty = true;
         $scope.refreshDailyTotals();
         $scope.refreshTotals();
+        $scope.validateRecord();
     };
 
-    $scope.$watchGroup(['records', 'iSelectedRecord'], function() {
-        if ($scope.records && $scope.records[$scope.iSelectedRecord]) {
-            $scope.getAccrualForSelectedRecord();
-            $scope.setDisplayEntries();
-            $scope.refreshDailyTotals();
-            $scope.refreshTotals();
-            console.log($scope.records[$scope.iSelectedRecord]);
-        }
-    });
+    $scope.recordSubmittable = function () {
+        var record = $scope.records[$scope.iSelectedRecord];
+        return record && $scope.recordValid() && !moment(record.endDate).isAfter(moment(), 'day');
+    };
 
     // A map of employee record statuses to the logical next status upon record submission
     var nextStatusMap = {
@@ -117,10 +157,9 @@ essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appPr
     $scope.saveRecord = function(submit) {
         var record = $scope.records[$scope.iSelectedRecord];
         if (submit) {
-            // todo ensure totals + accruals are in line
+            // todo ensure totals hours are in line
             record.recordStatus = nextStatusMap[record.recordStatus];
         }
-        // todo some basic validation for saving e.g. accrual usage,
         recordsApi.save(record, function (response) {
             if (submit) {
                 $scope.getRecords();
@@ -133,6 +172,17 @@ essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appPr
             // todo handle invalid record response
         });
     };
+
+    $scope.$watchGroup(['records', 'iSelectedRecord'], function() {
+        if ($scope.records && $scope.records[$scope.iSelectedRecord]) {
+            $scope.validation = getDefaultValidation();
+            $scope.getAccrualForSelectedRecord();
+            $scope.setDisplayEntries();
+            $scope.refreshDailyTotals();
+            $scope.refreshTotals();
+            $scope.validateRecord();
+        }
+    });
 
     $scope.init = function(miscLeaveMap) {
         $scope.miscLeaves = miscLeaveMap;

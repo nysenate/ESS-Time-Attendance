@@ -18,7 +18,7 @@ Toggle this for temporary emps.
 <div ng-controller="RecordEntryController" ng-init='init(<%= miscLeaveMapJson%>)'>
     <div id="record-selection-container" class="content-container content-controls">
         <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>
-        <table>
+        <table class="simple-table">
             <thead>
             <tr>
                 <th>Select</th>
@@ -30,7 +30,7 @@ Toggle this for temporary emps.
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="record in records">
+            <tr ng-repeat="record in records" ng-click="$parent.iSelectedRecord = $index">
                 <td>
                     <input type="radio" name="recordSelect" ng-value="$index"
                            ng-model="$parent.iSelectedRecord"/>
@@ -110,39 +110,44 @@ Toggle this for temporary emps.
                 <tr class="time-record-row" ng-repeat="(i,entry) in displayEntries"
                     ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}">
                     <td style="text-align: right;padding-right:20px;">{{entry.date | moment:'ddd M/D/YYYY'}}</td>
-                    <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                    <td ng-class="{invalid: entry.workHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="24" ng-disabled="entry.unavailable"
                                ng-model="entry.workHours" tabindex="{{$index+1}}" name="numWorkHours"/>
                     </td>
                     <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
                                ng-model="entry.holidayHours" name="numHolidayHours" disabled/>
                     </td>
-                    <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                    <td ng-class="{invalid: entry.vacationHours > 0 && !validation.accruals.vacation || entry.vacationHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
                                ng-model="entry.vacationHours" name="numVacationHours" tabindex="{{$index+15}}"/>
-                    <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                    </td>
+                    <td ng-class="{invalid: entry.personalHours > 0 && !validation.accruals.personal || entry.personalHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
                                ng-model="entry.personalHours" name="numPersonalHours"/>
-                    <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                    </td>
+                    <td ng-class="{invalid: entry.sickEmpHours > 0 && !validation.accruals.sick || entry.sickEmpHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
                                ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
-                    <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                    </td>
+                    <td ng-class="{invalid: entry.sickFamHours > 0 && !validation.accruals.sick || entry.sickFamHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
                                ng-model="entry.sickFamHours" name="numSickFamHours"/>
-                    <td>
-                        <input type="number" ng-change="setDirty(entry)" time-record-input class="hours-input"
+                    </td>
+                    <td ng-class="{invalid: entry.miscHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                                placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
                                ng-model="entry.miscHours" name="numMiscHours"/>
+                    </td>
                     <td>
                         <select style="font-size:.9em;" name="miscHourType"
-                                ng-model="entry.miscType" ng-disabled="entry.unavailable"
+                                ng-model="entry.miscType" ng-disabled="entry.unavailable" ng-change="setDirty()"
                                 ng-options="type as label for (type, label) in miscLeaves">
                             <option value="">No Misc Hours</option>
                         </select>
@@ -176,7 +181,7 @@ Toggle this for temporary emps.
                     <input ng-click="saveRecord(false)" class="submit-button" type="button" value="Save Record"
                         ng-disabled="!records[iSelectedRecord].dirty"/>
                     <input ng-click="saveRecord(true)" class="submit-button" type="button" value="Submit Record"
-                        ng-disabled="records[iSelectedRecord].endDate | momentCmp:'>'"/>
+                        ng-disabled="!recordSubmittable()"/>
                 </div>
                 <div class="clearfix"></div>
             </div>

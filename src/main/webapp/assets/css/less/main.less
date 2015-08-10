@@ -84,7 +84,7 @@ input[type="button"].neutral-button {
   border-width: 2px;
   border-color: darken(@bgColor, 10%);
 
-  &.inactive {
+  &.inactive, &[disabled="disabled"] {
     background: none;
     color: #333;
     &:hover {
@@ -724,7 +724,7 @@ table#timeRecordTable {
   background: #f9f9f9;
   input[type="button"] {
     margin-top: 10px;
-    width: 100px;
+    width: 8.5em;
   }
 }
 
