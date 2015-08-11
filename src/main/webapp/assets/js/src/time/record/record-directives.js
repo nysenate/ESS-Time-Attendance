@@ -4,12 +4,13 @@ var essApp = angular.module('ess');
 
 essApp.filter('timeRecordStatus', function () {
     var statusDispMap = {
-        SUBMITTED: "Submitted",
         NOT_SUBMITTED: "Not Submitted",
-        APPROVED: "Supervisor Approved",
+        SUBMITTED: "Submitted",
         DISAPPROVED: "Supervisor Disapproved",
-        SUBMITTED_PERSONNEL: "Personnel Approved",
-        DISAPPROVED_PERSONNEL: "Personnel Disapproved"
+        APPROVED: "Supervisor Approved",
+        DISAPPROVED_PERSONNEL: "Personnel Disapproved",
+        SUBMITTED_PERSONNEL: "Submitted Personnel",
+        APPROVED_PERSONNEL: "Personnel Approved"
     };
     return function (status) {
         if (statusDispMap.hasOwnProperty(status)) {

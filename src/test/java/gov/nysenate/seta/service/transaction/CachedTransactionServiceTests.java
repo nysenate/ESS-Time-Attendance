@@ -16,7 +16,7 @@ public class CachedTransactionServiceTests extends BaseTests {
 
     private static final Logger logger = LoggerFactory.getLogger(CachedTransactionServiceTests.class);
 
-    @Autowired CachedTransactionService transService;
+    @Autowired CachedEmpTransactionService transService;
 
     @Autowired EventBus eventBus;
 

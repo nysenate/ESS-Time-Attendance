@@ -9,11 +9,15 @@
     <script>
         window.globalProps = {
             ctxPath: '${ctxPath}',
+            apiPath: '${ctxPath}/api/v1',
             runtimeLevel: '${runtimeLevel}',
             loginUrl: '${loginUrl}'
         };
         <c:if test="${not empty principalJson}">
             window.globalProps.user = ${principalJson};
+        </c:if>
+        <c:if test="${not empty empActiveYears}">
+            window.globalProps.empActiveYears = ${empActiveYears};
         </c:if>
     </script>
     <jsp:doBody/>

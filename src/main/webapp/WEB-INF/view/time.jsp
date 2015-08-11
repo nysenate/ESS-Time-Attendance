@@ -8,9 +8,13 @@
     <jsp:attribute name="pageTitle">ESS - Time and Attendance</jsp:attribute>
     <jsp:body>
         <ess:ts-assets/>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-entry-ctrl.js"></script>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-directives.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/home.js"></script>
+
+        <!-- Time Entry -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-directives.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-parent-ctrl.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-entry-ctrl.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-history-ctrl.js"></script>
 
         <!-- Time Off Requests -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/timeoff/new-request-ctrl.js"></script>
