@@ -8,8 +8,8 @@ import gov.nysenate.seta.model.transaction.TransactionHistory;
 import java.time.LocalDate;
 import java.util.Set;
 
-public interface TransactionService {
-
+public interface EmpTransactionService
+{
     /**
      * Gets all transactions for the given employee as they exist in the data store
      * @see #getTransHistory(int, EmpTransDaoOption, Set, Range)

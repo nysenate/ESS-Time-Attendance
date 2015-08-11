@@ -49,6 +49,10 @@ public class ListViewResponse<ViewType> extends PaginationResponse
         return new ListViewResponse<>(ListView.ofStringList(items), resultFieldName, total, limitOffset);
     }
 
+    public static ListViewResponse<Integer> ofIntList(List<Integer> items, String resultFieldName) {
+        return new ListViewResponse<>(ListView.ofIntList(items), resultFieldName, items.size(), new LimitOffset(items.size()));
+    }
+
     public static ListViewResponse<Integer> ofIntList(List<Integer> items, String resultFieldName, int total, LimitOffset limitOffset) {
         return new ListViewResponse<>(ListView.ofIntList(items), resultFieldName, total, limitOffset);
     }

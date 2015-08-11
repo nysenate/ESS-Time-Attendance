@@ -7,13 +7,13 @@ import gov.nysenate.seta.dao.accrual.AccrualDao;
 import gov.nysenate.seta.dao.attendance.TimeRecordDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
-import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.accrual.*;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,9 @@ public class EssAccrualComputeService implements AccrualComputeService
 
     @Autowired private AccrualDao accrualDao;
     @Autowired private PayPeriodDao periodDao;
-    @Autowired private EmpTransactionDao empTransDao;
     @Autowired private TimeRecordDao timeRecordDao;
+
+    @Autowired private EmpTransactionService empTransService;
 
     /** --- Implemented Methods --- */
 
@@ -76,7 +77,7 @@ public class EssAccrualComputeService implements AccrualComputeService
                     annualAccruals = accrualDao.getAnnualAccruals(empId, periodSet.last().getYear());
                 }
                 if (empTrans == null) {
-                    empTrans = empTransDao.getTransHistory(empId, EmpTransDaoOption.INITIALIZE_AS_APP);
+                    empTrans = empTransService.getTransHistory(empId, EmpTransDaoOption.INITIALIZE_AS_APP);
                 }
                 Map.Entry<PayPeriod, PeriodAccSummary> periodAccRecord = periodAccruals.lowerEntry(p);
                 Optional<PeriodAccSummary> optPeriodAccRecord =

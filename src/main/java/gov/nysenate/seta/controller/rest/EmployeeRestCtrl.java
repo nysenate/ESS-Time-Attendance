@@ -8,6 +8,7 @@ import gov.nysenate.seta.client.view.EmployeeView;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeException;
+import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class EmployeeRestCtrl extends BaseRestCtrl
     private static final Logger logger = LoggerFactory.getLogger(EmployeeRestCtrl.class);
 
     @Autowired protected EmployeeDao employeeDao;
+    @Autowired private EmployeeInfoService empInfoService;
 
     @RequestMapping(value = "")
     public BaseResponse getEmployeeById(@RequestParam(required = true) Integer empId[],
@@ -35,6 +37,11 @@ public class EmployeeRestCtrl extends BaseRestCtrl
         return getEmployeeResponse(
             Arrays.asList(empId).stream().map(employeeDao::getEmployeeById).collect(toList()), detail);
 
+    }
+
+    @RequestMapping(value = "/active-years")
+    public BaseResponse getEmployeeYearsActive(@RequestParam(required = true) Integer empId) {
+        return ListViewResponse.ofIntList(empInfoService.getEmployeeActiveYearsService(empId), "activeYears");
     }
 
     private BaseResponse getEmployeeResponse(List<Employee> employeeList, boolean detail) {

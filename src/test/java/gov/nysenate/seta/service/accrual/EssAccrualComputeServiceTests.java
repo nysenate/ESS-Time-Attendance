@@ -31,7 +31,7 @@ public class EssAccrualComputeServiceTests extends BaseTests
     @Test
     public void testGetAccruals1() throws Exception {
         List<PayPeriod> payPeriods = payPeriodDao.getPayPeriods(
-            PayPeriodType.AF, Range.closed(LocalDate.of(2011, 1, 1), LocalDate.of(2015, 1, 1)), SortOrder.ASC);
-        accrualComputeService.getAccruals(7048, payPeriods);
+            PayPeriodType.AF, Range.closed(LocalDate.of(2015, 1, 1), LocalDate.of(2015, 8, 1)), SortOrder.ASC);
+        logger.info("{}", OutputUtils.toJson(accrualComputeService.getAccruals(10976, payPeriods)));
     }
 }

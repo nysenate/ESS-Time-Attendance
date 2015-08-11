@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public enum ContentCache
 {
+    PAY_PERIOD,
     TRANSACTION
     ;
 

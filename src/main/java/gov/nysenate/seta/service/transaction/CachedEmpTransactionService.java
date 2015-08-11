@@ -26,9 +26,9 @@ import static org.springframework.cache.Cache.ValueWrapper;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @Service
-public class CachedTransactionService extends BaseCachingService<Integer> implements TransactionService {
-
-    private static final Logger logger = LoggerFactory.getLogger(CachedTransactionService.class);
+public class CachedEmpTransactionService extends BaseCachingService<Integer> implements EmpTransactionService
+{
+    private static final Logger logger = LoggerFactory.getLogger(CachedEmpTransactionService.class);
 
     @Autowired EmpTransactionDao transactionDao;
 

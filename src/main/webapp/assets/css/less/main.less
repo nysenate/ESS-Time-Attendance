@@ -736,19 +736,15 @@ table#timeRecordTable {
   tbody {
     tr {
       border-bottom: 1px solid #eee !important;
-
       &:hover {
         background: fade(@teal, 5%);
       }
-
       &:nth-child(even) {
         background: fade(#333, 5%);
       }
-
       td {
         padding: .5em;
-        border-right: 1px solid #eee;
-
+        border: 0;
         .action-link {
           font-size: .9em;
         }
@@ -942,9 +938,9 @@ table.attendance-entry-sub-table {
   width: 100%;
   thead {
     tr {
-      border-bottom: 1px solid #ddd;
+      border: 0;
       th {
-        border-right: 1px solid #ddd;
+        border: 0;
         padding: .3em 0;
       }
       &:last-of-type {
@@ -958,8 +954,7 @@ table.attendance-entry-sub-table {
         background: fade(#333, 5%);
       }
       td {
-        border-bottom: 1px solid #ddd;
-        border-right: 1px solid #ddd;
+        border: 0;
         text-align: center;
         padding: .4em 0;
       }

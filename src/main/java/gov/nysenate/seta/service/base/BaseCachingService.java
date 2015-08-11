@@ -12,9 +12,11 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 
-/** A base implementation of CachingService that uses a single EhCacheCache */
-public abstract class BaseCachingService<ContentId> implements CachingService<ContentId> {
-
+/**
+ * A base implementation of CachingService that uses a single EhCacheCache
+ */
+public abstract class BaseCachingService<ContentId> implements CachingService<ContentId>
+{
     @Autowired CacheManager cacheManager;
     @Autowired EventBus eventBus;
 

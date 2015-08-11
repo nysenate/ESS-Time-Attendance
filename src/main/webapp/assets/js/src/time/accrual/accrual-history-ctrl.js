@@ -1,22 +1,24 @@
 var essTime = angular.module('essTime');
 
-essTime.controller('AccrualHistoryCtrl', ['$scope', '$http', 'appProps', 'AccrualHistoryApi',
-    function($scope, $http, appProps, AccrualHistoryApi) {
+essTime.controller('AccrualHistoryCtrl',
+    ['$scope', '$http', 'appProps', 'AccrualHistoryApi', 'EmpActiveYearsApi',
+    function($scope, $http, appProps, AccrualHistoryApi, EmpActiveYearsApi) {
 
     $scope.state = {
-        year: moment().year(),
-        accSummaries: null
+        empId: appProps.user.employeeId,
+        accSummaries: null,
+        activeYears: [],
+        selectedYear: null
     };
 
     $scope.getAccSummaries = function(year) {
-        var empId = appProps.user.employeeId;
         var fromDate = moment([year, 0, 1]);
-        var toDate = moment([year + 1, 0, 1]);
-        if ($scope.state.year == moment().year()) {
-            toDate = moment();
+        var toDate = moment([year + 1, 0, 1]).subtract(1, 'days');
+        if (year == moment().year()) {
+            //toDate = moment();
         }
         var accSummariesResp = AccrualHistoryApi.get({
-            empId: empId,
+            empId: $scope.state.empId,
             fromDate: fromDate.format('YYYY-MM-DD'),
             toDate: toDate.format('YYYY-MM-DD')
         }, function(resp) {
@@ -29,7 +31,17 @@ essTime.controller('AccrualHistoryCtrl', ['$scope', '$http', 'appProps', 'Accrua
         });
     };
 
+    $scope.getEmpActiveYears = function(callBack) {
+        EmpActiveYearsApi.get({empId: $scope.state.empId}, function(resp) {
+            $scope.state.activeYears = resp.activeYears.reverse();
+            $scope.state.selectedYear = resp.activeYears[0];
+            if (callBack) callBack();
+        });
+    };
+
     $scope.init = function() {
-        $scope.getAccSummaries($scope.state.year);
+        $scope.getEmpActiveYears(function() {
+            $scope.getAccSummaries($scope.state.selectedYear);
+        });
     }();
 }]);

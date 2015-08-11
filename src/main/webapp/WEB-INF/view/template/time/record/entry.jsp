@@ -109,7 +109,7 @@ Toggle this for temporary emps.
                 <tbody>
                 <tr ng-class="{'weekend': date.getDay() == 0 || date.getDay() == 6, 'dummy-entry': entry.dummyEntry}"
                     class="time-record-row" ng-repeat="(i,entry) in displayEntries">
-                    <td style="text-align: right;padding-right:20px;">{{entry.date | moment:'l'}}</td>
+                    <td style="text-align: right;padding-right:20px;">{{entry.date | moment:'ddd l'}}</td>
                     <td>
                         <input ng-change="setDirty(entry)" ng-model="entry.workHours" time-record-input
                                tabindex="{{$index+1}}" class="hours-input" placeholder="--" type="text" min="0" max="24"
