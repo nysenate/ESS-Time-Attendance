@@ -83,15 +83,15 @@ module.exports = function(grunt) {
         watch: {
             less: {
                 files: ['<%= lessSource %>/**.less', '<%= lessSource %>/common/**.less'],
-                tasks: ['less', 'cssmin']
+                tasks: ['less', 'cssmin', 'copy:css']
             },
             css: {
-                files: ['<%= cssVendor %>/**.css'],
-                tasks: ['cssmin']
+                files: ['<%= cssVendor %>/**/*.css', '<%= cssSource %>/**/*.css'],
+                tasks: ['cssmin', 'copy:css']
             },
             jsVendor: {
                 files: ['<%= bowerRoot %>/**.js'],
-                tasks: ['uglify:vendor']
+                tasks: ['uglify:vendor', 'copy:js']
             },
             jsSource: {
                 files: ['<%= jsSource %>/**/*.js'],

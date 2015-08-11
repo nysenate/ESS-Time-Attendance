@@ -92,7 +92,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      * --------------------
      *
      * Save a time record:
-     *      (POST) /api/v1/records
+     *      (POST) /api/v1/timerecords
      *
      * Post Data: json TimeRecordView
      */

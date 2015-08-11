@@ -70,7 +70,7 @@ public class TimeEntryView implements ViewObject {
     @JsonIgnore
     public TimeEntry toTimeEntry() {
         TimeEntry entry = new TimeEntry(new BigInteger(timeRecordId), empId);
-        entry.setEntryId(new BigInteger(entryId));
+        entry.setEntryId(entryId != null ? new BigInteger(entryId) : null);
         entry.setEmployeeName(employeeName);
         entry.setDate(date);
         entry.setWorkHours(workHours);

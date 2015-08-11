@@ -18,7 +18,7 @@ Toggle this for temporary emps.
 <div ng-controller="RecordEntryController" ng-init='init(<%= miscLeaveMapJson%>)'>
     <div id="record-selection-container" class="content-container content-controls">
         <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>
-        <table>
+        <table class="simple-table">
             <thead>
             <tr>
                 <th>Select</th>
@@ -30,20 +30,20 @@ Toggle this for temporary emps.
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="record in records">
+            <tr ng-repeat="record in records" ng-click="$parent.iSelectedRecord = $index">
                 <td>
-                    <input type="radio" name="recordSelect" ng-value="records[$index]"
-                           ng-model="$parent.selectedRecord"/>
+                    <input type="radio" name="recordSelect" ng-value="$index"
+                           ng-model="$parent.iSelectedRecord"/>
                 </td>
                 <td>{{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}</td>
                 <td>{{record.supervisor.fullName}}</td>
                 <td>{{record.endDate | momentFromNow}}</td>
                 <td>{{record.recordStatus | timeRecordStatus}}</td>
                 <td>
-                    <span ng-show="record.updateDate | momentEquals:record.originalDate:'second' | not">
+                    <span ng-show="record.updateDate | momentCmp:'=':record.originalDate:'second' | not">
                       {{record.updateDate | moment: 'lll'}}
                     </span>
-                    <span ng-show="record.updateDate | momentEquals:record.originalDate:'second'">New</span>
+                    <span ng-show="record.updateDate | momentCmp:'=':record.originalDate:'second'">New</span>
                 </td>
             </tr>
             </tbody>
@@ -107,36 +107,47 @@ Toggle this for temporary emps.
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-class="{'weekend': date.getDay() == 0 || date.getDay() == 6, 'dummy-entry': entry.dummyEntry}"
-                    class="time-record-row" ng-repeat="(i,entry) in displayEntries">
-                    <td style="text-align: right;padding-right:20px;">{{entry.date | moment:'ddd l'}}</td>
-                    <td>
-                        <input ng-change="setDirty(entry)" ng-model="entry.workHours" time-record-input
-                               tabindex="{{$index+1}}" class="hours-input" placeholder="--" type="text" min="0" max="24"
-                               step=".5" name="numWorkHours"/>
+                <tr class="time-record-row" ng-repeat="(i,entry) in displayEntries"
+                    ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}">
+                    <td style="text-align: right;padding-right:20px;">{{entry.date | moment:'ddd M/D/YYYY'}}</td>
+                    <td ng-class="{invalid: entry.workHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="24" ng-disabled="entry.unavailable"
+                               ng-model="entry.workHours" tabindex="{{$index+1}}" name="numWorkHours"/>
                     </td>
                     <td>
-                        <input ng-change="setDirty(entry)" ng-model="entry.holidayHours" time-record-input class="hours-input"
-                               disabled placeholder="--" type="number" min="0" max="7" step=".5" name="numHolidayHours"/>
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                               ng-model="entry.holidayHours" name="numHolidayHours" disabled/>
                     </td>
-                    <td>
-                        <input ng-change="setDirty(entry)" ng-model="entry.vacationHours" time-record-input
-                               tabindex="{{$index+15}}" class="hours-input" placeholder="--" type="number" min="0" max="7"
-                               step=".5" name="numVacationHours"/></td>
-                    <td>
-                        <input ng-change="setDirty(entry)" ng-model="entry.personalHours" time-record-input
-                               class="hours-input" placeholder="--" type="number" min="0" max="7" step=".5"
-                               name="numPersonalHours"/></td>
-                    <td>
-                        <input ng-change="setDirty(entry)" ng-model="entry.sickEmpHours" time-record-input class="hours-input"
-                               placeholder="--" type="number" min="0" max="7" step=".5" name="numSickEmpHours"/></td>
-                    <td><input ng-change="setDirty(entry)" ng-model="entry.sickFamHours" time-record-input class="hours-input"
-                               placeholder="--" type="number" min="0" max="7" step=".5" name="numSickFamHours"/></td>
-                    <td><input ng-change="setDirty(entry)" ng-model="entry.miscHours" time-record-input class="hours-input"
-                               placeholder="--" type="number" min="0" max="7" step=".5" name="numMiscHours"/></td>
+                    <td ng-class="{invalid: entry.vacationHours > 0 && !validation.accruals.vacation || entry.vacationHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                               ng-model="entry.vacationHours" name="numVacationHours" tabindex="{{$index+15}}"/>
+                    </td>
+                    <td ng-class="{invalid: entry.personalHours > 0 && !validation.accruals.personal || entry.personalHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                               ng-model="entry.personalHours" name="numPersonalHours"/>
+                    </td>
+                    <td ng-class="{invalid: entry.sickEmpHours > 0 && !validation.accruals.sick || entry.sickEmpHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                               ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
+                    </td>
+                    <td ng-class="{invalid: entry.sickFamHours > 0 && !validation.accruals.sick || entry.sickFamHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                               ng-model="entry.sickFamHours" name="numSickFamHours"/>
+                    </td>
+                    <td ng-class="{invalid: entry.miscHours === undefined}">
+                        <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
+                               placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                               ng-model="entry.miscHours" name="numMiscHours"/>
+                    </td>
                     <td>
                         <select style="font-size:.9em;" name="miscHourType"
-                                ng-model="entry.miscType"
+                                ng-model="entry.miscType" ng-disabled="entry.unavailable" ng-change="setDirty()"
                                 ng-options="type as label for (type, label) in miscLeaves">
                             <option value="">No Misc Hours</option>
                         </select>
@@ -160,14 +171,17 @@ Toggle this for temporary emps.
             <div id="saveRecordContainer">
                 <div id="remarksRecordContainer">
                     <label for="remarksTextArea">Notes / Remarks</label>
-                    <textarea id="remarksTextArea"></textarea>
+                    <textarea id="remarksTextArea" ng-model="records[iSelectedRecord].remarks"></textarea>
                 </div>
                 <div class="float-right">
-                    <label ng-show="selectedRecord.savedDate" style="position: relative;top: 20px;right: 20px;font-size: 1.1em;">Last
-                        Saved {{selectedRecord.savedDate | moment:'lll'}}
+                    <label ng-show="records[iSelectedRecord].savedDate"
+                           style="position: relative;top: 20px;right: 20px;font-size: 1.1em;">
+                        Last Saved {{records[iSelectedRecord].savedDate | moment:'lll'}}
                     </label>
-                    <input ng-click="saveRecord()" class="submit-button" type="button"
-                           value="Save Record"/>
+                    <input ng-click="saveRecord(false)" class="submit-button" type="button" value="Save Record"
+                        ng-disabled="!records[iSelectedRecord].dirty"/>
+                    <input ng-click="saveRecord(true)" class="submit-button" type="button" value="Submit Record"
+                        ng-disabled="!recordSubmittable()"/>
                 </div>
                 <div class="clearfix"></div>
             </div>

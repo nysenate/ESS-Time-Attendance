@@ -57,7 +57,7 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
 
     private static MapSqlParameterSource getTimeEntryParams(TimeEntry timeEntry) {
         MapSqlParameterSource param = new MapSqlParameterSource();
-        param.addValue("tSDayId", new BigDecimal(timeEntry.getEntryId()));
+        param.addValue("tSDayId", timeEntry.getEntryId() != null ? new BigDecimal(timeEntry.getEntryId()) : null);
         param.addValue("timesheetId", new BigDecimal(timeEntry.getTimeRecordId()));
         param.addValue("empId", timeEntry.getEmpId());
         param.addValue("employeeName", timeEntry.getEmployeeName());
