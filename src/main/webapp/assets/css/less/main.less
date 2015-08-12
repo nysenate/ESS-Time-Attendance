@@ -534,6 +534,7 @@ table.simple-table {
 
 table#timeRecordTable {
   thead {
+    background: white;
     tr {
       th {
         width: 65px;
@@ -937,6 +938,7 @@ table.attendance-entry-sub-table {
 .accruals-table, .detail-acc-history-table, #accrual-usage-details-table {
   width: 100%;
   thead {
+    background: white;
     tr {
       border: 0;
       th {
@@ -952,6 +954,10 @@ table.attendance-entry-sub-table {
     tr {
       &:nth-child(even) {
         background: fade(#333, 5%);
+      }
+      &.highlighted {
+        border: 1px solid @teal;
+        border-left-width: 3px;
       }
       td {
         border: 0;

@@ -56,7 +56,9 @@ module.exports = function(grunt) {
                          '<%= bowerRoot %>/angular-animate/angular-animate.min.js',
                          '<%= bowerRoot %>/odometer/odometer.min.js',
                          '<%= bowerRoot %>/moment/min/moment.min.js',
-                         '<%= bowerRoot %>/highcharts.com/highcharts.src.js'
+                         '<%= bowerRoot %>/floatThead/dist/jquery.floatThead.min.js',
+                         '<%= bowerRoot %>/angular-float-thead/angular-floatThead.js'
+                         //'<%= bowerRoot %>/highcharts.com/highcharts.src.js'
                         ],
                     '<%= jsDest %>/timesheets-vendor-ie.min.js':
                         ['<%= bowerRoot %>/json2/json2.js']

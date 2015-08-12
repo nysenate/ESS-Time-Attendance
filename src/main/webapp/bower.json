@@ -17,7 +17,9 @@
     "lesshat": "2.0.15",
     "highcharts.com": "~3.0.9",
     "jquery-ui": "1.10.4",
-    "odometer": "0.4.6"
+    "odometer": "0.4.6",
+    "floatThead": "~1.2.12",
+    "angular-float-thead": "~0.0.1"
   },
   "devDependencies": {
     "json2": "*"

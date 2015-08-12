@@ -13,14 +13,14 @@
         <h1 class="teal">Running Accrual Summary</h1>
         <p class="content-info">The hours accrued, used, and remaining are listed in the table below.<br/>
             The accrued, used, and available hours in each column are a running total from the start of the year.</p>
-        <table class="detail-acc-history-table">
+        <table class="detail-acc-history-table" float-thead="floatTheadOpts">
             <thead>
             <tr>
                 <th colspan="2">Pay Period</th>
                 <th colspan="3" class="personal">Personal</th>
                 <th colspan="4" class="vacation">Vacation</th>
                 <th colspan="4" class="sick">Sick</th>
-                <th colspan="1" class="misc">Misc</th>
+                <%--<th colspan="1" class="misc">Misc</th>--%>
             </tr>
             <tr>
                 <th>Number</th>
@@ -30,31 +30,31 @@
                 <th>Avail</th>
                 <th>Rate</th>
                 <th>Accrued</th>
-                <th>Used</th>
+                <th>Used Ytd</th>
                 <th>Avail</th>
                 <th>Rate</th>
                 <th>Accrued</th>
-                <th>Used</th>
+                <th>Used Ytd</th>
                 <th>Avail</th>
-                <th>Used</th>
+                <%--<th>Used</th>--%>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="record in state.accSummaries">
+            <tr ng-repeat="record in state.accSummaries" ng-class="{'highlighted': record.current}">
                 <td>{{record.payPeriod.payPeriodNum}}</td>
                 <td>{{record.payPeriod.endDate | moment:'MM/DD/YYYY'}}</td>
                 <td>{{record.personalAccruedYtd}}</td>
                 <td>{{record.personalUsed}}</td>
                 <td>{{record.personalAvailable}}</td>
                 <td>{{record.vacationRate}}</td>
-                <td>{{record.vacationAccruedYtd}}</td>
+                <td>{{record.vacationAccruedYtd + record.vacationBanked}}</td>
                 <td>{{record.vacationUsed}}</td>
                 <td>{{record.vacationAvailable}}</td>
                 <td>{{record.sickRate}}</td>
                 <td>{{record.sickAccruedYtd}}</td>
                 <td>{{record.empSickUsed + record.famSickUsed}}</td>
                 <td>{{record.sickAvailable}}</td>
-                <td>{{record.miscUsed}}</td>
+                <%--<td>{{record.miscUsed}}</td>--%>
             </tr>
             </tbody>
         </table>

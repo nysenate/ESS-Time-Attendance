@@ -94,7 +94,7 @@ Toggle this for temporary emps.
       </div>
       <hr/>
       <form id="timeRecordForm" method="post" action="">
-        <table class="ess-table" id="timeRecordTable">
+        <table class="ess-table" id="timeRecordTable" float-thead="floatTheadOpts">
           <thead>
           <tr>
             <th>Date</th>

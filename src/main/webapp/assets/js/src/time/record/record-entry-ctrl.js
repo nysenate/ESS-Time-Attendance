@@ -27,6 +27,12 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
         DISAPPROVED_PERSONNEL: "SUBMITTED_PERSONNEL"
     };
 
+    // Settings for floating the time entry table heading
+    $scope.floatTheadOpts = {
+        scrollingTop: 47,
+        autoReflow: true
+    };
+
     $scope.init = function() {
         $scope.getRecords();
     };

@@ -6,6 +6,7 @@ essTime.controller('AccrualHistoryCtrl',
 
     $scope.state = {
         empId: appProps.user.employeeId,
+        today: moment(),
         accSummaries: null,
         activeYears: [],
         selectedYear: null
@@ -24,6 +25,16 @@ essTime.controller('AccrualHistoryCtrl',
         }, function(resp) {
             if (resp.success) {
                 $scope.state.accSummaries = resp.result;
+                if (year == moment().year()) {
+                    var currSummary = $scope.state.accSummaries.filter(function(accSum) {
+                        return $scope.state.today.isBetween(accSum.payPeriod.startDate, accSum.payPeriod.endDate);
+                    });
+                    if (currSummary) {
+                        currSummary[0].current = true;
+                        console.log(currSummary);
+                    }
+                }
+
             }
             else {
                 alert("Error while fetching accruals.");
@@ -37,6 +48,11 @@ essTime.controller('AccrualHistoryCtrl',
             $scope.state.selectedYear = resp.activeYears[0];
             if (callBack) callBack();
         });
+    };
+
+    $scope.floatTheadOpts = {
+        scrollingTop: 47,
+        autoReflow: true
     };
 
     $scope.init = function() {
