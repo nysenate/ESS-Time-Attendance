@@ -34,6 +34,7 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
     };
 
     $scope.init = function() {
+        console.log('rec init');
         $scope.getRecords();
     };
 

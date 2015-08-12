@@ -1,6 +1,7 @@
 var essTime = angular.module('essTime');
 
-essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi', function ($scope, appProps, timeRecordsApi) {
+essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi', 'modals',
+function ($scope, appProps, timeRecordsApi, modals) {
 
     $scope.activeYears = appProps.empActiveYears;
     $scope.year = $scope.activeYears[$scope.activeYears.length - 1];
@@ -30,6 +31,17 @@ essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi',
         }, function(response) {
             // todo error handling
         })
+    };
+
+    /** --- Display Methods --- */
+
+    // Open a new modal window showing a detailed view of the given record
+    $scope.showDetails = function(record) {
+        var params = {
+            record: record,
+            miscLeaves: $scope.miscLeaves
+        };
+        modals.open('details', params);
     };
 
     /** --- Internal Methods --- */
@@ -64,5 +76,12 @@ essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi',
     }
 
     $scope.init();
+}]);
+
+/** --- Record Details Modal Ctrl --- */
+
+essTime.controller('RecordDetailsCtrl', ['$scope', 'modals', function ($scope, modals) {
+    $scope.record = modals.params().record;
+    $scope.miscLeaves = modals.params().miscLeaves;
 }]);
 

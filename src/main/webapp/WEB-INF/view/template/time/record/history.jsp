@@ -22,35 +22,35 @@
         the right.</p>
       <table id="attendance-active-table" class="ess-table attendance-listing-table">
         <thead>
-          <tr>
-            <th>Date Range</th>
-            <th>Pay Period</th>
-            <th>Status</th>
-            <th>Work</th>
-            <th>Holiday</th>
-            <th>Vacation</th>
-            <th>Personal</th>
-            <th>Sick Emp</th>
-            <th>Sick Fam</th>
-            <th>Misc</th>
-            <th>Total</th>
-            <th>Actions</th>
-          </tr>
+        <tr>
+          <th>Date Range</th>
+          <th>Pay Period</th>
+          <th>Status</th>
+          <th>Work</th>
+          <th>Holiday</th>
+          <th>Vacation</th>
+          <th>Personal</th>
+          <th>Sick Emp</th>
+          <th>Sick Fam</th>
+          <th>Misc</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="record in records.employee">
-            <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
-            <td>{{record.payPeriod.payPeriodNum}}</td>
-            <td>{{record.recordStatus | timeRecordStatus}}</td>
-            <td>{{record.totals.work}}</td>
-            <td>{{record.totals.holiday}}</td>
-            <td>{{record.totals.vac}}</td>
-            <td>{{record.totals.personal}}</td>
-            <td>{{record.totals.sickEmp}}</td>
-            <td>{{record.totals.sickFam}}</td>
-            <td>{{record.totals.misc}}</td>
-            <td>{{record.totals.total}}</td>
-            <td><a href="${ctxPath}/time/record/entry" class="action-link">Edit</a></td>
+        <tr ng-repeat="record in records.employee">
+          <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
+          <td>{{record.payPeriod.payPeriodNum}}</td>
+          <td>{{record.recordStatus | timeRecordStatus}}</td>
+          <td>{{record.totals.work}}</td>
+          <td>{{record.totals.holiday}}</td>
+          <td>{{record.totals.vac}}</td>
+          <td>{{record.totals.personal}}</td>
+          <td>{{record.totals.sickEmp}}</td>
+          <td>{{record.totals.sickFam}}</td>
+          <td>{{record.totals.misc}}</td>
+          <td>{{record.totals.total}}</td>
+          <td><a href="${ctxPath}/time/record/entry" class="action-link">Edit</a></td>
         </tr>
         </tbody>
       </table>
@@ -64,105 +64,123 @@
         right.</p>
       <table id="attendance-history-table" class="ess-table attendance-listing-table">
         <thead>
-          <tr>
-            <th>Date Range</th>
-            <th>Pay Period</th>
-            <th>Status</th>
-            <th>Work</th>
-            <th>Holiday</th>
-            <th>Vacation</th>
-            <th>Personal</th>
-            <th>Sick Emp</th>
-            <th>Sick Fam</th>
-            <th>Misc</th>
-            <th>Total</th>
-            <th>Actions</th>
-          </tr>
+        <tr>
+          <th>Date Range</th>
+          <th>Pay Period</th>
+          <th>Status</th>
+          <th>Work</th>
+          <th>Holiday</th>
+          <th>Vacation</th>
+          <th>Personal</th>
+          <th>Sick Emp</th>
+          <th>Sick Fam</th>
+          <th>Misc</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="record in records.other">
-            <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
-            <td>{{record.payPeriod.payPeriodNum}}</td>
-            <td>{{record.recordStatus | timeRecordStatus}}</td>
-            <td>{{record.totals.work}}</td>
-            <td>{{record.totals.holiday}}</td>
-            <td>{{record.totals.vac}}</td>
-            <td>{{record.totals.personal}}</td>
-            <td>{{record.totals.sickEmp}}</td>
-            <td>{{record.totals.sickFam}}</td>
-            <td>{{record.totals.misc}}</td>
-            <td>{{record.totals.total}}</td>
-            <td><a class="action-link">View Details</a></td>
-          </tr>
-          <tr style="border-top:2px solid teal;">
-            <td colspan="2"></td>
-            <td><strong>Annual Totals</strong></td>
-            <td><strong>{{annualTotals.work}}</strong></td>
-            <td><strong>{{annualTotals.holiday}}</strong></td>
-            <td><strong>{{annualTotals.vac}}</strong></td>
-            <td><strong>{{annualTotals.personal}}</strong></td>
-            <td><strong>{{annualTotals.sickEmp}}</strong></td>
-            <td><strong>{{annualTotals.sickFam}}</strong></td>
-            <td><strong>{{annualTotals.misc}}</strong></td>
-            <td><strong>{{annualTotals.total}}</strong></td>
-            <td></td>
-          </tr>
+        <tr ng-repeat="record in records.other">
+          <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
+          <td>{{record.payPeriod.payPeriodNum}}</td>
+          <td>{{record.recordStatus | timeRecordStatus}}</td>
+          <td>{{record.totals.work}}</td>
+          <td>{{record.totals.holiday}}</td>
+          <td>{{record.totals.vac}}</td>
+          <td>{{record.totals.personal}}</td>
+          <td>{{record.totals.sickEmp}}</td>
+          <td>{{record.totals.sickFam}}</td>
+          <td>{{record.totals.misc}}</td>
+          <td>{{record.totals.total}}</td>
+          <td><a class="action-link" ng-click="showDetails(record)">View Details</a></td>
+        </tr>
+        <tr style="border-top:2px solid teal;">
+          <td colspan="2"></td>
+          <td><strong>Annual Totals</strong></td>
+          <td><strong>{{annualTotals.work}}</strong></td>
+          <td><strong>{{annualTotals.holiday}}</strong></td>
+          <td><strong>{{annualTotals.vac}}</strong></td>
+          <td><strong>{{annualTotals.personal}}</strong></td>
+          <td><strong>{{annualTotals.sickEmp}}</strong></td>
+          <td><strong>{{annualTotals.sickFam}}</strong></td>
+          <td><strong>{{annualTotals.misc}}</strong></td>
+          <td><strong>{{annualTotals.total}}</strong></td>
+          <td></td>
+        </tr>
         </tbody>
       </table>
 
-      <div id="dialog" title="Attendance Details">
-        <p class="content-info" style="margin-bottom:0;">The time entries for pay period X are displayed in the table
-          below.</p>
-        <table class="attendance-entry-sub-table ess-table">
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Date</th>
-              <th>Work</th>
-              <th>Holiday</th>
-              <th>Vacation</th>
-              <th>Personal</th>
-              <th>Sick Emp</th>
-              <th>Sick Fam</th>
-              <th>Misc</th>
-              <th>Misc Type</th>
-              <th>Total</th>
+      <div modal ng-show="subview" ng-switch="subview" class="modal-container">
+        <div class="record-detail-modal" title="Attendance Details"
+             ng-switch-when="details" ng-controller="RecordDetailsCtrl">
+          <p class="content-info" style="margin-bottom:0;">
+            The time entries for {{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}
+            are displayed in the table below.
+          </p>
+          <table class="attendance-entry-sub-table ess-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Date</th>
+                <th class="hour-col">Work</th>
+                <th class="hour-col">Holiday</th>
+                <th class="hour-col">Vacation</th>
+                <th class="hour-col">Personal</th>
+                <th class="hour-col">Sick Emp</th>
+                <th class="hour-col">Sick Fam</th>
+                <th class="hour-col">Misc</th>
+                <th>Misc Type</th>
+                <th class="hour-col">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="entry in record.timeEntries">
+              <td>{{entry.date | moment:'dddd'}}</td>
+              <td>{{entry.date | moment:'MMMM Do'}}</td>
+              <td>{{entry.workHours || '--'}}</td>
+              <td>{{entry.holidayHours || '--'}}</td>
+              <td>{{entry.vacationHours || '--'}}</td>
+              <td>{{entry.personalHours || '--'}}</td>
+              <td>{{entry.sickEmpHours || '--'}}</td>
+              <td>{{entry.sickFamHours || '--'}}</td>
+              <td>{{entry.miscHours || '--'}}</td>
+              <td>{{miscLeaves[entry] || '--'}}</td>
+              <td>{{entry.total}}</td>
             </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Fri</td>
-              <td>1/30</td>
-              <td>7</td>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-              <td>--</td>
-              <td>7</td>
+            <tr class="time-totals-row">
+              <td></td>
+              <td><strong>Record Totals</strong></td>
+              <td><strong>{{record.totals.work}}</strong></td>
+              <td><strong>{{record.totals.holiday}}</strong></td>
+              <td><strong>{{record.totals.vac}}</strong></td>
+              <td><strong>{{record.totals.personal}}</strong></td>
+              <td><strong>{{record.totals.sickEmp}}</strong></td>
+              <td><strong>{{record.totals.sickFam}}</strong></td>
+              <td><strong>{{record.totals.misc}}</strong></td>
+              <td></td>
+              <td><strong>{{record.totals.total}}</strong></td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <script>
-        $("#dialog").dialog({
-          autoOpen: false,
-          width: '620px',
-          modal: true,
-          buttons: {
-            Done: function () {
-              $(this).dialog("close");
-            }
-          }
-        });
+      <%--<script>--%>
+      <%--$("#dialog").dialog({--%>
+      <%--autoOpen: false,--%>
+      <%--width: '620px',--%>
+      <%--modal: true,--%>
+      <%--buttons: {--%>
+      <%--Done: function () {--%>
+      <%--$(this).dialog("close");--%>
+      <%--}--%>
+      <%--}--%>
+      <%--});--%>
 
-        $("#attendance-history-table .action-link").click(function (e) {
-          $("#dialog").dialog("open");
-        });
-      </script>
+      <%--$("#attendance-history-table .action-link").click(function (e) {--%>
+      <%--$("#dialog").dialog("open");--%>
+      <%--});--%>
+      <%--</script>--%>
     </div>
   </div>
 </div>
