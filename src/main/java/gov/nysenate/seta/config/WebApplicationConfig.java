@@ -35,7 +35,7 @@ import java.util.List;
 @EnableWebMvc
 @ComponentScan("gov.nysenate.seta")
 @Profile({"test", "dev", "prod"})
-@Import({PropertyConfig.class, SecurityConfig.class, DatabaseConfig.class, CacheConfig.class})
+@Import({PropertyConfig.class, LdapConfig.class, SecurityConfig.class, DatabaseConfig.class, CacheConfig.class})
 public class WebApplicationConfig extends WebMvcConfigurerAdapter
 {
     private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);

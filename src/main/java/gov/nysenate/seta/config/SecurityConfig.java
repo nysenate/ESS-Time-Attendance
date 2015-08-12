@@ -1,7 +1,8 @@
 package gov.nysenate.seta.config;
 
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.security.filter.EssAuthenticationFilter;
-import gov.nysenate.seta.security.realm.EssAuthzRealm;
+import gov.nysenate.seta.security.realm.EssLdapAuthzRealm;
 import gov.nysenate.seta.security.xsrf.XsrfTokenValidator;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.apache.shiro.config.Ini;
@@ -12,13 +13,11 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.core.env.Environment;
 
 import javax.servlet.Filter;
 
@@ -31,14 +30,14 @@ public class SecurityConfig
 {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${ldap.url}") private String ldapUrl;
-    @Value("${ldap.dn.template}") private String ldapDnTemplate;
     @Value("${login.url:/login}") private String loginUrl;
     @Value("${login.success.url:/}") private String loginSuccessUrl;
     @Value("${xsrf.token.bytes:128}") private int xsrfBytesSize;
 
+    @Autowired private Environment environment;
+
     @Autowired
-    private EssAuthzRealm essAuthzRealm;
+    private EssLdapAuthzRealm essAuthzRealm;
 
     /**
      * Shiro Filter factory that sets up the url authentication mechanism and applies the security
@@ -46,6 +45,7 @@ public class SecurityConfig
      */
     @Bean(name = "shiroFilter")
     public ShiroFilterFactoryBean shiroFilter() {
+        logger.info("{}", OutputUtils.toJson(environment.getActiveProfiles()));
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager());
         shiroFilter.setLoginUrl(loginUrl);
@@ -103,21 +103,5 @@ public class SecurityConfig
         realm.addRole("admin");
         realm.addAccount("user", "pass", "employee", "supervisor", "personnel", "admin");
         return realm;
-    }
-
-    /**
-     * Provides a configured LdapTemplate instance that can be used to perform any ldap based operations
-     * against the Senate LDAP. This should typically be autowired into DAO layer classes.
-     */
-    @Bean(name = "ldapTemplate")
-    public LdapTemplate ldapTemplate() {
-        if (ldapUrl == null || ldapUrl.isEmpty()) {
-            throw new BeanInitializationException("Cannot instantiate LDAP Template because ldap.url in the properties file is not set.");
-        }
-        logger.info("Configuring ldap template with url {}", ldapUrl);
-        LdapContextSource ldapContextSource = new LdapContextSource();
-        ldapContextSource.setUrl(ldapUrl);
-        ldapContextSource.afterPropertiesSet();
-        return new LdapTemplate(ldapContextSource);
     }
 }

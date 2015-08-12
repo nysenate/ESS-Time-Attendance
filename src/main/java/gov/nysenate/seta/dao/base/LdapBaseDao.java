@@ -1,19 +1,28 @@
 package gov.nysenate.seta.dao.base;
 
 import gov.nysenate.seta.model.auth.SenateLdapPerson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.NamingException;
+import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.query.LdapQueryBuilder;
 
 import javax.naming.Name;
+import javax.naming.directory.Attributes;
 import java.util.List;
+
+import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 public abstract class LdapBaseDao
 {
+    private static final Logger logger = LoggerFactory.getLogger(LdapBaseDao.class);
+
     @Autowired
     protected LdapTemplate ldapTemplate;
 
@@ -32,6 +41,18 @@ public abstract class LdapBaseDao
      */
     public SenateLdapPerson getPerson(Name dn) throws NamingException {
         return ldapTemplate.findByDn(dn, SenateLdapPerson.class);
+    }
+
+    /**
+     * Retrieve a SenateLdapPerson by uid.
+     * @param uid String
+     * @return SenateLdapPerson
+     * @throws NamingException
+     */
+    public SenateLdapPerson getPersonByUid(String uid) throws NamingException {
+        List<SenateLdapPerson> persons = ldapTemplate.search(query().where("uid").is(uid),
+                (AttributesMapper<SenateLdapPerson>) SenateLdapPerson::new);
+        return persons.get(0);
     }
 
     /**

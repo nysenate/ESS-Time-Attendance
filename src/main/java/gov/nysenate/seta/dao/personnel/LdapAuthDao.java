@@ -4,12 +4,9 @@ import gov.nysenate.seta.dao.base.LdapBaseDao;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.AuthenticationException;
 import org.springframework.ldap.NamingException;
-import org.springframework.ldap.core.AuthenticatedLdapEntryContextMapper;
-import org.springframework.ldap.core.LdapEntryIdentification;
 import org.springframework.stereotype.Repository;
 
 import javax.naming.Name;
-import javax.naming.directory.DirContext;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 

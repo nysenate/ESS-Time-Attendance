@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for computing accrual information for an employee based on processed accrual
@@ -62,56 +63,67 @@ public class EssAccrualComputeService implements AccrualComputeService
         TreeMap<PayPeriod, PeriodAccSummary> periodAccruals =
             accrualDao.getPeriodAccruals(empId, beforeDate, LimitOffset.ALL, SortOrder.ASC);
 
-        // Annual accrual records, if necessary
-        TreeMap<Integer, AnnualAccSummary> annualAccruals = null;
-
-        // Emp Transaction History, if necessary
-        TransactionHistory empTrans = null;
-
-        for (PayPeriod p : periodSet) {
-            if (periodAccruals.containsKey(p)) {
-                resultMap.put(p, periodAccruals.get(p));
+        // Filter out the pay periods that we already have PD23ACCUSAGE records for.
+        Iterator<PayPeriod> periodItr = periodSet.iterator();
+        while (periodItr.hasNext()) {
+            PayPeriod currPeriod = periodItr.next();
+            if (periodAccruals.containsKey(currPeriod)) {
+                resultMap.put(currPeriod, periodAccruals.get(currPeriod));
+                periodItr.remove();
             }
-            else {
-                if (annualAccruals == null) {
-                    annualAccruals = accrualDao.getAnnualAccruals(empId, periodSet.last().getYear());
-                }
-                if (empTrans == null) {
-                    empTrans = empTransService.getTransHistory(empId, EmpTransDaoOption.INITIALIZE_AS_APP);
-                }
-                Map.Entry<PayPeriod, PeriodAccSummary> periodAccRecord = periodAccruals.lowerEntry(p);
+        }
+
+        if (!periodSet.isEmpty()) {
+            PayPeriod lastPeriod = periodSet.last();
+            TreeMap<Integer, AnnualAccSummary> annualAcc = accrualDao.getAnnualAccruals(empId, lastPeriod.getYear());
+            if (annualAcc.isEmpty()) {
+                throw new AccrualException(empId, AccrualExceptionType.NO_ACTIVE_ANNUAL_RECORD_FOUND);
+            }
+            LocalDate fromDate = com.google.common.base.Objects.firstNonNull(
+                annualAcc.lastEntry().getValue().getEndDate(), annualAcc.lastEntry().getValue().getContServiceDate());
+
+            if (fromDate.isBefore(lastPeriod.getEndDate())) {
+                Range<LocalDate> periodRange = Range.closed(fromDate, lastPeriod.getEndDate());
+                List<PayPeriod> unMatchedPeriods = periodDao.getPayPeriods(PayPeriodType.AF, periodRange, SortOrder.ASC);
+                TransactionHistory empTrans = empTransService.getTransHistory(empId, EmpTransDaoOption.INITIALIZE_AS_APP);
+                TreeMap<PayPeriod, PeriodAccUsage> periodUsages = accrualDao.getPeriodAccrualUsages(empId, periodRange);
+                List<TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(empId, periodRange);
+
+                Map.Entry<PayPeriod, PeriodAccSummary> periodAccRecord = periodAccruals.lowerEntry(lastPeriod);
                 Optional<PeriodAccSummary> optPeriodAccRecord =
-                    (periodAccRecord != null) ? Optional.of(periodAccRecord.getValue()) : Optional.empty();
-                resultMap.put(p, computeAccruals(empId, p, empTrans, optPeriodAccRecord, annualAccruals.get(p.getYear())));
+                        (periodAccRecord != null) ? Optional.of(periodAccRecord.getValue()) : Optional.empty();
+
+                AccrualState accrualState = computeAccrualState(empTrans, optPeriodAccRecord, annualAcc.get(lastPeriod.getYear()));
+
+                // Generate a list of all the pay periods between the period immediately following the DTPERLSPOST and
+                // before the pay period we are trying to compute available accruals for. We will call these the accrual
+                // gap periods.
+                Range<LocalDate> gapDateRange = Range.openClosed(accrualState.getEndDate(), lastPeriod.getEndDate());
+                LinkedList<PayPeriod> gapPeriods = new LinkedList<>(unMatchedPeriods.stream()
+                        .filter(p -> gapDateRange.encloses(p.getDateRange()))
+                        .collect(Collectors.toList()));
+                PayPeriod refPeriod = (optPeriodAccRecord.isPresent()) ? optPeriodAccRecord.get().getRefPayPeriod()
+                        : gapPeriods.getFirst(); // FIXME?
+                for (PayPeriod gapPeriod : gapPeriods) {
+                    computeGapPeriodAccruals(gapPeriod, accrualState, empTrans, timeRecords, periodUsages);
+                    if (periodSet.contains(gapPeriod)) {
+                        resultMap.put(gapPeriod, accrualState.toPeriodAccrualSummary(refPeriod, gapPeriod));
+                    }
+                }
             }
         }
         return resultMap;
     }
 
     /**
-     *
-     * @param empId int - Employee id
-     * @param payPeriod PayPeriod - The pay period we want to compute accruals for
-     * @param transHistory TransactionHistory - The full transaction history for the employee
-     * @param periodAccSum Optional<PeriodAccSummary> - The latest period acc summary record prior to this pay period
-     * @param annualAcc AnnualAccSummary - The annual accrual record for this pay period's year
-     * @return PeriodAccSummary
-     * @throws AccrualException - If accruals cannot be computed with the supplied data.
+     * Compute an initial accrual state that is effective up to the DTPERLSPOST date from the annual accrual record.
+     * @param transHistory TransactionHistory
+     * @param periodAccSum Optional<PeriodAccSummary>
+     * @param annualAcc AnnualAccSummary
+     * @return AccrualState
      */
-    protected PeriodAccSummary computeAccruals(int empId, PayPeriod payPeriod, TransactionHistory transHistory,
-                                               Optional<PeriodAccSummary> periodAccSum,
-                                               AnnualAccSummary annualAcc) throws AccrualException {
-        verifyValidPayPeriod(payPeriod);
-        LocalDate periodStartDate = payPeriod.getStartDate();
-
-        // If no PM23ATTEND record exists, we cannot compute accruals. For new employees a record will exist since
-        // it is created initially by personnel.
-        if (annualAcc == null) {
-            throw new AccrualException(empId, AccrualExceptionType.NO_ACTIVE_ANNUAL_RECORD_FOUND);
-        }
-
-        // Compute an initial accrual state that is effective up to the DTPERLSPOST date from the annual accrual
-        // record.
+    private AccrualState computeAccrualState(TransactionHistory transHistory, Optional<PeriodAccSummary> periodAccSum,
+                                             AnnualAccSummary annualAcc) {
         AccrualState accrualState = new AccrualState(annualAcc);
         Range<LocalDate> initialRange = Range.atMost(accrualState.getEndDate());
 
@@ -122,34 +134,11 @@ public class EssAccrualComputeService implements AccrualComputeService
         else {
             accrualState.setYtdHoursExpected(BigDecimal.ZERO);
         }
-
         accrualState.setEmployeeActive(transHistory.getEffectiveEmpStatus(initialRange).lastEntry().getValue());
         accrualState.setPayType(transHistory.getEffectivePayTypes(initialRange).lastEntry().getValue());
         accrualState.setMinTotalHours(transHistory.getEffectiveMinHours(initialRange).lastEntry().getValue());
         accrualState.computeRates();
-
-        // Generate a list of all the pay periods between the period immediately following the DTPERLSPOST and
-        // before the pay period we are trying to compute available accruals for. We will call these the accrual
-        // gap periods.
-        Range<LocalDate> gapDateRange = Range.openClosed(accrualState.getEndDate(), periodStartDate);
-        LinkedList<PayPeriod> gapPeriods = new LinkedList<>(
-            periodDao.getPayPeriods(PayPeriodType.AF, gapDateRange, SortOrder.ASC));
-
-        // Retrieve all PD23ATTEND records that are available during the accrual gap.
-        TreeMap<PayPeriod, PeriodAccUsage> periodUsages = accrualDao.getPeriodAccrualUsages(empId, gapDateRange);
-
-        // Retrieve all time records for all pay periods between the one following the last retrieved PD23ATTEND
-        // record and the last accrual gap period.
-        LocalDate fetchTimeRecordsAfter = (periodUsages.isEmpty()) ?
-                                          gapDateRange.lowerEndpoint() : periodUsages.lastKey().getEndDate();
-        List<TimeRecord> timeRecords =
-            timeRecordDao.getRecordsDuring(empId, Range.open(fetchTimeRecordsAfter, periodStartDate));
-
-        for (PayPeriod gapPeriod : gapPeriods) {
-            computeGapPeriodAccruals(gapPeriod, accrualState, transHistory, timeRecords, periodUsages);
-        }
-        PayPeriod refPeriod = (periodAccSum.isPresent()) ? periodAccSum.get().getRefPayPeriod() : gapPeriods.getFirst();
-        return accrualState.toPeriodAccrualSummary(refPeriod, payPeriod);
+        return accrualState;
     }
 
     /**

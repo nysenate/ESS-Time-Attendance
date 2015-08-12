@@ -20,6 +20,7 @@ public class PayPeriodView implements ViewObject
     protected boolean startYearSplit;
     protected boolean endYearSplit;
     protected boolean active;
+    protected boolean current;
 
     public PayPeriodView() {}
 
@@ -33,6 +34,7 @@ public class PayPeriodView implements ViewObject
             this.startYearSplit = payPeriod.isStartOfYearSplit();
             this.endYearSplit = payPeriod.isEndOfYearSplit();
             this.active = payPeriod.isActive();
+            this.current = payPeriod.getDateRange().contains(LocalDate.now());
         }
     }
 
@@ -44,6 +46,8 @@ public class PayPeriodView implements ViewObject
                 payPeriodNum, active
         );
     }
+
+    /** --- Basic Getters --- */
 
     @Override
     @XmlElement
@@ -84,5 +88,10 @@ public class PayPeriodView implements ViewObject
     @XmlElement
     public boolean isEndYearSplit() {
         return endYearSplit;
+    }
+
+    @XmlElement
+    public boolean isCurrent() {
+        return current;
     }
 }

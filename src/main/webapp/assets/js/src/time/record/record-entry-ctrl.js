@@ -29,8 +29,7 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
 
     // Settings for floating the time entry table heading
     $scope.floatTheadOpts = {
-        scrollingTop: 47,
-        autoReflow: true
+        scrollingTop: 47
     };
 
     $scope.init = function() {

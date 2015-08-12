@@ -25,16 +25,17 @@ essTime.controller('AccrualHistoryCtrl',
         }, function(resp) {
             if (resp.success) {
                 $scope.state.accSummaries = resp.result;
-                if (year == moment().year()) {
-                    var currSummary = $scope.state.accSummaries.filter(function(accSum) {
-                        return $scope.state.today.isBetween(accSum.payPeriod.startDate, accSum.payPeriod.endDate);
-                    });
-                    if (currSummary) {
-                        currSummary[0].current = true;
-                        console.log(currSummary);
+                // Compute deltas
+                for (var i = 0; i < $scope.state.accSummaries.length; i++) {
+                    var currSummary = $scope.state.accSummaries[i];
+                    if (i == 0) {
+                        currSummary.vacationUsedDelta = currSummary.vacationUsed;
+                    }
+                    else {
+                        var prevSummary = $scope.state.accSummaries[i - 1];
+                        currSummary.vacationUsedDelta = currSummary.vacationUsed - prevSummary.vacationUsed;
                     }
                 }
-
             }
             else {
                 alert("Error while fetching accruals.");
@@ -51,8 +52,7 @@ essTime.controller('AccrualHistoryCtrl',
     };
 
     $scope.floatTheadOpts = {
-        scrollingTop: 47,
-        autoReflow: true
+        scrollingTop: 47
     };
 
     $scope.init = function() {

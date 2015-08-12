@@ -1,7 +1,5 @@
 package gov.nysenate.seta.security.realm;
 
-import com.google.common.collect.Lists;
-import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.service.auth.LdapAuthService;
 import org.apache.shiro.authc.*;
@@ -10,10 +8,10 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,9 +21,10 @@ import org.springframework.stereotype.Component;
  * we're using Spring LDAP to handle low level LDAP operations it wasn't necessary to extend that class.
  */
 @Component
-public class EssAuthzRealm extends AuthorizingRealm
+@Profile({"dev", "test", "prod"})
+public class EssLdapAuthzRealm extends AuthorizingRealm
 {
-    private static final Logger logger = LoggerFactory.getLogger(EssAuthzRealm.class);
+    private static final Logger logger = LoggerFactory.getLogger(EssLdapAuthzRealm.class);
 
     @Autowired
     private LdapAuthService essLdapAuthService;

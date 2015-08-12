@@ -7,6 +7,8 @@ import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
 
 import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
 
 /**
  * Represents a person record in the Senate LDAP. This class is annotated such that methods
@@ -35,7 +37,7 @@ public final class SenateLdapPerson
     @Attribute(name = "uid")
     private String uid;
 
-    @Attribute(name = "givenename")
+    @Attribute(name = "givenname")
     private String firstName;
 
     @Attribute(name = "middleinitial")
@@ -69,6 +71,27 @@ public final class SenateLdapPerson
     private String phoneNumber;
 
     public SenateLdapPerson() {}
+
+    public SenateLdapPerson(Attributes attrs) throws NamingException {
+        if (attrs != null) {
+            this.fullName = attrs.get("cn").toString();
+//            this.organization = (attrs.get("ou").toString();
+            this.employeeId = attrs.get("employeeid").get().toString();
+            this.email = attrs.get("mail").get().toString();
+            this.uid = attrs.get("uid").get().toString();
+            this.firstName = attrs.get("givenname").get().toString();
+//            this.middleInitial = attrs.get("middleinitial").toString();
+            this.sn = attrs.get("sn").get().toString();
+            this.title = attrs.get("title").get().toString();
+//            this.postalAddress = attrs.get("postaladdress").toString();
+//            this.officeAddress = attrs.get("officestreetaddress").toString();
+//            this.location = attrs.get("l").toString();
+//            this.state = attrs.get("st").toString();
+//            this.postalCode = attrs.get("postalcode").toString();
+//            this.department = attrs.get("department").toString();
+//            this.phoneNumber = attrs.get("telephonenumber").toString();
+        }
+    }
 
     /** --- Overrides --- */
 
