@@ -24,6 +24,8 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/datepicker-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/moment-filter.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/not-filter.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/modal-service.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/modal-directive.js"></script>
 
     </c:when>
     <c:when test="${runtimeLevel eq 'test'}">

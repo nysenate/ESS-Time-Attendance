@@ -3,6 +3,7 @@ var essTime = angular.module('essTime');
 essTime.controller('RecordParentCtrl', ['$scope', function ($scope) {
 
     $scope.init = function(miscLeaveMap) {
+        console.log('init', miscLeaveMap);
         $scope.miscLeaves = miscLeaveMap;
     };
 

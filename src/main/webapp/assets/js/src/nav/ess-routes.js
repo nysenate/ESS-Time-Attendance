@@ -19,13 +19,11 @@ essApp.config(function($routeProvider, $locationProvider) {
 
     /** Time and Attendance */
     $routeProvider.when(ctxPath + '/time/record/entry', {
-        templateUrl: ctxPath + '/template/time/record/entry',
-        controller: 'RecordEntryController'
+        templateUrl: ctxPath + '/template/time/record/entry'
     });
 
     $routeProvider.when(ctxPath + '/time/record/history', {
-        templateUrl: ctxPath + '/template/time/record/history',
-        controller: 'TestCtrl'
+        templateUrl: ctxPath + '/template/time/record/history'
     });
 
     $routeProvider.when(ctxPath + '/time/record/emphistory', {

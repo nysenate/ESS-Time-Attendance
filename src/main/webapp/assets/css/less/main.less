@@ -754,6 +754,12 @@ table#timeRecordTable {
   }
 }
 
+.record-detail-modal {
+  max-width: 65em;
+  max-height: 41.4em;
+  padding: 0.4em;
+}
+
 table.attendance-entry-sub-table {
   width:100%;
   font-size:1em;
@@ -761,7 +767,9 @@ table.attendance-entry-sub-table {
   border-bottom: 1px solid #ddd;
   thead {
     tr {
-
+      th.hour-col {
+        width: 5em;
+      }
     }
   }
   tbody {
@@ -773,6 +781,9 @@ table.attendance-entry-sub-table {
       td {
         padding: .4em !important;
         border-right: 1px solid #ddd;
+      }
+      &.time-totals-row {
+        border-top: 2px solid teal;
       }
     }
   }
