@@ -13,6 +13,7 @@ import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.service.period.PayPeriodService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,9 @@ public class EssAccrualComputeService implements AccrualComputeService
     private static final Logger logger = LoggerFactory.getLogger(EssAccrualComputeService.class);
 
     @Autowired private AccrualDao accrualDao;
-    @Autowired private PayPeriodDao periodDao;
     @Autowired private TimeRecordDao timeRecordDao;
 
+    @Autowired private PayPeriodService payPeriodService;
     @Autowired private EmpTransactionService empTransService;
 
     /** --- Implemented Methods --- */
@@ -67,6 +68,7 @@ public class EssAccrualComputeService implements AccrualComputeService
         Iterator<PayPeriod> periodItr = periodSet.iterator();
         while (periodItr.hasNext()) {
             PayPeriod currPeriod = periodItr.next();
+            verifyValidPayPeriod(currPeriod);
             if (periodAccruals.containsKey(currPeriod)) {
                 resultMap.put(currPeriod, periodAccruals.get(currPeriod));
                 periodItr.remove();
@@ -84,7 +86,7 @@ public class EssAccrualComputeService implements AccrualComputeService
 
             if (fromDate.isBefore(lastPeriod.getEndDate())) {
                 Range<LocalDate> periodRange = Range.closed(fromDate, lastPeriod.getEndDate());
-                List<PayPeriod> unMatchedPeriods = periodDao.getPayPeriods(PayPeriodType.AF, periodRange, SortOrder.ASC);
+                List<PayPeriod> unMatchedPeriods = payPeriodService.getPayPeriods(PayPeriodType.AF, periodRange, SortOrder.ASC);
                 TransactionHistory empTrans = empTransService.getTransHistory(empId, EmpTransDaoOption.INITIALIZE_AS_APP);
                 TreeMap<PayPeriod, PeriodAccUsage> periodUsages = accrualDao.getPeriodAccrualUsages(empId, periodRange);
                 List<TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(empId, periodRange);

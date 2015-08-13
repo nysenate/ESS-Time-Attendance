@@ -10,6 +10,7 @@ import gov.nysenate.seta.client.view.PayPeriodView;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
+import gov.nysenate.seta.service.period.PayPeriodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ import static gov.nysenate.seta.controller.rest.BaseRestCtrl.REST_PATH;
 @RequestMapping(REST_PATH + "/periods")
 public class PayPeriodRestCtrl extends BaseRestCtrl
 {
-    @Autowired private PayPeriodDao payPeriodDao;
+    @Autowired private PayPeriodService payPeriodService;
 
     @RequestMapping("/{periodTypeStr}")
     public BaseResponse getPayPeriods(@PathVariable String periodTypeStr,
@@ -57,6 +58,6 @@ public class PayPeriodRestCtrl extends BaseRestCtrl
 
     private List<PayPeriod> getPayPeriodList(String periodTypeStr, LocalDate fromDate, LocalDate toDate) {
         PayPeriodType periodType = PayPeriodType.valueOf(periodTypeStr);
-        return payPeriodDao.getPayPeriods(periodType, Range.closed(fromDate, toDate), SortOrder.ASC);
+        return payPeriodService.getPayPeriods(periodType, Range.closed(fromDate, toDate), SortOrder.ASC);
     }
 }
