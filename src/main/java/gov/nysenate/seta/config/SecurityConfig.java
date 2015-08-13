@@ -2,7 +2,7 @@ package gov.nysenate.seta.config;
 
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.security.filter.EssAuthenticationFilter;
-import gov.nysenate.seta.security.realm.EssLdapAuthzRealm;
+import gov.nysenate.seta.security.realm.EssLdapDbAuthzRealm;
 import gov.nysenate.seta.security.xsrf.XsrfTokenValidator;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.apache.shiro.config.Ini;
@@ -37,7 +37,7 @@ public class SecurityConfig
     @Autowired private Environment environment;
 
     @Autowired
-    private EssLdapAuthzRealm essAuthzRealm;
+    private EssLdapDbAuthzRealm essAuthzRealm;
 
     /**
      * Shiro Filter factory that sets up the url authentication mechanism and applies the security

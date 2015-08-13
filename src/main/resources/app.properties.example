@@ -5,6 +5,15 @@
 # Runtime level (dev/test/prod)
 runtime.level = dev
 
+# --- Security Settings -------------------------------------------------------
+
+# Set to true to enforce authentication. Otherwise you will be able to login as
+# anyone if the profile is set to dev!
+auth.enabled = true
+
+# If auth is disabled, this password will be used to login as any user.
+auth.master.pass =
+
 # LDAP Configuration
 ldap.url = ldap://webmail.senate.state.ny.us:389
 ldap.dn.template = CN={0},O=senate

@@ -16,7 +16,7 @@ import javax.naming.directory.Attributes;
  * directly into this object.
  */
 @Entry(objectClasses = {"person", "top"}, base = "O=senate")
-public final class SenateLdapPerson
+public final class SenateLdapPerson implements SenatePerson
 {
     @Id
     private Name dn;
@@ -74,22 +74,22 @@ public final class SenateLdapPerson
 
     public SenateLdapPerson(Attributes attrs) throws NamingException {
         if (attrs != null) {
-            this.fullName = attrs.get("cn").toString();
-//            this.organization = (attrs.get("ou").toString();
-            this.employeeId = attrs.get("employeeid").get().toString();
-            this.email = attrs.get("mail").get().toString();
-            this.uid = attrs.get("uid").get().toString();
-            this.firstName = attrs.get("givenname").get().toString();
-//            this.middleInitial = attrs.get("middleinitial").toString();
-            this.sn = attrs.get("sn").get().toString();
-            this.title = attrs.get("title").get().toString();
-//            this.postalAddress = attrs.get("postaladdress").toString();
-//            this.officeAddress = attrs.get("officestreetaddress").toString();
-//            this.location = attrs.get("l").toString();
-//            this.state = attrs.get("st").toString();
-//            this.postalCode = attrs.get("postalcode").toString();
-//            this.department = attrs.get("department").toString();
-//            this.phoneNumber = attrs.get("telephonenumber").toString();
+            this.fullName = (attrs.get("cn") != null) ? attrs.get("cn").get().toString() : null;
+            this.organization = (attrs.get("ou") != null) ? attrs.get("ou").get().toString() : null;
+            this.employeeId = (attrs.get("employeeid") != null) ? attrs.get("employeeid").get().toString() : null;
+            this.email = (attrs.get("mail") != null) ? attrs.get("mail").get().toString() : null;
+            this.uid = (attrs.get("uid") != null) ? attrs.get("uid").get().toString() : null;
+            this.firstName = (attrs.get("givenname") != null) ? attrs.get("givenname").get().toString() : null;
+            this.middleInitial = (attrs.get("middleinitial") != null) ? attrs.get("middleinitial").get().toString() : null;
+            this.sn = (attrs.get("sn") != null) ? attrs.get("sn").get().toString() : null;
+            this.title = (attrs.get("title") != null) ? attrs.get("title").get().toString() : null;
+            this.postalAddress = (attrs.get("postaladdress") != null) ? attrs.get("postaladdress").get().toString() : null;
+            this.officeAddress = (attrs.get("officestreetaddress") != null) ? attrs.get("officestreetaddress").get().toString() : null;
+            this.location = (attrs.get("l") != null) ? attrs.get("l").get().toString() : null;
+            this.state = (attrs.get("st") != null) ? attrs.get("st").get().toString() : null;
+            this.postalCode = (attrs.get("postalcode") != null) ? attrs.get("postalcode").get().toString() : null;
+            this.department = (attrs.get("department") != null) ? attrs.get("department").get().toString() : null;
+            this.phoneNumber = (attrs.get("telephonenumber") != null) ? attrs.get("telephonenumber").get().toString() : null;
         }
     }
 

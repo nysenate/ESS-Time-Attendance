@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.ldap.CommunicationException;
 import org.springframework.ldap.NamingException;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +26,7 @@ public class EssLdapAuthService implements LdapAuthService
     @Autowired
     private LdapAuthDao ldapAuthDao;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public LdapAuthResult authenticateUserByUid(String uid, String credentials) {
         /** Quick validation check */
@@ -46,6 +45,10 @@ public class EssLdapAuthService implements LdapAuthService
                 return new LdapAuthResult(LdapAuthStatus.AUTHENTICATED, uid, name, person);
             }
         }
+        catch(CommunicationException ex) {
+            logger.debug("Error connecting to LDAP server! {}", ex.getMessage());
+            authStatus = LdapAuthStatus.CONNECTION_ERROR;
+        }
         catch(NamingException ex) {
             logger.debug("Authentication exception thrown when trying to authenticate {}", uid);
             logger.error(ex.getMessage(), ex.getExplanation());
@@ -59,5 +62,21 @@ public class EssLdapAuthService implements LdapAuthService
             logger.warn("Unhandled exception thrown when trying to authenticate {}: {}", uid, ex.getMessage());
         }
         return new LdapAuthResult(authStatus, uid);
+    }
+
+    /** {@inheritDoc} */
+    public LdapAuthResult authenticateUserByUidWithoutCreds(String uid, String suppliedPass, String masterPass) {
+        logger.warn("Warning! Attempting login as user {} with authentication disabled.");
+        LdapAuthResult ldapAuthResult = authenticateUserByUid(uid, suppliedPass);
+        if (ldapAuthResult.getAuthStatus().equals(LdapAuthStatus.AUTHENTICATION_EXCEPTION)) {
+            if (suppliedPass.equals(masterPass)) {
+                SenateLdapPerson person = ldapAuthDao.getPersonByUid(uid);
+                if (person != null) {
+                    logger.warn("Warning! Allowing login as user {} with authentication disabled.");
+                    return new LdapAuthResult(LdapAuthStatus.AUTHENTICATED, uid, null, person);
+                }
+            }
+        }
+        return ldapAuthResult;
     }
 }
