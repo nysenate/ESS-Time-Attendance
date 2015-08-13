@@ -14,9 +14,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -34,7 +33,6 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected boolean active;
     protected LocalDate beginDate;
     protected LocalDate endDate;
-    protected PayType payType;
     protected PayPeriod payPeriod;
     protected String remarks;
     protected String exceptionDetails;
@@ -61,7 +59,6 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.active = true;
         this.beginDate = DateUtils.startOfDateRange(dateRange);
         this.endDate = DateUtils.endOfDateRange(dateRange);
-        this.payType = payType;
         this.payPeriod = payPeriod;
         this.recordStatus = TimeRecordStatus.NOT_SUBMITTED;
         this.originalUserId = this.employeeName;
@@ -147,8 +144,10 @@ public class TimeRecord implements Comparable<TimeRecord>
         return usage;
     }
 
-    public BigDecimal getSumOfTimeEntries(Function<? super TimeEntry, BigDecimal> mapper) {
-        return timeEntryMap.values().stream().map(mapper).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal getSumOfTimeEntries(Function<? super TimeEntry, Optional<BigDecimal>> mapper) {
+        return timeEntryMap.values().stream()
+                .map(entry -> mapper.apply(entry).orElse(BigDecimal.ZERO))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /** --- Basic Getters/Setters --- */
@@ -295,13 +294,5 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public void setSupervisor(Employee supervisor) {
         this.supervisor = supervisor;
-    }
-
-    public PayType getPayType() {
-        return payType;
-    }
-
-    public void setPayType(PayType payType) {
-        this.payType = payType;
     }
 }

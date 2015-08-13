@@ -164,7 +164,6 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("excDetails", timeRecord.getExceptionDetails());
         params.addValue("procDate", toDate(timeRecord.getProcessedDate()));
         params.addValue("respCtr", timeRecord.getRespHeadCode());
-        params.addValue("payType", timeRecord.getPayType().name());
 
         return params;
     }
