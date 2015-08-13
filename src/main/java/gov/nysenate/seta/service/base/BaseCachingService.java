@@ -5,6 +5,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.config.CacheConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheCache;
 
@@ -17,6 +19,8 @@ import java.util.List;
  */
 public abstract class BaseCachingService<ContentId> implements CachingService<ContentId>
 {
+    private static final Logger logger = LoggerFactory.getLogger(BaseCachingService.class);
+
     @Autowired CacheManager cacheManager;
     @Autowired EventBus eventBus;
 

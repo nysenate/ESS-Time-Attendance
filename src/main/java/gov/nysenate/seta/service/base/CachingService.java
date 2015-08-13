@@ -14,7 +14,8 @@ import java.util.List;
 
 import static net.sf.ehcache.config.SizeOfPolicyConfiguration.MaxDepthExceededBehavior.ABORT;
 
-public interface CachingService<ContentId> {
+public interface CachingService<ContentId>
+{
     Logger logger = LoggerFactory.getLogger(CachingService.class);
 
     /**
