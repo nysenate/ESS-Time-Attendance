@@ -1,9 +1,6 @@
 <%@ page import="gov.nysenate.seta.model.payroll.MiscLeaveType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%
-  String miscLeaveMapJson = MiscLeaveType.getJsonLabels();
-%>
 <!--
 Toggle this for temporary emps.
 <div class="content-container content-controls">
@@ -15,7 +12,7 @@ Toggle this for temporary emps.
 </p>
 </div> -->
 
-<div ng-controller="RecordParentCtrl" ng-init='init(<%= miscLeaveMapJson%>)'>
+<div ng-controller="RecordParentCtrl">
   <div ng-controller="RecordEntryController">
     <div id="record-selection-container" class="content-container content-controls">
       <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>

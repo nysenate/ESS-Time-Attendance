@@ -37,10 +37,7 @@ function ($scope, appProps, timeRecordsApi, modals) {
 
     // Open a new modal window showing a detailed view of the given record
     $scope.showDetails = function(record) {
-        var params = {
-            record: record,
-            miscLeaves: $scope.miscLeaves
-        };
+        var params = { record: record };
         modals.open('details', params);
     };
 
@@ -77,11 +74,3 @@ function ($scope, appProps, timeRecordsApi, modals) {
 
     $scope.init();
 }]);
-
-/** --- Record Details Modal Ctrl --- */
-
-essTime.controller('RecordDetailsCtrl', ['$scope', 'modals', function ($scope, modals) {
-    $scope.record = modals.params().record;
-    $scope.miscLeaves = modals.params().miscLeaves;
-}]);
-

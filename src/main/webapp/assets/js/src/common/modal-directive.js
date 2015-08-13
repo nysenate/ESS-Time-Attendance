@@ -4,12 +4,12 @@
  * Insert markup for one or more modals inside this directive and display based on $scope.subview
  */
 angular.module('ess')
-    .directive('modal', ['$rootScope', 'modals',
+    .directive('modalContainer', ['$rootScope', 'modals',
 function ($rootScope, modals) {
 
     return link;
 
-    function link($scope, $element, $attributes) {
+    function link($scope, $element) {
         // Determines which modal is being rendered
         $scope.subview = null;
 

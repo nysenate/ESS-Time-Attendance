@@ -2,11 +2,6 @@ var essTime = angular.module('essTime');
 
 essTime.controller('RecordParentCtrl', ['$scope', function ($scope) {
 
-    $scope.init = function(miscLeaveMap) {
-        console.log('init', miscLeaveMap);
-        $scope.miscLeaves = miscLeaveMap;
-    };
-
     // Get the total used hours for a single time entry
     $scope.getDailyTotal = function(entry) {
         return +(entry.workHours) + +(entry.travelHours) + +(entry.holidayHours) + +(entry.vacationHours) +
