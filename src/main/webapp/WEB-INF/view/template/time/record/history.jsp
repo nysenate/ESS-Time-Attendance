@@ -1,11 +1,6 @@
-<%@ page import="gov.nysenate.seta.model.payroll.MiscLeaveType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%
-  String miscLeaveMapJson = MiscLeaveType.getJsonLabels();
-%>
-
-<div ng-controller="RecordParentCtrl" ng-init='init(<%= miscLeaveMapJson%>)'>
+<div ng-controller="RecordParentCtrl">
   <div ng-controller="RecordHistoryCtrl">
     <div class="content-container content-controls">
       <p class="content-info" style="margin-bottom:0;">
@@ -110,59 +105,8 @@
         </tbody>
       </table>
 
-      <div modal ng-show="subview" ng-switch="subview" class="modal-container">
-        <div class="record-detail-modal" title="Attendance Details"
-             ng-switch-when="details" ng-controller="RecordDetailsCtrl">
-          <p class="content-info" style="margin-bottom:0;">
-            The time entries for {{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}
-            are displayed in the table below.
-          </p>
-          <table class="attendance-entry-sub-table ess-table">
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Date</th>
-                <th class="hour-col">Work</th>
-                <th class="hour-col">Holiday</th>
-                <th class="hour-col">Vacation</th>
-                <th class="hour-col">Personal</th>
-                <th class="hour-col">Sick Emp</th>
-                <th class="hour-col">Sick Fam</th>
-                <th class="hour-col">Misc</th>
-                <th>Misc Type</th>
-                <th class="hour-col">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="entry in record.timeEntries">
-              <td>{{entry.date | moment:'dddd'}}</td>
-              <td>{{entry.date | moment:'MMMM Do'}}</td>
-              <td>{{entry.workHours || '--'}}</td>
-              <td>{{entry.holidayHours || '--'}}</td>
-              <td>{{entry.vacationHours || '--'}}</td>
-              <td>{{entry.personalHours || '--'}}</td>
-              <td>{{entry.sickEmpHours || '--'}}</td>
-              <td>{{entry.sickFamHours || '--'}}</td>
-              <td>{{entry.miscHours || '--'}}</td>
-              <td>{{miscLeaves[entry] || '--'}}</td>
-              <td>{{entry.total}}</td>
-            </tr>
-            <tr class="time-totals-row">
-              <td></td>
-              <td><strong>Record Totals</strong></td>
-              <td><strong>{{record.totals.work}}</strong></td>
-              <td><strong>{{record.totals.holiday}}</strong></td>
-              <td><strong>{{record.totals.vac}}</strong></td>
-              <td><strong>{{record.totals.personal}}</strong></td>
-              <td><strong>{{record.totals.sickEmp}}</strong></td>
-              <td><strong>{{record.totals.sickFam}}</strong></td>
-              <td><strong>{{record.totals.misc}}</strong></td>
-              <td></td>
-              <td><strong>{{record.totals.total}}</strong></td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+      <div modal-container ng-show="subview" ng-switch="subview">
+        <div record-detail-modal ng-switch-when="details"></div>
       </div>
 
       <%--<script>--%>

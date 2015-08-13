@@ -1,18 +1,18 @@
+@import './positioning';
 
-.modal-container {
+modal-container, [modal-container] {
   background: rgba(0,0,0,.6);
   position: fixed;
   width: 100vw;
   height: 100vh;
-  z-index: 10;
+  z-index: 101;
   top: 0;
   left: 0;
-}
 
-.modal-container > * {
-  display: block;
-  background: #fefefe;
-  margin: auto;
-  position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
+  & > * {
+    display: block;
+    background: #fefefe;
+    margin: auto;
+    .vertical-align;
+  }
 }

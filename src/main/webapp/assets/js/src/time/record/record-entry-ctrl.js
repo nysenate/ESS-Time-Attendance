@@ -8,6 +8,8 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
         accrual: null
     };
 
+    $scope.miscLeaves = appProps.miscLeaves;
+
     // Get a clean validation object where everything is set as valid
     function getDefaultValidation() {
         return {

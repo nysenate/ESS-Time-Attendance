@@ -1,5 +1,6 @@
 package gov.nysenate.seta.web;
 
+import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class CommonAttributeFilter implements Filter
     public static String CONTEXT_PATH_ATTRIBUTE = "ctxPath";
     public static String RUNTIME_LEVEL_ATTRIBUTE = "runtimeLevel";
     public static String LOGIN_URL_ATTRIBUTE = "loginUrl";
+    public static String MISC_LEAVE_ATTRIBUTE = "miscLeaves";
 
     @Value("${runtime.level}") private String runtimeLevel;
     @Value("${login.url}") private String loginUrl;
@@ -51,11 +53,12 @@ public class CommonAttributeFilter implements Filter
         setRuntimeLevelAttribute(request);
         setLoginUrlAttribute(request);
         setXsrfTokenAttribute(httpServletRequest);
+        setMiscLeaveAttribute(httpServletRequest);
 
         chain.doFilter(request, response);
     }
 
-    private void setContextPathAttribute(HttpServletRequest httpServletRequest) {
+    private static void setContextPathAttribute(HttpServletRequest httpServletRequest) {
         httpServletRequest.setAttribute(CONTEXT_PATH_ATTRIBUTE, httpServletRequest.getContextPath());
     }
 
@@ -77,6 +80,10 @@ public class CommonAttributeFilter implements Filter
     private void setXsrfTokenAttribute(HttpServletRequest httpServletRequest) {
         HttpSession session = httpServletRequest.getSession();
         xsrfValidator.saveXsrfToken(httpServletRequest, session);
+    }
+
+    private static void setMiscLeaveAttribute(HttpServletRequest request) {
+        request.setAttribute(MISC_LEAVE_ATTRIBUTE, MiscLeaveType.getJsonLabels());
     }
 
     /** Life-cycle is maintained by Spring. The init method is not used. */

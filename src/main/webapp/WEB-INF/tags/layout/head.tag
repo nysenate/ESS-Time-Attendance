@@ -11,7 +11,8 @@
             ctxPath: '${ctxPath}',
             apiPath: '${ctxPath}/api/v1',
             runtimeLevel: '${runtimeLevel}',
-            loginUrl: '${loginUrl}'
+            loginUrl: '${loginUrl}',
+            miscLeaves: ${miscLeaves}
         };
         <c:if test="${not empty principalJson}">
             window.globalProps.user = ${principalJson};

@@ -18,7 +18,6 @@ essApp.service('modals', ['$rootScope', '$q', function($rootScope, $q) {
     /** --- Public Methods --- */
 
     function open(type, params, pipeResponse) {
-        console.log('opening new modal', type, params, pipeResponse);
         var prevDeferred = modal.deferred;
 
         modal.deferred = $q.defer();
