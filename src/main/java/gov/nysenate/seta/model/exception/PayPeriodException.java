@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model.exception;
 
-public class PayPeriodException extends Exception
+public class PayPeriodException extends RuntimeException
 {
     public PayPeriodException() {
     }

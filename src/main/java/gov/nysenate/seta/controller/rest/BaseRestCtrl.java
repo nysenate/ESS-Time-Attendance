@@ -2,10 +2,18 @@ package gov.nysenate.seta.controller.rest;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
+import gov.nysenate.seta.client.response.error.ErrorCode;
+import gov.nysenate.seta.client.response.error.ErrorResponse;
 import gov.nysenate.seta.model.exception.InvalidRequestParamEx;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +24,8 @@ import java.util.function.Function;
 
 public class BaseRestCtrl
 {
+    private static final Logger logger = LoggerFactory.getLogger(BaseRestCtrl.class);
+
     protected static final String REST_PATH = "/api/v1/";
 
     /** --- Request Parsers / Getters --- */
@@ -159,5 +169,14 @@ public class BaseRestCtrl
                                                             String paramValue, T defaultValue) {
         T result = mapFunction.apply(paramValue);
         return result != null ? result : defaultValue;
+    }
+
+    /** --- Generic Exception Handlers --- */
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    protected ErrorResponse handleUnknownError(Exception ex) {
+        logger.error("Caught unhandled servlet exception:\n{}", ExceptionUtils.getStackTrace(ex));
+        return new ErrorResponse(ErrorCode.APPLICATION_ERROR);
     }
 }

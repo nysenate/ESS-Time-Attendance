@@ -30,10 +30,15 @@ essTime.controller('AccrualHistoryCtrl',
                     var currSummary = $scope.state.accSummaries[i];
                     if (i == 0) {
                         currSummary.vacationUsedDelta = currSummary.vacationUsed;
+                        currSummary.personalUsedDelta = currSummary.personalUsed;
+                        currSummary.sickUsedDelta = currSummary.empSickUsed + currSummary.famSickUsed;
                     }
                     else {
                         var prevSummary = $scope.state.accSummaries[i - 1];
                         currSummary.vacationUsedDelta = currSummary.vacationUsed - prevSummary.vacationUsed;
+                        currSummary.personalUsedDelta = currSummary.personalUsed - prevSummary.personalUsed;
+                        currSummary.sickUsedDelta = (currSummary.empSickUsed + currSummary.famSickUsed) -
+                                                    (prevSummary.empSickUsed + prevSummary.famSickUsed);
                     }
                 }
             }

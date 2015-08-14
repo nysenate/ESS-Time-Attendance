@@ -7,6 +7,7 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.cache.ContentCache;
+import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.service.base.BaseCachingService;
@@ -34,6 +35,11 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
         warmCaches();
     }
 
+    /**
+     * Since we lookup pay periods by determining if the given date intersects the period's date range,
+     * we need to store the periods in a tree map to avoid having to loop through each one to find the
+     * one we want.
+     */
     private static class PayPeriodCacheTree
     {
         private final TreeMap<LocalDate, PayPeriod> startDateMap = new TreeMap<>();
@@ -44,21 +50,38 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
             });
         }
 
+        public PayPeriod getPayPeriod(LocalDate date) {
+            Map.Entry<LocalDate, PayPeriod> entry = startDateMap.floorEntry(date);
+            if (entry == null) throw new PayPeriodNotFoundEx("Pay period containing date " + date + " could not be found.");
+            return entry.getValue();
+        }
+
         public List<PayPeriod> getPayPeriodsInRange(Range<LocalDate> dateRange, SortOrder dateOrder) {
             LocalDate fromDate = DateUtils.startOfDateRange(dateRange);
             LocalDate toDate = DateUtils.endOfDateRange(dateRange);
-            ArrayList<PayPeriod> payPeriods = new ArrayList<>(startDateMap.subMap(fromDate, true, toDate, true).values());
-            if (!payPeriods.isEmpty()) {
-                // Need to account for when the range includes a date that begins in the middle of a pay period.
-                if (payPeriods.get(0).getStartDate().compareTo(fromDate) > 0) {
-                    payPeriods.add(0, startDateMap.floorEntry(fromDate).getValue());
+            LinkedList<PayPeriod> payPeriods = new LinkedList<>(startDateMap.subMap(fromDate, true, toDate, true).values());
+
+            // Need to account for when the range includes a date that begins in the middle of a pay period.
+            if (payPeriods.isEmpty() || payPeriods.getFirst().getStartDate().compareTo(fromDate) > 0) {
+                Map.Entry<LocalDate, PayPeriod> entry = startDateMap.floorEntry(fromDate);
+                if (entry != null) {
+                    payPeriods.addFirst(entry.getValue());
                 }
-                if (dateOrder.equals(SortOrder.DESC)) {
-                    Collections.reverse(payPeriods);
-                }
+            }
+            if (dateOrder.equals(SortOrder.DESC)) {
+                Collections.reverse(payPeriods);
             }
             return payPeriods;
         }
+    }
+
+    @Override
+    public PayPeriod getPayPeriod(PayPeriodType type, LocalDate date) throws PayPeriodNotFoundEx {
+        if (this.primaryCache.get(type) != null) {
+            PayPeriodCacheTree payPeriodCacheTree = (PayPeriodCacheTree) this.primaryCache.get(type).get();
+            return payPeriodCacheTree.getPayPeriod(date);
+        }
+        return payPeriodDao.getPayPeriod(type, date);
     }
 
     @Override

@@ -10,5 +10,7 @@ import java.util.List;
 
 public interface PayPeriodService
 {
+    public PayPeriod getPayPeriod(PayPeriodType type, LocalDate date);
+
     public List<PayPeriod> getPayPeriods(PayPeriodType type, Range<LocalDate> dateRange, SortOrder dateOrder);
 }
