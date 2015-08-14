@@ -1,8 +1,8 @@
 var essApp = angular.module('ess');
 
 essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
-                                            'AccrualPeriodApi',
-function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrualPeriodApi){
+                                            'AccrualPeriodApi', 'RecordUtils',
+function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrualPeriodApi, recordUtils){
 
     $scope.state = {
         accrual: null
@@ -117,8 +117,11 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
 
     // Refreshes totals and validates a record when a change occurs on a record
     function onRecordChange() {
-        refreshDailyTotals();
-        refreshTotals();
+        var record = $scope.records[$scope.iSelectedRecord];
+
+        recordUtils.calculateDailyTotals(record);
+        $scope.totals = recordUtils.getRecordTotals(record);
+
         validateRecord();
     }
 
@@ -139,16 +142,6 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
             entry.unavailable = date.isAfter(moment(), 'day');
             $scope.displayEntries.push(entry);
         }
-    }
-
-    // Updates the daily totals for each time entry in the selected record
-    function refreshDailyTotals() {
-        $scope.calculateDailyTotals($scope.records[$scope.iSelectedRecord]);
-    }
-
-    // Calculates the overall totals for the selected record
-    function refreshTotals() {
-        $scope.totals = $scope.getRecordTotals($scope.records[$scope.iSelectedRecord]);
     }
 
     // Recursively ensures that all boolean fields are true within the given object (see $scope.recordValid)

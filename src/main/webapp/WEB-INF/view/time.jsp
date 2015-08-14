@@ -12,7 +12,7 @@
 
         <!-- Time Entry -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-directives.js"></script>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-parent-ctrl.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-utils.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-entry-ctrl.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-history-ctrl.js"></script>
 

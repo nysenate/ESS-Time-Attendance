@@ -1,13 +1,18 @@
 var essTime = angular.module('essTime');
 
-essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi', 'modals',
-function ($scope, appProps, timeRecordsApi, modals) {
+essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi', 'modals', 'RecordUtils',
+function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
 
     $scope.activeYears = appProps.empActiveYears;
     $scope.year = $scope.activeYears[$scope.activeYears.length - 1];
 
     $scope.init = function() {
         $scope.getRecords();
+    };
+
+    // Settings for floating the time entry table heading
+    $scope.floatTheadOpts = {
+        scrollingTop: 47
     };
 
     /** --- API Methods --- */
@@ -48,8 +53,8 @@ function ($scope, appProps, timeRecordsApi, modals) {
         for(var i in responseRecords) {
             var record = responseRecords[i];
 
-            $scope.calculateDailyTotals(record);
-            record.totals = $scope.getRecordTotals(record);
+            recordUtils.calculateDailyTotals(record);
+            record.totals = recordUtils.getRecordTotals(record);
 
             if (record.scope === "E") {
                 $scope.records.employee.push(record);
