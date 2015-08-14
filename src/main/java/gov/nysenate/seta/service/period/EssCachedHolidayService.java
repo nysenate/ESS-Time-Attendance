@@ -95,10 +95,8 @@ public class EssCachedHolidayService extends BaseCachingService<Holiday> impleme
         preCacheWarm();
         evictCaches();
         logger.info("Caching holidays...");
-        TreeMap<LocalDate, Holiday> holidayMap = new TreeMap<>();
-        holidayDao.getHolidays(Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED), true, SortOrder.ASC)
-            .forEach(h -> holidayMap.put(h.getDate(), h));
-        this.primaryCache.put(HOLIDAY_CACHE_KEY, holidayMap);
+        this.primaryCache.put(HOLIDAY_CACHE_KEY, new HolidayCacheTree(
+            holidayDao.getHolidays(Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED), true, SortOrder.ASC)));
         logger.info("Done caching holidays.");
         postCacheWarm();
     }

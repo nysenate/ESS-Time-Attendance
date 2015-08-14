@@ -7,6 +7,7 @@ import gov.nysenate.seta.client.response.base.ListViewResponse;
 import gov.nysenate.seta.client.view.HolidayView;
 import gov.nysenate.seta.dao.period.HolidayDao;
 import gov.nysenate.seta.model.payroll.Holiday;
+import gov.nysenate.seta.service.period.HolidayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class HolidayRestCtrl extends BaseRestCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(HolidayRestCtrl.class);
 
-    @Autowired private HolidayDao holidayDao;
+    @Autowired private HolidayService holidayService;
 
     @RequestMapping("/year/{year}" )
     public BaseResponse getHolidays(@PathVariable Integer year, WebRequest request) {
@@ -44,7 +45,7 @@ public class HolidayRestCtrl extends BaseRestCtrl
     }
 
     private List<Holiday> getHolidaysDuring(LocalDate fromDate, LocalDate toDate, WebRequest request) {
-        return holidayDao.getHolidays(Range.closed(fromDate, toDate), true, SortOrder.ASC);
+        return holidayService.getHolidays(Range.closed(fromDate, toDate), true, SortOrder.ASC);
     }
 
     private BaseResponse getListViewResponse(List<Holiday> holidays) {
