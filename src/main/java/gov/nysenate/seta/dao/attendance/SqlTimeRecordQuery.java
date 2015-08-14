@@ -64,9 +64,9 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "INSERT \n" +
         "INTO " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
         "(NUXRTIMESHEET, NUXREFEM, NATXNORGUSER, NATXNUPDUSER, NAUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS,\n" +
-        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD, CDPAYTYPE) \n" +
+        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD) \n" +
         "VALUES (:timesheetId,  :empId, :tOriginalUserId, :tUpdateUserId, :employeeName, :tOriginalDate, :tUpdateDate, :status,\n" +
-                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr, :payType) \n"
+                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr) \n"
     ),
     UPDATE_TIME_REC_SQL (
         "UPDATE " + TIMESHEET_SFMS + ".PM23TIMESHEET \n" +
@@ -74,8 +74,7 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "  NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId,\n" +
         "  DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId,\n" +
         "  DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId,\n" +
-        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr," +
-        "  CDPAYTYPE = :payType\n" +
+        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr\n" +
         "WHERE NUXRTIMESHEET = :timesheetId"
     )
     ;

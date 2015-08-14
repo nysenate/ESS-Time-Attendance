@@ -25,7 +25,6 @@ public class TimeRecordView implements ViewObject {
     protected String employeeName;
     protected String respHeadCode;
     protected boolean active;
-    protected String payType;
     protected PayPeriodView payPeriod;
     protected LocalDate beginDate;
     protected LocalDate endDate;
@@ -51,7 +50,6 @@ public class TimeRecordView implements ViewObject {
             this.respHeadCode = record.getRespHeadCode();
             this.scope = (record.getRecordStatus() != null) ? record.getRecordStatus().getScope().getCode() : null;
             this.active = record.isActive();
-            this.payType = record.getPayType() != null ? record.getPayType().name() : null;
             this.payPeriod = new PayPeriodView(record.getPayPeriod());
             this.beginDate = record.getBeginDate();
             this.endDate = record.getEndDate();
@@ -79,7 +77,6 @@ public class TimeRecordView implements ViewObject {
         record.setEmployeeName(employeeName);
         record.setRespHeadCode(respHeadCode);
         record.setActive(active);
-        record.setPayType(payType != null ? PayType.valueOf(payType) : null);
         record.setPayPeriod(payPeriod.toPayPeriod());
         record.setBeginDate(beginDate);
         record.setEndDate(endDate);
@@ -195,11 +192,6 @@ public class TimeRecordView implements ViewObject {
     @XmlElement
     public EmployeeView getSupervisor() {
         return supervisor;
-    }
-
-    @XmlElement
-    public String getPayType() {
-        return payType;
     }
 
     @Override

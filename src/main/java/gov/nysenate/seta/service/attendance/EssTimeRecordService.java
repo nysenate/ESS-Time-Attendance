@@ -2,6 +2,7 @@ package gov.nysenate.seta.service.attendance;
 
 import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.attendance.TimeEntry;
@@ -15,8 +16,11 @@ import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
+import gov.nysenate.seta.service.personnel.EmployeeInfoService;
+import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,6 +31,9 @@ import java.util.stream.Collectors;
 public class EssTimeRecordService extends SqlDaoBackedService implements TimeRecordService
 {
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordService.class);
+
+    @Autowired public EmployeeInfoService empInfoService;
+    @Autowired public EmpTransactionService transService;
 
     /** {@inheritDoc} */
     @Override
@@ -42,7 +49,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         addSupervisors(records.values());
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
-                .peek(EssTimeRecordService::initializeEntries)
+                .peek(this::initializeEntries)
                 .collect(Collectors.toList());
     }
 
@@ -85,12 +92,17 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     private void fillMissingRecords(int empId, TreeMultimap<PayPeriod, TimeRecord> records, Range<LocalDate> dateRange) {
         // Todo: what if a split-triggering transaction is posted within a pay period that already has a record created
         //       eg. a record is initially created for 7/16 - 7/29, but a supervisor change occurs on 7/22
-        TreeSet<PayPeriod> incompletePeriods =
-                payPeriodDao.getOpenAttendancePayPeriods(empId, DateUtils.endOfDateRange(dateRange), SortOrder.ASC)
-                        .stream()
-                        .filter(payPeriod -> dateRange.contains(payPeriod.getStartDate()))
-                        .filter(payPeriod -> !payPeriod.isEnclosedBy(records.get(payPeriod)))
-                        .collect(Collectors.toCollection(TreeSet::new));
+        RangeSet<LocalDate> activeDates = empInfoService.getEmployeeActiveDatesService(empId);
+        List<PayPeriod> openPeriods =
+                payPeriodDao.getOpenAttendancePayPeriods(empId, DateUtils.endOfDateRange(dateRange), SortOrder.ASC);
+        TreeSet<PayPeriod> incompletePeriods = openPeriods.stream()
+                // Pay period is within the requested date range
+                .filter(payPeriod -> dateRange.contains(payPeriod.getStartDate()))
+                // Pay period is not covered by existing records
+                .filter(payPeriod -> !payPeriod.isEnclosedBy(records.get(payPeriod)))
+                // Pay period intersects with employee active dates
+                .filter(payPeriod -> !activeDates.subRangeSet(payPeriod.getDateRange()).isEmpty())
+                .collect(Collectors.toCollection(TreeSet::new));
         if (!incompletePeriods.isEmpty()) {
             Employee employee = employeeDao.getEmployeeById(empId);
             TransactionHistory history = empTransactionDao.getTransHistory(empId, EmpTransDaoOption.DEFAULT);
@@ -143,15 +155,18 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     /**
      * Ensures that the given time record contains entries for each day covered
      */
-    private static void initializeEntries(TimeRecord timeRecord) {
-        if (timeRecord.getPayType() == null && !timeRecord.getTimeEntries().isEmpty()) {
-            timeRecord.setPayType(timeRecord.getTimeEntries().get(0).getPayType());
-        }
+    private void initializeEntries(TimeRecord timeRecord) {
+        RangeMap<LocalDate, PayType> payTypeMap = null;
 
         for (LocalDate entryDate = timeRecord.getBeginDate(); !entryDate.isAfter(timeRecord.getEndDate());
              entryDate = entryDate.plusDays(1)) {
             if (!timeRecord.containsEntry(entryDate)) {
-                timeRecord.addTimeEntry(new TimeEntry(timeRecord, entryDate));
+                if (payTypeMap == null) {
+                    TransactionHistory transHistory = transService.getTransHistory(timeRecord.getEmployeeId());
+                    payTypeMap = RangeUtils.toRangeMap(
+                            transHistory.getEffectivePayTypes(timeRecord.getDateRange()), timeRecord.getEndDate());
+                }
+                timeRecord.addTimeEntry(new TimeEntry(timeRecord, payTypeMap.get(entryDate), entryDate));
             }
         }
     }
