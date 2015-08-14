@@ -7,7 +7,6 @@ import gov.nysenate.seta.dao.allowances.mapper.AmountExceedRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 import gov.nysenate.seta.model.payroll.SalaryRec;
-import gov.nysenate.seta.model.transaction.AuditHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -86,7 +85,7 @@ public class SqlAllowanceDao extends SqlBaseDao implements AllowanceDao
 
     /** {@inheritDoc} */
     @Override
-     public AllowanceUsage getAllowanceUsage(int empId, int year, AuditHistory auditHistory) {
+     public AllowanceUsage getAllowanceUsage(int empId, int year) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         LocalDate janDate = LocalDate.of(year, 1, 1);
         params.addValue("empId", empId);
@@ -120,7 +119,7 @@ public class SqlAllowanceDao extends SqlBaseDao implements AllowanceDao
         matchValues.put("CDPAYTYPE", "TE");
         String[] columnChangeFilter =  {"MOSALBIWKLY"};
 
-        salaries = setSalaryRecs(auditHistory.getMatchedAuditRecords(matchValues, true, columnChangeFilter));
+//        salaries = setSalaryRecs(auditHistory.getMatchedAuditRecords(matchValues, true, columnChangeFilter));
 
         annualAllowanceRecs.get(0).setSalaryRecs(salaries);
 
