@@ -1,8 +1,6 @@
 package gov.nysenate.seta.service.period;
 
-import com.google.common.collect.BoundType;
-import com.google.common.collect.Range;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
@@ -42,32 +40,22 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
      */
     private static class PayPeriodCacheTree
     {
-        private final TreeMap<LocalDate, PayPeriod> startDateMap = new TreeMap<>();
+        private final RangeMap<LocalDate, PayPeriod> rangeMap = TreeRangeMap.create();
 
         public PayPeriodCacheTree(TreeSet<PayPeriod> periodSet) {
             periodSet.forEach(p -> {
-                startDateMap.put(p.getStartDate(), p);
+                rangeMap.put(Range.closed(p.getStartDate(), p.getEndDate()), p);
             });
         }
 
         public PayPeriod getPayPeriod(LocalDate date) {
-            Map.Entry<LocalDate, PayPeriod> entry = startDateMap.floorEntry(date);
-            if (entry == null) throw new PayPeriodNotFoundEx("Pay period containing date " + date + " could not be found.");
-            return entry.getValue();
+            PayPeriod period = rangeMap.get(date);
+            if (period == null) throw new PayPeriodNotFoundEx("Pay period containing date " + date + " could not be found.");
+            return period;
         }
 
         public List<PayPeriod> getPayPeriodsInRange(Range<LocalDate> dateRange, SortOrder dateOrder) {
-            LocalDate fromDate = DateUtils.startOfDateRange(dateRange);
-            LocalDate toDate = DateUtils.endOfDateRange(dateRange);
-            LinkedList<PayPeriod> payPeriods = new LinkedList<>(startDateMap.subMap(fromDate, true, toDate, true).values());
-
-            // Need to account for when the range includes a date that begins in the middle of a pay period.
-            if (payPeriods.isEmpty() || payPeriods.getFirst().getStartDate().compareTo(fromDate) > 0) {
-                Map.Entry<LocalDate, PayPeriod> entry = startDateMap.floorEntry(fromDate);
-                if (entry != null) {
-                    payPeriods.addFirst(entry.getValue());
-                }
-            }
+            List<PayPeriod> payPeriods = new ArrayList<>(rangeMap.subRangeMap(dateRange).asMapOfRanges().values());
             if (dateOrder.equals(SortOrder.DESC)) {
                 Collections.reverse(payPeriods);
             }
