@@ -1,12 +1,11 @@
 package gov.nysenate.seta.controller.rest;
 
 import com.google.common.collect.Range;
-import gov.nysenate.common.LimitOffset;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
 import gov.nysenate.seta.client.view.HolidayView;
-import gov.nysenate.seta.dao.personnel.HolidayDao;
+import gov.nysenate.seta.dao.period.HolidayDao;
 import gov.nysenate.seta.model.payroll.Holiday;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -21,6 +21,8 @@ public abstract class BaseCachingService<ContentId> implements CachingService<Co
 {
     private static final Logger logger = LoggerFactory.getLogger(BaseCachingService.class);
 
+    protected volatile Boolean CACHE_REFRESHING = false;
+
     @Autowired CacheManager cacheManager;
     @Autowired EventBus eventBus;
 
@@ -54,5 +56,17 @@ public abstract class BaseCachingService<ContentId> implements CachingService<Co
     @Override
     public void evictContent(ContentId contentId) {
         primaryCache.evict(contentId);
+    }
+
+    protected void preCacheWarm() {
+        CACHE_REFRESHING = true;
+    }
+
+    protected void postCacheWarm() {
+        CACHE_REFRESHING = false;
+    }
+
+    protected boolean isCacheReady() {
+        return !CACHE_REFRESHING && this.primaryCache != null;
     }
 }

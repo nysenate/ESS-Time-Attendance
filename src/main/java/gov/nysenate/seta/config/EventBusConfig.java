@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EventBusConfig {
-
+public class EventBusConfig
+{
     private static final Logger logger = LoggerFactory.getLogger(EventBusConfig.class);
 
     /** --- Guava Event Bus Configuration --- */

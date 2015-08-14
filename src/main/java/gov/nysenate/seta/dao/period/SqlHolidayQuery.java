@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.period;
 
 import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbSchema;

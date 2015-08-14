@@ -1,4 +1,4 @@
-package gov.nysenate.seta.dao.personnel.mapper;
+package gov.nysenate.seta.dao.period.mapper;
 
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.model.payroll.Holiday;

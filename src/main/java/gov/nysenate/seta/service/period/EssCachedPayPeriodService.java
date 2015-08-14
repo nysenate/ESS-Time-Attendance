@@ -13,12 +13,14 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 @Service
 public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> implements PayPeriodService
@@ -87,7 +89,9 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
     }
 
     @Override
+    @Scheduled(cron = "0 0 * * * *") // Refresh once a day
     public void warmCaches() {
+        evictCaches();
         logger.debug("Fetching all AF pay period recs for caching...");
         Range<LocalDate> cacheRange = Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED);
         TreeSet<PayPeriod> payPeriods =

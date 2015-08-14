@@ -49,8 +49,6 @@ public class WebIntializer implements WebApplicationInitializer
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
         dispatcherContext.setServletContext(servletContext);
         dispatcherContext.setParent(rootContext);
-        /** TODO : Decide how to best use profiles. */
-        dispatcherContext.getEnvironment().setActiveProfiles("dev");
         dispatcherContext.register(WebApplicationConfig.class);
 
         /** Register the dispatcher servlet which basically serves as the front controller for Spring.

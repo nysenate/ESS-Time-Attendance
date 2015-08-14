@@ -1,10 +1,11 @@
-package gov.nysenate.seta.dao.personnel;
+package gov.nysenate.seta.dao.period;
 
 import com.google.common.collect.Range;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,9 +20,9 @@ public interface HolidayDao extends BaseDao
      *
      * @param date Date
      * @return Holiday
-     * @throws HolidayNotFoundForDateEx if a holiday was not found for given date.
+     * @throws EmptyResultDataAccessException if a holiday was not found for given date.
      */
-    public Holiday getHoliday(LocalDate date) throws HolidayNotFoundForDateEx;
+    public Holiday getHoliday(LocalDate date) throws EmptyResultDataAccessException;
 
     /**
      * Retrieves a list of all the non-questionable holidays that occur within the given range.
