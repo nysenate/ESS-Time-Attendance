@@ -46,7 +46,7 @@ Toggle this for temporary emps.
       </tbody>
     </table>
   </div>
-  <div class="content-container">
+  <div class="content-container" ng-show="displayEntries">
     <p class="content-info">All hours available need approval from appointing authority.</p>
 
     <div class="accrual-hours-container">
