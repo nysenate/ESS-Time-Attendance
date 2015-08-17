@@ -67,7 +67,7 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
 
     @Override
     public PayPeriod getPayPeriod(PayPeriodType type, LocalDate date) throws PayPeriodNotFoundEx {
-        if (this.primaryCache.get(type) != null) {
+        if (isCacheReady() && this.primaryCache.get(type) != null) {
             PayPeriodCacheTree payPeriodCacheTree = (PayPeriodCacheTree) this.primaryCache.get(type).get();
             return payPeriodCacheTree.getPayPeriod(date);
         }
@@ -76,7 +76,7 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
 
     @Override
     public List<PayPeriod> getPayPeriods(PayPeriodType type, Range<LocalDate> dateRange, SortOrder dateOrder) {
-        if (this.primaryCache.get(type) != null) {
+        if (isCacheReady() && this.primaryCache.get(type) != null) {
             PayPeriodCacheTree payPeriodCacheTree = (PayPeriodCacheTree) this.primaryCache.get(type).get();
             return payPeriodCacheTree.getPayPeriodsInRange(dateRange, dateOrder);
         }
@@ -91,6 +91,7 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
     @Override
     @Scheduled(cron = "0 0 * * * *") // Refresh once a day
     public void warmCaches() {
+        preCacheWarm();
         evictCaches();
         logger.debug("Fetching all AF pay period recs for caching...");
         Range<LocalDate> cacheRange = Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED);
@@ -98,5 +99,6 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
             new TreeSet<>(payPeriodDao.getPayPeriods(PayPeriodType.AF, cacheRange, SortOrder.ASC));
         this.primaryCache.put(PayPeriodType.AF, new PayPeriodCacheTree(payPeriods));
         logger.info("Done caching {} AF pay period records.", payPeriods.size());
+        postCacheWarm();
     }
 }

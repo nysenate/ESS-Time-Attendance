@@ -18,9 +18,9 @@ public enum SqlPayPeriodQuery implements BasicSqlQuery
     GET_OPEN_ATTEND_PERIODS_SQL(
         "SELECT * FROM " + DbSchema.MASTER_SFMS + ".SL16PERIOD \n" +
         "WHERE (DTEND <= TRUNC(:endDate) OR TRUNC(:endDate) BETWEEN DTBEGIN AND DTEND) \n" +
-        "AND CDPERIOD = 'AF' AND DTPERIODYEAR > (\n" +
-        "  SELECT DISTINCT MAX(DTPERIODYEAR) OVER (PARTITION BY NUXREFEM) \n" +
-        "  FROM PM23ATTEND WHERE NUXREFEM = :empId AND DTCLOSE IS NOT NULL\n" +
+        "AND CDPERIOD = 'AF' AND DTPERIODYEAR >= (\n" +
+        "  SELECT DISTINCT MIN(DTPERIODYEAR)\n" +
+        "  FROM PM23ATTEND WHERE NUXREFEM = :empId AND DTCLOSE IS NULL\n" +
         ")"
     );
 

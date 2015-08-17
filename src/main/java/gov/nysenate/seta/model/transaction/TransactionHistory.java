@@ -92,6 +92,12 @@ public class TransactionHistory
         return minHrs;
     }
 
+    public TreeMap<LocalDate, Boolean> getEffectiveAccrualStatus(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, Boolean> minHrs = new TreeMap<>();
+        getEffectiveEntriesDuring("CDACCRUE", dateRange, true).forEach((k,v) -> minHrs.put(k, v.equals("Y")));
+        return minHrs;
+    }
+
     /** --- Functional Getters/Setters --- */
 
     /**

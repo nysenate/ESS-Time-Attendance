@@ -26,9 +26,9 @@ import static org.springframework.cache.Cache.ValueWrapper;
 import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @Service
-public class CachedEmpTransactionService extends BaseCachingService<Integer> implements EmpTransactionService
+public class EssCachedEmpTransactionService extends BaseCachingService<Integer> implements EmpTransactionService
 {
-    private static final Logger logger = LoggerFactory.getLogger(CachedEmpTransactionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EssCachedEmpTransactionService.class);
 
     @Autowired EmpTransactionDao transactionDao;
 
@@ -38,11 +38,16 @@ public class CachedEmpTransactionService extends BaseCachingService<Integer> imp
     @Override
     public TransactionHistory getTransHistory(int empId) throws EmployeeNotFoundEx {
         try {
-            ValueWrapper cacheResult = primaryCache.get(empId);
+            ValueWrapper cacheResult = null;
+            if (isCacheReady()) {
+                cacheResult = primaryCache.get(empId);
+            }
             TransactionHistory transHistory = cacheResult != null ? (TransactionHistory) cacheResult.get() : null;
             if (transHistory == null) {
                 transHistory = transactionDao.getTransHistory(empId, EmpTransDaoOption.DEFAULT);
-                primaryCache.put(empId, transHistory);
+                if (isCacheReady()) {
+                    primaryCache.put(empId, transHistory);
+                }
             }
             return transHistory;
         } catch (EmptyResultDataAccessException ex) {
@@ -99,7 +104,9 @@ public class CachedEmpTransactionService extends BaseCachingService<Integer> imp
 
     @Override
     public void warmCaches() {
+        preCacheWarm();
         evictCaches();
-        //todo warm chaches
+        //todo warm caches
+        postCacheWarm();
     }
 }
