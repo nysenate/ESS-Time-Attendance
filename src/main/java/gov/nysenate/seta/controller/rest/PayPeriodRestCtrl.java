@@ -1,25 +1,20 @@
 package gov.nysenate.seta.controller.rest;
 
 import com.google.common.collect.Range;
-import gov.nysenate.common.LimitOffset;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
-import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.view.PayPeriodView;
-import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.service.period.PayPeriodService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,10 +1,7 @@
 package gov.nysenate.seta.service.attendance.validators;
 
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
-
-import java.util.Set;
 
 /**
  * An interface for a class that performs time record validation according to a specific time record rule

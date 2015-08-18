@@ -2,7 +2,6 @@ package gov.nysenate.seta.service.period;
 
 import com.google.common.collect.Range;
 import gov.nysenate.common.SortOrder;
-import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
 
 import java.time.LocalDate;

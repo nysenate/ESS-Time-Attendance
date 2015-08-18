@@ -30,7 +30,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId);
         try {
-            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_ID_SQL.getSql(), params, getEmployeeRowMapper());
+            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_ID_SQL.getSql(schemaMap()), params, getEmployeeRowMapper());
         }
         catch (DataRetrievalFailureException ex) {
             logger.warn("Retrieve employee {} error: {}", empId, ex.getMessage());
@@ -44,7 +44,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empIdSet", new HashSet<>(empIds));
-        return getEmployeeMap(GET_EMPS_BY_IDS_SQL.getSql(), params);
+        return getEmployeeMap(GET_EMPS_BY_IDS_SQL.getSql(schemaMap()), params);
     }
 
     /** {@inheritDoc} */
@@ -54,7 +54,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("email", email);
         try {
-            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_EMAIL_SQL.getSql(), params, getEmployeeRowMapper());
+            employee = remoteNamedJdbc.queryForObject(GET_EMP_BY_EMAIL_SQL.getSql(schemaMap()), params, getEmployeeRowMapper());
         }
         catch (DataRetrievalFailureException ex) {
             throw new EmployeeNotFoundEx("No matching employee record for email: " + email);

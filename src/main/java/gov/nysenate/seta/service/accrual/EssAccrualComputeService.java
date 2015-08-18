@@ -5,7 +5,6 @@ import gov.nysenate.common.LimitOffset;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.accrual.AccrualDao;
 import gov.nysenate.seta.dao.attendance.TimeRecordDao;
-import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.accrual.*;
 import gov.nysenate.seta.model.attendance.TimeRecord;

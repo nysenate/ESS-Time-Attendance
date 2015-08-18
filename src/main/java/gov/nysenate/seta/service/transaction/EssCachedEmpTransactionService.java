@@ -22,8 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
+import static gov.nysenate.seta.model.transaction.TransactionCode.RTP;
 import static org.springframework.cache.Cache.ValueWrapper;
-import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @Service
 public class EssCachedEmpTransactionService extends BaseCachingService<Integer> implements EmpTransactionService

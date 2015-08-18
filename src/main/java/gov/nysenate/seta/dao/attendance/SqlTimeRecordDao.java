@@ -43,7 +43,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
     public TimeRecord getTimeRecord(BigInteger timeRecordId) throws EmptyResultDataAccessException {
         MapSqlParameterSource params = new MapSqlParameterSource("timesheetId", String.valueOf(timeRecordId));
         TimeRecordRowCallbackHandler rowHandler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_ID.getSql(), params, rowHandler);
+        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_ID.getSql(schemaMap()), params, rowHandler);
         List<TimeRecord> records = rowHandler.getRecordList();
         if (records.isEmpty()) {
             throw new EmptyResultDataAccessException("could not find time record with id: " + timeRecordId, 1);
@@ -64,7 +64,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("endDate", toDate(DateUtils.endOfDateRange(dateRange)));
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES_EMP_ID.getSql(), params, handler);
+        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES_EMP_ID.getSql(schemaMap()), params, handler);
         return handler.getRecordMap();
     }
 
@@ -117,7 +117,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("empId", empId);
 
         try{
-            timeRecordList = remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_BY_EMPID.getSql(), params,
+            timeRecordList = remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_BY_EMPID.getSql(schemaMap()), params,
                     new RemoteRecordRowMapper());
         } catch (DataRetrievalFailureException ex){
             logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
@@ -132,9 +132,9 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
         MapSqlParameterSource params = getTimeRecordParams(record);
 
-        if (remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(), params)==0) {
+        if (remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(schemaMap()), params)==0) {
             KeyHolder tsIdHolder = new GeneratedKeyHolder();
-            if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(), params,
+            if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(schemaMap()), params,
                     tsIdHolder, new String[] {"NUXRTIMESHEET"}) == 0) {
                 return false;
             }
@@ -167,7 +167,6 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
         return params;
     }
-
 }
 
 

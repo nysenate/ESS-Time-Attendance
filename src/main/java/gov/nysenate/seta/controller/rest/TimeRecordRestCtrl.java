@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static gov.nysenate.seta.controller.rest.BaseRestCtrl.*;
+import static gov.nysenate.seta.controller.rest.BaseRestCtrl.REST_PATH;
 
 @RestController
 @RequestMapping(REST_PATH + "/timerecords")

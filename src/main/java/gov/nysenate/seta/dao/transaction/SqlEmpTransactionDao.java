@@ -50,7 +50,7 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
               // We don't filter by transaction codes here if the earliest record needs to be the initial state
               .addValue("transCodes", (!options.shouldInitialize()) ? getTransCodesFromSet(codes) : getAllTransCodes());
 
-        String sql = applyAuditColsToSql(GET_TRANS_HISTORY_SQL.getSql(), "audColumns", "AUD.", codes, options);
+        String sql = applyAuditColsToSql(GET_TRANS_HISTORY_SQL.getSql(schemaMap()), "audColumns", "AUD.", codes, options);
         TransHistoryHandler handler = new TransHistoryHandler(empId, "", "", codes, options);
         remoteNamedJdbc.query(sql, params, handler);
         return handler.getTransactionHistory();

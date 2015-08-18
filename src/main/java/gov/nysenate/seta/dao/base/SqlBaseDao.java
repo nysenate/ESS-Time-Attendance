@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.base;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -11,6 +12,8 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class SqlBaseDao
 {
@@ -27,10 +30,27 @@ public abstract class SqlBaseDao
     protected NamedParameterJdbcTemplate remoteNamedJdbc;
 
     /** The main production schema. Intended for read access only. */
-    protected static String MASTER_SCHEMA = "SASS_OWNER";
+    @Value("${master.schema}")
+    protected String MASTER_SCHEMA;
 
     /** The time/attendance buffer schema. Permits writes. */
-    protected static String TS_SCHEMA = "TS_OWNER";
+    @Value("${ts.schema}")
+    protected String TS_SCHEMA;
+
+    private static Map<String, String> schemaMap = null;
+
+    /**
+     * Returns a string substitution map for setting the configured schema names.
+     * @return Map<String, String>
+     */
+    protected Map<String, String> schemaMap() {
+        if (schemaMap == null) {
+            schemaMap = new HashMap<>();
+            schemaMap.put("masterSchema", MASTER_SCHEMA);
+            schemaMap.put("tsSchema", TS_SCHEMA);
+        }
+        return schemaMap;
+    }
 
     /**
      * Convert a LocalDate to a Date. Returns null on null input.

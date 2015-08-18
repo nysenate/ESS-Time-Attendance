@@ -3,8 +3,6 @@ package gov.nysenate.seta.dao.personnel;
 import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbVendor;
 
-import static gov.nysenate.seta.dao.base.DbSchema.MASTER_SFMS;
-
 public enum SqlEmployeeQuery implements BasicSqlQuery
 {
     GET_EMP_SQL_TMPL(
@@ -28,22 +26,19 @@ public enum SqlEmployeeQuery implements BasicSqlQuery
         "loc.FFADCITY AS LOC_FFADCITY, loc.ADSTATE AS LOC_ADSTATE,\n" +
         "loc.ADZIPCODE AS LOC_ADZIPCODE\n" +
 
-        "FROM " + MASTER_SFMS + ".PM21PERSONN per\n" +
-        "LEFT JOIN " + MASTER_SFMS + ".PL21EMPTITLE ttl ON per.CDEMPTITLE = ttl.CDEMPTITLE\n" +
-        "LEFT JOIN (SELECT * FROM " + MASTER_SFMS + ".PM21ADDRESS WHERE CDADDRTYPE = 'LEGL') addr ON per.NUXREFEM = addr.NUXREFEM\n" +
-        "LEFT JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
-        "LEFT JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
-        "LEFT JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
-        "LEFT JOIN (SELECT * FROM " + MASTER_SFMS + ".SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
+        "FROM ${masterSchema}.PM21PERSONN per\n" +
+        "LEFT JOIN ${masterSchema}.PL21EMPTITLE ttl ON per.CDEMPTITLE = ttl.CDEMPTITLE\n" +
+        "LEFT JOIN (SELECT * FROM ${masterSchema}.PM21ADDRESS WHERE CDADDRTYPE = 'LEGL') addr ON per.NUXREFEM = addr.NUXREFEM\n" +
+        "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
+        "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
+        "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
+        "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
         "WHERE %s \n"),
 
     GET_EMP_BY_ID_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NUXREFEM = :empId")),
     GET_EMP_BY_EMAIL_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NAEMAIL = :email")),
     GET_ACTIVE_EMPS_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.CDEMPSTATUS = 'A'")),
     GET_EMPS_BY_IDS_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NUXREFEM IN :empIdSet"))
-
-
-
     ;
 
     private String sql;

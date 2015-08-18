@@ -5,7 +5,6 @@ import gov.nysenate.common.LimitOffset;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.accrual.AnnualAccSummary;
-import gov.nysenate.seta.model.accrual.AnnualAccrualUsage;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 import gov.nysenate.seta.model.accrual.PeriodAccUsage;
 import gov.nysenate.seta.model.period.PayPeriod;

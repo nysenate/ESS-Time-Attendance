@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static gov.nysenate.seta.model.attendance.TimeRecordStatus.*;
-import static com.google.common.collect.Sets.*;
 
 /**
  * Checks to ensure that a posted time record is following a valid progression through the time record life cycle

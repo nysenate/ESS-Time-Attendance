@@ -6,7 +6,6 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.period.HolidayDao;
 import gov.nysenate.seta.model.cache.ContentCache;
-import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
 import gov.nysenate.seta.service.base.BaseCachingService;
 import org.slf4j.Logger;

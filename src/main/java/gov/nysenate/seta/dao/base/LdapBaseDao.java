@@ -11,10 +11,8 @@ import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.query.LdapQueryBuilder;
 
 import javax.naming.Name;
-import javax.naming.directory.Attributes;
 import java.util.List;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;

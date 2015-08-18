@@ -8,7 +8,6 @@ import gov.nysenate.seta.model.payroll.PayType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.lang.String;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;

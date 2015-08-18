@@ -3,8 +3,6 @@ package gov.nysenate.seta.model.personnel;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.unit.Location;
 
-import java.util.Objects;
-
 /**
  * Represents information that identifies an employee in the NYS Senate
  */

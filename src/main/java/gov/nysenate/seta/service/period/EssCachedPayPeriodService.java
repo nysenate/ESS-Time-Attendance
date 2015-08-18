@@ -1,7 +1,9 @@
 package gov.nysenate.seta.service.period;
 
-import com.google.common.collect.*;
-import gov.nysenate.common.DateUtils;
+import com.google.common.collect.BoundType;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.cache.ContentCache;
@@ -9,7 +11,6 @@ import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.service.base.BaseCachingService;
-import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.TreeSet;
 
 @Service
 public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> implements PayPeriodService

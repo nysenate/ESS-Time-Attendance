@@ -36,7 +36,7 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
         params.addValue("periodType", type.getCode());
         params.addValue("date", toDate(date));
         try {
-            payPeriod = remoteNamedJdbc.queryForObject(GET_PAY_PERIOD_SQL.getSql(), params, new PayPeriodRowMapper(""));
+            payPeriod = remoteNamedJdbc.queryForObject(GET_PAY_PERIOD_SQL.getSql(schemaMap()), params, new PayPeriodRowMapper(""));
         }
         catch (DataRetrievalFailureException ex) {
             logger.warn("Retrieve pay period of type: {} during: {} error: {}", type, date, ex.getMessage());
@@ -53,7 +53,7 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
             .addValue("startDate", toDate(startOfDateRange(dateRange)))
             .addValue("endDate", toDate(endOfDateRange(dateRange)));
         OrderBy orderBy = new OrderBy("DTBEGIN", dateOrder);
-        String sql = GET_PAY_PERIODS_IN_RANGE_SQL.getSql(orderBy);
+        String sql = GET_PAY_PERIODS_IN_RANGE_SQL.getSql(schemaMap(), orderBy);
         return remoteNamedJdbc.query(sql, params, new PayPeriodRowMapper(""));
     }
 
@@ -64,7 +64,7 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
         params.addValue("empId", empId);
         params.addValue("endDate", toDate(endDate));
         OrderBy orderBy = new OrderBy("DTBEGIN", dateOrder);
-        String sql = GET_OPEN_ATTEND_PERIODS_SQL.getSql(orderBy);
+        String sql = GET_OPEN_ATTEND_PERIODS_SQL.getSql(schemaMap(), orderBy);
         return remoteNamedJdbc.query(sql, params, new PayPeriodRowMapper(""));
     }
 }

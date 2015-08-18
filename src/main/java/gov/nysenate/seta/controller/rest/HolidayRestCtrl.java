@@ -5,7 +5,6 @@ import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
 import gov.nysenate.seta.client.view.HolidayView;
-import gov.nysenate.seta.dao.period.HolidayDao;
 import gov.nysenate.seta.model.payroll.Holiday;
 import gov.nysenate.seta.service.period.HolidayService;
 import org.slf4j.Logger;

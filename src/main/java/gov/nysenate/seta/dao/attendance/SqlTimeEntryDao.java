@@ -27,8 +27,11 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         return null;
     }
 
-    /** {@inheritDoc}
-     * @param timeRecordId*/
+    /**
+     * {@inheritDoc}
+     *
+     * @param timeRecordId
+     */
     @Override
     public List<TimeEntry> getTimeEntriesByRecordId(BigInteger timeRecordId) throws TimeEntryException {
         List<TimeEntry> timeEntryList;
@@ -36,11 +39,11 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         params.addValue("status", "A");
         params.addValue("timesheetId", new BigDecimal(timeRecordId));
         try {
-            timeEntryList = remoteNamedJdbc.query(SqlTimeEntryQuery.SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID.getSql(
-                                                                                new OrderBy("DTDAY", SortOrder.ASC) ),
-                                                  params, new RemoteEntryRowMapper());
+            timeEntryList = remoteNamedJdbc.query(
+                    SqlTimeEntryQuery.SELECT_TIME_ENTRIES_BY_TIME_RECORD_ID.getSql(schemaMap(),
+                            new OrderBy("DTDAY", SortOrder.ASC)), params, new RemoteEntryRowMapper());
         }
-        catch (DataRetrievalFailureException ex){
+        catch (DataRetrievalFailureException ex) {
             logger.warn("Retrieve time entries for record {} error: {}", timeRecordId, ex.getMessage());
             throw new TimeEntryNotFoundEx("No matching TimeEntries for TimeRecord id: " + timeRecordId);
         }
@@ -50,8 +53,8 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
     @Override
     public void updateTimeEntry(TimeEntry timeEntry) {
         MapSqlParameterSource params = getTimeEntryParams(timeEntry);
-        if (remoteNamedJdbc.update(SqlTimeEntryQuery.UPDATE_TIME_ENTRY.getSql(), params) == 0){
-            remoteNamedJdbc.update(SqlTimeEntryQuery.INSERT_TIME_ENTRY.getSql(), params);
+        if (remoteNamedJdbc.update(SqlTimeEntryQuery.UPDATE_TIME_ENTRY.getSql(schemaMap()), params) == 0) {
+            remoteNamedJdbc.update(SqlTimeEntryQuery.INSERT_TIME_ENTRY.getSql(schemaMap()), params);
         }
     }
 
@@ -71,7 +74,7 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("sickFamilyHR", timeEntry.getSickFamHours().orElse(null));
         param.addValue("miscHR", timeEntry.getMiscHours().orElse(null));
         param.addValue("miscTypeId", timeEntry.getMiscType() != null ?
-                                        new BigDecimal(timeEntry.getMiscType().getMiscLeaveId()) : new BigDecimal(BigInteger.ZERO) );
+                new BigDecimal(timeEntry.getMiscType().getMiscLeaveId()) : new BigDecimal(BigInteger.ZERO));
         param.addValue("tOriginalUserId", timeEntry.getOriginalUserId());
         param.addValue("tUpdateUserId", timeEntry.getUpdateUserId());
         param.addValue("tOriginalDate", toDate(timeEntry.getOriginalDate()));

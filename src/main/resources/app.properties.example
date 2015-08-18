@@ -39,6 +39,14 @@ db.remote.name = dev
 db.remote.user =
 db.remote.pass =
 
+# Schema Configuration
+
+# The schema containing the read-only tables
+master.schema =
+
+# The schema containing read-write tables for timesheets
+ts.schema =
+
 # --- Eh Cache Configuration --------------------------------------------------
 
 # The amount of memory to allocate to Eh Cache for all heap based caches (in MB).

@@ -3,9 +3,6 @@ package gov.nysenate.seta.dao.personnel;
 import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbVendor;
 
-import static gov.nysenate.seta.dao.base.DbSchema.MASTER_SFMS;
-import static gov.nysenate.seta.dao.base.DbSchema.TIMESHEET_SFMS;
-
 public enum SqlSupervisorQuery implements BasicSqlQuery
 {
     /**
@@ -22,7 +19,7 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
 
         /**  Fetch the ids of the supervisor's direct employees. */
         "    SELECT DISTINCT 'PRIMARY' AS EMP_GROUP, NUXREFEM, NULL AS OVR_NUXREFSV\n" +
-        "    FROM " + MASTER_SFMS + ".PM21PERAUDIT WHERE NUXREFSV = :supId \n" +
+        "    FROM ${masterSchema}.PM21PERAUDIT WHERE NUXREFSV = :supId \n" +
 
         /**  Combine that with the ids of the employees that are accessible through the sup overrides.
          *   The EMP_GROUP column will either be 'SUP_OVR' or 'EMP_OVR' to indicate the type of override. */
@@ -33,8 +30,8 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "        WHEN ovr.NUXREFEMSUB IS NOT NULL THEN 'EMP_OVR' " +
         "    END,\n" +
         "    per.NUXREFEM, ovr.NUXREFSVSUB\n" +
-        "    FROM " + MASTER_SFMS + ".PM23SUPOVRRD ovr\n" +
-        "    LEFT JOIN " + MASTER_SFMS + ".PM21PERAUDIT per ON \n" +
+        "    FROM ${masterSchema}.PM23SUPOVRRD ovr\n" +
+        "    LEFT JOIN ${masterSchema}.PM21PERAUDIT per ON \n" +
         "      CASE WHEN ovr.NUXREFSVSUB IS NOT NULL AND per.NUXREFSV = ovr.NUXREFSVSUB THEN 1\n" +
         "           WHEN ovr.NUXREFEMSUB IS NOT NULL AND per.NUXREFEM = ovr.NUXREFEMSUB THEN 1\n" +
         "           ELSE 0\n" +
@@ -43,13 +40,13 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "    AND :endDate BETWEEN NVL(ovr.DTSTART, :endDate) AND NVL(ovr.DTEND, :endDate)\n" +
         "    AND per.NUXREFEM IS NOT NULL\n" +
         "  ) empList\n" +
-        "JOIN " + MASTER_SFMS + ".PM21PERAUDIT per ON empList.NUXREFEM = per.NUXREFEM\n" +
-        "JOIN " + MASTER_SFMS + ".PD21PTXNCODE ptx ON per.NUXREFEM = ptx.NUXREFEM AND per.NUCHANGE = ptx.NUCHANGE\n" +
+        "JOIN ${masterSchema}.PM21PERAUDIT per ON empList.NUXREFEM = per.NUXREFEM\n" +
+        "JOIN ${masterSchema}.PD21PTXNCODE ptx ON per.NUXREFEM = ptx.NUXREFEM AND per.NUCHANGE = ptx.NUCHANGE\n" +
 
         /**  Retrieve just the APP/RTP/SUP/EMP transactions unless the employee doesn't
          *   have any of them (some earlier employees may be missing APP for example). */
         "WHERE \n" +
-        "    (per.NUXREFEM NOT IN (SELECT DISTINCT NUXREFEM FROM " + MASTER_SFMS + ".PD21PTXNCODE\n" +
+        "    (per.NUXREFEM NOT IN (SELECT DISTINCT NUXREFEM FROM ${masterSchema}.PD21PTXNCODE\n" +
         "                          WHERE CDTRANS IN ('APP', 'RTP', 'SUP'))\n" +
         "    OR ptx.CDTRANS IN ('APP', 'RTP', 'SUP', 'EMP'))\n" +
         "AND ptx.CDTRANSTYP = 'PER'\n" +
@@ -57,7 +54,7 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "ORDER BY NUXREFEM, TRANS_RANK"),
 
     GET_SUP_CHAIN_EXCEPTIONS(
-        "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM " + MASTER_SFMS + ".PM23SPCHNEX\n" +
+        "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM ${masterSchema}.PM23SPCHNEX\n" +
         "WHERE CDSTATUS = 'A' AND NUXREFEM = :empId")
     ;
 

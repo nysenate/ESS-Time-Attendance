@@ -1,6 +1,5 @@
 package gov.nysenate.seta.security.realm;
 
-import gov.nysenate.seta.dao.personnel.LdapAuthDao;
 import gov.nysenate.seta.model.auth.LdapAuthResult;
 import gov.nysenate.seta.service.auth.LdapAuthService;
 import org.apache.shiro.authc.*;

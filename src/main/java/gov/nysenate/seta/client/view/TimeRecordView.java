@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
-import gov.nysenate.seta.model.payroll.PayType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

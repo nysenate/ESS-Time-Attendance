@@ -47,7 +47,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         MapSqlParameterSource params = getPeriodAccSummaryParams(empId, beforeDate);
         OrderBy orderBy = new OrderBy("DTEND", order);
         List<PeriodAccSummary> periodAccSummaries =
-            remoteNamedJdbc.query(GET_PERIOD_ACC_SUMMARIES.getSql(orderBy, limOff), params, new PeriodAccSummaryRowMapper("",""));
+            remoteNamedJdbc.query(GET_PERIOD_ACC_SUMMARIES.getSql(schemaMap(), orderBy, limOff), params, new PeriodAccSummaryRowMapper("",""));
         return new TreeMap<>(Maps.uniqueIndex(periodAccSummaries, PeriodAccSummary::getRefPayPeriod));
     }
 
@@ -56,7 +56,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
     public TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int empId, int endYear) {
         MapSqlParameterSource params = getAnnualAccSummaryParams(empId, endYear);
         List<AnnualAccSummary> annualAccRecs =
-            remoteNamedJdbc.query(GET_ANNUAL_ACC_SUMMARIES.getSql(), params, new AnnualAccSummaryRowMapper());
+            remoteNamedJdbc.query(GET_ANNUAL_ACC_SUMMARIES.getSql(schemaMap()), params, new AnnualAccSummaryRowMapper());
         return new TreeMap<>(Maps.uniqueIndex(annualAccRecs, AnnualAccSummary::getYear));
     }
 
@@ -66,7 +66,7 @@ public class SqlAccrualDao extends SqlBaseDao implements AccrualDao
         MapSqlParameterSource params = getAccrualUsageParams(empId, DateUtils.startOfDateRange(dateRange),
                                                                     DateUtils.endOfDateRange(dateRange));
         List<PeriodAccUsage> usageRecs =
-            remoteNamedJdbc.query(GET_PERIOD_ACCRUAL_USAGE.getSql(), params, new PeriodAccUsageRowMapper("",""));
+            remoteNamedJdbc.query(GET_PERIOD_ACCRUAL_USAGE.getSql(schemaMap()), params, new PeriodAccUsageRowMapper("",""));
         return new TreeMap<>(Maps.uniqueIndex(usageRecs, PeriodAccUsage::getPayPeriod));
     }
 

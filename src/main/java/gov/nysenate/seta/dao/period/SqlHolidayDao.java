@@ -5,11 +5,9 @@ import gov.nysenate.common.OrderBy;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.period.mapper.HolidayRowMapper;
-import gov.nysenate.seta.model.exception.HolidayNotFoundForDateEx;
 import gov.nysenate.seta.model.payroll.Holiday;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -31,7 +29,7 @@ public class SqlHolidayDao extends SqlBaseDao implements HolidayDao
     @Override
     public Holiday getHoliday(LocalDate date) throws EmptyResultDataAccessException {
         MapSqlParameterSource params = new MapSqlParameterSource("date", toDate(date));
-        return remoteNamedJdbc.queryForObject(GET_HOLIDAY_SQL.getSql(), params, new HolidayRowMapper(""));
+        return remoteNamedJdbc.queryForObject(GET_HOLIDAY_SQL.getSql(schemaMap()), params, new HolidayRowMapper(""));
     }
 
     /** {@inheritDoc} */
@@ -48,6 +46,6 @@ public class SqlHolidayDao extends SqlBaseDao implements HolidayDao
             .addValue("endDate", toDate(endOfDateRange(dateRange)));
         OrderBy orderBy = new OrderBy("DTHOLIDAY", dateOrder);
         SqlHolidayQuery holidaySql = (includeQuestionable) ? GET_HOLIDAYS_SQL : GET_NON_QUESTIONABLE_HOLIDAYS_SQL;
-        return remoteNamedJdbc.query(holidaySql.getSql(orderBy), params, new HolidayRowMapper(""));
+        return remoteNamedJdbc.query(holidaySql.getSql(schemaMap(), orderBy), params, new HolidayRowMapper(""));
     }
 }

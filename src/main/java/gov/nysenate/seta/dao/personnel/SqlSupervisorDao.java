@@ -4,8 +4,8 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Range;
 import com.google.common.collect.Table;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
+import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorMissingEmpsEx;
 import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
@@ -108,7 +108,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
         /** Look for any active inclusions/exclusions */
         SqlParameterSource params = new MapSqlParameterSource("empId", empId);
-        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_CHAIN_EXCEPTIONS.getSql(), params, new ColumnMapRowMapper());
+        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_CHAIN_EXCEPTIONS.getSql(schemaMap()), params, new ColumnMapRowMapper());
         if (!res.isEmpty()) {
             for (Map<String, Object> row : res) {
                 int supId = Integer.parseInt(row.get("NUXREFSV").toString());
@@ -134,7 +134,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         params.addValue("endDate", toDate(endDate));
         List<Map<String, Object>> res;
         try {
-            res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL.getSql(), params, new ColumnMapRowMapper());
+            res = remoteNamedJdbc.query(GET_SUP_EMP_TRANS_SQL.getSql(schemaMap()), params, new ColumnMapRowMapper());
         }
         catch (DataRetrievalFailureException ex) {
             throw new SupervisorException("Failed to retrieve matching employees for supId: " + supId + " before: " + endDate);
