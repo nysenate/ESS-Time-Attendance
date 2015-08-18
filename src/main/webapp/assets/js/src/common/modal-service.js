@@ -45,6 +45,7 @@ essApp.service('modals', ['$rootScope', '$q', function($rootScope, $q) {
 
         modal.deferred.reject(reason);
         modal.deferred = modal.params = null;
+        console.log('rejecting modal', reason);
         $rootScope.$emit("modals.close");
     }
 

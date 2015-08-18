@@ -155,13 +155,13 @@ Toggle this for temporary emps.
         </tr>
         <tr class="time-totals-row">
           <td>Biweekly Totals</td>
-          <td>{{totals.work}}</td>
-          <td>{{totals.holiday}}</td>
-          <td>{{totals.vac}}</td>
-          <td>{{totals.personal}}</td>
-          <td>{{totals.sickEmp}}</td>
-          <td>{{totals.sickFam}}</td>
-          <td>{{totals.misc}}</td>
+          <td>{{totals.workHours}}</td>
+          <td>{{totals.holidayHours}}</td>
+          <td>{{totals.vacationHours}}</td>
+          <td>{{totals.personalHours}}</td>
+          <td>{{totals.sickEmpHours}}</td>
+          <td>{{totals.sickFamHours}}</td>
+          <td>{{totals.miscHours}}</td>
           <td></td>
           <td>{{totals.total}}</td>
         </tr>

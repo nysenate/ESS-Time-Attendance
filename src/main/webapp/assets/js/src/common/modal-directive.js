@@ -23,6 +23,7 @@ function ($rootScope, modals) {
 
         // Set subview upon modal open event
         $rootScope.$on('modals.open', function (event, modalType) {
+            console.log('showing modal of type', modalType);
             $scope.subview = modalType;
         });
 

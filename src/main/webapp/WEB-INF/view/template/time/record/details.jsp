@@ -38,13 +38,13 @@
   <tr class="time-totals-row">
     <td></td>
     <td><strong>Record Totals</strong></td>
-    <td><strong>{{record.totals.work}}</strong></td>
-    <td><strong>{{record.totals.holiday}}</strong></td>
-    <td><strong>{{record.totals.vac}}</strong></td>
-    <td><strong>{{record.totals.personal}}</strong></td>
-    <td><strong>{{record.totals.sickEmp}}</strong></td>
-    <td><strong>{{record.totals.sickFam}}</strong></td>
-    <td><strong>{{record.totals.misc}}</strong></td>
+    <td><strong>{{record.totals.workHours}}</strong></td>
+    <td><strong>{{record.totals.holidayHours}}</strong></td>
+    <td><strong>{{record.totals.vacationHours}}</strong></td>
+    <td><strong>{{record.totals.personalHours}}</strong></td>
+    <td><strong>{{record.totals.sickEmpHours}}</strong></td>
+    <td><strong>{{record.totals.sickFamHours}}</strong></td>
+    <td><strong>{{record.totals.miscHours}}</strong></td>
     <td></td>
     <td><strong>{{record.totals.total}}</strong></td>
   </tr>

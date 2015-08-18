@@ -1,8 +1,11 @@
-var essApp = angular.module('ess');
+var essApp = angular.module('ess')
+        .controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi',
+                                            'TimeRecordsApi', 'AccrualPeriodApi', 'RecordUtils', 'LocationService',
+                                            recordEntryCtrl]);
 
-essApp.controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi', 'TimeRecordsApi',
-                                            'AccrualPeriodApi', 'RecordUtils',
-function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrualPeriodApi, recordUtils){
+
+function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
+                         recordsApi, accrualPeriodApi, recordUtils, locationService) {
 
     $scope.state = {
         accrual: null
@@ -52,7 +55,7 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
         }, function (response) {
             if (empId in response.result.items) {
                 $scope.records = response.result.items[empId];
-                console.log($scope.records);
+                linkToRecord();
             }
         });
     };
@@ -76,13 +79,16 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
             // todo ensure totals hours are in line
             record.recordStatus = nextStatusMap[record.recordStatus];
         }
+        console.log(submit ? 'submitting' : 'saving', 'record', record);
         recordsApi.save(record, function (response) {
             if (submit) {
                 $scope.getRecords();
+                console.log('submitted');
             } else {
                 record.updateDate = moment().toISOString();
                 record.savedDate = record.updateDate;
                 record.dirty = false;
+                console.log('saved');
             }
         }, function (response) {
             // todo handle invalid record response
@@ -169,10 +175,32 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
         var accrual = $scope.state.accrual;
 
         if (accrual) {
-            var sickUsage = $scope.totals.sickEmp + $scope.totals.sickFam;
+            var sickUsage = $scope.totals.sickEmpHours + $scope.totals.sickFamHours;
             accValidation.sick = sickUsage <= accrual.sickAvailable;
-            accValidation.personal = $scope.totals.personal <= accrual.personalAvailable;
-            accValidation.vacation = $scope.totals.vac <= accrual.vacationAvailable;
+            accValidation.personal = $scope.totals.personalHours <= accrual.personalAvailable;
+            accValidation.vacation = $scope.totals.vacationHours <= accrual.vacationAvailable;
+        }
+    }
+
+    // Sets search params pertaining to the current active record
+    function setRecordSearchParams() {
+        var record = $scope.records[$scope.iSelectedRecord];
+        locationService.setSearchParam('record', record.beginDate);
+    }
+
+    // Checks for a 'record' search param
+    // If a record exists with a start date equal to the 'record' param, set that record as selected record
+    function linkToRecord() {
+        var recordParam = locationService.getSearchParam('record');
+        if (recordParam) {
+            console.log('linking to', recordParam);
+            for(var iRecord in $scope.records) {
+                var record = $scope.records[iRecord];
+                if (record.beginDate === recordParam) {
+                    $scope.iSelectedRecord = iRecord;
+                    break;
+                }
+            }
         }
     }
 
@@ -185,8 +213,9 @@ function($scope, $http, $filter, appProps, activeRecordsApi, recordsApi, accrual
             $scope.getAccrualForSelectedRecord();
             setDisplayEntries();
             onRecordChange();
+            setRecordSearchParams();
         }
     });
 
     $scope.init();
-}]);
+}
