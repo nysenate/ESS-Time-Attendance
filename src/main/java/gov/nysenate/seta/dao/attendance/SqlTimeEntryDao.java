@@ -62,12 +62,14 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("empId", timeEntry.getEmpId());
         param.addValue("employeeName", timeEntry.getEmployeeName());
         param.addValue("dayDate", toDate(timeEntry.getDate()));
-        param.addValue("workHR", timeEntry.getWorkHours());
-        param.addValue("travelHR", timeEntry.getTravelHours());
-        param.addValue("holidayHR", timeEntry.getHolidayHours());
-        param.addValue("sickEmpHR", timeEntry.getSickEmpHours());
-        param.addValue("sickFamilyHR", timeEntry.getSickFamHours());
-        param.addValue("miscHR", timeEntry.getMiscHours());
+        param.addValue("workHR", timeEntry.getWorkHours().orElse(null));
+        param.addValue("travelHR", timeEntry.getTravelHours().orElse(null));
+        param.addValue("holidayHR", timeEntry.getHolidayHours().orElse(null));
+        param.addValue("vacationHR", timeEntry.getVacationHours().orElse(null));
+        param.addValue("personalHR", timeEntry.getPersonalHours().orElse(null));
+        param.addValue("sickEmpHR", timeEntry.getSickEmpHours().orElse(null));
+        param.addValue("sickFamilyHR", timeEntry.getSickFamHours().orElse(null));
+        param.addValue("miscHR", timeEntry.getMiscHours().orElse(null));
         param.addValue("miscTypeId", timeEntry.getMiscType() != null ?
                                         new BigDecimal(timeEntry.getMiscType().getMiscLeaveId()) : new BigDecimal(BigInteger.ZERO) );
         param.addValue("tOriginalUserId", timeEntry.getOriginalUserId());
@@ -77,8 +79,6 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
         param.addValue("status", String.valueOf(getStatusCode(timeEntry.isActive())));
         param.addValue("empComment", timeEntry.getEmpComment());
         param.addValue("payType", timeEntry.getPayType().name());
-        param.addValue("vacationHR", timeEntry.getVacationHours());
-        param.addValue("personalHR", timeEntry.getPersonalHours());
         return param;
     }
 }
