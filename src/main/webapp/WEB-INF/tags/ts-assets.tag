@@ -20,6 +20,7 @@
         <!-- Common Directives -->
         <%--<script type="text/javascript" src="${ctxPath}/assets/js/src/common/highcharts-directive.js"></script>--%>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ess-notifications.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/loader-indicator-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/odometer-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/datepicker-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/moment-filter.js"></script>

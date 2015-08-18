@@ -31,7 +31,7 @@ essMyInfo.controller('EmpTransactionHistoryCtrl',
                     }
                 },
                 function(resp) {
-                    console.log("Error getting transactions!");
+                    $scope.state.transactions[year] = false;
                 });
         }
     };

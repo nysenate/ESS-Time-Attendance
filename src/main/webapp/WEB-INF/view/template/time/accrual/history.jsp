@@ -9,6 +9,8 @@
         </p>
     </div>
 
+    <div loader-indicator ng-show="state.searching === true"></div>
+
     <div class="content-container" ng-show="state.accSummaries">
         <h1 class="teal">Running Accrual Summary</h1>
         <p class="content-info">The hours accrued, used, and remaining are listed in the table below.<br/>

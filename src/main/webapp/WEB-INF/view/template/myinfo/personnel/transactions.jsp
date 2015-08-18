@@ -10,7 +10,7 @@
   </div>
 
   <div class="padding-10">
-      <ess-notification ng-show="!state.transactions[state.selectedYear]" level="info" message="No transactions found for this year."></ess-notification>
+      <ess-notification ng-show="state.transactions[state.selectedYear] === false" level="info" message="No transactions found for this year."></ess-notification>
       <div ng-repeat="(date,txArr) in state.transactions[state.selectedYear]">
         <h2>{{date | moment:'ll'}}</h2>
         <hr/>

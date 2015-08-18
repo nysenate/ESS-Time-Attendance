@@ -8,7 +8,8 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                          recordsApi, accrualPeriodApi, recordUtils, locationService) {
 
     $scope.state = {
-        accrual: null
+        accrual: null,
+        searching: false
     };
 
     $scope.miscLeaves = appProps.miscLeaves;
@@ -47,6 +48,7 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
     // Get active employee scoped records for the current user
     $scope.getRecords = function () {
         var empId = appProps.user.employeeId;
+        $scope.state.searching = true;
         $scope.records = [];
         $scope.iSelectedRecord = 0;
         activeRecordsApi.get({
@@ -57,6 +59,7 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                 $scope.records = response.result.items[empId];
                 linkToRecord();
             }
+            $scope.state.searching = false;
         });
     };
 

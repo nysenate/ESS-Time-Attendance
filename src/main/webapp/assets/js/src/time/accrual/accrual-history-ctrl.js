@@ -9,10 +9,12 @@ essTime.controller('AccrualHistoryCtrl',
         today: moment(),
         accSummaries: null,
         activeYears: [],
-        selectedYear: null
+        selectedYear: null,
+        searching: false
     };
 
     $scope.getAccSummaries = function(year) {
+        $scope.state.searching = true;
         var fromDate = moment([year, 0, 1]);
         var toDate = moment([year + 1, 0, 1]).subtract(1, 'days');
         var accSummariesResp = AccrualHistoryApi.get({
@@ -42,6 +44,7 @@ essTime.controller('AccrualHistoryCtrl',
             else {
                 alert("Error while fetching accruals.");
             }
+            $scope.state.searching = false;
         });
     };
 
