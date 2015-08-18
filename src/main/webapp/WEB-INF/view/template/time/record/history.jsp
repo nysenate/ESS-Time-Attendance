@@ -17,35 +17,35 @@
     <table id="attendance-active-table" class="ess-table attendance-listing-table"
            float-thead="floatTheadOpts" ng-model="records.employee">
       <thead>
-      <tr>
-        <th>Date Range</th>
-        <th>Pay Period</th>
-        <th>Status</th>
-        <th>Work</th>
-        <th>Holiday</th>
-        <th>Vacation</th>
-        <th>Personal</th>
-        <th>Sick Emp</th>
-        <th>Sick Fam</th>
-        <th>Misc</th>
-        <th>Total</th>
-        <th>Actions</th>
-      </tr>
+        <tr>
+          <th>Date Range</th>
+          <th>Pay Period</th>
+          <th>Status</th>
+          <th>Work</th>
+          <th>Holiday</th>
+          <th>Vacation</th>
+          <th>Personal</th>
+          <th>Sick Emp</th>
+          <th>Sick Fam</th>
+          <th>Misc</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
       </thead>
       <tbody>
       <tr ng-repeat="record in records.employee">
         <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
         <td>{{record.payPeriod.payPeriodNum}}</td>
         <td>{{record.recordStatus | timeRecordStatus}}</td>
-        <td>{{record.totals.work}}</td>
-        <td>{{record.totals.holiday}}</td>
-        <td>{{record.totals.vac}}</td>
-        <td>{{record.totals.personal}}</td>
-        <td>{{record.totals.sickEmp}}</td>
-        <td>{{record.totals.sickFam}}</td>
-        <td>{{record.totals.misc}}</td>
+        <td>{{record.totals.workHours}}</td>
+        <td>{{record.totals.holidayHours}}</td>
+        <td>{{record.totals.vacationHours}}</td>
+        <td>{{record.totals.personalHours}}</td>
+        <td>{{record.totals.sickEmpHours}}</td>
+        <td>{{record.totals.sickFamHours}}</td>
+        <td>{{record.totals.miscHours}}</td>
         <td>{{record.totals.total}}</td>
-        <td><a href="${ctxPath}/time/record/entry" class="action-link">Edit</a></td>
+        <td><a ng-href="${ctxPath}/time/record/entry?record={{record.beginDate}}" class="action-link">Edit</a></td>
       </tr>
       </tbody>
     </table>
@@ -80,26 +80,26 @@
         <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
         <td>{{record.payPeriod.payPeriodNum}}</td>
         <td>{{record.recordStatus | timeRecordStatus}}</td>
-        <td>{{record.totals.work}}</td>
-        <td>{{record.totals.holiday}}</td>
-        <td>{{record.totals.vac}}</td>
-        <td>{{record.totals.personal}}</td>
-        <td>{{record.totals.sickEmp}}</td>
-        <td>{{record.totals.sickFam}}</td>
-        <td>{{record.totals.misc}}</td>
+        <td>{{record.totals.workHours}}</td>
+        <td>{{record.totals.holidayHours}}</td>
+        <td>{{record.totals.vacationHours}}</td>
+        <td>{{record.totals.personalHours}}</td>
+        <td>{{record.totals.sickEmpHours}}</td>
+        <td>{{record.totals.sickFamHours}}</td>
+        <td>{{record.totals.miscHours}}</td>
         <td>{{record.totals.total}}</td>
         <td><a class="action-link" ng-click="showDetails(record)">View Details</a></td>
       </tr>
       <tr style="border-top:2px solid teal;">
         <td colspan="2"></td>
         <td><strong>Annual Totals</strong></td>
-        <td><strong>{{annualTotals.work}}</strong></td>
-        <td><strong>{{annualTotals.holiday}}</strong></td>
-        <td><strong>{{annualTotals.vac}}</strong></td>
-        <td><strong>{{annualTotals.personal}}</strong></td>
-        <td><strong>{{annualTotals.sickEmp}}</strong></td>
-        <td><strong>{{annualTotals.sickFam}}</strong></td>
-        <td><strong>{{annualTotals.misc}}</strong></td>
+        <td><strong>{{annualTotals.workHours}}</strong></td>
+        <td><strong>{{annualTotals.holidayHours}}</strong></td>
+        <td><strong>{{annualTotals.vacationHours}}</strong></td>
+        <td><strong>{{annualTotals.personalHours}}</strong></td>
+        <td><strong>{{annualTotals.sickEmpHours}}</strong></td>
+        <td><strong>{{annualTotals.sickFamHours}}</strong></td>
+        <td><strong>{{annualTotals.miscHours}}</strong></td>
         <td><strong>{{annualTotals.total}}</strong></td>
         <td></td>
       </tr>

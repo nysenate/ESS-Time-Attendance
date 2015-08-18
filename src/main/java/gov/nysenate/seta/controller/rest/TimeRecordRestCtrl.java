@@ -127,7 +127,9 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
         empIds.forEach(eId ->
                 payPeriodDao.getOpenAttendancePayPeriods(eId, LocalDate.now(), SortOrder.ASC)
                         .forEach(period -> activePeriods.add(period.getDateRange())));
-        return getRecords(empIds, activePeriods.span(), parseStatuses(status));
+        return activePeriods.isEmpty() ?
+                ArrayListMultimap.create() :
+                getRecords(empIds, activePeriods.span(), parseStatuses(status));
     }
 
     private Range<LocalDate> parseDateRange(String from, String to) {

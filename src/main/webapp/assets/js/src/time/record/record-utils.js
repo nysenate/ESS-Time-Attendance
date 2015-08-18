@@ -5,17 +5,39 @@ var essTime = angular.module('essTime');
  */
 essTime.service('RecordUtils', [function () {
 
+    // Contains the field names for each hour field in a time entry
+    var timeEntryFields = [
+        'workHours',
+        'travelHours',
+        'holidayHours',
+        'vacationHours',
+        'personalHours',
+        'sickEmpHours',
+        'sickFamHours',
+        'miscHours'
+    ];
+
     return {
         getDailyTotal: getDailyTotal,
         calculateDailyTotals: calculateDailyTotals,
         getTotal: getTotal,
-        getRecordTotals: getRecordTotals
+        getRecordTotals: getRecordTotals,
+        getTimeEntryFields: getTimeEntryFields
     };
+
+    // Return a copy of timeEntryFields array
+    function getTimeEntryFields() {
+        return timeEntryFields.slice();
+    }
 
     // Get the total used hours for a single time entry
     function getDailyTotal(entry) {
-        return +(entry.workHours) + +(entry.travelHours) + +(entry.holidayHours) + +(entry.vacationHours) +
-            +(entry.personalHours) + +(entry.sickEmpHours) + +(entry.sickFamHours) + +(entry.miscHours);
+        return timeEntryFields
+            .map(function (timeField) {
+                return +entry[timeField];
+            }).reduce(function (a, b) {
+                return a + b;
+            });
     }
 
     // Calculate and add the daily total as a field in each time entry within a record
@@ -39,17 +61,14 @@ essTime.service('RecordUtils', [function () {
 
     // Returns an object containing the total number of hours for each time usage type over an entire time recodr
     function getRecordTotals(record) {
-        return {
-            work: getTotal(record, 'workHours'),
-            travel: getTotal(record, 'travelHours'),
-            holiday: getTotal(record, 'holidayHours'),
-            vac: getTotal(record, 'vacationHours'),
-            personal: getTotal(record, 'personalHours'),
-            sickEmp: getTotal(record, 'sickEmpHours'),
-            sickFam: getTotal(record, 'sickFamHours'),
-            misc: getTotal(record, 'miscHours'),
-            total: getTotal(record, 'total')
-        };
+        var totals = {};
+
+        for (var iField in timeEntryFields) {
+            var field = timeEntryFields[iField];
+            totals[field] = getTotal(record, field);
+        }
+        totals.total = getTotal(record, 'total');
+        return totals;
     }
 }]);
 

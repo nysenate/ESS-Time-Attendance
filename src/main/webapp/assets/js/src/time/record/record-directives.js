@@ -52,19 +52,27 @@ essApp.directive('timeRecordInput', [function(){
 }]);
 
 /**
- * A modal that displays details for a specific time record
- * use with modal-container {@see assets/js/src/common/modal-directive.js}
+ * A table that displays details for a specific time record
  */
-essApp.directive('recordDetailModal', ['modals', 'appProps', function (modals, appProps) {
+essApp.directive('recordDetails', ['appProps', function (appProps) {
     return {
-        templateUrl: appProps.ctxPath + '/template/time/record/details',
-        link: link
+        scope: {
+            record: '=',
+            employee: '=?'
+        },
+        templateUrl: appProps.ctxPath + '/template/time/record/details'
     };
+}]);
 
-    function link($scope, $elem, $attr) {
-        console.log('hi', modals.params());
-        $scope.record = modals.params().record;
-        $scope.employee = modals.params().employee;
+essApp.directive('recordDetailModal', ['modals', function (modals) {
+    return {
+        template: '<div class="record-detail-modal" record-details record="record" employee="employee"></div>',
+        link: function ($scope, $elem, $attrs) {
+            var params = modals.params();
+            $scope.record = params.record;
+            $scope.employee = params.employee;
+            console.log('i r modal', $scope.record);
+        }
     }
 }]);
 

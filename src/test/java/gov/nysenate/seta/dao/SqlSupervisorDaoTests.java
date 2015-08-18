@@ -1,6 +1,8 @@
 package gov.nysenate.seta.dao;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 public class SqlSupervisorDaoTests extends BaseTests
 {
@@ -34,6 +37,14 @@ public class SqlSupervisorDaoTests extends BaseTests
         SupervisorEmpGroup group =
             supervisorDao.getSupervisorEmpGroup(9896, Range.closed(LocalDate.of(2015, 1, 1), LocalDate.of(2015, 7, 31)));
         logger.info(OutputUtils.toJson(group));
+    }
+
+    @Test
+    public void issupTest() {
+        supervisorDao.isSupervisor(11423, DateUtils.ALL_DATES);
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        logger.info("{}", supervisorDao.isSupervisor(11423, DateUtils.ALL_DATES));
+        logger.info("{}", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
     }
 
 
