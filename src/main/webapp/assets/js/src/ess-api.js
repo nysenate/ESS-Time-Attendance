@@ -45,3 +45,9 @@ essApi.factory('AccrualHistoryApi', ['$resource', 'appProps', function($resource
 essApi.factory('EmpActiveYearsApi', ['$resource', 'appProps', function($resource, appProps) {
     return $resource(appProps.apiPath + '/employees/active-years');
 }]);
+
+/** --- Transaction API --- */
+
+essApi.factory('EmpTransactionsApi', ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/empTransactions/')
+}]);

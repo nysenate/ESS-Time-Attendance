@@ -15,9 +15,6 @@ essTime.controller('AccrualHistoryCtrl',
     $scope.getAccSummaries = function(year) {
         var fromDate = moment([year, 0, 1]);
         var toDate = moment([year + 1, 0, 1]).subtract(1, 'days');
-        if (year == moment().year()) {
-            //toDate = moment();
-        }
         var accSummariesResp = AccrualHistoryApi.get({
             empId: $scope.state.empId,
             fromDate: fromDate.format('YYYY-MM-DD'),

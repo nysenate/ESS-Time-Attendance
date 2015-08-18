@@ -9,12 +9,11 @@
         </p>
     </div>
 
-    <div class="content-container">
+    <div class="content-container" ng-show="state.accSummaries">
         <h1 class="teal">Running Accrual Summary</h1>
         <p class="content-info">The hours accrued, used, and remaining are listed in the table below.<br/>
             The accrued, used, and available hours in each column are a running total from the start of the year.</p>
-        <table ng-show="state.accSummaries"
-               class="detail-acc-history-table" float-thead="floatTheadOpts" ng-model="state.accSummaries">
+        <table class="detail-acc-history-table" float-thead="floatTheadOpts" ng-model="state.accSummaries">
             <thead>
             <tr>
                 <th colspan="2">Pay Period</th>
@@ -66,134 +65,4 @@
             </tbody>
         </table>
     </div>
-
-    <script>
-        /*$('#accrual-usage-stacked-bar-plot').highcharts({
-         colors: ['#006B80', '#799933', '#d19525', '#e64727' ],
-         chart: {
-         type: 'column',
-         height: 250
-         },
-         credits: {
-         enabled: false
-         },
-         title: {
-         text: ''
-         },
-         xAxis: {
-         categories: ['1/1/14', '2/1/14', '3/1/14', '4/1/14', '5/1/14', '6/1/14', '7/1/14', '8/1/14'],
-         title: {
-         text: 'Pay Period End Date'
-         }
-         },
-         yAxis: {
-         min: 0,
-         title: {
-         text: 'Hours Used'
-         },
-         stackLabels: {
-         enabled: true,
-         style: {
-         fontWeight: 'bold',
-         color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-         }
-         },
-         gridLineColor: '#ddd',
-         gridLineDashStyle: 'longdash'
-         },
-         legend: {
-         borderWidth: 0
-         },
-         tooltip: {
-         formatter: function() {
-         return '<b>'+ this.x +'</b><br/>'+
-         this.series.name +': '+ this.y +'<br/>'+
-         'Total: '+ this.point.stackTotal;
-         }
-         },
-         plotOptions: {
-         area: { stacking: 'normal'},
-         column: {
-         stacking: 'normal',
-         dataLabels: {
-         enabled: false
-         }
-         }
-         },
-         series: [{
-         name: 'Personal',
-         data: [0, 3, 2, 0, 2, 0, 1, 0]
-         }, {
-         name: 'Vacation',
-         data: [2, 0, 0, 2, 1, 0, 0, 1]
-         }, {
-         name: 'Sick',
-         data: [3, 0, 0, 2, 0, 0, 0, 0]
-         }, {
-         name: 'Misc',
-         data: [0, 0, 0, 0, 0, 0, 0, 0]
-         }]
-         });
-
-         $('#accrual-rem-stacked-area-plot').highcharts({
-         colors: ['#006B80', '#799933', '#d19525', '#e64727' ],
-         chart: {
-         type: 'area',
-         height: 250
-         },
-         credits: {
-         enabled: false
-         },
-         title: {
-         text: ''
-         },
-         xAxis: {
-         categories: ['1/1/14', '2/1/14', '3/1/14', '4/1/14', '5/1/14', '6/1/14', '7/1/14', '8/1/14'],
-         title: {
-         text: 'Pay Period End Date'
-         }
-         },
-         yAxis: {
-         min: 0,
-         title: {
-         text: 'Hours Remaining'
-         },
-         stackLabels: {
-         enabled: true,
-         style: {
-         fontWeight: 'bold',
-         color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-         }
-         },
-         gridLineColor: '#ddd',
-         gridLineDashStyle: 'longdash'
-         },
-         legend: {
-         borderWidth: 0
-         },
-         tooltip: {
-         formatter: function() {
-         return '<b>'+ this.x +'</b><br/>'+
-         this.series.name +': '+ this.y +'<br/>'+
-         'Total: '+ this.point.stackTotal;
-         }
-         },
-         plotOptions: {
-         area: { stacking: 'normal'},
-         column: {
-         stacking: 'normal',
-         dataLabels: {
-         enabled: false
-         }
-         }
-         },
-         series: [{
-         name: 'Personal',
-         data: [35, 32, 28, 28, 22, 22, 21, 21]
-         }, {
-         name: 'Vacation',
-         data: [39.75, 43, 40, 43, 47, 41, 44, 47]
-         }]
-         }); */
-    </script>
 </section>

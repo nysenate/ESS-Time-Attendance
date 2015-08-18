@@ -10,6 +10,9 @@
         <ess:ts-assets/>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/home.js"></script>
 
+        <!-- Personnel -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/myinfo/personnel/transaction-history-ctrl.js"></script>
+
     </jsp:body>
 </ess-layout:head>
 

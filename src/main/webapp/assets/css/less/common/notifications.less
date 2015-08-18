@@ -1,0 +1,20 @@
+@import "./colors";
+
+.ess-notification {
+  border-width: 1px;
+  border-style: solid;
+  background: white;
+  text-align: center;
+  &.info {
+    color: @navy;
+    border-color: @light-teal;
+  }
+  &.warn {
+    color: @brown;
+    border-color: @orange;
+  }
+  &.error {
+    color: @redorange;
+    border-color: @redorange;
+  }
+}

@@ -357,6 +357,15 @@ table.simple-table {
       vertical-align: top;
       position: absolute;
       right: 0;
+      #user-name-section {
+        float:left;
+        font-size: 1.1em;
+        font-weight: bold;
+        padding: 11px;
+        display: block;
+        text-decoration: none !important;
+        color: #333;
+      }
       #logoutSection {
         float:left;
         font-size: 1.1em;
@@ -505,6 +514,8 @@ table.simple-table {
     }
   }
 }
+
+/** --- Main content elements --- */
 
 .content-controls {
   margin-top: 0;
@@ -732,9 +743,7 @@ table#timeRecordTable {
   }
 }
 
-/*
-  --- Attendance History Page ---
-*/
+/* --- Attendance History Page --- */
 
 .attendance-listing-table {
   tbody {
@@ -801,9 +810,7 @@ table.attendance-entry-sub-table {
 }
 
 
-/*
-  --- Request Time Off Page ---
-*/
+/* --- Request Time Off Page --- */
 
 .timeoff-request-accrual-container {
   width: 600px;
@@ -865,9 +872,7 @@ table.attendance-entry-sub-table {
   }
 }
 
-/**
-  --- View Pay Period Calendar Page ---
-*/
+/** --- View Pay Period Calendar Page --- */
 
 .pay-period-cal-container {
   .legend-container {
@@ -944,9 +949,7 @@ table.attendance-entry-sub-table {
   }
 }
 
-/**
-  --- Accrual History Page ---
-*/
+/** --- Accrual History Page --- */
 
 .accruals-table, .detail-acc-history-table, #accrual-usage-details-table {
   width: 100%;
@@ -1064,6 +1067,20 @@ table.approve-attendance-rec-table {
   }
 }
 
+/** --- Transaction History --- */
+
+.tx-container {
+  margin-left: 20px;
+}
+
+.tx-heading {
+  color: @blue;
+}
+
+.tx-update-date {
+  font-size: 13px;
+  color: #666;
+}
 
 
 

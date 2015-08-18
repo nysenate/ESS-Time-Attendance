@@ -14,12 +14,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 @RequestMapping("/myinfo/**")
-public class MyInfoPageCtrl
+public class MyInfoPageCtrl extends BaseEssPageCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(MyInfoPageCtrl.class);
 
     @RequestMapping(method = RequestMethod.GET)
-    public String myInfoHome(ModelMap modelMap, HttpServletRequest request) {
+    @Override
+    String mainPage(ModelMap modelMap, HttpServletRequest request) {
+        addModelMapData(modelMap);
         return "myinfo";
     }
 }

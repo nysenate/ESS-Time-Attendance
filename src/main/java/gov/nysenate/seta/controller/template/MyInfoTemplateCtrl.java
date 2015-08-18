@@ -15,11 +15,17 @@ public class MyInfoTemplateCtrl extends BaseTemplateCtrl
     private static final Logger logger = LoggerFactory.getLogger(MyInfoTemplateCtrl.class);
     protected static final String MYINFO_TMPL_BASE_URL = TMPL_BASE_URL + "/myinfo";
 
-    /** --- Profile --- */
+    /** --- Personnel --- */
 
-    @RequestMapping(value="/profile/summary")
+    @RequestMapping(value="/personnel/summary")
     public String profileSummary() {
-        return MYINFO_TMPL_BASE_URL + "/profile/summary";
+        return MYINFO_TMPL_BASE_URL + "/personnel/transactions";
     }
+
+    @RequestMapping(value="/personnel/transactions")
+    public String personnelTransactions() {
+        return MYINFO_TMPL_BASE_URL + "/personnel/transactions";
+    }
+
 
 }

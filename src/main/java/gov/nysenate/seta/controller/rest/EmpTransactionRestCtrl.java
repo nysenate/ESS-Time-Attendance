@@ -2,6 +2,7 @@ package gov.nysenate.seta.controller.rest;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
@@ -26,19 +28,21 @@ import static gov.nysenate.seta.controller.rest.BaseRestCtrl.REST_PATH;
 import static java.util.stream.Collectors.toList;
 
 @RestController
-@RequestMapping(REST_PATH + "/empTransactions/")
+@RequestMapping(REST_PATH + "/empTransactions")
 public class EmpTransactionRestCtrl extends BaseRestCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(EmpTransactionRestCtrl.class);
 
     @Autowired private EmpTransactionDao empTransactionDao;
 
-    @RequestMapping("/empId/{empId}/dates/{fromDateStr}/{toDateStr}")
-    public BaseResponse getTransactionsByEmpId(@PathVariable Integer empId, @PathVariable String fromDateStr,
-                                               @PathVariable String toDateStr, WebRequest request) {
-        LocalDate fromDate = parseISODate(fromDateStr, "from-date");
-        LocalDate toDate = parseISODate(toDateStr, "to-date");
-        Range<LocalDate> range = Range.closed(fromDate, toDate);
+    @RequestMapping("")
+    public BaseResponse getTransactionsByEmpId(@RequestParam Integer empId,
+                                               @RequestParam(required = false) String fromDate,
+                                               @RequestParam(required = false) String toDate,
+                                               WebRequest request) {
+        LocalDate fromLocalDate = (fromDate != null) ? parseISODate(fromDate, "from-date") : DateUtils.LONG_AGO;
+        LocalDate toLocalDate = (toDate != null) ? parseISODate(toDate, "to-date") : DateUtils.THE_FUTURE;
+        Range<LocalDate> range = Range.closed(fromLocalDate, toLocalDate);
         Set<TransactionCode> codeSet = getCodesFromParam(request);
         return ListViewResponse.of(
             empTransactionDao.getTransHistory(empId, codeSet, range, EmpTransDaoOption.DEFAULT)

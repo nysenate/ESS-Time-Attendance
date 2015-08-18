@@ -14,7 +14,10 @@ essApp.config(function($routeProvider, $locationProvider) {
 
     /** My Info */
     $routeProvider.when(ctxPath + '/myinfo/profile/summary', {
-        templateUrl: ctxPath + '/template/myinfo/profile/summary'
+        templateUrl: ctxPath + '/template/myinfo/personnel/summary'
+    });
+    $routeProvider.when(ctxPath + '/myinfo/personnel/transactions', {
+        templateUrl: ctxPath + '/template/myinfo/personnel/transactions'
     });
 
     /** Time and Attendance */

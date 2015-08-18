@@ -4,6 +4,12 @@
 table.ess-table {
   width: 100%;
 
+  &.center-align {
+    thead tr th, tbody tr td {
+      text-align: center;
+    }
+  }
+
   thead {
     background: white;
     tr {
@@ -33,8 +39,7 @@ table.ess-table {
       border-bottom: 1px solid #bbb;
 
       td {
-        text-align: center;
-
+        text-align: left;
         &.invalid, input.ng-invalid {
           background: #FFBCBC
         }

@@ -19,15 +19,15 @@
                 <li id="timeAttendanceLink" class="main-topic teal <c:if test='${activeTopic == "time"}'>active</c:if>">
                     <a target="_self" href="${ctxPath}/time"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/clock.png"/>Time</a>
                 </li>
-                <li id="payrollLink" class="main-topic">
-                    <a target="_self"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/dollar.png"/>Payroll</a>
-                </li>
                 <li id="helpLink" class="main-topic">
                     <a target="_self"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/question.png"/>Help</a>
                 </li>
             </ul>
         </div>
         <div class="right-header-area">
+            <div id="user-name-section">
+                Hi, ${principal.getFullName()}
+            </div>
             <div id="logoutSection">
                 <a target="_self" href="${ctxPath}/logout">Sign Out</a>
             </div>
