@@ -7,7 +7,8 @@ import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import junit.framework.Assert;
+import org.apache.commons.lang3.time.StopWatch;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,13 @@ public class SqlPayPeriodDaoTests extends BaseTests
     @Test
     public void testGetPayPeriod() throws Exception {
         logger.info(OutputUtils.toJson(payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2012, 11, 7))));
+        StopWatch sw = new StopWatch();
+        sw.start();
+        payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2012, 11, 7));
+        payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2012, 11, 7));
+        payPeriodDao.getPayPeriod(PayPeriodType.AF, LocalDate.of(2012, 11, 7));
+        sw.stop();
+        logger.info("{}", sw.getTime());
     }
 
     @Test
