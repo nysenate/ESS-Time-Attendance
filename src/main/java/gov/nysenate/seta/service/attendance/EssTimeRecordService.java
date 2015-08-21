@@ -105,7 +105,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                 .collect(Collectors.toCollection(TreeSet::new));
         if (!incompletePeriods.isEmpty()) {
             Employee employee = employeeDao.getEmployeeById(empId);
-            TransactionHistory history = empTransactionDao.getTransHistory(empId, EmpTransDaoOption.NONE);
+            TransactionHistory history = transService.getTransHistory(empId);
             incompletePeriods.forEach(period ->
                     records.putAll(period, createEmptyTimeRecords(employee, period, history, records.get(period))));
         }

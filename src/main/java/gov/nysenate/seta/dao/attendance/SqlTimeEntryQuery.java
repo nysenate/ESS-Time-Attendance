@@ -15,20 +15,17 @@ public enum SqlTimeEntryQuery implements BasicSqlQuery
     ),
     INSERT_TIME_ENTRY(
         "INSERT INTO ${tsSchema}.PD23TIMESHEET\n" +
-        " (NUXRDAY, NUXRTIMESHEET, NUXREFEM, NAUSER, DTDAY, NUWORK, NUTRAVEL, NUHOLIDAY, NUSICKEMP, " +
-        "  NUSICKFAM, NUMISC, NUXRMISC, NATXNORGUSER, NATXNUPDUSER, DTTXNORIGIN, DTTXNUPDATE, " +
-        "  CDSTATUS, DECOMMENTS, CDPAYTYPE, NUVACATION, NUPERSONAL)\n" +
-        "VALUES (:tSDayId, :timesheetId, :empId, :employeeName, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, " +
-        "        :miscHR, :miscTypeId, :tOriginalUserId, :tUpdateUserId, :tOriginalDate, :tUpdateDate, :status, " +
-        "        :empComment, :payType, :vacationHR, :personalHR )"
+        " (NUXRTIMESHEET, NUXREFEM, DTDAY, NUWORK, NUTRAVEL, NUHOLIDAY, NUSICKEMP, NUSICKFAM,\n" +
+        "       NUMISC, NUXRMISC, CDSTATUS, DECOMMENTS, CDPAYTYPE, NUVACATION, NUPERSONAL)\n" +
+        "VALUES (:timesheetId, :empId, :dayDate, :workHR, :travelHR, :holidayHR, :sickEmpHR, :sickFamilyHR, \n" +
+        "        :miscHR, :miscTypeId, :status, :empComment, :payType, :vacationHR, :personalHR )"
     ),
     UPDATE_TIME_ENTRY(
         "UPDATE ${tsSchema}.PD23TIMESHEET " + "\n" +
-        "SET NUXRTIMESHEET = :timesheetId, NAUSER = :employeeName, NUWORK = :workHR, NUTRAVEL = :travelHR, " +
-            "NUHOLIDAY = :holidayHR, NUSICKEMP = :sickEmpHR, NUSICKFAM = :sickFamilyHR, NUMISC = :miscHR, " +
-            "NUXRMISC = :miscTypeId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId, " +
-            "DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, DECOMMENTS = :empComment, " +
-            "CDPAYTYPE = :payType, NUVACATION = :vacationHR, NUPERSONAL = :personalHR " + "\n" +
+        "SET NUXRTIMESHEET = :timesheetId, NUWORK = :workHR, NUTRAVEL = :travelHR,\n" +
+        "   NUHOLIDAY = :holidayHR, NUSICKEMP = :sickEmpHR, NUSICKFAM = :sickFamilyHR, NUMISC = :miscHR,\n" +
+        "   NUXRMISC = :miscTypeId, CDSTATUS = :status, DECOMMENTS = :empComment,\n" +
+        "   CDPAYTYPE = :payType, NUVACATION = :vacationHR, NUPERSONAL = :personalHR\n" +
         "WHERE NUXREFEM = :empId AND NUXRDAY = :tSDayId"
     );
 

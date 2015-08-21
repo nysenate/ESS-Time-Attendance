@@ -62,20 +62,23 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     INSERT_TIME_REC(
         "INSERT \n" +
         "INTO ${tsSchema}.PM23TIMESHEET \n" +
-        "(NUXRTIMESHEET, NUXREFEM, NATXNORGUSER, NATXNUPDUSER, NAUSER, DTTXNORIGIN, DTTXNUPDATE, CDSTATUS,\n" +
-        " CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD) \n" +
-        "VALUES (:timesheetId,  :empId, :tOriginalUserId, :tUpdateUserId, :employeeName, :tOriginalDate, :tUpdateDate, :status,\n" +
-                ":tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr) \n"
+        "(NUXREFEM, CDSTATUS, CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD) \n" +
+        "VALUES (:empId, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr) \n"
     ),
     UPDATE_TIME_REC_SQL (
         "UPDATE ${tsSchema}.PM23TIMESHEET \n" +
         "SET \n" +
-        "  NUXREFEM = :empId, NATXNORGUSER = :tOriginalUserId, NATXNUPDUSER = :tUpdateUserId,\n" +
-        "  DTTXNORIGIN = :tOriginalDate, DTTXNUPDATE = :tUpdateDate, CDSTATUS = :status, CDTSSTAT = :tSStatusId,\n" +
+        "  NUXREFEM = :empId, CDSTATUS = :status, CDTSSTAT = :tSStatusId,\n" +
         "  DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId,\n" +
         "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr\n" +
         "WHERE NUXRTIMESHEET = :timesheetId"
-    )
+    ),
+    DELETE_TIME_REC_SQL (
+        "DELETE FROM ${tsSchema}.PM23TIMESHEET WHERE NUXRTIMESHEET = :timesheetId"
+    ),
+    DELETE_TIME_REC_ENTRIES_SQL (
+        "DELETE FROM ${tsSchema}.PD23TIMESHEET WHERE NUXRTIMESHEET = :timesheetId"
+    ),
     ;
 
     private String sql;

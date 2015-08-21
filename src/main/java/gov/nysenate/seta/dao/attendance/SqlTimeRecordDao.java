@@ -132,7 +132,11 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
         MapSqlParameterSource params = getTimeRecordParams(record);
 
-        if (remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(schemaMap()), params)==0) {
+        boolean isUpdate = true;
+
+        if (record.getTimeRecordId() == null ||
+                remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(schemaMap()), params)==0) {
+            isUpdate = false;
             KeyHolder tsIdHolder = new GeneratedKeyHolder();
             if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(schemaMap()), params,
                     tsIdHolder, new String[] {"NUXRTIMESHEET"}) == 0) {
@@ -141,8 +145,18 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             record.setTimeRecordId(((BigDecimal) tsIdHolder.getKeys().get("NUXRTIMESHEET")).toBigInteger());
         }
         // Insert each entry from the time record
-        record.getTimeEntries().forEach(timeEntryDao::updateTimeEntry);
+        final TimeRecord oldRecord = isUpdate ? getTimeRecord(record.getTimeRecordId()) : null;
+        record.getTimeEntries().stream()
+                .filter(entry -> shouldInsert(entry, oldRecord))
+                .forEach(timeEntryDao::updateTimeEntry);
         return true;
+    }
+
+    @Override
+    public void deleteRecord(BigInteger recordId) {
+        MapSqlParameterSource params = new MapSqlParameterSource("timesheetId", new BigDecimal(recordId));
+        remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_SQL.getSql(schemaMap()), params);
+        remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_ENTRIES_SQL.getSql(schemaMap()), params);
     }
 
     public static MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {
@@ -166,6 +180,21 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("respCtr", timeRecord.getRespHeadCode());
 
         return params;
+    }
+
+    /** --- Internal Methods --- */
+
+    /**
+     * @param entry TimeEntry - the time entry to insert
+     * @param oldRecord TimeRecord - a record containing the last saved entry set
+     * @return true if the entry is fundamentally different than the equivalent entry in oldRecord
+     */
+    private static boolean shouldInsert(TimeEntry entry, TimeRecord oldRecord) {
+        if (oldRecord == null) {
+            return !entry.isEmpty();
+        }
+        TimeEntry oldEntry = oldRecord.getEntry(entry.getDate());
+        return oldEntry == null ? !entry.isEmpty() : !entry.equals(oldEntry);
     }
 }
 

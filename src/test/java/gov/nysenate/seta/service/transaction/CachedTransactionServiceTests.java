@@ -53,9 +53,7 @@ public class CachedTransactionServiceTests extends BaseTests {
 
     @Test
     public void testTransactions() throws Exception {
-//        logger.info("{}", OutputUtils.toJson(transDao.getTransHistory(11423, EmpTransDaoOption.DEFAULT)
-//                .getTransRecords(Sets.newHashSet(TransactionCode.ACC), SortOrder.ASC)));
-        TransactionHistory transHistory = transDao.getTransHistory(183, EmpTransDaoOption.NONE);
+        TransactionHistory transHistory = transDao.getTransHistory(1719, EmpTransDaoOption.NONE);
         logger.info("{}", transHistory.getEffectiveAccrualStatus(Range.upTo(LocalDate.now(), BoundType.CLOSED)));
 
     }

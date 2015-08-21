@@ -23,7 +23,7 @@ public class EssTimeRecordServiceTests extends BaseTests
 
     @Test
     public void testGetActiveRecords() throws Exception {
-        logger.info("{}", OutputUtils.toJson(timeRecordService.getTimeRecords(Collections.singleton(11423),
+        logger.info("{}", OutputUtils.toJson(timeRecordService.getTimeRecords(Collections.singleton(1719),
                 Range.closed(LocalDate.of(2015, 1, 1), LocalDate.now()), EnumSet.allOf(TimeRecordStatus.class), true)));
     }
 

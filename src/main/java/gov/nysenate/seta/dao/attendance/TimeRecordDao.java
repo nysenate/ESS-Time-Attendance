@@ -67,4 +67,9 @@ public interface TimeRecordDao extends BaseDao
      * @return Boolean value, true if data successfully updated else false.
      */
     boolean saveRecord(TimeRecord record);
+
+    /**
+     * Remove a TimeRecord from the database
+     */
+    void deleteRecord(BigInteger recordId);
 }

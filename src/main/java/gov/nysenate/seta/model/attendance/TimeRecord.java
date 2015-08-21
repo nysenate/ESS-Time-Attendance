@@ -144,20 +144,26 @@ public class TimeRecord implements Comparable<TimeRecord>
         return usage;
     }
 
+    /** --- Functional Getters/Setters --- */
+
     public BigDecimal getSumOfTimeEntries(Function<? super TimeEntry, Optional<BigDecimal>> mapper) {
         return timeEntryMap.values().stream()
                 .map(entry -> mapper.apply(entry).orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    /**
+     * Sets time record id for all entries as well as for the time record
+     */
+    public void setTimeRecordId(BigInteger timeRecordId) {
+        this.timeRecordId = timeRecordId;
+        timeEntryMap.forEach(((date, entry) -> entry.setTimeRecordId(timeRecordId)));
+    }
+
     /** --- Basic Getters/Setters --- */
 
     public BigInteger getTimeRecordId() {
         return timeRecordId;
-    }
-
-    public void setTimeRecordId(BigInteger timeRecordId) {
-        this.timeRecordId = timeRecordId;
     }
 
     public Integer getEmployeeId() {

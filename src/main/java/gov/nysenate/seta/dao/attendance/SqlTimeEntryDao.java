@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -54,7 +56,9 @@ public class SqlTimeEntryDao extends SqlBaseDao implements TimeEntryDao
     public void updateTimeEntry(TimeEntry timeEntry) {
         MapSqlParameterSource params = getTimeEntryParams(timeEntry);
         if (remoteNamedJdbc.update(SqlTimeEntryQuery.UPDATE_TIME_ENTRY.getSql(schemaMap()), params) == 0) {
-            remoteNamedJdbc.update(SqlTimeEntryQuery.INSERT_TIME_ENTRY.getSql(schemaMap()), params);
+            KeyHolder entryIdHolder = new GeneratedKeyHolder();
+            remoteNamedJdbc.update(SqlTimeEntryQuery.INSERT_TIME_ENTRY.getSql(schemaMap()), params, entryIdHolder, new String[]{"NUXRDAY"});
+            timeEntry.setEntryId(((BigDecimal) entryIdHolder.getKeys().get("NUXRDAY")).toBigInteger());
         }
     }
 

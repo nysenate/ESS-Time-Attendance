@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.attendance;
 
+import com.google.common.base.Objects;
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.model.payroll.PayType;
 
@@ -7,7 +8,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -106,41 +106,49 @@ public class TimeEntry
         return Optional.ofNullable(miscHours);
     }
 
+    /**
+     * @return true if no fields are set for this time record
+     */
+    public boolean isEmpty() {
+        return workHours == null &&
+                travelHours == null &&
+                holidayHours == null &&
+                vacationHours == null &&
+                personalHours == null &&
+                sickEmpHours == null &&
+                sickFamHours == null &&
+                miscHours == null &&
+                miscType == null &&
+                empComment == null;
+    }
+
     /** --- Overrides --- */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TimeEntry)) return false;
-        TimeEntry timeEntry = (TimeEntry) o;
-        return Objects.equals(empId, timeEntry.empId) &&
-                Objects.equals(workHours, timeEntry.workHours) &&
-                Objects.equals(travelHours, timeEntry.travelHours) &&
-                Objects.equals(holidayHours, timeEntry.holidayHours) &&
-                Objects.equals(vacationHours, timeEntry.vacationHours) &&
-                Objects.equals(personalHours, timeEntry.personalHours) &&
-                Objects.equals(sickEmpHours, timeEntry.sickEmpHours) &&
-                Objects.equals(sickFamHours, timeEntry.sickFamHours) &&
-                Objects.equals(miscHours, timeEntry.miscHours) &&
-                Objects.equals(active, timeEntry.active) &&
-                Objects.equals(entryId, timeEntry.entryId) &&
-                Objects.equals(timeRecordId, timeEntry.timeRecordId) &&
-                Objects.equals(employeeName, timeEntry.employeeName) &&
-                Objects.equals(date, timeEntry.date) &&
-                Objects.equals(miscType, timeEntry.miscType) &&
-                Objects.equals(empComment, timeEntry.empComment) &&
-                Objects.equals(payType, timeEntry.payType) &&
-                Objects.equals(originalUserId, timeEntry.originalUserId) &&
-                Objects.equals(updateUserId, timeEntry.updateUserId) &&
-                Objects.equals(originalDate, timeEntry.originalDate) &&
-                Objects.equals(updateDate, timeEntry.updateDate);
+        TimeEntry entry = (TimeEntry) o;
+        return Objects.equal(active, entry.active) &&
+                Objects.equal(timeRecordId, entry.timeRecordId) &&
+                Objects.equal(date, entry.date) &&
+                Objects.equal(workHours, entry.workHours) &&
+                Objects.equal(travelHours, entry.travelHours) &&
+                Objects.equal(holidayHours, entry.holidayHours) &&
+                Objects.equal(vacationHours, entry.vacationHours) &&
+                Objects.equal(personalHours, entry.personalHours) &&
+                Objects.equal(sickEmpHours, entry.sickEmpHours) &&
+                Objects.equal(sickFamHours, entry.sickFamHours) &&
+                Objects.equal(miscHours, entry.miscHours) &&
+                Objects.equal(miscType, entry.miscType) &&
+                Objects.equal(empComment, entry.empComment) &&
+                Objects.equal(payType, entry.payType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entryId, timeRecordId, empId, employeeName, date, workHours, travelHours, holidayHours,
-                            vacationHours, personalHours, sickEmpHours, sickFamHours, miscHours, miscType, active,
-                            empComment, payType, originalUserId, updateUserId, originalDate, updateDate);
+        return Objects.hashCode(timeRecordId, date, workHours, travelHours, holidayHours, vacationHours, personalHours,
+                sickEmpHours, sickFamHours, miscHours, miscType, active, empComment, payType);
     }
 
     /** --- Basic Getters/Setters --- */

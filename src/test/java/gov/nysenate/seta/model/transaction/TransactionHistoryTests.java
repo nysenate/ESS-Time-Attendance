@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-import static gov.nysenate.seta.dao.transaction.EmpTransDaoOption.DEFAULT;
+import static gov.nysenate.seta.dao.transaction.EmpTransDaoOption.NONE;
 
 public class TransactionHistoryTests extends BaseTests
 {
@@ -22,8 +22,8 @@ public class TransactionHistoryTests extends BaseTests
 
     @Test
     public void testHasRecords() throws Exception {
-//        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10976, DEFAULT).getAllTransRecords(SortOrder.ASC)));
-        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(6221, DEFAULT).getEffectiveSupervisorIds(
+//        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(10976, NONE).getAllTransRecords(SortOrder.ASC)));
+        logger.info("{}", OutputUtils.toJson(transactionDao.getTransHistory(6221, NONE).getEffectiveSupervisorIds(
             Range.atMost(LocalDate.now()))));
     }
 
