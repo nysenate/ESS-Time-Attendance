@@ -12,6 +12,12 @@ public class ErrorResponse extends BaseResponse
         this.responseType = "error";
     }
 
+    public ErrorResponse(ErrorCode errorCode, String message) {
+        this.errorCode = errorCode;
+        this.message = errorCode.getMessage() + "\n" + message;
+        this.responseType = "error";
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }

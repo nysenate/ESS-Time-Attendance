@@ -9,7 +9,7 @@ package gov.nysenate.seta.dao.transaction;
  */
 public enum EmpTransDaoOption
 {
-    DEFAULT             (0),
+    NONE                (0),
     INITIALIZE          (1),
     SET_AS_APP          (2),
     INITIALIZE_AS_APP   (3);

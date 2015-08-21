@@ -41,7 +41,7 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
     public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange,
                                               EmpTransDaoOption options) {
         // Use default options if not specified
-        options = (options == null) ? EmpTransDaoOption.DEFAULT : options;
+        options = (options == null) ? EmpTransDaoOption.NONE : options;
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("empId", empId)

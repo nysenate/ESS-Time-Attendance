@@ -3,16 +3,12 @@ package gov.nysenate.seta.service.transaction;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
-import gov.nysenate.common.OutputUtils;
-import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.cache.CacheEvictIdEvent;
 import gov.nysenate.seta.model.cache.ContentCache;
-import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -59,7 +55,7 @@ public class CachedTransactionServiceTests extends BaseTests {
     public void testTransactions() throws Exception {
 //        logger.info("{}", OutputUtils.toJson(transDao.getTransHistory(11423, EmpTransDaoOption.DEFAULT)
 //                .getTransRecords(Sets.newHashSet(TransactionCode.ACC), SortOrder.ASC)));
-        TransactionHistory transHistory = transDao.getTransHistory(10976, EmpTransDaoOption.DEFAULT);
+        TransactionHistory transHistory = transDao.getTransHistory(183, EmpTransDaoOption.NONE);
         logger.info("{}", transHistory.getEffectiveAccrualStatus(Range.upTo(LocalDate.now(), BoundType.CLOSED)));
 
     }

@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableSet;
  */
 public enum ContentCache
 {
+    EMPLOYEE,
+    ACCRUAL_ANNUAL,
     HOLIDAY,
     PAY_PERIOD,
     TRANSACTION

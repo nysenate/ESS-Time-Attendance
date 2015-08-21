@@ -12,6 +12,8 @@ import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.service.base.CachingService;
+import gov.nysenate.seta.service.base.SqlDaoBackedService;
 import gov.nysenate.seta.service.period.PayPeriodService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
@@ -29,12 +31,9 @@ import java.util.stream.Collectors;
  * and employee transaction data in SFMS.
  */
 @Service
-public class EssAccrualComputeService implements AccrualComputeService
+public class EssAccrualComputeService extends SqlDaoBackedService implements AccrualComputeService
 {
     private static final Logger logger = LoggerFactory.getLogger(EssAccrualComputeService.class);
-
-    @Autowired private AccrualDao accrualDao;
-    @Autowired private TimeRecordDao timeRecordDao;
 
     @Autowired private PayPeriodService payPeriodService;
     @Autowired private EmpTransactionService empTransService;
@@ -86,7 +85,7 @@ public class EssAccrualComputeService implements AccrualComputeService
             if (fromDate.isBefore(lastPeriod.getEndDate())) {
                 Range<LocalDate> periodRange = Range.closed(fromDate, lastPeriod.getEndDate());
                 List<PayPeriod> unMatchedPeriods = payPeriodService.getPayPeriods(PayPeriodType.AF, periodRange, SortOrder.ASC);
-                TransactionHistory empTrans = empTransService.getTransHistory(empId, EmpTransDaoOption.INITIALIZE_AS_APP);
+                TransactionHistory empTrans = empTransService.getTransHistory(empId);
                 TreeMap<PayPeriod, PeriodAccUsage> periodUsages = accrualDao.getPeriodAccrualUsages(empId, periodRange);
                 List<TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(empId, periodRange);
 

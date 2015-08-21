@@ -7,9 +7,9 @@ import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
 import gov.nysenate.seta.client.view.EmpTransRecordView;
-import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
-import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.service.transaction.EmpTransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,30 +32,30 @@ public class EmpTransactionRestCtrl extends BaseRestCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(EmpTransactionRestCtrl.class);
 
-    @Autowired private EmpTransactionDao empTransactionDao;
+    @Autowired private EmpTransactionService transactionService;
 
     @RequestMapping("")
     public BaseResponse getTransactionsByEmpId(@RequestParam Integer empId,
                                                @RequestParam(required = false) String fromDate,
                                                @RequestParam(required = false) String toDate,
-                                               WebRequest request) {
+                                               @RequestParam(required = false) String codes) {
         LocalDate fromLocalDate = (fromDate != null) ? parseISODate(fromDate, "from-date") : DateUtils.LONG_AGO;
         LocalDate toLocalDate = (toDate != null) ? parseISODate(toDate, "to-date") : DateUtils.THE_FUTURE;
         Range<LocalDate> range = Range.closed(fromLocalDate, toLocalDate);
-        Set<TransactionCode> codeSet = getCodesFromParam(request);
+        Set<TransactionCode> codeSet = getTransCodesFromString(codes);
         return ListViewResponse.of(
-            empTransactionDao.getTransHistory(empId, codeSet, range, EmpTransDaoOption.DEFAULT)
-                .getAllTransRecords(SortOrder.ASC).stream()
-                    .map(EmpTransRecordView::new)
-                    .collect(toList()), "transactions");
+            transactionService.getTransHistory(empId)
+                .getTransRecords(range, codeSet, SortOrder.ASC).stream()
+                .map(EmpTransRecordView::new)
+                .collect(toList()), "transactions");
     }
 
-    private Set<TransactionCode> getCodesFromParam(WebRequest request) {
-        if (request.getParameter("codes") != null) {
+    private Set<TransactionCode> getTransCodesFromString(String codes) {
+        if (StringUtils.isNotBlank(codes)) {
             List<String> codeStrList = Splitter.on(",")
                 .omitEmptyStrings()
                 .trimResults()
-                .splitToList(request.getParameter("codes"));
+                .splitToList(codes);
 
             Set<TransactionCode> codeSet = new HashSet<>();
             for (String code : codeStrList) {
