@@ -66,7 +66,7 @@ public class SupervisorEmpGroup
      * Get overridden employees granted by the given supervisor id
      */
     public Map<Integer, EmployeeSupInfo> getSupOverrideEmployees(int supId) {
-        return supOverrideEmployees.columnMap().get(supId);
+        return supOverrideEmployees.rowMap().get(supId);
     }
 
     /** --- Basic Getters/Setters --- */

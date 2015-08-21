@@ -71,7 +71,6 @@ essApp.directive('recordDetailModal', ['modals', function (modals) {
             var params = modals.params();
             $scope.record = params.record;
             $scope.employee = params.employee;
-            console.log('i r modal', $scope.record);
         }
     }
 }]);

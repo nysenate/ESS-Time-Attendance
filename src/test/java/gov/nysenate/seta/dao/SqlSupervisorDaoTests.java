@@ -47,5 +47,10 @@ public class SqlSupervisorDaoTests extends BaseTests
         logger.info("{}", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
     }
 
+    @Test
+    public void supOverrideTest() throws Exception {
+        supervisorDao.setSupervisorOverride(11423, 7048, Range.closed(LocalDate.of(2015, 7, 16), LocalDate.of(2015, 7, 29)));
+    }
+
 
 }

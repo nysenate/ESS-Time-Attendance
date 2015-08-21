@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
@@ -53,5 +54,13 @@ public class SpringLdapTest extends BaseTests
             logger.debug("Postal Address: " + person.getPostalAddress());
         }
 
+    }
+
+    @Test
+    public void getByEmpIdTest() {
+        int empId = 11344;
+        List<SenateLdapPerson> peoples = ldapTemplate.search(query().where("employeeid").is(Integer.toString(empId)),
+                (AttributesMapper<SenateLdapPerson>) SenateLdapPerson::new);
+        logger.info("{}", peoples.get(0));
     }
 }

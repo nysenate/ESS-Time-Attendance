@@ -47,6 +47,16 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
         return TIME_TMPL_BASE_URL + "/record/details";
     }
 
+    @RequestMapping(value = "/record/supervisor-record-list")
+    public String recordList() {
+        return TIME_TMPL_BASE_URL + "/record/supervisor-record-list";
+    }
+
+    @RequestMapping(value = "/record/record-review-modal")
+    public String recordReviewModal() {
+        return TIME_TMPL_BASE_URL + "/record/record-review-modal";
+    }
+
     /** --- Accruals --- */
 
     @RequestMapping(value="/accrual/history")

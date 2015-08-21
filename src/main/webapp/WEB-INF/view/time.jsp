@@ -15,6 +15,9 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-utils.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-entry-ctrl.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-history-ctrl.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-manage-ctrl.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/supervisor-record-list.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-review-modal.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-emp-history-ctrl.js"></script>
 
         <!-- Time Off Requests -->

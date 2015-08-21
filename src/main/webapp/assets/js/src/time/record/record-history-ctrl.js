@@ -8,7 +8,7 @@ function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
     };
 
     $scope.activeYears = appProps.empActiveYears;
-    $scope.year = $scope.activeYears[$scope.activeYears.length - 1];
+    $scope.year = $scope.activeYears[$scope.activeYears.length - 1] || 0;
 
     $scope.init = function() {
         $scope.getRecords();

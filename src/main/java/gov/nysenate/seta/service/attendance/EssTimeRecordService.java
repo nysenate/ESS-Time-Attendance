@@ -66,11 +66,11 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                 getTimeRecordsForSupInfos(empGroup.getPrimaryEmployees().values(), dateRange, statuses));
 
         // Get and addUsage override employee time records
-        empGroup.getOverrideSupIds().forEach(overrideSupId ->
-                records.putAll(overrideSupId,
-                        getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
-                                                  dateRange, statuses))
-        );
+        empGroup.getOverrideSupIds().forEach(overrideSupId -> {
+                    records.putAll(overrideSupId,
+                            getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
+                                    dateRange, statuses));
+                });
 
         return records;
     }
