@@ -1,8 +1,10 @@
 package gov.nysenate.seta.service.attendance;
 
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
+import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,8 +30,9 @@ public class EssTimeRecordServiceTests extends BaseTests
     @Test
     public void testGetSupervisorRecordsTest() throws Exception {
         LocalDate now = LocalDate.now();
-        logger.info("{}", OutputUtils.toJson(timeRecordService.getSupervisorRecords(9896,
-                Range.closed(LocalDate.of(now.getYear(), 1, 1), now))));
+        ListMultimap<Integer, TimeRecord> supRecords =
+                timeRecordService.getSupervisorRecords(7048, Range.closed(LocalDate.of(now.getYear(), 1, 1), now));
+        supRecords.keySet().forEach(supId -> logger.info("supId {}: {} records", supId, supRecords.get(supId).size()));
     }
 
     @Test

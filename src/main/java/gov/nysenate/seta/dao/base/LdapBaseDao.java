@@ -53,6 +53,12 @@ public abstract class LdapBaseDao
         return persons.get(0);
     }
 
+    public SenateLdapPerson getPersonByEmpId(int empId) throws NamingException {
+        List<SenateLdapPerson> peoples = ldapTemplate.search(query().where("employeeid").is(Integer.toString(empId)),
+                (AttributesMapper<SenateLdapPerson>) SenateLdapPerson::new);
+        return peoples.get(0);
+    }
+
     /**
      * The search method on the LdapTemplate typically returns lists of Objects. In the case when a List of
      * Name objects need to be mapped to a single Name, this method will either return the Name if the list size
