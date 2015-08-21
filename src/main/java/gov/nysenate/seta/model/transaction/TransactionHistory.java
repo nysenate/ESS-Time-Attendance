@@ -139,13 +139,13 @@ public class TransactionHistory
     /**
      * See overloaded method.
      *
-     * @see #getTransRecords(java.util.Set, SortOrder)
+     * @see #getTransRecords(Range, Set, SortOrder)
      * @param code TransactionCode
      * @param dateSort SortOrder
      * @return LinkedList<TransactionRecord>
      */
     public LinkedList<TransactionRecord> getTransRecords(TransactionCode code, SortOrder dateSort) {
-        return getTransRecords(Sets.newHashSet(code), dateSort);
+        return getTransRecords(Range.all(), Sets.newHashSet(code), dateSort);
     }
 
     /**
@@ -156,11 +156,12 @@ public class TransactionHistory
      * @param dateSort SortOrder - Sort order based on the effective date
      * @return LinkedList<TransactionRecord>
      */
-    public LinkedList<TransactionRecord> getTransRecords(Set<TransactionCode> transCodes, SortOrder dateSort) {
+    public LinkedList<TransactionRecord> getTransRecords(Range<LocalDate> effectDateRange,
+                                                         Set<TransactionCode> transCodes, SortOrder dateSort) {
         LinkedList<TransactionRecord> sortedRecList = new LinkedList<>();
-        recordsByCode.keySet().stream()
-            .filter(transCodes::contains)
-            .forEach(code -> sortedRecList.addAll(recordsByCode.get(code)));
+        getRecordsByCode().values().stream()
+            .filter(r -> transCodes.contains(r.getTransCode()) && effectDateRange.contains(r.getEffectDate()))
+            .forEach(sortedRecList::add);
         sortedRecList.sort((dateSort.equals(SortOrder.ASC)) ? new TransDateAscending() : new TransDateDescending());
         return sortedRecList;
     }
@@ -168,12 +169,12 @@ public class TransactionHistory
     /**
      * Shorthand method to retrieve every available transaction record.
      *
-     * @see #getTransRecords(java.util.Set, SortOrder)
+     * @see #getTransRecords(Range, Set, SortOrder)
      * @param dateOrder SortOrder - Sort order based on the effective date
      * @return LinkedList<TransactionRecord>
      */
     public LinkedList<TransactionRecord> getAllTransRecords(SortOrder dateOrder) {
-        return getTransRecords(recordsByCode.keySet(), dateOrder);
+        return getTransRecords(Range.all(), recordsByCode.keySet(), dateOrder);
     }
 
     /**
