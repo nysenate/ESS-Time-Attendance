@@ -21,6 +21,10 @@ essApp.config(function($routeProvider, $locationProvider) {
     });
 
     /** Time and Attendance */
+    $routeProvider.when(ctxPath + '/time', {
+       redirectTo: ctxPath + '/time/record/entry'
+    });
+
     $routeProvider.when(ctxPath + '/time/record/entry', {
         templateUrl: ctxPath + '/template/time/record/entry',
         reloadOnSearch: false

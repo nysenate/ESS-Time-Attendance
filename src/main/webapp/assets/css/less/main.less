@@ -357,7 +357,7 @@ table.simple-table {
       vertical-align: top;
       position: absolute;
       right: 0;
-      #user-name-section {
+      .header-label-segment {
         float:left;
         font-size: 1.1em;
         font-weight: bold;
@@ -380,14 +380,6 @@ table.simple-table {
           display: block;
           text-decoration: none !important;
           color: #333;
-          .logout-icon {
-            .transform-origin(0 0);
-            .transition(.3s);
-            margin-right: 5px;
-            float: left;
-            .icon-image('20px-ffffff', 'logout.png');
-            .image-size(20px);
-          }
         }
       }
     }
@@ -559,7 +551,9 @@ table#timeRecordTable {
   tbody {
     tr {
       height: 32px;
-
+      &:hover {
+        background: #f3f6ff;
+      }
       &.time-record-row {
         td {
           &:nth-child(1) {
@@ -568,7 +562,6 @@ table#timeRecordTable {
           }
         }
       }
-
       &.time-totals-row {
         border-top: 2px solid teal;
         td {
@@ -618,6 +611,10 @@ table#timeRecordTable {
       &.active {
         background: #e7e9f6;
       }
+      &:hover {
+        background: #E4EBFF;
+      }
+      cursor: pointer;
     }
     th {
       border-bottom: 1px solid #ccc;

@@ -3,10 +3,12 @@
 <div ng-controller="RecordHistoryCtrl">
   <div class="content-container content-controls">
     <p class="content-info" style="margin-bottom:0;">
-      View attendance records for year
+      View attendance records for year&nbsp;
       <select ng-model="year" ng-options="yearOpt for yearOpt in activeYears" ng-change="getRecords()"></select>
     </p>
   </div>
+
+  <div loader-indicator ng-show="state.searching === true"></div>
 
   <div class="content-container" ng-show="records.employee.length > 0">
     <h1>Active Attendance Records</h1>

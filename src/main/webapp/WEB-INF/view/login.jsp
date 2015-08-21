@@ -14,6 +14,10 @@
 
 <ess-layout:body>
     <jsp:body>
+        <c:if test="${runtimeLevel != 'prod'}">
+            <div ess-notification level="info" title="Running in ${runtimeLevel} mode"
+                 message="Actions performed here will not affect the production database."></div>
+        </c:if>
         <section id="loginContainer" class="login-container">
             <p style="display:none" class="login-message">You have been logged out.</p>
             <div id="loginHeader">

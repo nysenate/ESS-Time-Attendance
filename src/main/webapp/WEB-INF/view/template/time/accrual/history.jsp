@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<section ng-controller="AccrualHistoryCtrl" >
+<section ng-controller="AccrualHistoryCtrl" ng-init="showDialog = false">
     <div class="content-container content-controls">
         <p class="content-info">Display accrual information for year &nbsp;
             <select ng-model="state.selectedYear" ng-change="getAccSummaries(state.selectedYear)"
@@ -11,12 +11,12 @@
 
     <div loader-indicator ng-show="state.searching === true"></div>
 
-    <div class="content-container" ng-show="state.accSummaries">
+    <div class="content-container" ng-show="state.searching === false && state.accSummaries[state.selectedYear]">
         <h1 class="teal">Running Accrual Summary</h1>
         <p class="content-info">The hours accrued, used, and remaining are listed in the table below.<br/>
             The accrued, used, and available hours in each column are a running total from the start of the year.</p>
         <div class="padding-10">
-            <table class="detail-acc-history-table" float-thead="floatTheadOpts" ng-model="state.accSummaries">
+            <table class="detail-acc-history-table" float-thead="floatTheadOpts" ng-model="state.accSummaries[state.selectedYear]">
                 <thead>
                 <tr>
                     <th colspan="2">Pay Period</th>
@@ -46,7 +46,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="record in state.accSummaries" ng-class="{'highlighted': record.payPeriod.current}">
+                <tr ng-repeat="record in state.accSummaries[state.selectedYear]" ng-class="{'highlighted': record.payPeriod.current}">
                     <td>{{record.payPeriod.payPeriodNum}}</td>
                     <td>{{record.payPeriod.endDate | moment:'MM/DD/YYYY'}}</td>
                     <td>{{record.personalAccruedYtd}}</td>

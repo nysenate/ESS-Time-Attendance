@@ -3,6 +3,10 @@ var essTime = angular.module('essTime');
 essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi', 'modals', 'RecordUtils',
 function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
 
+    $scope.state = {
+        searching: false
+    };
+
     $scope.activeYears = appProps.empActiveYears;
     $scope.year = $scope.activeYears[$scope.activeYears.length - 1];
 
@@ -19,6 +23,7 @@ function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
 
     // Get all records for the current user for the selected year
     $scope.getRecords = function() {
+        $scope.state.searching = true;
         $scope.records = {employee: [], other: []};
         $scope.annualTotals = {};
         var empId = appProps.user.employeeId;
@@ -33,7 +38,9 @@ function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
         console.log('getting new records', params);
         timeRecordsApi.get(params, function(response) {
             initializeRecords(response.result.items[empId]);
+            $scope.state.searching = false;
         }, function(response) {
+            $scope.state.searching = false;
             // todo error handling
         })
     };

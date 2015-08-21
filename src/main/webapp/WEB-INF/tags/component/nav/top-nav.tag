@@ -25,9 +25,12 @@
             </ul>
         </div>
         <div class="right-header-area">
-            <div id="user-name-section">
-                Hi, ${principal.getFullName()}
-            </div>
+            <c:if test="${runtimeLevel != 'prod'}">
+                <div class="header-label-segment dark-red">
+                    <span class="dark-red">Running in ${runtimeLevel} mode.</span>
+                </div>
+            </c:if>
+            <div class="header-label-segment">Hi, ${principal.getFullName()}</div>
             <div id="logoutSection">
                 <a target="_self" href="${ctxPath}/logout">Sign Out</a>
             </div>

@@ -9,10 +9,27 @@
     </p>
   </div>
 
+  <div class="content-container content-controls">
+      <p class="content-info">Filter By Transaction Type &nbsp;
+          <select ng-model="state.filterCodes" ng-change="getTransRecords(state.selectedYear)">
+              <option value="">Show All</option>
+              <option value="APP,RTP">Initial</option>
+              <option value="CHK,LEG">Address</option>
+              <option value="MAR">Marital Status</option>
+              <option value="MIN">Minimum Total Hours</option>
+              <option value="TYP">Payroll Type</option>
+              <option value="PHO">Phone Number</option>
+              <option value="SAL">Salary Change</option>
+              <option value="SUP">Supervisor Change</option>
+          </select>
+      </p>
+  </div>
+
   <div class="padding-10">
-      <ess-notification ng-show="state.transactions[state.selectedYear] === false" level="info" message="No transactions found for this year."></ess-notification>
+      <ess-notification ng-show="state.transactions[state.selectedYear] === false" level="info"
+                        message="No transactions found with the given filters."></ess-notification>
       <div ng-repeat="(date,txArr) in state.transactions[state.selectedYear]">
-        <h2>{{date | moment:'ll'}}</h2>
+        <h2>Effective {{date | moment:'ll'}}</h2>
         <hr/>
         <div class="tx-container" ng-repeat="tx in txArr">
             <h3 class="tx-heading">{{tx.transDesc}}</h3>

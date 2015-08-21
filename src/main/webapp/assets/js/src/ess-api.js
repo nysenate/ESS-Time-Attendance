@@ -30,6 +30,12 @@ essApi.factory('SupervisorTimeRecordsApi', ['$resource', 'appProps', function ($
     return $resource(appProps.apiPath + '/timerecords/supervisor');
 }]);
 
+/** --- Supervisor API --- */
+
+essApi.factory('SupervisorEmployeesApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/supervisor/employees');
+}]);
+
 /** --- Accrual API --- */
 
 essApi.factory('AccrualPeriodApi', ['$resource', 'appProps', function($resource, appProps) {
