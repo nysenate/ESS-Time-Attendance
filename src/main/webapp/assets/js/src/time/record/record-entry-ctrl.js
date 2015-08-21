@@ -88,7 +88,7 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                 $scope.getRecords();
                 console.log('submitted');
             } else {
-                record.updateDate = moment().toISOString();
+                record.updateDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
                 record.savedDate = record.updateDate;
                 record.dirty = false;
                 console.log('saved');
