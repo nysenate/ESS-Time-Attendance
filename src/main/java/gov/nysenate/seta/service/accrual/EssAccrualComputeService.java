@@ -2,6 +2,7 @@ package gov.nysenate.seta.service.accrual;
 
 import com.google.common.collect.Range;
 import gov.nysenate.common.LimitOffset;
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.accrual.AccrualDao;
 import gov.nysenate.seta.dao.attendance.TimeRecordDao;
@@ -83,11 +84,12 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
                 annualAcc.lastEntry().getValue().getEndDate(), annualAcc.lastEntry().getValue().getContServiceDate());
 
             if (fromDate.isBefore(lastPeriod.getEndDate())) {
-                Range<LocalDate> periodRange = Range.closed(fromDate, lastPeriod.getEndDate());
+                Range<LocalDate> periodRange = Range.openClosed(fromDate, lastPeriod.getEndDate());
                 List<PayPeriod> unMatchedPeriods = payPeriodService.getPayPeriods(PayPeriodType.AF, periodRange, SortOrder.ASC);
                 TransactionHistory empTrans = empTransService.getTransHistory(empId);
                 TreeMap<PayPeriod, PeriodAccUsage> periodUsages = accrualDao.getPeriodAccrualUsages(empId, periodRange);
                 List<TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(empId, periodRange);
+//                logger.info("{}", OutputUtils.toJson(timeRecords.get(timeRecords.size() -1)));
 
                 Map.Entry<PayPeriod, PeriodAccSummary> periodAccRecord = periodAccruals.lowerEntry(lastPeriod);
                 Optional<PeriodAccSummary> optPeriodAccRecord =
@@ -172,9 +174,11 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
                     accrualState.addUsage(periodUsages.get(gapPeriod));
                 }
                 // Otherwise check if there is a time record to apply accrual usage from.
-                else if (!timeRecords.isEmpty() && timeRecords.get(0).getPayPeriod().equals(gapPeriod)) {
-                    accrualState.addUsage(timeRecords.get(0).getPeriodAccUsage());
-                    timeRecords.remove(0);
+                else {
+                    while (!timeRecords.isEmpty() && gapPeriod.getDateRange().contains(timeRecords.get(0).getEndDate())) {
+                        accrualState.addUsage(timeRecords.get(0).getPeriodAccUsage());
+                        timeRecords.remove(0);
+                    }
                 }
                 // As long as this is a valid accrual period, increment the accruals.
                 if (!gapPeriod.isEndOfYearSplit()) {
