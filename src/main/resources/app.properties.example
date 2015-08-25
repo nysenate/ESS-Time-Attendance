@@ -65,4 +65,4 @@ resource.location = /assets/
 # Url Details
 
 login.url = /login
-login.success.url = /record/entry
+login.success.url = /time/record/entry

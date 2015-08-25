@@ -50,7 +50,7 @@ function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
     // Open a new modal window showing a detailed view of the given record
     $scope.showDetails = function(record) {
         var params = { record: record };
-        modals.open('details', params);
+        modals.open('record-details', params);
     };
 
     /** --- Internal Methods --- */

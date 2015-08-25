@@ -2,7 +2,8 @@ var essApp = angular.module('ess');
 
 essApp.service('modals', ['$rootScope', '$q', function($rootScope, $q) {
 
-    // State of the active modal instance
+    // State of the active modal instances
+    var modals = [];
     var modal = {
         deferred: null,
         params: null
@@ -12,50 +13,60 @@ essApp.service('modals', ['$rootScope', '$q', function($rootScope, $q) {
         open: open,
         params: params,
         reject: reject,
+        rejectAll: rejectAll,
         resolve: resolve
     };
 
     /** --- Public Methods --- */
 
     function open(type, params, pipeResponse) {
-        var prevDeferred = modal.deferred;
+        var modal = {
+            deferred: $q.defer(),
+            params: params
+        };
 
-        modal.deferred = $q.defer();
-        modal.params = params;
-
-        if (prevDeferred && pipeResponse) {
-            modal.deferred.promise
-                .then(prevDeferred.resolve, prevDeferred.reject)
-        } else if (prevDeferred) {
-            prevDeferred.reject();
+        if (modals.length > 0 && pipeResponse) {
+            var prevDeferred = modals[modals.length - 1].deferred;
+            modal.deferred.promise.then(resolve, reject);
         }
 
         $rootScope.$emit("modals.open", type);
+        modals.push(modal);
         return modal.deferred.promise;
     }
 
     function params() {
-        return modal.params || {};
+        var modal = modals[modals.length - 1];
+        if (modal) {
+            return modal.params || {};
+        }
+        return {};
     }
 
     function reject(reason) {
-        if (!modal.deferred) {
+        var modal = modals.pop();
+        if (!modal) {
             return;
         }
 
         modal.deferred.reject(reason);
-        modal.deferred = modal.params = null;
-        console.log('rejecting modal', reason);
+        console.log('rejecting modal',modal, reason);
         $rootScope.$emit("modals.close");
     }
 
+    function rejectAll(reason) {
+        while(modals.length > 0) {
+            reject(reason);
+        }
+    }
+
     function resolve(response) {
-        if (!modal.deferred) {
+        var modal = modals.pop();
+        if (!modal) {
             return;
         }
 
         modal.deferred.resolve(response);
-        modal.deferred = modal.params = null;
         $rootScope.$emit("modals.close");
     }
 
