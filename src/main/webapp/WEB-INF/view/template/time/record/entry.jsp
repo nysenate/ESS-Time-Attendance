@@ -176,10 +176,6 @@ Toggle this for temporary emps.
           <textarea id="remarksTextArea" ng-model="records[iSelectedRecord].remarks"></textarea>
         </div>
         <div class="float-right">
-          <label ng-show="records[iSelectedRecord].savedDate"
-                 style="position: relative;top: 20px;right: 20px;font-size: 1.1em;">
-            Last Saved {{records[iSelectedRecord].savedDate | moment:'lll'}}
-          </label>
           <input ng-click="saveRecord(false)" class="submit-button" type="button" value="Save Record"
                  ng-disabled="!records[iSelectedRecord].dirty"/>
           <input ng-click="saveRecord(true)" class="submit-button" type="button" value="Submit Record"
@@ -188,5 +184,22 @@ Toggle this for temporary emps.
         <div class="clearfix"></div>
       </div>
     </form>
-  </div>
+    <div modal-container ng-show="subview" ng-switch="subview">
+        <div ng-switch-when="save-indicator" class="save-progress-modal">
+          <div ng-show="state.saving">
+            <h3 class="content-info" style="margin-bottom:0;">
+              Saving time record...
+            </h3>
+            <loader-indicator></loader-indicator>
+          </div>
+          <div ng-show="!state.saving">
+            <h3 class="content-info" style="margin-bottom:0;">Your time record has been saved.</h3>
+            <h4>What would you like to do next?</h4>
+            <input ng-click="logout()" class="reject-button" type="button" value="Log out of ESS"/>
+            <input ng-click="closeSaveModal()" class="submit-button" type="button" value="Go back to ESS"/>
+          </div>
+        </div>
+    </div>
+
+    </div>
 </div>

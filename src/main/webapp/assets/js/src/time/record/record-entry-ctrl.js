@@ -1,15 +1,15 @@
 var essApp = angular.module('ess')
         .controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi',
                                             'TimeRecordsApi', 'AccrualPeriodApi', 'RecordUtils', 'LocationService',
-                                            recordEntryCtrl]);
-
+                                             'modals', recordEntryCtrl]);
 
 function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
-                         recordsApi, accrualPeriodApi, recordUtils, locationService) {
+                         recordsApi, accrualPeriodApi, recordUtils, locationService, modals) {
 
     $scope.state = {
         accrual: null,
-        searching: false
+        searching: false,
+        saving: false
     };
 
     $scope.miscLeaves = appProps.miscLeaves;
@@ -77,12 +77,15 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
 
     // Saves the currently selected record.  If the submit parameter is true, modifies the record status
     $scope.saveRecord = function(submit) {
+        $scope.state.saving = true;
         var record = $scope.records[$scope.iSelectedRecord];
         if (submit) {
             // todo ensure totals hours are in line
             record.recordStatus = nextStatusMap[record.recordStatus];
         }
         console.log(submit ? 'submitting' : 'saving', 'record', record);
+        // Open the modal to indicate save
+        modals.open('save-indicator', {'record': record});
         recordsApi.save(record, function (response) {
             if (submit) {
                 $scope.getRecords();
@@ -92,10 +95,20 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                 record.savedDate = record.updateDate;
                 record.dirty = false;
                 console.log('saved');
+                $scope.state.saving = false;
             }
         }, function (response) {
             // todo handle invalid record response
         });
+    };
+
+    /** TODO: This needs to be moved to a common module. */
+    $scope.logout = function() {
+        locationService.go('/logout', true);
+    };
+
+    $scope.closeSaveModal = function() {
+        modals.resolve();
     };
 
     /** --- Display Methods --- */

@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<p class="content-info" style="margin-bottom:0;">
+<h3 class="content-info" style="margin-bottom:0;">
   The time entries
   <span ng-if="$scope.employee">for {{$scope.employee}}</span>
   from {{record.beginDate | moment:'l'}} to {{record.endDate | moment:'l'}}
-</p>
+</h3>
 <table class="attendance-entry-sub-table ess-table">
   <thead>
   <tr>

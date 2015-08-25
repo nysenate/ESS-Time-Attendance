@@ -67,6 +67,12 @@ essApp.config(function($routeProvider, $locationProvider) {
         controller: 'TestCtrl'
     });
 
+    /** Logout */
+    //$routeProvider.when(ctxPath + '/logout', {
+    //    redirectTo: ctxPath + '/logout',
+    //    reloadOnSearch: true
+    //});
+
     $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix('!');
 });

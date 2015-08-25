@@ -1,15 +1,16 @@
 angular.module('ess')
-    .service('LocationService', ['$location', locationService]);
+    .service('LocationService', ['$location', '$window', 'appProps', locationService]);
 
 /**
  * A collection of utility functions that utilize $location
  */
-function locationService($location) {
+function locationService($location, $window, appProps) {
 
     return {
         setSearchParam: setSearchParam,
         getSearchParam: getSearchParam,
-        clearSearchParams: clearSearchParams
+        clearSearchParams: clearSearchParams,
+        go: go
     };
 
     /**
@@ -38,6 +39,14 @@ function locationService($location) {
      */
     function clearSearchParams() {
         $location.search({});
+    }
+
+    /**
+     * Goes to the specified path.
+     */
+    function go(path, reload) {
+        $location.path(appProps.ctxPath + path);
+        if (reload === true) $window.location.reload();
     }
 
 }

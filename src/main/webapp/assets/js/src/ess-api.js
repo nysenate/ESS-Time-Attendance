@@ -26,6 +26,11 @@ essApi.factory('ActiveTimeRecordsApi', ['$resource', 'appProps', function ($reso
     return $resource(appProps.apiPath + '/timerecords/active');
 }]);
 
+essApi.factory('ActiveYearsTimeRecordsApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/timerecords/active_years');
+}]);
+
+
 essApi.factory('SupervisorTimeRecordsApi', ['$resource', 'appProps', function ($resource, appProps) {
     return $resource(appProps.apiPath + '/timerecords/supervisor');
 }]);
