@@ -10,8 +10,15 @@ function ($rootScope, modals) {
     return link;
 
     function link($scope, $element) {
-        // Determines which modal is being rendered
-        $scope.subview = null;
+        // A stack of modal names in order of opening
+        $scope.openModals = [];
+
+        // The name of the modal most recently opened
+        $scope.top = null;
+
+        $scope.isOpen = function(viewName) {
+            return $scope.openModals.indexOf(viewName) >= 0;
+        };
 
         // Reject modal when the user clicks the backdrop
         $element.on('click', function (event) {
@@ -24,12 +31,18 @@ function ($rootScope, modals) {
         // Set subview upon modal open event
         $rootScope.$on('modals.open', function (event, modalType) {
             console.log('showing modal of type', modalType);
-            $scope.subview = modalType;
+            $scope.openModals.push(modalType);
+            updateTop();
         });
 
         // Remove subview upon modal close event
         $rootScope.$on('modals.close', function(event) {
-            $scope.subview = null;
+            $scope.openModals.pop();
+            updateTop();
         });
+
+        function updateTop() {
+            $scope.top = $scope.openModals[$scope.openModals.length - 1];
+        }
     }
 }]);

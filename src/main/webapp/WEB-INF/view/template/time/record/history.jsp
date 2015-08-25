@@ -112,8 +112,8 @@
       </table>
     </div>
 
-    <div modal-container ng-show="subview" ng-switch="subview">
-      <div record-detail-modal ng-switch-when="details"></div>
+    <div modal-container ng-show="top" ng-switch="top">
+      <div record-detail-modal ng-switch-when="record-details"></div>
     </div>
 
     <%--<script>--%>
