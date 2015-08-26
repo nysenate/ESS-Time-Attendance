@@ -1,15 +1,16 @@
 angular.module('ess')
-    .service('LocationService', ['$location', '$window', 'appProps', locationService]);
+    .service('LocationService', ['$location', '$window', '$anchorScroll', 'appProps', locationService]);
 
 /**
  * A collection of utility functions that utilize $location
  */
-function locationService($location, $window, appProps) {
+function locationService($location, $window, $anchorScroll, appProps) {
 
     return {
         setSearchParam: setSearchParam,
         getSearchParam: getSearchParam,
         clearSearchParams: clearSearchParams,
+        scrollToId: scrollToId,
         go: go
     };
 
@@ -39,6 +40,14 @@ function locationService($location, $window, appProps) {
      */
     function clearSearchParams() {
         $location.search({});
+    }
+
+    /**
+     * Scrolls to the element with the given id
+     */
+    function scrollToId(id) {
+        $location.hash(id);
+        $anchorScroll();
     }
 
     /**

@@ -95,8 +95,8 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                 record.savedDate = record.updateDate;
                 record.dirty = false;
                 console.log('saved');
-                $scope.state.saving = false;
             }
+            $scope.state.saving = false;
         }, function (response) {
             // todo handle invalid record response
         });

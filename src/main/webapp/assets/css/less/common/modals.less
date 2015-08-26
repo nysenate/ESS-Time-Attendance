@@ -1,23 +1,32 @@
 @import './positioning';
 
-modal-container, [modal-container] {
-  background: rgba(0,0,0,.6);
+#modal-container {
   position: fixed;
   width: 100vw;
   height: 100vh;
-  z-index: 1003;
   top: 0;
   left: 0;
-  .vertical-align-parent;
-
-  & > * {
-    display: block;
-    background: #fefefe;
-    margin: auto;
-    .vertical-align;
-  }
-}
-
-.background-modal {
   z-index: 1002;
+  .align-parent;
+
+  & > ng-transclude > * {
+    background: #fafafa;
+    display: block;
+    margin: auto;
+    position: fixed;
+    .center-align;
+    z-index: 1004;
+  }
+
+  & #modal-backdrop {
+    position: fixed;
+    background: rgba(0,0,0,.6);
+    width: 100vw;
+    height: 100vh;
+    z-index: 1003;
+  }
+
+  & .background-modal {
+    z-index: 1002;
+  }
 }

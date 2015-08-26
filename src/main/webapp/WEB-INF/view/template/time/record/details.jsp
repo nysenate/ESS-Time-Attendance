@@ -51,7 +51,7 @@
   </tbody>
 </table>
 <div class="record-remarks">
-  <label>Remarks: </label>
   <label ng-show="!record.remarks">No Remarks.  Any remarks made will be displayed here.</label>
+  <label ng-show="record.remarks">Remarks: </label>
   <span ng-bind="record.remarks"></span>
 </div>

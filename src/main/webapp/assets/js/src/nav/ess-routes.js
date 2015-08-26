@@ -40,7 +40,8 @@ essApp.config(function($routeProvider, $locationProvider) {
 
     $routeProvider.when(ctxPath + '/time/record/manage', {
         templateUrl: ctxPath + '/template/time/record/manage',
-        controller: 'TestCtrl'
+        controller: 'TestCtrl',
+        reloadOnSearch: false
     });
 
     $routeProvider.when(ctxPath + '/time/record/grant', {

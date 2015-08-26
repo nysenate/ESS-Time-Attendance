@@ -41,7 +41,7 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
         console.log('getting employee records...');
         supRecordsApi.get({supId: empId}, function onSuccess(response) {
             var missingEmpIds = initializeRecords(response.result.items);
-            $scope.selectedIndices.clear();
+            $scope.selectNone();
             console.log('got records', $scope.supRecords);
             getEmployees(missingEmpIds);
         }, function onFail(response) {
@@ -57,8 +57,8 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
      * @param empIds - [] of employee ids
      */
     function getEmployees (empIds) {
-        console.log('getting employees..');
         if (empIds.length > 0) {
+            console.log('getting employees..');
             empInfoApi.get({empId: empIds}, function onSuccess(response) {
                 for (var iEmp in response.employees) {
                     var employee = response.employees[iEmp];
@@ -71,6 +71,8 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
                 console.log('get employees failed:', response);
                 // Todo handle failed response
             });
+        } else {
+            $scope.loading = false;
         }
     }
 
@@ -81,10 +83,12 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
     function submitRecords (records) {
         var promises = [];
         records.forEach(function(record) {
-            promises.push(timeRecordsApi.save(record).$promise);
+            promises.push(timeRecordsApi.save(record,
+                function(response){console.log('success:', record.timeRecordId, response)},
+                function(response){console.log('fail:', record.timeRecordId, response)}).$promise);
         });
         $scope.loading = true;
-        $q.all(promises)
+        return $q.all(promises)
             .then(function onFulfilled() {
                 console.log(records.length, 'records submitted');
                 getEmployeeRecords();
@@ -107,6 +111,14 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
     };
 
     /**
+     * Returns true if there are multiple supervisors to approve records for,
+     *  i.e. the current supervisor has been granted an override
+     */
+    $scope.multipleSups = function() {
+        return Object.keys($scope.supRecords).length > 2;
+    };
+
+    /**
      * Causes all SUBMITTED records to be selected for review
      */
     $scope.selectAll = function() {
@@ -122,6 +134,15 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
     };
 
     /**
+     * Open a record detail modal using the given record as data
+     * @param record
+     */
+    $scope.showDetails = function(record) {
+        var params = { record: record };
+        modals.open('record-details', params);
+    };
+
+    /**
      * Opens a record review modal in which the supervisor will view record details and approve/reject records accordingly
      * Passes all selected records
      * Upon resolution, the modal will return an object containing
@@ -132,10 +153,23 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
             selectedRecords.push($scope.supRecords[$scope.selSupId].SUBMITTED[index]);
         });
         var params = {
-            selectedRecords: selectedRecords
+            records: selectedRecords,
+            empInfos: $scope.empInfos
         };
-        modals.open('review', params)
-            .then(submitReviewedRecords);
+        modals.open('record-review', params)
+            .then(submitReviewedRecords)
+            .then($scope.selectNone);
+    };
+
+    /**
+     * Submits all displayed records that are awaiting supervisor approval as 'APPROVED'
+     */
+    $scope.approveAll = function () {
+        var displayedRecords = $scope.supRecords[$scope.selSupId].SUBMITTED;
+        displayedRecords.forEach(function (record) {
+            record.recordStatus = 'APPROVED';
+        });
+        submitRecords(displayedRecords);
     };
 
     /** --- Internal Methods --- */
@@ -187,12 +221,13 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
     function submitReviewedRecords(reviewedRecords) {
         console.log('review modal resolved:', reviewedRecords);
         var recordsToSubmit = [];
-        reviewedRecords.approved.forEach(function(record) {
+        angular.forEach(reviewedRecords.approved, function(record) {
             record.recordStatus = 'APPROVED';
             recordsToSubmit.push(record);
         });
-        reviewedRecords.disapproved.forEach(function(record) {
+        angular.forEach(reviewedRecords.disapproved, function(record) {
             record.recordStatus = 'DISAPPROVED';
+            record.remarks = record.rejectionRemarks;
             recordsToSubmit.push(record);
         });
         if (recordsToSubmit.length > 0) {

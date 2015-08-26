@@ -112,25 +112,8 @@
       </table>
     </div>
 
-    <div modal-container ng-show="top" ng-switch="top">
-      <div record-detail-modal ng-switch-when="record-details"></div>
+    <div modal-container>
+      <div record-detail-modal ng-if="isOpen('record-details')"></div>
     </div>
-
-    <%--<script>--%>
-    <%--$("#dialog").dialog({--%>
-    <%--autoOpen: false,--%>
-    <%--width: '620px',--%>
-    <%--modal: true,--%>
-    <%--buttons: {--%>
-    <%--Done: function () {--%>
-    <%--$(this).dialog("close");--%>
-    <%--}--%>
-    <%--}--%>
-    <%--});--%>
-
-    <%--$("#attendance-history-table .action-link").click(function (e) {--%>
-    <%--$("#dialog").dialog("open");--%>
-    <%--});--%>
-    <%--</script>--%>
   </div>
 </div>

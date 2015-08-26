@@ -1,13 +1,22 @@
+var essApp = angular.module('ess');
+
 /**
  * A modal container
  *
  * Insert markup for one or more modals inside this directive and display based on $scope.subview
  */
-angular.module('ess')
-    .directive('modalContainer', ['$rootScope', 'modals',
+essApp.directive('modalContainer', ['$rootScope', 'modals',
 function ($rootScope, modals) {
 
-    return link;
+    return {
+        template:
+            '<div id="modal-container" ng-show="top">' +
+            '  <div id="modal-backdrop"></div>' +
+            '  <ng-transclude></ng-transclude>' +
+            '</div>',
+        transclude: true,
+        link: link
+    };
 
     function link($scope, $element) {
         // A stack of modal names in order of opening
@@ -16,17 +25,19 @@ function ($rootScope, modals) {
         // The name of the modal most recently opened
         $scope.top = null;
 
+        // Returns true if the given view name exists in the open modals stack
         $scope.isOpen = function(viewName) {
             return $scope.openModals.indexOf(viewName) >= 0;
         };
 
+        var backDropEle = $element.find('#modal-backdrop')[0];
         // Reject modal when the user clicks the backdrop
-        $element.on('click', function (event) {
-            if ($element[0] !== event.target) {
+        backDropEle.onclick = function (event) {
+            if (backDropEle !== event.target) {
                 return;
             }
             $scope.$apply(modals.reject);
-        });
+        };
 
         // Set subview upon modal open event
         $rootScope.$on('modals.open', function (event, modalType) {
@@ -46,3 +57,17 @@ function ($rootScope, modals) {
         }
     }
 }]);
+
+essApp.directive('modal', function() {
+    return {
+        scope: {viewName: '@', isOpen: '&'},
+        transclude: true,
+        template:
+            '<div class="modal" ng-if="isOpen(\'record-details\')" ng-class="{\'background-modal\': top !== viewName}">' +
+            '  <ng-transclude></ng-transclude>' +
+            '</div>',
+        link: function($scope) {
+            console.log($scope.isOpen, $scope.$parent.$parent, $scope.viewName);
+        }
+    };
+});

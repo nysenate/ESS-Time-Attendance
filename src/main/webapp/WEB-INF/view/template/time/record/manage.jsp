@@ -6,7 +6,7 @@
     <div loader-indicator></div>
   </div>
   <div ng-if="!loading">
-    <div class="content-container content-controls">
+    <div class="content-container content-controls" ng-show="multipleSups()">
       <p class="content-info">View Employees Under &nbsp;
         <select name="supSelect" ng-model="$parent.selSupId" ng-change="selectNone()"
             ng-options="getOptionLabel(supId) for supId in supIds">
@@ -28,7 +28,9 @@
       <div supervisor-record-list records="supRecords[selSupId].SUBMITTED"
            emp-infos="empInfos" selected-indices="selectedIndices"></div>
       <div style="padding:.5em;text-align:right;">
-        <input id="review-sel-records-btn" type="button" class="submit-button" value="Review Selected Records"/>
+        <input type="button" class="submit-button" value="Approve All" ng-click="approveAll()"/>
+        <input type="button" class="submit-button" value="Review Selected Records"
+               ng-click="review()" ng-disabled="selectedIndices.size == 0"/>
       </div>
     </section>
 
@@ -59,41 +61,23 @@
     <section class="content-container" ng-if="supRecords[selSupId].DISAPPROVED_PERSONNEL">
       <h1>T&A Records Rejected By Personnel Awaiting Employee Correction</h1>
 
-      <p class="content-info">The following table lists records that have been rejected by personnel and are awaiting submission by the employee<br/>
+      <p class="content-info">The following table lists records that have been rejected by personnel and are awaiting re-submission by the employee<br/>
         You can preview the state of the record by clicking 'Show' in the Preview column.</p>
       <div supervisor-record-list records="supRecords[selSupId].DISAPPROVED_PERSONNEL" emp-infos="empInfos"></div>
     </section>
 
     <section class="content-container" ng-if="supRecords[selSupId].SUBMITTED_PERSONNEL">
-      <h1>T&A Records Pending Approval By Personnel</h1>
+      <h1>T&A Personnel Rejected Records Pending Approval</h1>
 
-      <p class="content-info">The following records have been recently submitted to personnel by the employee to correct errors detected by personnel</p>
+      <p class="content-info">The following records have been recently submitted to personnel by  employee to correct errors detected by personnel</p>
       <div supervisor-record-list records="supRecords[selSupId].SUBMITTED_PERSONNEL" emp-infos="empInfos"></div>
     </section>
 
 
-    <div modal-container ng-show="subview" ng-switch="subview">
-      <div record-detail-modal ng-switch-when="details"></div>
-      <div record-review-modal ng-switch-when="review"></div>
+    <div modal-container>
+      <div record-detail-modal ng-if="isOpen('record-details')"></div>
+      <div record-review-modal ng-if="isOpen('record-review')" ng-class="{'background-modal': top != 'record-review'}"></div>
+      <div record-review-reject-modal ng-if="isOpen('record-review-reject')"></div>
     </div>
   </div>
 </div>
-
-<%--<script>--%>
-  <%--$("#review-records-modal").dialog({--%>
-    <%--width: 1100,--%>
-    <%--modal: true,--%>
-    <%--autoOpen: false--%>
-  <%--});--%>
-
-  <%--$("#rejection-dialog").dialog({--%>
-    <%--modal: true,--%>
-    <%--autoOpen: false,--%>
-    <%--width: 400--%>
-  <%--});--%>
-
-  <%--$("#review-sel-records-btn").click(function () {--%>
-    <%--$("#review-records-modal").dialog("open");--%>
-  <%--});--%>
-<%--</script>--%>
-
