@@ -15,6 +15,7 @@ import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
@@ -34,6 +35,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
 
     @Autowired public EmployeeInfoService empInfoService;
     @Autowired public EmpTransactionService transService;
+    @Autowired public AccrualInfoService accrualInfoService;
 
     /** {@inheritDoc} */
     @Override
@@ -51,6 +53,12 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .peek(this::initializeEntries)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TimeRecord> getTimeRecordsWithSupervisor(Integer empId, Integer supId, Range<LocalDate> dateRange) {
+        List<TimeRecord> timeRecords = getTimeRecords(new HashSet<>(empId), dateRange, TimeRecordStatus.getAll(), false);
+        return timeRecords.stream().filter(t -> t.getSupervisorId().equals(supId)).collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */
@@ -94,7 +102,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         //       eg. a record is initially created for 7/16 - 7/29, but a supervisor change occurs on 7/22
         RangeSet<LocalDate> activeDates = empInfoService.getEmployeeActiveDatesService(empId);
         List<PayPeriod> openPeriods =
-                payPeriodDao.getOpenAttendancePayPeriods(empId, DateUtils.endOfDateRange(dateRange), SortOrder.ASC);
+            accrualInfoService.getActiveAttendancePeriods(empId, DateUtils.endOfDateRange(dateRange), SortOrder.ASC);
         TreeSet<PayPeriod> incompletePeriods = openPeriods.stream()
                 // Pay period is within the requested date range
                 .filter(payPeriod -> dateRange.contains(payPeriod.getStartDate()))
@@ -104,7 +112,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                 .filter(payPeriod -> !activeDates.subRangeSet(payPeriod.getDateRange()).isEmpty())
                 .collect(Collectors.toCollection(TreeSet::new));
         if (!incompletePeriods.isEmpty()) {
-            Employee employee = employeeDao.getEmployeeById(empId);
+            Employee employee = empInfoService.getEmployee(empId);
             TransactionHistory history = transService.getTransHistory(empId);
             incompletePeriods.forEach(period ->
                     records.putAll(period, createEmptyTimeRecords(employee, period, history, records.get(period))));
@@ -146,7 +154,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         ListMultimap<Integer, TimeRecord> supervisorMap = LinkedListMultimap.create();
         timeRecords.forEach(record -> supervisorMap.put(record.getSupervisorId(), record));
         supervisorMap.keySet().stream()
-                .map(employeeDao::getEmployeeById)
+                .map(empInfoService::getEmployee)
                 .forEach(supervisor ->
                         supervisorMap.get(supervisor.getEmployeeId())
                                 .forEach(record -> record.setSupervisor(supervisor)));

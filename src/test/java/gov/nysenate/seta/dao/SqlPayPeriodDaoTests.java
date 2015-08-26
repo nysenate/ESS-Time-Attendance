@@ -44,7 +44,7 @@ public class SqlPayPeriodDaoTests extends BaseTests
 
     @Test
     public void testGetOpenPayPeriods() throws Exception {
-        logger.info(OutputUtils.toJson(payPeriodDao.getOpenAttendancePayPeriods(10976, LocalDate.now(), SortOrder.DESC)));
+//        logger.info(OutputUtils.toJson(payPeriodDao.getOpenAttendancePayPeriods(10976, LocalDate.now(), SortOrder.DESC)));
     }
 
     @Test
@@ -72,6 +72,6 @@ public class SqlPayPeriodDaoTests extends BaseTests
 
     @Test
     public void testOpenPayPeriods() throws Exception {
-        logger.info("{}", payPeriodDao.getOpenAttendancePayPeriods(9896, LocalDate.now(), SortOrder.ASC));
+//        logger.info("{}", payPeriodDao.getOpenAttendancePayPeriods(9896, LocalDate.now(), SortOrder.ASC));
     }
 }

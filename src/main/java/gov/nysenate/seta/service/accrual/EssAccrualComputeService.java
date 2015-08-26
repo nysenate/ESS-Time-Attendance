@@ -37,6 +37,7 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
     private static final Logger logger = LoggerFactory.getLogger(EssAccrualComputeService.class);
 
     @Autowired private PayPeriodService payPeriodService;
+    @Autowired private AccrualInfoService accrualInfoService;
     @Autowired private EmpTransactionService empTransService;
 
     /** --- Implemented Methods --- */
@@ -76,7 +77,7 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
 
         if (!periodSet.isEmpty()) {
             PayPeriod lastPeriod = periodSet.last();
-            TreeMap<Integer, AnnualAccSummary> annualAcc = accrualDao.getAnnualAccruals(empId, lastPeriod.getYear());
+            TreeMap<Integer, AnnualAccSummary> annualAcc = accrualInfoService.getAnnualAccruals(empId, lastPeriod.getYear());
             if (annualAcc.isEmpty()) {
                 throw new AccrualException(empId, AccrualExceptionType.NO_ACTIVE_ANNUAL_RECORD_FOUND);
             }

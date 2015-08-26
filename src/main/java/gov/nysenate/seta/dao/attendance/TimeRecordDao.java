@@ -2,6 +2,7 @@ package gov.nysenate.seta.dao.attendance;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
@@ -36,11 +37,19 @@ public interface TimeRecordDao extends BaseDao
                                                        Set<TimeRecordStatus> statuses);
 
     /**
+     * Gets the distinct years that an employee has at least one time record for.
+     * @param empId Integer - employee id
+     * @param yearOrder - SortOrder - order the returned years
+     * @return List<Integer>
+     */
+    List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder);
+
+    /**
      * @see #getRecordsDuring(Set, Range, Set)
      * Use this overload if you don't want to filter by statuses.
      */
     default ListMultimap<Integer, TimeRecord> getRecordsDuring(Set<Integer> empIds, Range<LocalDate> dateRange) {
-        return getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class));
+        return getRecordsDuring(empIds, dateRange, TimeRecordStatus.getAll());
     }
 
     /**
@@ -56,7 +65,7 @@ public interface TimeRecordDao extends BaseDao
      * Use this overload if you don't want to filter by statuses and want records from a single employee.
      */
     default List<TimeRecord> getRecordsDuring(int empId, Range<LocalDate> dateRange) {
-        return getRecordsDuring(empId, dateRange, EnumSet.allOf(TimeRecordStatus.class));
+        return getRecordsDuring(empId, dateRange, TimeRecordStatus.getAll());
     }
 
     /** --- Insert/Update methods --- */

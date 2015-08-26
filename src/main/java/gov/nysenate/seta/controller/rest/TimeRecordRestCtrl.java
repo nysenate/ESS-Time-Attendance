@@ -3,6 +3,7 @@ package gov.nysenate.seta.controller.rest;
 import com.google.common.collect.*;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
+import gov.nysenate.seta.client.response.base.ListViewResponse;
 import gov.nysenate.seta.client.response.base.SimpleResponse;
 import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.view.TimeRecordView;
@@ -13,6 +14,7 @@ import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
+import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
 import gov.nysenate.seta.service.attendance.TimeRecordService;
 import gov.nysenate.seta.service.attendance.TimeRecordValidationService;
@@ -35,8 +37,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
 
     @Autowired TimeRecordDao timeRecordDao;
     @Autowired TimeRecordService timeRecordService;
-
-    @Autowired PayPeriodDao payPeriodDao;
+    @Autowired AccrualInfoService accrualInfoService;
 
     @Autowired TimeRecordValidationService validationService;
 
@@ -88,6 +89,18 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     }
 
     /**
+     * Get Time Record Years API
+     *
+     * Returns the years during which the given employee has at least one time record during.
+     *
+     * Request Params: empId - employeeId
+     */
+    @RequestMapping(value = "active_years")
+    public BaseResponse getTimeRecordYears(@RequestParam Integer empId) {
+        return ListViewResponse.ofIntList(timeRecordDao.getTimeRecordYears(empId, SortOrder.ASC), "years");
+    }
+
+    /**
      * Save Time Record API
      * --------------------
      *
@@ -125,8 +138,8 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
         RangeSet<LocalDate> activePeriods = TreeRangeSet.create();
         Set<Integer> empIds = new HashSet<>(Arrays.asList(empId));
         empIds.forEach(eId ->
-                payPeriodDao.getOpenAttendancePayPeriods(eId, LocalDate.now(), SortOrder.ASC)
-                        .forEach(period -> activePeriods.add(period.getDateRange())));
+            accrualInfoService.getActiveAttendancePeriods(eId, LocalDate.now(), SortOrder.ASC)
+                .forEach(period -> activePeriods.add(period.getDateRange())));
         return activePeriods.isEmpty() ?
                 ArrayListMultimap.create() :
                 getRecords(empIds, activePeriods.span(), parseStatuses(status));

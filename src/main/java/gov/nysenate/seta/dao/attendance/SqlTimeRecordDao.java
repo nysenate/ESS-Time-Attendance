@@ -4,6 +4,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.LimitOffset;
+import gov.nysenate.common.OrderBy;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteRecordRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -66,6 +70,14 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
         remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES_EMP_ID.getSql(schemaMap()), params, handler);
         return handler.getRecordMap();
+    }
+
+    @Override
+    public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
+        MapSqlParameterSource params = new MapSqlParameterSource("empId", empId);
+        OrderBy orderBy = new OrderBy("year", yearOrder);
+        return remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_DISTINCT_YEARS.getSql(schemaMap(), orderBy), params,
+            new SingleColumnRowMapper<>());
     }
 
     /** --- Helper Classes --- */

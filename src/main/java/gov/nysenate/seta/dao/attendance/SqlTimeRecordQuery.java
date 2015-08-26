@@ -25,7 +25,7 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE " + "\n" +
         "FROM ${tsSchema}.PM23TIMESHEET rec\n" +
         "LEFT JOIN " + MASTER_SFMS + ".SL16PERIOD per\n" +
-        "    ON (TRUNC(rec.DTBEGIN) BETWEEN TRUNC(per.DTBEGIN) AND TRUNC(per.DTEND)) AND per.CDPERIOD = 'AF' AND per.CDSTATUS = 'A'\n" +
+        "    ON (rec.DTBEGIN BETWEEN per.DTBEGIN AND per.DTEND) AND per.CDPERIOD = 'AF' AND per.CDSTATUS = 'A'\n" +
         "LEFT JOIN ${tsSchema}.PD23TIMESHEET ent\n" +
         "    ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET AND ent.CDSTATUS = 'A'\n" +
         "WHERE rec.CDSTATUS = 'A' %s" + "\n" +
@@ -36,8 +36,8 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
     ),
     GET_TIME_REC_BY_DATES(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-            "AND (TRUNC(rec.DTBEGIN) BETWEEN :startDate AND :endDate\n" +
-            "       OR TRUNC(rec.DTEND) BETWEEN :startDate AND :endDate)\n" +
+            "AND (rec.DTBEGIN BETWEEN :startDate AND :endDate\n" +
+            "       OR rec.DTEND BETWEEN :startDate AND :endDate)\n" +
             "   AND rec.CDTSSTAT IN (:statuses)\n" +
             "   %s")
     ),
@@ -59,12 +59,22 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
         "CDTSSTAT = :tSStatusId AND NUXREFEM = :empId AND DTBEGIN = :startDate AND DTEND = :endDate")
     ),
+
+
+    GET_TREC_DISTINCT_YEARS(
+        "SELECT DISTINCT EXTRACT(YEAR FROM DTEND) AS year\n" +
+        "FROM ${tsSchema}.PM23TIMESHEET\n" +
+        "WHERE NUXREFEM = :empId\n"
+    ),
+
     INSERT_TIME_REC(
         "INSERT \n" +
         "INTO ${tsSchema}.PM23TIMESHEET \n" +
         "(NUXREFEM, CDSTATUS, CDTSSTAT, DTBEGIN, DTEND, DEREMARKS, NUXREFSV, DEEXCEPTION, DTPROCESS, CDRESPCTRHD) \n" +
         "VALUES (:empId, :status, :tSStatusId, :beginDate, :endDate, :remarks, :supervisorId, :excDetails, :procDate, :respCtr) \n"
     ),
+
+
     UPDATE_TIME_REC_SQL (
         "UPDATE ${tsSchema}.PM23TIMESHEET \n" +
         "SET \n" +
@@ -73,6 +83,8 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr\n" +
         "WHERE NUXRTIMESHEET = :timesheetId"
     ),
+
+
     DELETE_TIME_REC_SQL (
         "DELETE FROM ${tsSchema}.PM23TIMESHEET WHERE NUXRTIMESHEET = :timesheetId"
     ),

@@ -14,7 +14,8 @@ public interface TimeRecordService
 {
     /**
      * Get time records for one or more employees, matching certain time record statuses, over a specified date range.
-     * Will create time records for uncovered pay periods if desired
+     * Will create time records for uncovered pay periods if desired,
+     *
      * @param empIds Set<Integer> - employee ids
      * @param dateRange Range<LocalDate> - interval to check for
      * @param statuses Set<TimeRecordStatus> - time record statuses to retrieve
@@ -24,6 +25,17 @@ public interface TimeRecordService
     List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
                                     Set<TimeRecordStatus> statuses,
                                     boolean fillMissingRecords);
+
+    /**
+     * Retrieves the time records for an employee with employee id 'empId' that were to be approved by the given
+     * supervisor with id 'supId' that are contained during the 'dateRange'.
+     *
+     * @param empId Integer - Employee id to retrieve records for
+     * @param supId Integer - Supervisor id that managed the set of records we are returning
+     * @param dateRange Range<LocalDate> - Returned records will be contained within this date range
+     * @return List<TimeRecord>
+     */
+    List<TimeRecord> getTimeRecordsWithSupervisor(Integer empId, Integer supId, Range<LocalDate> dateRange);
 
     /**
      * Retrieve time records for which the given supervisor id is the supervisor or supervisor override

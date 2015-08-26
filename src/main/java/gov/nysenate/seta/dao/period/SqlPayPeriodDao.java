@@ -56,15 +56,4 @@ public class SqlPayPeriodDao extends SqlBaseDao implements PayPeriodDao
         String sql = GET_PAY_PERIODS_IN_RANGE_SQL.getSql(schemaMap(), orderBy);
         return remoteNamedJdbc.query(sql, params, new PayPeriodRowMapper(""));
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<PayPeriod> getOpenAttendancePayPeriods(int empId, LocalDate endDate, SortOrder dateOrder) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
-        params.addValue("endDate", toDate(endDate));
-        OrderBy orderBy = new OrderBy("DTBEGIN", dateOrder);
-        String sql = GET_OPEN_ATTEND_PERIODS_SQL.getSql(schemaMap(), orderBy);
-        return remoteNamedJdbc.query(sql, params, new PayPeriodRowMapper(""));
-    }
 }

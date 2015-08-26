@@ -35,11 +35,11 @@ public class EmployeeRestCtrl extends BaseRestCtrl
     public BaseResponse getEmployeeById(@RequestParam(required = true) Integer empId[],
                                         @RequestParam(defaultValue = "false") boolean detail) throws EmployeeException {
         return getEmployeeResponse(
-            Arrays.asList(empId).stream().map(employeeDao::getEmployeeById).collect(toList()), detail);
+            Arrays.asList(empId).stream().map(empInfoService::getEmployee).collect(toList()), detail);
 
     }
 
-    @RequestMapping(value = "/active-years")
+    @RequestMapping(value = "/active_years")
     public BaseResponse getEmployeeYearsActive(@RequestParam(required = true) Integer empId) {
         return ListViewResponse.ofIntList(empInfoService.getEmployeeActiveYearsService(empId), "activeYears");
     }
