@@ -184,8 +184,8 @@ Toggle this for temporary emps.
         <div class="clearfix"></div>
       </div>
     </form>
-    <div modal-container ng-show="subview" ng-switch="subview">
-        <div ng-switch-when="save-indicator" class="save-progress-modal">
+    <div modal-container ng-show="top" ng-switch="top">
+        <div ng-if="isOpen('save-indicator')" class="save-progress-modal">
           <div ng-show="state.saving">
             <h3 class="content-info" style="margin-bottom:0;">
               Saving time record...
