@@ -13,7 +13,7 @@ Toggle this for temporary emps.
 </div> -->
 
 <div ng-controller="RecordEntryController">
-  <div id="record-selection-container" class="content-container content-controls">
+  <div id="record-selection-container" class="content-container content-controls" ng-show="records.length > 0">
     <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>
     <table class="simple-table">
       <thead>
@@ -34,12 +34,12 @@ Toggle this for temporary emps.
         </td>
         <td>{{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}</td>
         <td>{{record.supervisor.fullName}}</td>
-        <td>{{record.endDate | momentFromNow}}</td>
+        <td ng-class="{'dark-red': record.isDue === true}">{{record.dueFromNowStr}}</td>
         <td>{{record.recordStatus | timeRecordStatus}}</td>
         <td>
-                    <span ng-show="record.updateDate | momentCmp:'=':record.originalDate:'second' | not">
-                      {{record.updateDate | moment: 'lll'}}
-                    </span>
+          <span ng-show="record.updateDate | momentCmp:'=':record.originalDate:'second' | not">
+            {{record.updateDate | moment: 'lll'}}
+          </span>
           <span ng-show="record.updateDate | momentCmp:'=':record.originalDate:'second'">New</span>
         </td>
       </tr>
@@ -48,6 +48,10 @@ Toggle this for temporary emps.
   </div>
 
   <div loader-indicator ng-show="state.searching"></div>
+
+  <div ess-notification level="error" title="No time records availble to enter."
+       ng-show="state.fetchedRecs === true && records.length == 0"
+       message="Please contact Senate Personnel at XXX-XXX-XXXX for more details."></div>
 
   <div class="content-container" ng-show="displayEntries">
     <p class="content-info">All hours available need approval from appointing authority.</p>

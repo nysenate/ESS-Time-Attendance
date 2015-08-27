@@ -9,6 +9,7 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
     $scope.state = {
         accrual: null,
         searching: false,
+        fetchedRecs: false,
         saving: false
     };
 
@@ -57,9 +58,15 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         }, function (response) {
             if (empId in response.result.items) {
                 $scope.records = response.result.items[empId];
+                angular.forEach($scope.records, function(record){
+                    var endDateMoment = moment(record.endDate);
+                    record.dueFromNowStr = endDateMoment.fromNow(false);
+                    record.isDue = endDateMoment.isBefore(moment().add(1, 'days').startOf('day'));
+                });
                 linkToRecord();
             }
             $scope.state.searching = false;
+            $scope.state.fetchedRecs = true;
         });
     };
 
