@@ -5,7 +5,7 @@ import gov.nysenate.seta.dao.base.DbVendor;
 
 public enum SqlEmpTransactionQuery implements BasicSqlQuery
 {
-    GET_TRANS_HISTORY_SQL(
+    GET_TRANS_HISTORY_TEMPLATE(
         "SELECT\n" +
         "    AUD.NUXREFEM, AUD.DTTXNORIGIN AS AUD_DTTXNORIGIN, PTX.CDSTATUS, PTX.CDTRANS, PTX.CDTRANSTYP, PTX.NUCHANGE, " +
         "    CAST (PTX.DTTXNORIGIN AS TIMESTAMP) AS DTTXNORIGIN, CAST (PTX.DTTXNUPDATE AS TIMESTAMP) AS DTTXNUPDATE,\n" +
@@ -13,9 +13,23 @@ public enum SqlEmpTransactionQuery implements BasicSqlQuery
         "FROM ${masterSchema}.PM21PERAUDIT AUD\n" +
         "JOIN ${masterSchema}.PD21PTXNCODE PTX ON AUD.NUCHANGE = PTX.NUCHANGE\n" +
         "JOIN (SELECT DISTINCT CDTRANS, CDTRANSTYP FROM ${masterSchema}.PL21TRANCODE) CD ON PTX.CDTRANS = CD.CDTRANS\n" +
-        "WHERE AUD.NUXREFEM = :empId AND PTX.CDSTATUS = 'A' AND PTX.DTEFFECT BETWEEN :dateStart AND :dateEnd\n" +
-        "AND PTX.CDTRANS IN (:transCodes)\n" +
-        "ORDER BY PTX.DTEFFECT, PTX.DTTXNORIGIN, AUD.DTTXNORIGIN, AUD.DTTXNUPDATE, PTX.CDTRANS");
+        "%s\n" +
+        "ORDER BY PTX.DTEFFECT, PTX.DTTXNORIGIN, AUD.DTTXNORIGIN, AUD.DTTXNUPDATE, PTX.CDTRANS"),
+
+    GET_TRANS_HISTORY_SQL(
+        String.format(GET_TRANS_HISTORY_TEMPLATE.sql,
+            "WHERE AUD.NUXREFEM = :empId AND PTX.CDSTATUS = 'A' AND PTX.DTEFFECT BETWEEN :dateStart AND :dateEnd\n")
+    ),
+
+    GET_TRANS_HISTORY_SQL_FILTER_BY_CODE(
+        String.format(GET_TRANS_HISTORY_TEMPLATE.sql, "" +
+            "WHERE AUD.NUXREFEM = :empId AND PTX.CDSTATUS = 'A' AND PTX.DTEFFECT BETWEEN :dateStart AND :dateEnd " +
+            "AND PTX.CDTRANS IN (:transCodes)")
+    ),
+
+    GET_LAST_UPDATED_RECS_SQL(
+        String.format(GET_TRANS_HISTORY_TEMPLATE.sql, "WHERE PTX.DTTXNUPDATE > :lastDateTime AND PTX.CDSTATUS = 'A'\n")
+    );
 
     private String sql;
 

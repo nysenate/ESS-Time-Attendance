@@ -35,6 +35,11 @@ public class TransHistoryHandler extends BaseHandler
     /** Stores the valid records. */
     protected List<TransactionRecord> records = new ArrayList<>();
 
+    /** Records the code of the original transaction (in case it's overwritten as APP). */
+    protected TransactionCode originalFirstCode = null;
+
+    protected TransRecordRowMapper transRowMapper;
+
     /** --- Constructors --- */
 
     public TransHistoryHandler(int empId, String pfx, String auditPfx, Set<TransactionCode> transCodes,
@@ -44,6 +49,7 @@ public class TransHistoryHandler extends BaseHandler
         this.auditPfx = auditPfx;
         this.transCodes = transCodes;
         this.options = options;
+        this.transRowMapper = new TransRecordRowMapper(pfx, auditPfx, options);
     }
 
     /** --- Handler --- */
@@ -53,9 +59,12 @@ public class TransHistoryHandler extends BaseHandler
         TransactionCode code = TransactionCode.valueOf(rs.getString(pfx + "CDTRANS"));
 
         // If this is the first record, the options may request it to be set as APP.
-        if (rs.isFirst() && options.shouldSetToApp() && !code.isAppointType()) {
-            logger.debug("{} transaction will appear as 'APP' based on option: {}", code, options);
-            code = TransactionCode.APP;
+        if (rs.isFirst()) {
+            originalFirstCode = code;
+            if (options.shouldSetToApp() && !code.isAppointType()) {
+                logger.debug("{} transaction will appear as 'APP' based on option: {}", code, options);
+                code = TransactionCode.APP;
+            }
         }
 
         // If initialization of earliest record was requested, the result set will not filter
@@ -65,30 +74,8 @@ public class TransHistoryHandler extends BaseHandler
             return;
         }
 
-        TransactionRecord transRec = new TransactionRecord();
-        transRec.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
-        transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
-        transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
-        transRec.setTransCode(code);
-        transRec.setOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
-        transRec.setUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
-        transRec.setEffectDate(getLocalDateFromRs(rs, pfx + "DTEFFECT"));
-        transRec.setAuditDate(getLocalDateTimeFromRs(rs, pfx + "AUD_DTTXNORIGIN"));
-        transRec.setNote((transRec.getTransCode().getType().equals(TransactionType.PER))
-                ? rs.getString(pfx + "DETXNNOTE50") : rs.getString(pfx + "DETXNNOTEPAY"));
-
-        /**
-         * The value map will contain the column -> value mappings for the db columns associated with the
-         * transaction code. The appointment transactions (APP/RTP) will have value maps containing every column
-         * since they represent the initial snapshot of the data.
-         */
-        Map<String, String> valueMap = new HashMap<>();
-        List<String> columns = (code.isAppointType() || (options.shouldInitialize() && rs.isFirst()))
-                ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList();
-        for (String col : columns) {
-            valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
-        }
-        transRec.setValueMap(valueMap);
+        // Map the transaction record.
+        TransactionRecord transRec = transRowMapper.mapRow(rs, 0);
 
         /** Add the record to the collection. */
         records.add(transRec);
@@ -100,6 +87,6 @@ public class TransHistoryHandler extends BaseHandler
      * Construct and returns a TransactionHistory generated from the result set.
      */
     public TransactionHistory getTransactionHistory() {
-        return new TransactionHistory(empId, records);
+        return new TransactionHistory(empId, originalFirstCode, records);
     }
 }

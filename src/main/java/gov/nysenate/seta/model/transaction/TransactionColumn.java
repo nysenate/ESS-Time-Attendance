@@ -68,8 +68,8 @@ public enum TransactionColumn
     MOLOSTTIME(""),
     MOPRIORYRTE(""),
     MOSALBIWKLY("Bi-weekly Salary"),
-    MOTOTHRSPD("Total Hours Spent"),
-    MOVACHRSPD("Total Vacation Hours Spent"),
+    MOTOTHRSPD("Total Money Paid"),
+    MOVACHRSPD("Vacation Money Paid"),
     NAFIRST("First Name"),
     NAFIRSTSUP("Supervisor's First Name"),
     NALAST("Last Name"),
@@ -86,7 +86,7 @@ public enum TransactionColumn
     NUPOSITION("Position Number"),
     NUSTATTAXEX(""),
     NUVACHRSLF(""),
-    NUVACHRSPD(""),
+    NUVACHRSPD("Vacation Hours Paid"),
     NUXREFSV("Supervisor Id"),
     NUYONTAXEX("");
     

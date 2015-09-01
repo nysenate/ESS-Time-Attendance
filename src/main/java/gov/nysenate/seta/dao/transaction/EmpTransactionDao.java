@@ -3,8 +3,11 @@ package gov.nysenate.seta.dao.transaction;
 import com.google.common.collect.Range;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,13 +24,13 @@ public interface EmpTransactionDao
      * Gets all transactions for the given emp id.
      * @see #getTransHistory(int, java.util.Set, EmpTransDaoOption)
      */
-    public TransactionHistory getTransHistory(int empId, EmpTransDaoOption options);
+    TransactionHistory getTransHistory(int empId, EmpTransDaoOption options);
 
     /**
      * Gets just the transactions specified in the 'codes' set for the given emp id.*
      * @see #getTransHistory(int, java.util.Set, com.google.common.collect.Range, EmpTransDaoOption)
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, EmpTransDaoOption options);
+    TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, EmpTransDaoOption options);
 
     /**
      * Retrieves a TransactionHistory of all the records for the given set of TransactionCodes that have an
@@ -40,6 +43,10 @@ public interface EmpTransactionDao
      * @param options    TransDaoOption   Options for retrieving the transaction.
      * @return TransactionHistory
      */
-    public TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange,
+    TransactionHistory getTransHistory(int empId, Set<TransactionCode> codes, Range<LocalDate> dateRange,
                                               EmpTransDaoOption options);
+
+    /** --- Check updates --- */
+
+    List<TransactionRecord> updatedRecordsSince(LocalDateTime dateTime);
 }

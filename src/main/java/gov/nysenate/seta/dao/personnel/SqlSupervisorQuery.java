@@ -30,13 +30,13 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "        WHEN ovr.NUXREFEMSUB IS NOT NULL THEN 'EMP_OVR' " +
         "    END,\n" +
         "    per.NUXREFEM, ovr.NUXREFSVSUB\n" +
-        "    FROM ${masterSchema}.PM23SUPOVRRD ovr\n" +
+        "    FROM ${tsSchema}.PM23SUPOVRRD ovr\n" +
         "    LEFT JOIN ${masterSchema}.PM21PERAUDIT per ON \n" +
         "      CASE WHEN ovr.NUXREFSVSUB IS NOT NULL AND per.NUXREFSV = ovr.NUXREFSVSUB THEN 1\n" +
         "           WHEN ovr.NUXREFEMSUB IS NOT NULL AND per.NUXREFEM = ovr.NUXREFEMSUB THEN 1\n" +
         "           ELSE 0\n" +
         "      END = 1\n" +
-        "    WHERE ovr.NUXREFEM = :supId AND ovr.CDSTATUS = 'A'\n" +
+        "    WHERE ovr.NUXREFEM = :supId\n" +
         "    AND :endDate BETWEEN NVL(ovr.DTSTART, :endDate) AND NVL(ovr.DTEND, :endDate)\n" +
         "    AND per.NUXREFEM IS NOT NULL\n" +
         "  ) empList\n" +

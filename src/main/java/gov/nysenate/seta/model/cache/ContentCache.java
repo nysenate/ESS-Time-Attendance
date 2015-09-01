@@ -13,7 +13,8 @@ public enum ContentCache
     ACCRUAL_ANNUAL,
     HOLIDAY,
     PAY_PERIOD,
-    TRANSACTION
+    TRANSACTION,
+    SUPERVISOR_EMP_GROUP
     ;
 
     private static final ImmutableSet<ContentCache> allContentCaches = ImmutableSet.copyOf(ContentCache.values());
