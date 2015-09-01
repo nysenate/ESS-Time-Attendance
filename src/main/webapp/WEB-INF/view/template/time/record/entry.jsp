@@ -49,7 +49,13 @@ Toggle this for temporary emps.
 
   <div loader-indicator ng-show="state.searching"></div>
 
-  <div ess-notification level="error" title="No time records availble to enter."
+  <div ess-notification level="error" title="Time record requires correction"
+       message="{{records[iSelectedRecord].remarks}}" class="margin-top-20"
+       ng-show="records[iSelectedRecord].recordStatus === 'DISAPPROVED' ||
+                records[iSelectedRecord].recordStatus === 'DISAPPROVED_PERSONNEL'">
+  </div>
+
+  <div ess-notification level="error" title="No time records available to enter."
        ng-show="state.fetchedRecs === true && records.length == 0"
        message="Please contact Senate Personnel at XXX-XXX-XXXX for more details."></div>
 
