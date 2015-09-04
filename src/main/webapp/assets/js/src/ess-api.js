@@ -58,7 +58,7 @@ essApi.factory('EmpInfoApi', ['$resource', 'appProps', function ($resource, appP
 }]);
 
 essApi.factory('EmpActiveYearsApi', ['$resource', 'appProps', function($resource, appProps) {
-    return $resource(appProps.apiPath + '/employees/active-years');
+    return $resource(appProps.apiPath + '/employees/active_years');
 }]);
 
 /** --- Transaction API --- */

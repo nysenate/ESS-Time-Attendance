@@ -30,6 +30,9 @@ public class TransactionHistory
     /** The employee id that this history refers to. */
     protected int employeeId;
 
+    /** Records the code of the original transaction (in case it's overwritten as APP). */
+    protected TransactionCode originalFirstCode;
+
     /** A collection of TransactionRecords grouped via the TransactionCode. */
     protected LinkedListMultimap<TransactionCode, TransactionRecord> recordsByCode;
 
@@ -39,7 +42,12 @@ public class TransactionHistory
     /** --- Constructors --- */
 
     public TransactionHistory(int empId, List<TransactionRecord> recordsList) {
+        this(empId, null, recordsList);
+    }
+
+    public TransactionHistory(int empId, TransactionCode originalFirstCode, List<TransactionRecord> recordsList) {
         this.employeeId = empId;
+        this.originalFirstCode = originalFirstCode;
 
         // Sort the input record list from earliest first. (just to be safe)
         List<TransactionRecord> sortedRecs = new ArrayList<>(recordsList);
@@ -448,5 +456,9 @@ public class TransactionHistory
 
     public int getEmployeeId() {
         return employeeId;
+    }
+
+    public TransactionCode getOriginalFirstCode() {
+        return originalFirstCode;
     }
 }

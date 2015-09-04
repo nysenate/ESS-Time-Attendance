@@ -3,6 +3,8 @@ package gov.nysenate.seta.model.transaction;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static gov.nysenate.seta.model.transaction.TransactionType.PAY;
 import static gov.nysenate.seta.model.transaction.TransactionType.PER;

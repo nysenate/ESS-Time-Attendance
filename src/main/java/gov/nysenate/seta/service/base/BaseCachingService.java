@@ -40,7 +40,6 @@ public abstract class BaseCachingService<ContentId> implements CachingService<Co
         Cache cache = new Cache(new CacheConfiguration()
                 .name(getCacheType().name())
                 .eternal(true)
-                //todo set max size
                 .sizeOfPolicy(defaultSizeOfPolicy()));
         cacheManager.addCache(cache);
         this.primaryCache = new EhCacheCache(cache);

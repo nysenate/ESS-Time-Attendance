@@ -1,10 +1,16 @@
 package gov.nysenate.seta.model.personnel;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Range;
 import com.google.common.collect.Table;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Represents the employees that are managed by the certain supervisor.
@@ -39,6 +45,17 @@ public class SupervisorEmpGroup
 
     public SupervisorEmpGroup() {}
 
+    public SupervisorEmpGroup(SupervisorEmpGroup supEmpGroup) {
+        if (supEmpGroup != null) {
+            this.supervisorId = supEmpGroup.supervisorId;
+            this.startDate = supEmpGroup.getStartDate();
+            this.endDate = supEmpGroup.getEndDate();
+            this.primaryEmployees = new HashMap<>(supEmpGroup.getPrimaryEmployees());
+            this.overrideEmployees = new HashMap<>(supEmpGroup.getOverrideEmployees());
+            this.supOverrideEmployees = HashBasedTable.create(supEmpGroup.supOverrideEmployees);
+        }
+    }
+
     public SupervisorEmpGroup(int supervisorId, LocalDate startDate, LocalDate endDate) {
         this.supervisorId = supervisorId;
         this.startDate = startDate;
@@ -54,6 +71,34 @@ public class SupervisorEmpGroup
         return (primaryEmployees != null && !primaryEmployees.isEmpty()) ||
                (overrideEmployees != null && !overrideEmployees.isEmpty()) ||
                (supOverrideEmployees != null && !supOverrideEmployees.isEmpty());
+    }
+
+    /**
+     * Filter out any employees in this Supervisor emp group that are not under this supervisor during the
+     * given dateRange.
+     * @param dateRange Range<LocalDate>
+     */
+    public void filterActiveEmployeesByDate(Range<LocalDate> dateRange) {
+        this.setPrimaryEmployees(this.getPrimaryEmployees().values().stream()
+            .filter(supInfo -> isSupInfoInRange(supInfo, dateRange))
+            .collect(Collectors.toMap(EmployeeSupInfo::getEmpId, Function.identity())));
+        this.setOverrideEmployees(this.getOverrideEmployees().values().stream()
+                .filter(supInfo -> isSupInfoInRange(supInfo, dateRange))
+                .collect(Collectors.toMap(EmployeeSupInfo::getEmpId, Function.identity())));
+        HashBasedTable<Integer, Integer, EmployeeSupInfo> filteredSupOverrideEmps = HashBasedTable.create();
+        this.supOverrideEmployees.values().stream().filter(supInfo -> isSupInfoInRange(supInfo, dateRange))
+            .forEach(supInfo -> filteredSupOverrideEmps.put(supInfo.getSupId(), supInfo.getEmpId(), supInfo));
+        this.supOverrideEmployees = filteredSupOverrideEmps;
+    }
+
+    /**
+     * Determines if an EmployeeSupInfo is contained within the given date range.
+     * @param supInfo EmployeeSupInfo
+     * @param dateRange Range<LocalDate>
+     * @return boolean
+     */
+    private boolean isSupInfoInRange(EmployeeSupInfo supInfo, Range<LocalDate> dateRange) {
+        return supInfo.getSupEndDate() == null || dateRange.contains(supInfo.getSupEndDate());
     }
 
     /** --- Functional Getters/Setters --- */

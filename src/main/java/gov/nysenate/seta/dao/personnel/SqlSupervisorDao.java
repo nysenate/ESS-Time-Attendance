@@ -40,8 +40,10 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 {
     private static final Logger logger = LoggerFactory.getLogger(SqlSupervisorDao.class);
 
-    @Autowired
-    private SqlEmpTransactionDao empTransDao;
+    @Autowired private SqlEmpTransactionDao empTransDao;
+
+    private final Set<TransactionCode> supTransCodes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
+    private final Set<TransactionCode> checkedTransCodes = new HashSet<>(Arrays.asList(EMP,SUP,APP,RTP));
 
     /**
      * {@inheritDoc}
@@ -146,11 +148,9 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
          */
         if (!res.isEmpty()) {
             SupervisorEmpGroup empGroup = new SupervisorEmpGroup(supId, startDate, endDate);
-            Set<TransactionCode> supTransCodes = new HashSet<>(Arrays.asList(SUP,APP,RTP));
             Map<Integer, EmployeeSupInfo> primaryEmps = new HashMap<>();
             Map<Integer, EmployeeSupInfo> overrideEmps = new HashMap<>();
             Table<Integer, Integer, EmployeeSupInfo> supOverrideEmps = HashBasedTable.create();
-
             Map<Integer, LocalDate> possiblePrimaryEmps = new HashMap<>();
             Table<Integer, Integer, LocalDate> possibleSupOvrEmps = HashBasedTable.create();
 
@@ -162,6 +162,8 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
                 LocalDate effectDate = LocalDate.from(formatter.parse(colMap.get("DTEFFECT").toString()));
                 int rank = Integer.parseInt(colMap.get("TRANS_RANK").toString());
+                boolean empTerminated = false;
+                boolean isUncheckedTransCode = false;
                 boolean effectDateIsPast = effectDate.compareTo(startDate) <= 0;
 
                 if (colMap.get("NUXREFSV") == null || !StringUtils.isNumeric(colMap.get("NUXREFSV").toString())) {
@@ -169,16 +171,19 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                 }
 
                 int currSupId = Integer.parseInt(colMap.get("NUXREFSV").toString());
-                EmployeeSupInfo empSupInfo = new EmployeeSupInfo(empId, startDate, endDate);
-                empSupInfo.setSupId(currSupId);
+
+                EmployeeSupInfo empSupInfo = new EmployeeSupInfo(empId, currSupId, startDate, endDate);
                 empSupInfo.setEmpLastName(colMap.get("NALAST").toString());
                 if (supTransCodes.contains(transType)) {
                     empSupInfo.setSupStartDate(effectDate);
                 }
-
-                boolean empTerminated = transType.equals(EMP);
-                if (empTerminated) {
+                else if (transType.equals(EMP)) {
+                    empTerminated = true;
                     empSupInfo.setSupEndDate(effectDate);
+                }
+                else {
+                    isUncheckedTransCode = true;
+                    empSupInfo.setSupStartDate(effectDate);
                 }
 
                 /**
@@ -195,7 +200,7 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
                      */
                     switch (group) {
                         case "PRIMARY": {
-                            if (currSupId == supId && !empTerminated) {
+                            if (currSupId == supId && !empTerminated && !isUncheckedTransCode) {
                                 primaryEmps.put(empId, empSupInfo);
                             }
                             else if (!effectDateIsPast) {

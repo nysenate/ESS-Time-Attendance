@@ -54,6 +54,9 @@ ts.schema =
 # to startup. (Recommended: 600)
 cache.max.size = 600
 
+# Delay (ms) during which the transactions cache is refreshed from the DB.
+cache.poll.delay.transactions = 60000
+
 # --- URL Configuration -------------------------------------------------------
 
 # The url path to be used for accessing resources (css/js)
