@@ -1,6 +1,7 @@
 package gov.nysenate.seta.dao.attendance;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
@@ -19,6 +20,9 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class TimeRecordDaoTests extends BaseTests
@@ -82,35 +86,23 @@ public class TimeRecordDaoTests extends BaseTests
     public void updateTimeRecordTest() {
         removeRecordTest();
         insertTimeRecord();
-        testRecord.getTimeEntries().get(0).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(1).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(2).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(3).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(4).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(5).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(6).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(7).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(8).setWorkHours(BigDecimal.ONE);
-        testRecord.getTimeEntries().get(9).setWorkHours(BigDecimal.ONE);
+        for (int i = 0; i < 10; i++) {
+            testRecord.getTimeEntries().get(i).setWorkHours(BigDecimal.ONE);
+        }
         insertTimeRecord();
-        testRecord.getTimeEntries().get(0).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(1).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(2).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(3).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(4).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(5).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(6).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(7).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(8).setWorkHours(BigDecimal.TEN);
-        testRecord.getTimeEntries().get(9).setWorkHours(BigDecimal.TEN);
+        for (int i = 0; i < 10; i++) {
+            testRecord.getTimeEntries().get(i).setWorkHours(BigDecimal.TEN);
+        }
         insertTimeRecord();
     }
 
     @Test
     public void getRecordByEmployeeId() throws Exception {
-        LocalDate fromDate = LocalDate.of(1990, 1, 1);
-        LocalDate toDate = LocalDate.of(1991, 1, 1);
-        logger.info(OutputUtils.toJson(timeRecordDao.getRecordsDuring(11423, Range.closed(fromDate, toDate))));
+        Stopwatch sw = Stopwatch.createStarted();
+        ListMultimap<Integer, TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(Collections.singleton(11423),
+                Range.closed(LocalDate.of(2015, 1, 1), LocalDate.now()),
+                EnumSet.allOf(TimeRecordStatus.class));
+        logger.info("{}ms", sw.stop().elapsed(TimeUnit.MILLISECONDS));
     }
 
     @Test

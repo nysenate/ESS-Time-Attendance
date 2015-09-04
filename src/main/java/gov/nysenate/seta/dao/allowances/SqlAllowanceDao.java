@@ -1,11 +1,10 @@
 package gov.nysenate.seta.dao.allowances;
 
 
-import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.dao.allowances.mapper.AllowanceRowMapper;
 import gov.nysenate.seta.dao.allowances.mapper.AmountExceedRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.model.allowances.AllowanceUsage;
+import gov.nysenate.seta.model.allowances.OldAllowanceUsage;
 import gov.nysenate.seta.model.payroll.SalaryRec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,18 +12,15 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 @Repository
 public class SqlAllowanceDao extends SqlBaseDao implements AllowanceDao
 {
-    private static final Logger logger = LoggerFactory.getLogger(AllowanceUsage.class);
+    private static final Logger logger = LoggerFactory.getLogger(OldAllowanceUsage.class);
 
     /** --- SQL Queries --- */
 
@@ -85,12 +81,12 @@ public class SqlAllowanceDao extends SqlBaseDao implements AllowanceDao
 
     /** {@inheritDoc} */
     @Override
-     public AllowanceUsage getAllowanceUsage(int empId, int year) {
+     public OldAllowanceUsage getAllowanceUsage(int empId, int year) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         LocalDate janDate = LocalDate.of(year, 1, 1);
         params.addValue("empId", empId);
         params.addValue("janDate", toDate(janDate));
-        LinkedList<AllowanceUsage> annualAllowanceRecs;
+        LinkedList<OldAllowanceUsage> annualAllowanceRecs;
         annualAllowanceRecs = new LinkedList<>(remoteNamedJdbc.query(GET_ALLOWANCE_USAGE_SQL, params,
                 new AllowanceRowMapper("")));
 
@@ -126,27 +122,27 @@ public class SqlAllowanceDao extends SqlBaseDao implements AllowanceDao
         return annualAllowanceRecs.get(0);
     }
 
-    protected LinkedList<SalaryRec> setSalaryRecs(List<Map<String, String>> auditRecs) {
-        LinkedList<SalaryRec> salaries = null;
-        salaries = new LinkedList<SalaryRec>();
-        Map<String, String> currentAuditRec = null;
-
-        for (int x=0;x <auditRecs.size(); x++) {
-            SalaryRec salaryRec = new SalaryRec();
-            currentAuditRec = auditRecs.get(x);
-            logger.debug(OutputUtils.toJson(currentAuditRec));
-
-            salaryRec.setSalary(new BigDecimal(currentAuditRec.get("MOSALBIWKLY")));
-            try {
-                salaryRec.setEffectDate(new SimpleDateFormat("MM/dd/yyyy").parse(currentAuditRec.get("EffectDate")));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            salaries.add(salaryRec);
-        }
-
-        return salaries;
-    }
+//    protected LinkedList<SalaryRec> setSalaryRecs(List<Map<String, String>> auditRecs) {
+//        LinkedList<SalaryRec> salaries = null;
+//        salaries = new LinkedList<SalaryRec>();
+//        Map<String, String> currentAuditRec = null;
+//
+//        for (int x=0;x <auditRecs.size(); x++) {
+//            SalaryRec salaryRec = new SalaryRec();
+//            currentAuditRec = auditRecs.get(x);
+//            logger.debug(OutputUtils.toJson(currentAuditRec));
+//
+//            salaryRec.setSalary(new BigDecimal(currentAuditRec.get("MOSALBIWKLY")));
+//            try {
+//                salaryRec.setEffectDate(new SimpleDateFormat("MM/dd/yyyy").parse(currentAuditRec.get("EffectDate")));
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//            salaries.add(salaryRec);
+//        }
+//
+//        return salaries;
+//    }
 
 }
 

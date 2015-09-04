@@ -1,7 +1,7 @@
 package gov.nysenate.seta.dao.allowances;
 
 import gov.nysenate.seta.dao.base.BaseDao;
-import gov.nysenate.seta.model.allowances.AllowanceUsage;
+import gov.nysenate.seta.model.allowances.OldAllowanceUsage;
 
 /**
  * Data access layer for retrieving and computing allowance information
@@ -9,5 +9,5 @@ import gov.nysenate.seta.model.allowances.AllowanceUsage;
  */
 public interface AllowanceDao extends BaseDao
 {
-    public AllowanceUsage getAllowanceUsage(int empId, int year);
+    public OldAllowanceUsage getAllowanceUsage(int empId, int year);
 }

@@ -5,8 +5,10 @@ import com.google.common.collect.Range;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
+import gov.nysenate.seta.model.period.PayPeriod;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +25,20 @@ public interface TimeRecordService
      * @return
      */
     List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
+                                    Set<TimeRecordStatus> statuses,
+                                    boolean fillMissingRecords);
+
+    /**
+     * Get time records for one or more employees, matching certain time record statuses, for the specified pay periods
+     * Will create time records for uncovered pay periods if desired,
+     *
+     * @param empIds Set<Integer> - employee ids
+     * @param payPeriods Collection<PayPeriod> - pay periods
+     * @param statuses Set<TimeRecordStatus> - time record statuses to retrieve
+     * @param fillMissingRecords boolean - will create new records to fill pay period gaps if true
+     * @return
+     */
+    List<TimeRecord> getTimeRecords(Set<Integer> empIds, Collection<PayPeriod> payPeriods,
                                     Set<TimeRecordStatus> statuses,
                                     boolean fillMissingRecords);
 

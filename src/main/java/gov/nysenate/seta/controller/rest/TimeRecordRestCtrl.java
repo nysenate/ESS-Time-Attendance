@@ -147,7 +147,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
 
     private Range<LocalDate> parseDateRange(String from, String to) {
         LocalDate toDate = to != null ? parseISODate(to, "to") : LocalDate.now();
-        LocalDate fromDate = to != null ? parseISODate(from, "from") : LocalDate.of(toDate.getYear(), 1, 1);
+        LocalDate fromDate = from != null ? parseISODate(from, "from") : LocalDate.of(toDate.getYear(), 1, 1);
         return getClosedRange(fromDate, toDate, "from", "to");
     }
 

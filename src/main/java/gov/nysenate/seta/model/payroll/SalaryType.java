@@ -23,8 +23,17 @@ public enum SalaryType
         this.payType = payType;
     }
 
-    public long getTime() {
-         return time;
+    /** --- Getters --- */
+
+    public String getDesc() {
+        return desc;
     }
 
+    public String getPayType() {
+        return payType;
+    }
+
+    public long getTime() {
+        return time;
+    }
 }

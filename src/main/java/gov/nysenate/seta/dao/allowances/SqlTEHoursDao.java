@@ -2,7 +2,7 @@ package gov.nysenate.seta.dao.allowances;
 
 import gov.nysenate.seta.dao.allowances.mapper.TEHoursRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.model.allowances.AllowanceUsage;
+import gov.nysenate.seta.model.allowances.OldAllowanceUsage;
 import gov.nysenate.seta.model.allowances.TEHours;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class SqlTEHoursDao extends SqlBaseDao implements TEHoursDao
     protected Date beginDate;
     protected Date endDate;
     protected boolean parametersChanged = false;
-    protected static final Logger logger = LoggerFactory.getLogger(AllowanceUsage.class);
+    protected static final Logger logger = LoggerFactory.getLogger(OldAllowanceUsage.class);
 
     /** --- SQL Queries --- */
 

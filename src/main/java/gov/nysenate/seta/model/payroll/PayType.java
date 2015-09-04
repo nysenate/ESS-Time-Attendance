@@ -9,6 +9,7 @@ public enum PayType
 {
     RA("Regular Annual", 1820, true),
     SA("Special Annual", 0, true),
+    SE("Session", 910, true),
     TE("Temporary", 0, false);
 
     private String desc;
