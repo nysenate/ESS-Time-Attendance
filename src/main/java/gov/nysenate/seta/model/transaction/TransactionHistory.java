@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -112,81 +111,31 @@ public class TransactionHistory
         return minHrs;
     }
 
-    /**
-     * Get a list of hourly work payments that are applicable to work performed in the given year
-     * @param year int
-     * @return List<HourlyWorkPayment>
-     */
-    public List<HourlyWorkPayment> getHourlyPayments(int year) {
-        logger.info("getting hourly payments for {}", year);
-        LocalDate prevYearStart = LocalDate.of(year - 1, 1, 1);
-        LocalDate nextYearEnd = LocalDate.of(year + 1, 12, 31);
-        Range<LocalDate> auditDateRange = Range.closed(prevYearStart, nextYearEnd);
-        Range<LocalDate> yearRange = Range.closed(LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
-
-        Table<Integer, String, TransactionRecord> effectiveRecords = TreeBasedTable.create();
-        getRecords(TransactionCode.HWT).stream()
-                // Filter out records more than a year before or after the requested year
-                .filter(record -> auditDateRange.contains(record.getAuditDate().toLocalDate()))
-                // Filter out records that are not temporary employee transactions
-                .forEach(record -> {
-                    // Add the record to the set of effective temporary transactions
-                    // if two records with the same document number exist for the same year,
-                    //   use only the one with the latest audit date
-                    TransactionRecord existingRecord =
-                            effectiveRecords.get(record.getAuditDate().getYear(), record.getDocumentId());
-                    if (existingRecord == null || existingRecord.getAuditDate().isBefore(record.getAuditDate())) {
-                        effectiveRecords.put(record.getAuditDate().getYear(), record.getDocumentId(), record);
-                    }
-                });
-
-        Map<LocalDate, TransactionRecord> priorYearPayments = getRecords(TransactionCode.PYA).stream()
-                .collect(Collectors.toMap(TransactionRecord::getEffectDate, Function.identity()));
-
-        // Parse the transactions into HourlyWorkPayment records
-        // Return the HourlyWorkPayments with work date ranges that overlap with the requested year
-        return effectiveRecords.values().stream()
-                .map(record -> new HourlyWorkPayment(
-                        record.getAuditDate(),
-                        record.getEffectDate(),
-                        record.getLocalDateValue("DTENDTE"),
-                        record.getBigDecimalValue("NUHRHRSPD"),
-                        new BigDecimal(latestValueOf("MOTOTHRSPD", record.getEffectDate(), false).orElse("0")),
-                        priorYearPayments.containsKey(record.getEffectDate())
-                                ? priorYearPayments.get(record.getEffectDate()).getBigDecimalValue("MOPRIORYRTE")
-                                : BigDecimal.ZERO
-                ))
-                .filter(payment -> yearRange.contains(payment.getEffectDate()) ||
-                        yearRange.contains(payment.getEndDate()))
-                .sorted((hwpA, hwpB) -> hwpA.getEffectDate().compareTo(hwpB.getEffectDate()))
-                .collect(Collectors.toList());
+    public TreeMap<LocalDate, BigDecimal> getEffectiveAllowances(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, BigDecimal> allowances = new TreeMap<>();
+        getEffectiveEntriesDuring("MOAMTEXCEED", dateRange, true)
+                .forEach((date, allowance) -> allowances.put(date, new BigDecimal(allowance)));
+        return allowances;
     }
 
-    /**
-     * @return RangeMap<LocalDate, SalaryRec> - all of the employee's past salaries mapped to their effective date ranges
-     */
-    public RangeMap<LocalDate, SalaryRec> getSalaryRecs() {
-        RangeMap<LocalDate, SalaryRec> salaryRecs = TreeRangeMap.create();
+    public TreeMap<LocalDate, SalaryRec> getEffectiveSalaryRecs(Range<LocalDate> dateRange) {
         TreeBasedTable<LocalDate, String, String> effectiveSalEntries =
-                getUniqueEntriesDuring(Sets.newHashSet("MOSALBIWKLY", "CDPAYTYPE"), DateUtils.ALL_DATES, true);
-
-        LocalDate effectDate = null;
-        for (LocalDate nextEffectDate : effectiveSalEntries.rowKeySet()) {
-            if (effectDate != null) {
-                SalaryRec rec = new SalaryRec(
-                        new BigDecimal(effectiveSalEntries.get(effectDate, "MOSALBIWKLY")),
-                        PayType.valueOf(effectiveSalEntries.get(effectDate, "CDPAYTYPE")),
-                        effectDate, nextEffectDate.minusDays(1) );
-                salaryRecs.put(rec.getEffectiveRange(), rec);
+                getUniqueEntriesDuring(Sets.newHashSet("MOSALBIWKLY", "CDPAYTYPE"), dateRange, true);
+        TreeMap<LocalDate, SalaryRec> salaryRecs = new TreeMap<>();
+        SalaryRec lastRec = null;
+        for (LocalDate effectDate : effectiveSalEntries.rowKeySet()) {
+            if (lastRec != null) {
+                lastRec.setEndDate(effectDate);
             }
-            effectDate = nextEffectDate;
+            lastRec = new SalaryRec(
+                    new BigDecimal(effectiveSalEntries.get(effectDate, "MOSALBIWKLY")),
+                    PayType.valueOf(effectiveSalEntries.get(effectDate, "CDPAYTYPE")),
+                    effectDate);
+            salaryRecs.put(lastRec.getEffectDate(), lastRec);
         }
-        SalaryRec lastRec = new SalaryRec(
-                new BigDecimal(effectiveSalEntries.get(effectDate, "MOSALBIWKLY")),
-                PayType.valueOf(effectiveSalEntries.get(effectDate, "CDPAYTYPE")),
-                effectDate, DateUtils.THE_FUTURE);
-        salaryRecs.put(lastRec.getEffectiveRange(), lastRec);
-
+        if (lastRec != null) {
+            lastRec.setEndDate(DateUtils.endOfDateRange(dateRange));
+        }
         return salaryRecs;
     }
 

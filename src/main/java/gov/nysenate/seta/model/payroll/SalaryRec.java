@@ -1,6 +1,7 @@
 package gov.nysenate.seta.model.payroll;
 
 import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,13 +25,17 @@ public class SalaryRec {
         this.endDate = endDate;
     }
 
+    public SalaryRec(BigDecimal salaryRate, PayType payType, LocalDate effectDate) {
+        this(salaryRate, payType, effectDate, DateUtils.THE_FUTURE);
+    }
+
     /** --- Functional Getters --- */
 
     public Range<LocalDate> getEffectiveRange() {
-        return Range.closed(effectDate, endDate);
+        return Range.closedOpen(effectDate, endDate);
     }
 
-    /** --- Getters --- */
+    /** --- Getters / Setters --- */
 
     public BigDecimal getSalaryRate() {
         return salaryRate;
@@ -46,5 +51,9 @@ public class SalaryRec {
 
     public LocalDate getEndDate() {
         return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

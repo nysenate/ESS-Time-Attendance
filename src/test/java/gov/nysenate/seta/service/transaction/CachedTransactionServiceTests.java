@@ -30,7 +30,6 @@ public class CachedTransactionServiceTests extends BaseTests {
     private void timedGet(int empId) {
         Stopwatch sw = Stopwatch.createStarted();
         TransactionHistory transHistory = transService.getTransHistory(empId);
-        transHistory.getHourlyPayments(2014);
         logger.info("got trans history for {}:  {}", empId, sw.stop().elapsed(TimeUnit.NANOSECONDS));
     }
 

@@ -24,12 +24,6 @@ public class HourlyWorkPayment {
     /** Money paid for the year prior to the year of endDate */
     private BigDecimal prevYearMoneyPaid;
 
-    public HourlyWorkPayment() {
-        this.hoursPaid = BigDecimal.ZERO;
-        this.hoursPaid = BigDecimal.ZERO;
-        this.hoursPaid = BigDecimal.ZERO;
-    }
-
     public HourlyWorkPayment(LocalDateTime auditDate, LocalDate effectDate, LocalDate endDate,
                              BigDecimal hoursPaid, BigDecimal moneyPaid, BigDecimal prevYearMoneyPaid) {
         this.auditDate = auditDate;

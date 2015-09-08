@@ -56,20 +56,20 @@ public class TransactionHistoryTests extends BaseTests
 
     }
 
-    @Test
-    public void getHourlyPaymentsTest() {
-        TransactionHistory transHistory = transactionDao.getTransHistory(10683, NONE);
-        int year = 2013;
-        List<HourlyWorkPayment> hourlyPayments = transHistory.getHourlyPayments(year);
-        hourlyPayments.forEach(hp -> logger.info("dte:{}\thrs:{}\tmoney:{}\tthisyr:{}\tlastyr:{}\tnxtYr:{}",
-                hp.getEffectDate(), hp.getHoursPaid(), hp.getMoneyPaid(),
-                hp.getMoneyPaidForYear(year), hp.getMoneyPaidForYear(year-1), hp.getMoneyPaidForYear(year + 1)));
-    }
-
-    @Test
-    public void getSalariesTest() {
-        TransactionHistory transHistory = transactionDao.getTransHistory(4856, NONE);
-        RangeMap<LocalDate, SalaryRec> salaryRecs = transHistory.getSalaryRecs();
-        salaryRecs.asMapOfRanges().values().forEach(salaryRec -> logger.info("{}", OutputUtils.toJson(salaryRec)));
-    }
+//    @Test
+//    public void getHourlyPaymentsTest() {
+//        TransactionHistory transHistory = transactionDao.getTransHistory(10683, NONE);
+//        int year = 2013;
+//        List<HourlyWorkPayment> hourlyPayments = transHistory.getHourlyPayments(year);
+//        hourlyPayments.forEach(hp -> logger.info("dte:{}\thrs:{}\tmoney:{}\tthisyr:{}\tlastyr:{}\tnxtYr:{}",
+//                hp.getEffectDate(), hp.getHoursPaid(), hp.getMoneyPaid(),
+//                hp.getMoneyPaidForYear(year), hp.getMoneyPaidForYear(year-1), hp.getMoneyPaidForYear(year + 1)));
+//    }
+//
+//    @Test
+//    public void getSalariesTest() {
+//        TransactionHistory transHistory = transactionDao.getTransHistory(4856, NONE);
+//        RangeMap<LocalDate, SalaryRec> salaryRecs = transHistory.getSalaryRecs();
+//        salaryRecs.asMapOfRanges().values().forEach(salaryRec -> logger.info("{}", OutputUtils.toJson(salaryRec)));
+//    }
 }
