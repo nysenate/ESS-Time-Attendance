@@ -55,7 +55,7 @@ Toggle this for temporary emps.
                 records[iSelectedRecord].recordStatus === 'DISAPPROVED_PERSONNEL'">
   </div>
 
-  <div ess-notification level="error" title="No time records available to enter."
+  <div ess-notification level="warn" title="No time records available to enter."
        ng-show="state.fetchedRecs === true && records.length == 0"
        message="Please contact Senate Personnel at XXX-XXX-XXXX for more details."></div>
 
