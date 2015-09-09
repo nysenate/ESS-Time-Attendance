@@ -71,7 +71,7 @@ public enum TransactionCode
     SUP(PER, "NAFIRSTSUP, NALASTSUP, NUXREFSV", "ATTENDANCE SUPERVISOR"),
     SWT(PAY, "NUSTATTAXEX", "STATE WITHHOLDING EXEMP"),
     TAX(PAY, "", "TAX"),
-    THP(PAY, "MOTOTHRSPD", "TOTAL HOURLY PAY"),
+    THP(PAY, "MOTOTHRSPD", "TOTAL HOURS PAID"),
     TLE(PER, "CDEMPTITLE", "EMPLOYEE TITLE CODE"),
     TLT(PAY, "DETIMELOST, DEDAYSLOST", "LOST TIME"),
     TXN(PAY, "DETXNNOTEPAY", "PAYROLL TRANSACTION NOTE"),
@@ -102,7 +102,7 @@ public enum TransactionCode
     }
 
     public static Set<TransactionCode> getAll() {
-        return Stream.of(TransactionCode.values()).collect(Collectors.toSet());
+        return EnumSet.allOf(TransactionCode.class);
     }
 
     /** --- Methods --- */

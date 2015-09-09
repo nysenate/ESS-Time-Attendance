@@ -2,16 +2,21 @@ package gov.nysenate.seta.model.transaction;
 
 import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
+import gov.nysenate.seta.model.allowances.HourlyWorkPayment;
 import gov.nysenate.seta.model.payroll.PayType;
+import gov.nysenate.seta.model.payroll.SalaryRec;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The TransactionHistory maintains an ordered collection of TransactionRecords. This class is intended to be
@@ -106,6 +111,34 @@ public class TransactionHistory
         return minHrs;
     }
 
+    public TreeMap<LocalDate, BigDecimal> getEffectiveAllowances(Range<LocalDate> dateRange) {
+        TreeMap<LocalDate, BigDecimal> allowances = new TreeMap<>();
+        getEffectiveEntriesDuring("MOAMTEXCEED", dateRange, true)
+                .forEach((date, allowance) -> allowances.put(date, new BigDecimal(allowance)));
+        return allowances;
+    }
+
+    public TreeMap<LocalDate, SalaryRec> getEffectiveSalaryRecs(Range<LocalDate> dateRange) {
+        TreeBasedTable<LocalDate, String, String> effectiveSalEntries =
+                getUniqueEntriesDuring(Sets.newHashSet("MOSALBIWKLY", "CDPAYTYPE"), dateRange, true);
+        TreeMap<LocalDate, SalaryRec> salaryRecs = new TreeMap<>();
+        SalaryRec lastRec = null;
+        for (LocalDate effectDate : effectiveSalEntries.rowKeySet()) {
+            if (lastRec != null) {
+                lastRec.setEndDate(effectDate);
+            }
+            lastRec = new SalaryRec(
+                    new BigDecimal(effectiveSalEntries.get(effectDate, "MOSALBIWKLY")),
+                    PayType.valueOf(effectiveSalEntries.get(effectDate, "CDPAYTYPE")),
+                    effectDate);
+            salaryRecs.put(lastRec.getEffectDate(), lastRec);
+        }
+        if (lastRec != null) {
+            lastRec.setEndDate(DateUtils.endOfDateRange(dateRange));
+        }
+        return salaryRecs;
+    }
+
     /** --- Functional Getters/Setters --- */
 
     /**
@@ -186,13 +219,48 @@ public class TransactionHistory
     }
 
     /**
+     * Gets the effective values for a set of columns on each date that one of the columns changed
+     * @param keys Set<String> - a set of column names
+     * @param dateRange Range<LocalDate> - range of dates in which effective values will be queried
+     * @param skipNulls boolean - will only include value sets where all values are non-null if set to true
+     * @return TreeBasedTable<LocalDate, String, String> - Effective date -> Column name -> Column value on date
+     */
+    public TreeBasedTable<LocalDate, String, String> getUniqueEntriesDuring(Set<String> keys,
+                                                                            Range<LocalDate> dateRange,
+                                                                            boolean skipNulls) {
+        // Get the effective entries for each value converted into range maps
+        Map<String, RangeMap<LocalDate, String>> entryRangeMaps = keys.stream()
+                .map(key -> ImmutablePair.of(key,
+                        RangeUtils.toRangeMap(
+                                getEffectiveEntriesDuring(key, dateRange, skipNulls), DateUtils.THE_FUTURE)))
+                .collect(Collectors.toMap(ImmutablePair::getLeft, ImmutablePair::getRight));
+
+        // Get a set of all dates where one of the values changed
+        Set<LocalDate> changeDates = entryRangeMaps.values().stream()
+                .flatMap(entryRangeMap -> entryRangeMap.asMapOfRanges().keySet().stream())
+                .map(DateUtils::startOfDateRange)
+                .collect(Collectors.toSet());
+
+        TreeBasedTable<LocalDate, String, String> uniqueEntries = TreeBasedTable.create();
+        // Get the effective entry of each key for each change date
+        changeDates.stream()
+                // if skip nulls is set, filter out entries where one or more keys are null
+                .filter(date -> !skipNulls ||
+                        entryRangeMaps.values().stream().allMatch(rangeMap -> rangeMap.get(date) != null))
+                .flatMap(date -> entryRangeMaps.entrySet().stream()
+                        .map(entry -> ImmutableTriple.of(date, entry.getKey(), entry.getValue().get(date))))
+                .forEach(triple -> uniqueEntries.put(triple.getLeft(), triple.getMiddle(), triple.getRight()));
+        return uniqueEntries;
+    }
+
+    /**
      * Obtains a mapping of LocalDate -> String for the values associated with the given key during the specified
      * date range. For example given the key 'NUXREFSV', a map will be returned containing the value of that field
      * before/on the start of the date range, and any modifications of that value up until the end of the date range.
      *
      * @param key String - The audit record column name
      * @param dateRange LocalDate - The date range for the values to be effective during.
-     * @param skipNulls boolean - If true, null values will be exluded from the map.
+     * @param skipNulls boolean - If true, null values will be excluded from the map.
      * @return TreeMap<LocalDate, String>
      */
     public TreeMap<LocalDate, String> getEffectiveEntriesDuring(String key, Range<LocalDate> dateRange, boolean skipNulls) {
@@ -284,6 +352,16 @@ public class TransactionHistory
      */
     public ImmutableMultimap<TransactionCode, TransactionRecord> getRecordsByCode() {
         return ImmutableMultimap.copyOf(recordsByCode);
+    }
+
+    /**
+     * Get a chronologically ordered immutable list containing all records with the given code in the transaction history
+     * @param code TransactionCode
+     * @return ImmutableList<TransactionRecord>
+     */
+    public ImmutableList<TransactionRecord> getRecords(TransactionCode code) {
+        List<TransactionRecord> records = recordsByCode.get(code);
+        return records != null ? ImmutableList.copyOf(records) : ImmutableList.of();
     }
 
     /**

@@ -23,20 +23,19 @@ public class CachedTransactionServiceTests extends BaseTests {
     private static final Logger logger = LoggerFactory.getLogger(CachedTransactionServiceTests.class);
 
     @Autowired EmpTransactionDao transDao;
-    @Autowired
-    EssCachedEmpTransactionService transService;
+    @Autowired EssCachedEmpTransactionService transService;
 
     @Autowired EventBus eventBus;
 
     private void timedGet(int empId) {
         Stopwatch sw = Stopwatch.createStarted();
-        transService.getTransHistory(empId);
+        TransactionHistory transHistory = transService.getTransHistory(empId);
         logger.info("got trans history for {}:  {}", empId, sw.stop().elapsed(TimeUnit.NANOSECONDS));
     }
 
     @Test
     public void cacheTest() {
-        int empId = 11423;
+        int empId = 45;
         for (int i = 0; i < 4; i++) {
             timedGet(empId);
         }
@@ -44,7 +43,7 @@ public class CachedTransactionServiceTests extends BaseTests {
 
     @Test
     public void invalidateTest() {
-        int empId = 11423;
+        int empId = 5803;
         cacheTest();
         logger.info("invalidating {}!", empId);
         eventBus.post(new CacheEvictIdEvent<>(ContentCache.TRANSACTION, empId));

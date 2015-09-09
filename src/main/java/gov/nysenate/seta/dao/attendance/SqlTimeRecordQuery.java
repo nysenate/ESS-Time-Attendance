@@ -48,8 +48,7 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
             String.format(GET_TIME_REC_BY_DATES.getSql(), "AND :supId IN (rec.NUXREFSV, ")
     ),
     GET_TREC_BY_EMPID(
-        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-                "NUXREFEM = :empId")
+        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(), "NUXREFEM = :empId")
     ),
     GET_TREC_BY_DATE(
         String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),

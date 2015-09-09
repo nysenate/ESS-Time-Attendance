@@ -3,8 +3,10 @@ package gov.nysenate.seta.model.transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -15,6 +17,8 @@ import java.util.Map;
 public class TransactionRecord
 {
     private static final Logger logger = LoggerFactory.getLogger(TransactionRecord.class);
+
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
     /** The employee id that this record belongs to. */
     protected int employeeId;
@@ -27,6 +31,11 @@ public class TransactionRecord
 
     /** The transaction code indicates the kinds of changes made. */
     protected TransactionCode transCode;
+
+    /** Document Id for the transaction
+     *  For temporary employees, this corresponds to a pay period and is prefixed with 'T'
+     *  For annual employees, this uniquely identifies a group of transactions */
+    protected String documentId;
 
     /** A mapping of the transaction's database column names to their values. */
     protected Map<String, String> valueMap;
@@ -81,6 +90,33 @@ public class TransactionRecord
         throw new IllegalStateException("The value map for the transaction record was not set.");
     }
 
+    /**
+     * Returns the value of the given column name, parsed into a LocalDate
+     * @param colName String
+     * @return LocalDate
+     */
+    public LocalDate getLocalDateValue(String colName) {
+        String dateString = getValue(colName);
+        return dateString != null ? LocalDate.parse(dateString, dateFormatter) : null;
+    }
+
+    /**
+     * Returns the value of the given column name, parsed into a big decimal
+     * @param colName String
+     * @param returnZero boolean - if this is true, 0 will be returned when the column value is null, otherwise null
+     * @return BigDecimal
+     */
+    public BigDecimal getBigDecimalValue(String colName, boolean returnZero) {
+        String numString = getValue(colName);
+        if (numString == null) {
+            return returnZero ? BigDecimal.ZERO : null;
+        }
+        return new BigDecimal(numString);
+    }
+    public BigDecimal getBigDecimalValue(String colName) {
+        return getBigDecimalValue(colName, true);
+    }
+
     /** --- Basic Getters/Setters --- */
 
     public int getEmployeeId() {
@@ -113,6 +149,14 @@ public class TransactionRecord
 
     public void setTransCode(TransactionCode transCode) {
         this.transCode = transCode;
+    }
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public Map<String, String> getValueMap() {

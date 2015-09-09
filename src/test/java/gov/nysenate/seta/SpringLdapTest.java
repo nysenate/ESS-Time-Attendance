@@ -58,7 +58,7 @@ public class SpringLdapTest extends BaseTests
 
     @Test
     public void getByEmpIdTest() {
-        int empId = 11344;
+        int empId = 5803;
         List<SenateLdapPerson> peoples = ldapTemplate.search(query().where("employeeid").is(Integer.toString(empId)),
                 (AttributesMapper<SenateLdapPerson>) SenateLdapPerson::new);
         logger.info("{}", peoples.get(0));

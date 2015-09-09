@@ -4,7 +4,6 @@ import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
-import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
@@ -59,6 +58,16 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .peek(this::initializeEntries)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TimeRecord> getTimeRecords(Set<Integer> empIds, Collection<PayPeriod> payPeriods,
+                                           Set<TimeRecordStatus> statuses, boolean fillMissingRecords) {
+        RangeSet<LocalDate> dateRanges = TreeRangeSet.create();
+        payPeriods.forEach(period -> dateRanges.add(period.getDateRange()));
+        return getTimeRecords(empIds, dateRanges.span(), statuses, fillMissingRecords).stream()
+                .filter(record -> dateRanges.encloses(record.getDateRange()))
                 .collect(Collectors.toList());
     }
 

@@ -1,45 +1,59 @@
 package gov.nysenate.seta.model.payroll;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import com.google.common.collect.Range;
+import gov.nysenate.common.DateUtils;
 
-/**
- * Created by Heitner on 6/30/2014.
- */
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class SalaryRec {
-    private BigDecimal mosalbiwkly;
-    private Date dteffect;
-    private Date dteffectEnd;
-    private SalaryType salaryType;
-    public SalaryRec() {}
 
-    public BigDecimal getSalary() {
-        return mosalbiwkly;
-    }
-    public void setSalary(BigDecimal mosalbiwkly) {
-        this.mosalbiwkly = mosalbiwkly;
-    }
-    public Date getEffectDate() {
-        return dteffect;
-    }
-    public void setEffectDate(Date dteffect) {
-        this.dteffect = dteffect;
-    }
-    public Date getEffectEndDate() {
-        return dteffectEnd;
+    /** The amount paid to the employee per pay period/hour/year */
+    private BigDecimal salaryRate;
+
+    /** Specifies the time unit that this salary is tracked by e.g. biweekly/hourly/yearly */
+    private PayType payType;
+
+    /** The start and end points for the range of dates for which this salary is in effect */
+    private LocalDate effectDate;
+    private LocalDate endDate;
+
+    public SalaryRec(BigDecimal salaryRate, PayType payType, LocalDate effectDate, LocalDate endDate) {
+        this.salaryRate = salaryRate;
+        this.payType = payType;
+        this.effectDate = effectDate;
+        this.endDate = endDate;
     }
 
-    public void setEffectEndDate(Date dteffectEnd) {
-        this.dteffectEnd = dteffectEnd;
+    public SalaryRec(BigDecimal salaryRate, PayType payType, LocalDate effectDate) {
+        this(salaryRate, payType, effectDate, DateUtils.THE_FUTURE);
     }
 
-    public SalaryType getSalaryType(SalaryType salaryType) {
-        return salaryType;
+    /** --- Functional Getters --- */
+
+    public Range<LocalDate> getEffectiveRange() {
+        return Range.closedOpen(effectDate, endDate);
     }
 
-    public void setSalaryType(SalaryType salaryType) {
-        this.salaryType =  salaryType;
+    /** --- Getters / Setters --- */
+
+    public BigDecimal getSalaryRate() {
+        return salaryRate;
     }
 
+    public PayType getPayType() {
+        return payType;
+    }
+
+    public LocalDate getEffectDate() {
+        return effectDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
 }
