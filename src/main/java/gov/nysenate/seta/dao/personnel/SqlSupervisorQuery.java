@@ -55,7 +55,18 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
 
     GET_SUP_CHAIN_EXCEPTIONS(
         "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM ${masterSchema}.PM23SPCHNEX\n" +
-        "WHERE CDSTATUS = 'A' AND NUXREFEM = :empId")
+        "WHERE CDSTATUS = 'A' AND NUXREFEM = :empId"),
+
+    GET_SUP_OVERRIDES(
+        "SELECT NUXREFEM, NUXREFSVSUB, CDSTATUS, DTSTART, DTEND, DTTXNORIGIN, DTTXNUPDATE\n" +
+        "FROM ${tsSchema}.PM23SUPOVRRD\n" +
+        "WHERE NUXREFEM = :empId AND NUXREFSVSUB IS NOT NULL AND CDSTATUS = 'A'"
+    ),
+    GET_SUP_GRANTS(
+        "SELECT NUXREFEM, NUXREFSVSUB, CDSTATUS, DTSTART, DTEND, DTTXNORIGIN, DTTXNUPDATE\n" +
+        "FROM ${tsSchema}.PM23SUPOVRRD\n" +
+        "WHERE NUXREFSVSUB = :empId AND CDSTATUS = 'A'"
+    )
     ;
 
     private String sql;

@@ -23,6 +23,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -74,7 +75,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     @Override
     public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
-        MapSqlParameterSource params = new MapSqlParameterSource("empId", empId);
+        SqlParameterSource params = new MapSqlParameterSource("empId", empId);
         OrderBy orderBy = new OrderBy("year", yearOrder);
         return remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_DISTINCT_YEARS.getSql(schemaMap(), orderBy), params,
             new SingleColumnRowMapper<>());

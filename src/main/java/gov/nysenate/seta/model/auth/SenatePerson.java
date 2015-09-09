@@ -8,7 +8,7 @@ public interface SenatePerson
 {
     public String getUid();
 
-    public String getEmployeeId();
+    public Integer getEmployeeId();
 
     public String getFullName();
 

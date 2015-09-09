@@ -66,13 +66,13 @@ public class EssLdapAuthService implements LdapAuthService
 
     /** {@inheritDoc} */
     public LdapAuthResult authenticateUserByUidWithoutCreds(String uid, String suppliedPass, String masterPass) {
-        logger.warn("Warning! Attempting login as user {} with authentication disabled.");
+        logger.warn("Warning! Attempting login as user {} with authentication disabled.", uid);
         LdapAuthResult ldapAuthResult = authenticateUserByUid(uid, suppliedPass);
         if (ldapAuthResult.getAuthStatus().equals(LdapAuthStatus.AUTHENTICATION_EXCEPTION)) {
             if (suppliedPass.equals(masterPass)) {
                 SenateLdapPerson person = ldapAuthDao.getPersonByUid(uid);
                 if (person != null) {
-                    logger.warn("Warning! Allowing login as user {} with authentication disabled.");
+                    logger.warn("Warning! Allowing login as user {} with authentication disabled.", uid);
                     return new LdapAuthResult(LdapAuthStatus.AUTHENTICATED, uid, null, person);
                 }
             }

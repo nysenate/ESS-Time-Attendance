@@ -18,6 +18,7 @@ import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
+import gov.nysenate.seta.service.personnel.SupervisorInfoService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +34,15 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
 {
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordService.class);
 
-    @Autowired public EmployeeInfoService empInfoService;
-    @Autowired public EmpTransactionService transService;
-    @Autowired public AccrualInfoService accrualInfoService;
+    @Autowired protected EmployeeInfoService empInfoService;
+    @Autowired protected EmpTransactionService transService;
+    @Autowired protected AccrualInfoService accrualInfoService;
+    @Autowired protected SupervisorInfoService supervisorInfoService;
+
+    @Override
+    public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
+        return timeRecordDao.getTimeRecordYears(empId, yearOrder);
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -66,7 +73,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
     public ListMultimap<Integer, TimeRecord> getSupervisorRecords(int supId, Range<LocalDate> dateRange,
                                                                   Set<TimeRecordStatus> statuses)
             throws SupervisorException {
-        SupervisorEmpGroup empGroup = supervisorDao.getSupervisorEmpGroup(supId, dateRange);
+        SupervisorEmpGroup empGroup = supervisorInfoService.getSupervisorEmpGroup(supId, dateRange);
         ListMultimap<Integer, TimeRecord> records = ArrayListMultimap.create();
 
         // Get and addUsage primary employee time records
@@ -142,8 +149,8 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         SetMultimap<Range<LocalDate>, Integer> periods = HashMultimap.create();
         supInfos.forEach(supInfo ->
                 periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
-        return periods.keySet().stream()
-                .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, true).stream())
+        return periods.keySet().stream().parallel()
+                .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, false).stream())
                 .collect(Collectors.toList());
     }
 

@@ -1,5 +1,8 @@
 package gov.nysenate.seta.controller.page;
 
+import gov.nysenate.common.SortOrder;
+import gov.nysenate.seta.model.auth.SenatePerson;
+import gov.nysenate.seta.service.attendance.TimeRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,9 +21,12 @@ public class TimePageCtrl extends BaseEssPageCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(TimePageCtrl.class);
 
+    private TimeRecordService timeRecordService;
+
     @RequestMapping(method = RequestMethod.GET)
     public String mainPage(ModelMap modelMap, HttpServletRequest request) {
-        addModelMapData(modelMap);
+        SenatePerson senatePerson = getUser();
+        addCommonModelMapData(modelMap);
 		return "time";
 	}
 }

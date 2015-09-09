@@ -30,6 +30,12 @@ public class Employee extends Person
         this.workLocation = other.workLocation;
     }
 
+    /** --- Functional Getters --- */
+
+    public boolean isSenator() {
+        return respCenter != null && respCenter.getAgency() != null && respCenter.getAgency().getCode().equals("04210");
+    }
+
     /** Basic Getters/Setters */
 
     public int getEmployeeId() {

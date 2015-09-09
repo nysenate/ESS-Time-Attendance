@@ -3,6 +3,7 @@ package gov.nysenate.seta.client.view;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.transaction.TransactionColumn;
 import gov.nysenate.seta.model.transaction.TransactionRecord;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,7 +33,7 @@ public class EmpTransRecordView implements ViewObject
             this.transDesc = record.getTransCode().getDesc();
             this.valueMap = new HashMap<>();
             record.getValueMap().forEach((k,v) -> {
-                if (TransactionColumn.isValidColumn(k)) {
+                if (TransactionColumn.isValidColumn(k) && StringUtils.isNotBlank(v)) {
                     String desc = TransactionColumn.valueOf(k).getDesc();
                     if (!desc.isEmpty()) {
                         this.valueMap.put(TransactionColumn.valueOf(k).getDesc(), v);
@@ -40,9 +41,6 @@ public class EmpTransRecordView implements ViewObject
                     else {
                         this.valueMap.put(k,v);
                     }
-                }
-                else {
-                    this.valueMap.put(k,v);
                 }
             });
             this.effectDate = record.getEffectDate();

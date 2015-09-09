@@ -1,17 +1,27 @@
 var essTime = angular.module('essTime');
 
-essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', 'TimeRecordsApi', 'modals', 'RecordUtils',
-function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
+essTime.controller('RecordHistoryCtrl', ['$scope', 'appProps', '$q', 'ActiveYearsTimeRecordsApi',
+                                         'TimeRecordsApi', 'modals', 'RecordUtils',
+function ($scope, appProps, $q, ActiveYearsTimeRecordsApi, timeRecordsApi, modals, recordUtils) {
 
     $scope.state = {
-        searching: false
+        searching: false,
+        recordYears: null,
+        year: null
     };
 
-    $scope.activeYears = appProps.empActiveYears;
-    $scope.year = $scope.activeYears[0] || 0;
-
     $scope.init = function() {
-        $scope.getRecords();
+        var empId = appProps.user.employeeId;
+        ActiveYearsTimeRecordsApi.get({empId: empId}, function(resp) {
+            if (resp.success) {
+                $scope.state.recordYears = resp.years.reverse();
+                $scope.state.year = $scope.state.recordYears[0];
+                $scope.getRecords();
+            }
+            else {
+                alert("Error getting time records.");
+            }
+        });
     };
 
     // Settings for floating the time entry table heading
@@ -30,9 +40,9 @@ function ($scope, appProps, timeRecordsApi, modals, recordUtils) {
         var now = moment();
         var params = {
             empId: empId,
-            from: $scope.year.toString() + '-01-01',
-            to: $scope.year < now.year() ?
-                $scope.year.toString() + '-12-31' :
+            from: $scope.state.year.toString() + '-01-01',
+            to: $scope.state.year < now.year() ?
+                $scope.state.year.toString() + '-12-31' :
                 now.format('YYYY-MM-DD')
         };
         console.log('getting new records', params);

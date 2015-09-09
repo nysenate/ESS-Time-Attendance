@@ -42,6 +42,7 @@ public class EssEhEhCacheManageService implements EhCacheManageService
 
     @Override
     public Cache registerCustomCache(CacheConfiguration config) {
+        config.sizeOfPolicy(defaultSizeOfPolicy());
         Cache cache = new Cache(config);
         cacheManager.addCache(cache);
         return cache;

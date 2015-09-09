@@ -128,9 +128,8 @@ Toggle this for temporary emps.
                    ng-model="entry.workHours" tabindex="{{$index+1}}" name="numWorkHours"/>
           </td>
           <td>
-            <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                   placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
-                   ng-model="entry.holidayHours" name="numHolidayHours" disabled/>
+            <input type="number" readonly time-record-input class="hours-input"
+                   step=".5" min="0" max="7" ng-model="entry.holidayHours" name="numHolidayHours"/>
           </td>
           <td ng-class="{invalid: entry.vacationHours > 0 && !validation.accruals.vacation || entry.vacationHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"

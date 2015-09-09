@@ -8,12 +8,8 @@ essApi.factory('PayPeriodApi', ['$resource', 'appProps', function($resource, app
 
 /** --- Holiday API --- */
 
-essApi.factory('HolidaysDuringYearApi', ['$resource', 'appProps', function($resource, appProps) {
-    return $resource(appProps.apiPath + '/holidays/year/:year');
-}]);
-
-essApi.factory('HolidaysDuringDatesApi', ['$resource', 'appProps', function($resource, appProps) {
-    return $resource(appProps.apiPath + '/holidays/dates/:startDate/:endDate');
+essApi.factory('HolidayApi', ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/holidays');
 }]);
 
 /** --- Time Record API --- */
@@ -40,6 +36,15 @@ essApi.factory('SupervisorTimeRecordsApi', ['$resource', 'appProps', function ($
 essApi.factory('SupervisorEmployeesApi', ['$resource', 'appProps', function ($resource, appProps) {
     return $resource(appProps.apiPath + '/supervisor/employees');
 }]);
+
+essApi.factory('SupervisorChainApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/supervisor/chain');
+}]);
+
+essApi.factory('SupervisorGrantsApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/supervisor/grants');
+}]);
+
 
 /** --- Accrual API --- */
 

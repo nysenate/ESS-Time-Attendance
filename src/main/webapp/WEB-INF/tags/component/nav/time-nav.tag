@@ -1,6 +1,7 @@
 <%@tag description="Left navigation menu for Time & Attendance screens" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="ess-component-nav" tagdir="/WEB-INF/tags/component/nav" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 
 <section class="left-nav" ess-navigation>
     <ess-component-nav:nav-header topicTitle="Time And Attendance Menu" colorClass="teal"/>
@@ -15,14 +16,14 @@
         <ul class="sub-topic-list">
             <li class="sub-topic"><a href="${ctxPath}/time/accrual/history">Accrual Summary</a></li>
         </ul>
-    <h3 class="main-topic">Manage Employees</h3>
-    <ul class="sub-topic-list">
-        <li class="sub-topic"><a href="${ctxPath}/time/record/manage">Review Time Records</a></li>
-        <li class="sub-topic"><a href="${ctxPath}/time/record/emphistory">Employee Record History</a></li>
-        <!--<li class="sub-topic"><a href="${ctxPath}/time/timeoff/manage">Review Time Off Requests</a></li>-->
-        <li class="sub-topic"><a href="${ctxPath}/time/record/grant">Grant Privileges</a></li>
-        <li class="sub-topic"><a href="">Send Notifications</a></li>
-    </ul>
+    <shiro:hasRole name="supervisor">
+        <h3 class="main-topic">Manage Employees</h3>
+        <ul class="sub-topic-list">
+            <li class="sub-topic"><a href="${ctxPath}/time/record/manage">Review Time Records</a></li>
+            <li class="sub-topic"><a href="${ctxPath}/time/record/emphistory">Employee Record History</a></li>
+            <li class="sub-topic"><a href="${ctxPath}/time/record/grant">Grant Privileges</a></li>
+        </ul>
+    </shiro:hasRole>
     <h3 class="main-topic">Preferences</h3>
     <ul class="sub-topic-list">
         <li class="sub-topic"><a href="${ctxPath}/ui/time/emailprefs">Email Reminders</a></li>

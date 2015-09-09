@@ -127,7 +127,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     private ListMultimap<Integer, TimeRecord> getRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
                                                          Set<TimeRecordStatus> statuses) {
         ListMultimap<Integer, TimeRecord> records = LinkedListMultimap.create();
-        timeRecordService.getTimeRecords(empIds, dateRange, statuses, true)
+        timeRecordService.getTimeRecords(empIds, dateRange, statuses, false)
                 .forEach(record -> records.put(record.getEmployeeId(), record));
         return records;
     }

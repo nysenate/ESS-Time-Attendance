@@ -4,16 +4,16 @@
 
     <div class="content-container content-controls">
         <p class="content-info">View Attendance Records for Employee &nbsp;
-            <select ng-model="state.selectedEmp" ng-if="state.primaryEmps.length > 0"
-                    ng-init="state.selectedEmp = state.selectedEmp || state.primaryEmps[0]"
+            <select ng-model="state.selectedEmp" ng-if="state.allEmps.length > 0"
+                    ng-init="state.selectedEmp = state.selectedEmp || state.allEmps[0]"
                     ng-change="getTimeRecordsForEmp(state.selectedEmp)"
-                    ng-options="emp.dropDownLabel group by emp.group for emp in state.primaryEmps">
+                    ng-options="emp.dropDownLabel group by emp.group for emp in state.allEmps">
             </select>
         </p>
     </div>
 
     <section class="content-container">
-        <h1>Employee Attendance Records</h1>
+        <h1>{{state.selectedEmp.empLastName}}'s Attendance Records</h1>
         <div class="content-controls">
             <p class="content-info" style="margin-bottom:0;">
                 View attendance records for year &nbsp;
@@ -23,8 +23,8 @@
                 </select>
             </p>
         </div>
-        <p class="content-info" style="">Time records that have been submitted for pay periods during 2014 are listed in
-            the table below.<br/>You can view details about each pay period by clicking the 'View Details' link to the right.</p>
+        <p class="content-info" style="">Time records that have been submitted for pay periods during {{state.selectedRecYear}}
+            are listed in the table below.<br/>You can view details about each pay period by clicking the 'View Details' link to the right.</p>
         <div class="padding-10">
             <div loader-indicator ng-show="state.searching"></div>
             <table id="attendance-history-table" ng-show="!state.searching" class="ess-table attendance-listing-table">

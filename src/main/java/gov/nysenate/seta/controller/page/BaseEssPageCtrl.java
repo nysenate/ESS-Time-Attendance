@@ -2,8 +2,11 @@ package gov.nysenate.seta.controller.page;
 
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.model.auth.SenateLdapPerson;
+import gov.nysenate.seta.model.auth.SenatePerson;
+import gov.nysenate.seta.service.attendance.TimeRecordService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +24,23 @@ public abstract class BaseEssPageCtrl
 
     abstract String mainPage(ModelMap modelMap, HttpServletRequest request);
 
-    protected void addModelMapData(ModelMap modelMap) {
+    protected void addCommonModelMapData(ModelMap modelMap) {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            SenateLdapPerson senateLdapPerson = (SenateLdapPerson) subject.getPrincipal();
-            modelMap.put("principal", senateLdapPerson);
-            modelMap.put("principalJson", OutputUtils.toJson(senateLdapPerson));
+            SenatePerson person = (SenatePerson) subject.getPrincipal();
+            modelMap.put("principal", person);
+            modelMap.put("principalJson", OutputUtils.toJson(person));
             List<Integer> employeeActiveYears =
-                    empInfoService.getEmployeeActiveYearsService(Integer.parseInt(senateLdapPerson.getEmployeeId()));
+                empInfoService.getEmployeeActiveYearsService(person.getEmployeeId());
             modelMap.put("empActiveYears", OutputUtils.toJson(employeeActiveYears));
         }
+    }
+
+    protected SenatePerson getUser() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            return (SenatePerson) subject.getPrincipal();
+        }
+        throw new UnauthenticatedException("User has not been authenticated.");
     }
 }

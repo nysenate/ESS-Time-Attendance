@@ -1,21 +1,18 @@
 package gov.nysenate.seta.model.personnel;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * An employee has a supervisor hierarchy that is represented as a chain. The chain
  * is useful for determining who can be granted a supervisor override if the employee is a
  * supervisor.
  */
-/** TODO Add chain exceptions */
 public class SupervisorChain
 {
     protected int employeeId;
-    protected LinkedList<Integer> chainList = new LinkedList<>();
-    protected HashSet<Integer> chainInclusions = new HashSet<>();
-    protected HashSet<Integer> chainExclusions = new HashSet<>();
-    private HashSet<Integer> supSet = new HashSet<>();
+    private LinkedHashSet<Integer> chain = new LinkedHashSet<>();
 
     public SupervisorChain() {}
 
@@ -24,18 +21,20 @@ public class SupervisorChain
     }
 
     public void addSupervisorToChain(int nextSupId) {
-        if (!supSet.contains(nextSupId)) {
-            chainList.add(nextSupId);
-            supSet.add(nextSupId);
+        if (!chain.contains(nextSupId) && nextSupId != this.employeeId) {
+            chain.add(nextSupId);
+        }
+    }
+
+    public void addAlterations(SupervisorChainAlteration alteration) {
+        if (alteration != null && alteration.hasAnyAlterations()) {
+            chain.removeAll(alteration.chainExclusions);
+            chain.addAll(alteration.chainInclusions);
         }
     }
 
     public boolean containsSupervisor(int supId) {
-        return supSet.contains(supId);
-    }
-
-    public boolean isInOwnChain() {
-        return supSet.contains(this.employeeId);
+        return chain.contains(supId);
     }
 
     /** Basic Getters/Setters */
@@ -48,15 +47,7 @@ public class SupervisorChain
         this.employeeId = employeeId;
     }
 
-    public LinkedList<Integer> getChainList() {
-        return chainList;
-    }
-
-    public HashSet<Integer> getChainInclusions() {
-        return chainInclusions;
-    }
-
-    public HashSet<Integer> getChainExclusions() {
-        return chainExclusions;
+    public LinkedHashSet<Integer> getChain() {
+        return chain;
     }
 }

@@ -2,6 +2,7 @@ package gov.nysenate.seta.service.attendance;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
@@ -12,6 +13,14 @@ import java.util.Set;
 
 public interface TimeRecordService
 {
+    /**
+     * Gets the distinct years that an employee has at least one time record for.
+     * @param empId Integer - employee id
+     * @param yearOrder - SortOrder - order the returned years
+     * @return List<Integer>
+     */
+    List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder);
+
     /**
      * Get time records for one or more employees, matching certain time record statuses, over a specified date range.
      * Will create time records for uncovered pay periods if desired,

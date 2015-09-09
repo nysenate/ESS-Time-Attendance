@@ -9,9 +9,11 @@ import gov.nysenate.seta.model.accrual.AnnualAccSummary;
 import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
+import gov.nysenate.seta.service.cache.EhCacheManageService;
 import gov.nysenate.seta.service.period.PayPeriodService;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache.ValueWrapper;
@@ -28,10 +30,10 @@ public class EssCachedAccrualInfoService implements AccrualInfoService
     @Autowired private AccrualDao accrualDao;
     @Autowired private PayPeriodService payPeriodService;
 
-    @Autowired private CacheManager cacheManager;
+    @Autowired private EhCacheManageService cacheManageService;
     @Autowired private EventBus eventBus;
 
-    protected EhCacheCache primaryCache;
+    private Cache annualAccrualCache;
 
     @PostConstruct
     public void init() {
@@ -40,20 +42,14 @@ public class EssCachedAccrualInfoService implements AccrualInfoService
     }
 
     public void setupCaches() {
-        Cache cache = new Cache(new CacheConfiguration()
-            .name(ContentCache.ACCRUAL_ANNUAL.name())
-            .eternal(true));
-        cacheManager.addCache(cache);
-        this.primaryCache = new EhCacheCache(cache);
+        this.annualAccrualCache = cacheManageService.registerEternalCache(ContentCache.ACCRUAL_ANNUAL.name());
     }
 
     private static final class AnnualAccCacheTree {
         TreeMap<Integer, AnnualAccSummary> annualAccruals;
-
         public AnnualAccCacheTree(TreeMap<Integer, AnnualAccSummary> annualAccruals) {
             this.annualAccruals = annualAccruals;
         }
-
         public TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int endYear) {
             return new TreeMap<>(annualAccruals.headMap(endYear, true));
         }
@@ -61,18 +57,26 @@ public class EssCachedAccrualInfoService implements AccrualInfoService
 
     @Override
     public TreeMap<Integer, AnnualAccSummary> getAnnualAccruals(int empId, int endYear) {
-        ValueWrapper cachedAccTreeWrapper = this.primaryCache.get(empId);
+        annualAccrualCache.acquireReadLockOnKey(empId);
+        Element elem = annualAccrualCache.get(empId);
+        annualAccrualCache.releaseReadLockOnKey(empId);
         AnnualAccCacheTree cachedAccTree;
-        if (cachedAccTreeWrapper == null) {
+        if (elem == null) {
             TreeMap<Integer, AnnualAccSummary> annualAccruals =
                 accrualDao.getAnnualAccruals(empId, DateUtils.THE_FUTURE.getYear());
             cachedAccTree = new AnnualAccCacheTree(annualAccruals);
-            this.primaryCache.put(empId, new AnnualAccCacheTree(annualAccruals));
+            putAnnualAccTreeInCache(empId, cachedAccTree);
         }
         else {
-            cachedAccTree = (AnnualAccCacheTree) cachedAccTreeWrapper.get();
+            cachedAccTree = (AnnualAccCacheTree) elem.getObjectValue();
         }
         return cachedAccTree.getAnnualAccruals(endYear);
+    }
+
+    private void putAnnualAccTreeInCache(int empId, AnnualAccCacheTree annualAccCacheTree) {
+        annualAccrualCache.acquireWriteLockOnKey(empId);
+        annualAccrualCache.put(new Element(empId, annualAccCacheTree));
+        annualAccrualCache.releaseWriteLockOnKey(empId);
     }
 
     @Override

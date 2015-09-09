@@ -14,8 +14,8 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
             selectedRecYear: null,
             records: [],
 
-            primaryEmps: [],
-            secondaryEmps: []
+            allEmps: [],
+            primaryEmps: []
         };
 
         $scope.getEmployeeGroups = function(supId, fromDate, toDate) {
@@ -30,15 +30,29 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
                 if (resp.success == true) {
                     $scope.state.primaryEmps = resp.result.primaryEmployees.sort(function(a,b) {
                         return a.empLastName.localeCompare(b.empLastName)});
+                    // This lookup table maps empId -> last name in case it's needed for the supervisor overrides.
+                    var primaryEmpLookup = {};
+                    // Add all the employees into a single collection to populate the drop down.
                     angular.forEach($scope.state.primaryEmps, function(emp) {
-                        emp.supStartMoment = moment(emp.supStartDate);
-                        emp.supEndMoment = (emp.supEndDate) ? moment(emp.supEndDate) : moment();
                         emp.group = 'Direct employees';
-                        emp.dropDownLabel = emp.empLastName + ' (' + emp.supStartMoment.format('MMM YYYY') + ' - ' +
-                                                                     emp.supEndMoment.format('MMM YYYY') + ')';
+                        primaryEmpLookup[emp.empId] = emp.empLastName;
+                        setAdditionalEmpData(emp);
+                        $scope.state.allEmps.push(emp);
                     });
-                    $scope.state.secondaryEmps = resp.result.empOverrideEmployees;
-                    $scope.state.selectedEmp = $scope.state.primaryEmps[0];
+                    angular.forEach(resp.result.empOverrideEmployees, function(emp) {
+                        emp.group = 'Additional Employees';
+                        setAdditionalEmpData(emp);
+                        $scope.state.allEmps.push(emp);
+                    });
+                    angular.forEach(resp.result.supOverrideEmployees.items, function(supGroup, supId) {
+                        angular.forEach(supGroup, function(emp) {
+                            emp.group = ((primaryEmpLookup[supId]) ? primaryEmpLookup[supId] + '\'s Employees'
+                                                                   : 'Sup Override Employees');
+                            setAdditionalEmpData(emp);
+                            $scope.state.allEmps.push(emp);
+                        });
+                    });
+                    $scope.state.selectedEmp = $scope.state.allEmps[0];
                     $scope.getTimeRecordsForEmp($scope.state.selectedEmp);
                 }
                 $scope.state.searching = false;
@@ -46,6 +60,13 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
                 $scope.state.searching = false;
             });
         };
+
+        function setAdditionalEmpData(emp) {
+            emp.supStartMoment = moment(emp.supStartDate);
+            emp.supEndMoment = (emp.supEndDate) ? moment(emp.supEndDate) : moment();
+            emp.dropDownLabel = emp.empLastName + ' (' + emp.supStartMoment.format('MMM YYYY') + ' - ' +
+                emp.supEndMoment.format('MMM YYYY') + ')';
+        }
 
         $scope.getTimeRecordsForEmp = function(emp) {
             ActiveYearsTimeRecordsApi.get({empId: emp.empId}, function(resp) {

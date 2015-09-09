@@ -29,6 +29,9 @@
         <!-- Accruals -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/accrual/accrual-history-ctrl.js"></script>
 
+        <!-- Grants -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/grant/grant-ctrl.js"></script>
+
     </jsp:body>
 </ess-layout:head>
 

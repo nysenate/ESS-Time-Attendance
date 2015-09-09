@@ -4,7 +4,7 @@
   <div class="content-container content-controls">
     <p class="content-info" style="margin-bottom:0;">
       View attendance records for year&nbsp;
-      <select ng-model="year" ng-options="yearOpt for yearOpt in activeYears" ng-change="getRecords()"></select>
+      <select ng-model="state.year" ng-options="year for year in state.recordYears" ng-change="getRecords()"></select>
     </p>
   </div>
 

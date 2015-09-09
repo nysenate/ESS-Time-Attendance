@@ -1,7 +1,12 @@
 package gov.nysenate.seta.security.realm;
 
+import com.google.common.collect.Range;
 import gov.nysenate.seta.model.auth.LdapAuthResult;
+import gov.nysenate.seta.model.auth.SenateLdapPerson;
+import gov.nysenate.seta.model.auth.SenatePerson;
 import gov.nysenate.seta.service.auth.LdapAuthService;
+import gov.nysenate.seta.service.personnel.SupervisorInfoService;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -33,6 +38,7 @@ public class EssLdapDbAuthzRealm extends AuthorizingRealm
     @Value("${auth.master.pass}") private String masterPass;
 
     @Autowired private LdapAuthService essLdapAuthService;
+    @Autowired private SupervisorInfoService supervisorInfoService;
 
     /**
      * {@inheritDoc}
@@ -87,9 +93,11 @@ public class EssLdapDbAuthzRealm extends AuthorizingRealm
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        String user = getUsername(principals);
         SimpleAuthorizationInfo authInfo = new SimpleAuthorizationInfo();
-//        authInfo.addStringPermission("api:employees:view:" + users.get(user));
+        SenatePerson user = (SenatePerson) principals.getPrimaryPrincipal();
+        if (supervisorInfoService.isSupervisorDuring(user.getEmployeeId())) {
+            authInfo.addRole("supervisor");
+        }
         return authInfo;
     }
 

@@ -4,16 +4,12 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Range;
 import com.google.common.collect.Table;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
-import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
+import gov.nysenate.seta.dao.personnel.mapper.SupervisorOverrideRowMapper;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorMissingEmpsEx;
-import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
-import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
-import gov.nysenate.seta.model.personnel.SupervisorChain;
-import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
+import gov.nysenate.seta.model.personnel.*;
 import gov.nysenate.seta.model.transaction.TransactionCode;
-import gov.nysenate.seta.model.transaction.TransactionHistory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,68 +58,26 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         return supervisorEmpGroup.hasEmployees();
     }
 
-    /**
-     * {@inheritDoc}
-     * The latest employee transactions before the given 'date' are checked to determine
-     * the supervisor id.
-     */
+    /**{@inheritDoc} */
     @Override
-    public int getSupervisorIdForEmp(int empId, LocalDate date) throws SupervisorException {
-        Set<TransactionCode> transCodes = new HashSet<>(Arrays.asList(APP, RTP, SUP));
-        TransactionHistory transHistory =
-            empTransDao.getTransHistory(empId, transCodes, Range.atMost(date), EmpTransDaoOption.INITIALIZE_AS_APP);
-        if (transHistory.hasRecords()) {
-            Optional<String> supIdStr = transHistory.latestValueOf("NUXREFSV", true);
-            if (supIdStr.isPresent() && StringUtils.isNumeric(supIdStr.get())) {
-                return Integer.parseInt(supIdStr.get());
-            }
-        }
-        throw new SupervisorNotFoundEx("Supervisor id not found for empId: " + empId + " for date: " + date);
-    }
-
-    /**
-     * Determine the chain by recursively retrieving the supervisor id for each successive employee.
-     * {@inheritDoc}
-     */
-    @Override
-    public SupervisorChain getSupervisorChain(int empId, LocalDate date) throws SupervisorException {
-        int currEmpId = empId;
-        int currDepth = 0;
-        final int maxDepth = 10;
-        SupervisorChain chain = new SupervisorChain(currEmpId);
-
-        while (true) {
-            int currSupId = getSupervisorIdForEmp(currEmpId, date);
-            if (!chain.containsSupervisor(currSupId)) {
-                chain.addSupervisorToChain(currSupId);
-                currEmpId = currSupId;
-            }
-            else {
-                break;
-            }
-            /** Eliminate possibility of infinite recursion. */
-            if (currDepth >= maxDepth) {
-                break;
-            }
-            currDepth++;
-        }
-
-        /** Look for any active inclusions/exclusions */
+    public SupervisorChainAlteration getSupervisorChainAlterations(int empId) {
         SqlParameterSource params = new MapSqlParameterSource("empId", empId);
-        List<Map<String, Object>> res = remoteNamedJdbc.query(GET_SUP_CHAIN_EXCEPTIONS.getSql(schemaMap()), params, new ColumnMapRowMapper());
+        Set<Integer> inclusions = new HashSet<>();
+        Set<Integer> exclusions = new HashSet<>();
+        List<Map<String, Object>> res = remoteNamedJdbc.query(
+            GET_SUP_CHAIN_EXCEPTIONS.getSql(schemaMap()), params, new ColumnMapRowMapper());
         if (!res.isEmpty()) {
             for (Map<String, Object> row : res) {
                 int supId = Integer.parseInt(row.get("NUXREFSV").toString());
                 if (row.get("CDTYPE").equals("I")) {
-                    chain.getChainInclusions().add(supId);
+                    inclusions.add(supId);
                 }
                 else {
-                    chain.getChainExclusions().add(supId);
+                    exclusions.add(supId);
                 }
             }
         }
-
-        return chain;
+        return new SupervisorChainAlteration(inclusions, exclusions);
     }
 
     /**{@inheritDoc} */
@@ -278,6 +232,16 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         throw new SupervisorMissingEmpsEx("No employee associations could be found for supId: " + supId + " before " + endDate);
     }
 
+    /**{@inheritDoc} */
+    @Override
+    public List<SupervisorOverride> getSupervisorOverrides(int supId, SupGrantType type) throws SupervisorException {
+        SqlParameterSource params = new MapSqlParameterSource("empId", supId);
+        String sql = (type.equals(SupGrantType.GRANTEE)) ? SqlSupervisorQuery.GET_SUP_OVERRIDES.getSql(schemaMap())
+                                                         : SqlSupervisorQuery.GET_SUP_GRANTS.getSql(schemaMap());
+        return remoteNamedJdbc.query(sql, params, new SupervisorOverrideRowMapper());
+    }
+
+    /**{@inheritDoc} */
     @Override
     public void setSupervisorOverride(int supId, int ovrSupId, Range<LocalDate> dateRange) throws SupervisorException {
         throw new NotImplementedException();

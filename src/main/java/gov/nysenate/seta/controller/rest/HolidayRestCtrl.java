@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
@@ -29,18 +30,18 @@ public class HolidayRestCtrl extends BaseRestCtrl
 
     @Autowired private HolidayService holidayService;
 
-    @RequestMapping("/year/{year}" )
-    public BaseResponse getHolidays(@PathVariable Integer year, WebRequest request) {
+    @RequestMapping(value = "", params = "year")
+    public BaseResponse getHolidaysByYear(@RequestParam Integer year, WebRequest request) {
         LocalDate fromDate = LocalDate.of(year, 1, 1);
         LocalDate toDate = LocalDate.of(year, 12, 31);
         return getListViewResponse(getHolidaysDuring(fromDate, toDate, request));
     }
 
-    @RequestMapping("/dates/{fromDateStr}/{toDateStr}")
-    public BaseResponse getHolidays(@PathVariable String fromDateStr, @PathVariable String toDateStr, WebRequest request) {
-        LocalDate fromDate = parseISODate(fromDateStr, "from-date");
-        LocalDate toDate = parseISODate(toDateStr, "to-date");
-        return getListViewResponse(getHolidaysDuring(fromDate, toDate, request));
+    @RequestMapping(value = "", params = {"fromDate", "toDate"})
+    public BaseResponse getHolidays(@RequestParam String fromDate, @RequestParam String toDate, WebRequest request) {
+        LocalDate fromLocalDate = parseISODate(fromDate, "from-date");
+        LocalDate toLocalDate = parseISODate(toDate, "to-date");
+        return getListViewResponse(getHolidaysDuring(fromLocalDate, toLocalDate, request));
     }
 
     private List<Holiday> getHolidaysDuring(LocalDate fromDate, LocalDate toDate, WebRequest request) {

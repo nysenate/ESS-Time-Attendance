@@ -9,6 +9,7 @@ import org.springframework.ldap.odm.annotations.Id;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import java.io.Serializable;
 
 /**
  * Represents a person record in the Senate LDAP. This class is annotated such that methods
@@ -16,8 +17,10 @@ import javax.naming.directory.Attributes;
  * directly into this object.
  */
 @Entry(objectClasses = {"person", "top"}, base = "O=senate")
-public final class SenateLdapPerson implements SenatePerson
+public final class SenateLdapPerson implements Serializable, SenatePerson
 {
+    private static final long serialVersionUID = 3289890768256266928L;
+
     @Id
     private Name dn;
 
@@ -100,6 +103,10 @@ public final class SenateLdapPerson implements SenatePerson
         return uid;
     }
 
+    public Integer getEmployeeId() {
+        return Integer.parseInt(employeeId);
+    }
+
     /** --- Basic Getters/Setters --- */
 
     @JsonIgnore
@@ -125,10 +132,6 @@ public final class SenateLdapPerson implements SenatePerson
 
     public void setOrganization(String organization) {
         this.organization = organization;
-    }
-
-    public String getEmployeeId() {
-        return employeeId;
     }
 
     public void setEmployeeId(String employeeId) {

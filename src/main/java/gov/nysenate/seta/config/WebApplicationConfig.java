@@ -35,7 +35,7 @@ import java.util.List;
 @ComponentScan("gov.nysenate.seta")
 @Profile({"test", "dev", "prod"})
 @Import({PropertyConfig.class, LdapConfig.class, EventBusConfig.class, SchedulerConfig.class,
-         SecurityConfig.class, DatabaseConfig.class, CacheConfig.class})
+         SecurityConfig.class, DbConnectionPoolConfig.class, DatabaseConfig.class, CacheConfig.class})
 public class WebApplicationConfig extends WebMvcConfigurerAdapter
 {
     private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
