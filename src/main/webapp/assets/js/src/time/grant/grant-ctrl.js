@@ -1,13 +1,16 @@
 var essTime = angular.module('essTime');
 
-essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'SupervisorChainApi', 'SupervisorGrantsApi',
-   function($scope, $http, appProps, SupervisorChainApi, SupervisorGrantsApi) {
+essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'SupervisorChainApi',
+    'SupervisorGrantsApi', 'SupervisorOverridesApi',
+   function($scope, $http, appProps, SupervisorChainApi, SupervisorGrantsApi, SupervisorOverridesApi) {
 
        $scope.state = {
            empId: appProps.user.employeeId,
            selectedGrantee: null,
            grantees: null,   // Stores an ordered list of the supervisors.
            granteeMap: null, // Map of supId -> sup, allows easy modification of supervisor grant status.
+
+           granters: [],    // List of overrides this supervisor has been granted
 
            modified: false,   // If the state has been altered.
            fetched: false,   // If the data has been fetched.
@@ -20,6 +23,7 @@ essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'Super
            $scope.state.selectedGrantee = null;
            $scope.state.grantees = [];
            $scope.state.granteeMap = {};
+           $scope.state.granters = [];
            $scope.state.modified = $scope.state.fetched = $scope.state.saving = $scope.state.saved = false;
 
            // Fetch supervisor chain
@@ -34,7 +38,7 @@ essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'Super
                    // Link up with any existing grants
                    SupervisorGrantsApi.get({supId: $scope.state.empId}, function(resp) {
                      if (resp.success) {
-                         angular.forEach(resp.grants, function(grant) {
+                         angular.forEach(resp.grants, function (grant) {
                              var supId = grant.granteeSupervisorId;
                              if (!$scope.state.granteeMap[supId]) {
                                  $scope.state.grantees.push(grant.granteeSupervisor);
@@ -42,11 +46,22 @@ essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'Super
                              }
                              $scope.state.granteeMap[supId].granted = true;
                              $scope.state.granteeMap[supId].grantStart =
-                                (grant.startDate != null) ? moment(grant.startDate).format('MM/DD/YYYY') : null;
+                                 (grant.startDate != null) ? moment(grant.startDate).format('MM/DD/YYYY') : null;
                              $scope.state.granteeMap[supId].grantEnd =
-                                (grant.endDate != null) ? moment(grant.endDate).format('MM/DD/YYYY') : null;
+                                 (grant.endDate != null) ? moment(grant.endDate).format('MM/DD/YYYY') : null;
                          });
                      }
+                     SupervisorOverridesApi.get({supId: $scope.state.empId}, function(resp) {
+                         if (resp.success) {
+                             $scope.state.granters = resp.overrides.map(function(ovr) {
+                                 var granter = ovr.overrideSupervisor;
+                                 granter.grantStartStr = (ovr.startDate) ? moment(ovr.startDate).format('MM/DD/YYYY') : 'No Start Date';
+                                 granter.grantEndStr = (ovr.endDate) ? moment(ovr.endDate).format('MM/DD/YYYY') : 'No End Date';
+                                 granter.activeStr = (ovr.active) ? 'Active' : 'Inactive';
+                                 return granter;
+                             });
+                         }
+                     });
                      $scope.state.fetched = true;
                    });
                }

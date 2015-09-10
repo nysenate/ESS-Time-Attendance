@@ -57,30 +57,30 @@
                        ng-click="saveGrants()" value="Update Grant Privileges"/>
             </div>
         </div>
-        <div style="display:none" class="grid">
-            <div class="col-1-2 padding-10">
-                <form action="">
-                    <div style="display:inline-block;vertical-align: top;">
-                        <label>Choose Grantee</label>
-                        <select ng-model="state.selectedGrantee"
-                                ng-options="grantee.fullName for grantee in state.grantees">
-                        </select>
-                        <br/><br/>
-                        <label>End Date</label>
-                        <input style="margin-left:64px;"type="text" datepicker/>
-                    </div>
-                </form>
-            </div>
-            <div class="col-1-2 padding-10">
-                <label>Select Employees</label><hr/>
-                <input type="checkbox" value="All"/><label>Select all employees</label>
-            </div>
-        </div>
     </div>
-
-
-        <%--<div class="content-container">--%>
-        <%--<h1>Grant New Supervisor Privileges</h1>--%>
-
+    <div ng-show="state.granters.length > 0" class="content-container content-controls margin-top-20">
+        <p class="content-info">The following employees have granted privileges to you.</p>
+        <div class="padding-10">
+            <table class="simple-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Supervisor</th>
+                    <th>Active</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="granter in state.granters">
+                    <td>{{$index + 1}}</td>
+                    <td>{{granter.firstName}} {{granter.lastName}}</td>
+                    <td>{{granter.activeStr}}</td>
+                    <td>{{granter.grantStartStr}}</td>
+                    <td>{{granter.grantEndStr}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
