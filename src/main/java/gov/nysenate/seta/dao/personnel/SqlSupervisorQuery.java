@@ -66,6 +66,16 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "SELECT NUXREFEM, NUXREFSVSUB, CDSTATUS, DTSTART, DTEND, DTTXNORIGIN, DTTXNUPDATE\n" +
         "FROM ${tsSchema}.PM23SUPOVRRD\n" +
         "WHERE NUXREFSVSUB = :empId AND CDSTATUS = 'A'"
+    ),
+
+    UPDATE_SUP_GRANT(
+        "UPDATE ${tsSchema}.PM23SUPOVRRD\n" +
+        "SET CDSTATUS = :status, DTSTART = :startDate, DTEND = :endDate\n" +
+        "WHERE NUXREFEM = :granteeSupId AND NUXREFSVSUB = :granterSupId"
+    ),
+    INSERT_SUP_GRANT(
+        "INSERT INTO ${tsSchema}.PM23SUPOVRRD (NUXREFEM, NUXREFSVSUB, CDSTATUS, DTSTART, DTEND)\n" +
+        "VALUES(:granteeSupId, :granterSupId, :status, :startDate, :endDate)"
     )
     ;
 

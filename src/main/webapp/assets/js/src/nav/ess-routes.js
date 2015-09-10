@@ -13,7 +13,7 @@ essApp.config(function($routeProvider, $locationProvider) {
     var ctxPath = globalProps.ctxPath;
 
     /** My Info */
-    $routeProvider.when(ctxPath + '/myinfo/profile/summary', {
+    $routeProvider.when(ctxPath + '/myinfo/personnel/summary', {
         templateUrl: ctxPath + '/template/myinfo/personnel/summary'
     });
     $routeProvider.when(ctxPath + '/myinfo/personnel/transactions', {

@@ -15,8 +15,8 @@ public class SupervisorOverrideRowMapper implements RowMapper<SupervisorOverride
     @Override
     public SupervisorOverride mapRow(ResultSet rs, int i) throws SQLException {
         SupervisorOverride supOvr = new SupervisorOverride();
-        supOvr.setSupervisorId(rs.getInt("NUXREFEM"));
-        supOvr.setOverrideSupervisorId(rs.getInt("NUXREFSVSUB"));
+        supOvr.setGranteeSupervisorId(rs.getInt("NUXREFEM"));
+        supOvr.setGranterSupervisorId(rs.getInt("NUXREFSVSUB"));
         supOvr.setActive(rs.getString("CDSTATUS").equals("A"));
         supOvr.setOriginDate(getLocalDateTime(rs, "DTTXNORIGIN"));
         supOvr.setUpdateDate(getLocalDateTime(rs, "DTTXNUPDATE"));

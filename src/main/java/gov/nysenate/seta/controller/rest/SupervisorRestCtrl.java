@@ -4,13 +4,11 @@ import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
+import gov.nysenate.seta.client.response.base.SimpleResponse;
 import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.response.error.ErrorCode;
 import gov.nysenate.seta.client.response.error.ErrorResponse;
-import gov.nysenate.seta.client.view.SupervisorChainView;
-import gov.nysenate.seta.client.view.SupervisorEmpGroupView;
-import gov.nysenate.seta.client.view.SupervisorGrantView;
-import gov.nysenate.seta.client.view.SupervisorOverrideView;
+import gov.nysenate.seta.client.view.*;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.SupervisorChain;
@@ -20,13 +18,12 @@ import gov.nysenate.seta.service.personnel.SupervisorInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -80,7 +77,7 @@ public class SupervisorRestCtrl extends BaseRestCtrl
         try {
             List<SupervisorOverride> overrides = supInfoService.getSupervisorOverrides(supId);
             return ListViewResponse.of(overrides.stream()
-                    .map(ovr -> new SupervisorOverrideView(ovr, empInfoService.getEmployee(ovr.getOverrideSupervisorId())))
+                    .map(ovr -> new SupervisorOverrideView(ovr, empInfoService.getEmployee(ovr.getGranterSupervisorId())))
                     .collect(toList()), "overrides");
         }
         catch (SupervisorException e) {
@@ -88,16 +85,38 @@ public class SupervisorRestCtrl extends BaseRestCtrl
         }
     }
 
-    @RequestMapping(value = "/grants")
+    @RequestMapping(value = "/grants", method = RequestMethod.GET)
     public BaseResponse getSupervisorGrants(@RequestParam Integer supId) {
         try {
             List<SupervisorOverride> overrides = supInfoService.getSupervisorGrants(supId);
             return ListViewResponse.of(overrides.stream()
-                    .map(ovr -> new SupervisorGrantView(ovr, empInfoService.getEmployee(ovr.getSupervisorId())))
+                    .map(ovr -> new SupervisorGrantView(ovr, empInfoService.getEmployee(ovr.getGranteeSupervisorId())))
                     .collect(toList()), "grants");
         }
         catch (SupervisorException e) {
             return new ErrorResponse(ErrorCode.APPLICATION_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/grants", method = RequestMethod.POST, consumes = "application/json")
+    public BaseResponse updateSupervisorGrants(@RequestBody SupervisorGrantSimpleView[] grantViews) {
+        for (SupervisorGrantSimpleView grantView : grantViews) {
+            if (grantView == null || grantView.getGranteeSupervisorId() == 0 || grantView.getGranterSupervisorId() == 0) {
+                throw new IllegalArgumentException("Grant must contain a valid supervisor and override supervisor id.");
+            }
+            SupervisorOverride override = new SupervisorOverride();
+            override.setGranteeSupervisorId(grantView.getGranteeSupervisorId());
+            override.setGranterSupervisorId(grantView.getGranterSupervisorId());
+            override.setStartDate(Optional.ofNullable(grantView.getStartDate()));
+            override.setEndDate(Optional.ofNullable(grantView.getEndDate()));
+            override.setActive(grantView.isActive());
+            try {
+                supInfoService.updateSupervisorOverride(override);
+            }
+            catch (SupervisorException e) {
+                return new ErrorResponse(ErrorCode.APPLICATION_ERROR, e.getMessage());
+            }
+        }
+        return new SimpleResponse(true, "Grants have been updated", "update supervisor grant");
     }
 }

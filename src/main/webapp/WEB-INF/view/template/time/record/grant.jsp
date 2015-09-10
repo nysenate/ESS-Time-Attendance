@@ -3,7 +3,7 @@
     <div class="content-container content-controls">
         <p class="content-info">Grant another supervisor privileges to review and/or approve your direct employee's time records.</p>
         <div class="padding-10">
-            <table class="simple-table">
+            <table class="simple-table" ng-if="state.fetched">
                 <thead>
                 <tr>
                     <th>#</th>
@@ -20,7 +20,7 @@
                     <td>
                         <div class="horizontal-input-group">
                             <input type="checkbox" id="grant-status-yes-{{$index}}" ng-model="grantee.granted"
-                                   ng-value="true" name="grant-status[{{$index}}]"/>
+                                   ng-value="true" ng-click="toggleGrantStatus(grantee)" name="grant-status[{{$index}}]"/>
                             <label ng-class="{'success-bold-label': grantee.granted === true}"
                                    for="grant-status-yes-{{$index}}">Grant Access</label>
                         </div>
@@ -38,7 +38,7 @@
                     <td ng-class="{'half-opacity': grantee.granted === false}">
                         <div class="horizontal-input-group">
                             <input id="grant-end-date-{{$index}}" ng-checked="grantee.grantEnd"
-                                   ng-disabled="grantee.granted === false" type="checkbox" ng-click="setStartDate(grantee)"/>
+                                   ng-disabled="grantee.granted === false" type="checkbox" ng-click="setEndDate(grantee)"/>
                             <label for="grant-end-date-{{$index}}">Set End Date</label>
                             <input ng-disabled="!grantee.granted || !grantee.grantEnd" ng-model="grantee.grantEnd"
                                    style="width:100px" type="text" datepicker/>
@@ -48,9 +48,13 @@
                 </tbody>
             </table>
             <hr/>
+            <div loader-indicator ng-show="state.saving === true"></div>
+            <div ess-notification ng-show="state.saved === true && !state.modified"
+                 level="info" title="Grants have been updated."></div>
             <div class="content-info" style="text-align: center;">
-                <input type="button" class="neutral-button" value="Discard Changes" ng-click="reset()"/>
-                <input type="button" class="submit-button" value="Update Grant Privileges"/>
+                <input type="button" class="neutral-button" ng-disabled="state.modified === false" value="Discard Changes" ng-click="reset()"/>
+                <input type="button" class="submit-button" ng-disabled="state.modified === false"
+                       ng-click="saveGrants()" value="Update Grant Privileges"/>
             </div>
         </div>
         <div style="display:none" class="grid">

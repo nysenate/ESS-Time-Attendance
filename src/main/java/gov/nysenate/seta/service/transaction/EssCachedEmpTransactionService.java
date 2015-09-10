@@ -1,8 +1,6 @@
 package gov.nysenate.seta.service.transaction;
 
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
-import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.cache.ContentCache;
@@ -21,11 +19,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
 
 @Service
 public class EssCachedEmpTransactionService implements EmpTransactionService

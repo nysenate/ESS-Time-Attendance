@@ -1,27 +1,26 @@
 package gov.nysenate.seta.client.view;
 
 import gov.nysenate.seta.client.view.base.ViewObject;
-import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.SupervisorOverride;
 
 import java.time.LocalDate;
 
-public class SupervisorOverrideView implements ViewObject
+public class SupervisorGrantSimpleView implements ViewObject
 {
-    protected int supervisorId;
+    protected int granterSupervisorId;
+    protected int granteeSupervisorId;
     protected boolean active;
-    protected int overrideSupervisorId;
-    protected EmployeeView overrideSupervisor;
     protected LocalDate startDate;
     protected LocalDate endDate;
 
     /** --- Constructors --- */
 
-    public SupervisorOverrideView(SupervisorOverride ovr, Employee overrideSupervisor) {
+    public SupervisorGrantSimpleView() {}
+
+    public SupervisorGrantSimpleView(SupervisorOverride ovr) {
         if (ovr != null) {
-            this.supervisorId = ovr.getGranteeSupervisorId();
-            this.overrideSupervisorId = ovr.getGranterSupervisorId();
-            this.overrideSupervisor = new EmployeeView(overrideSupervisor);
+            this.granteeSupervisorId = ovr.getGranteeSupervisorId();
+            this.granterSupervisorId = ovr.getGranterSupervisorId();
             this.active = ovr.isActive();
             this.startDate = ovr.getStartDate().orElse(null);
             this.endDate = ovr.getEndDate().orElse(null);
@@ -30,25 +29,21 @@ public class SupervisorOverrideView implements ViewObject
 
     @Override
     public String getViewType() {
-        return "supervisor override";
+        return "supervisor grant";
     }
 
     /** --- Basic Getters --- */
 
-    public int getSupervisorId() {
-        return supervisorId;
+    public int getGranteeSupervisorId() {
+        return granteeSupervisorId;
     }
 
     public boolean isActive() {
         return active;
     }
 
-    public int getOverrideSupervisorId() {
-        return overrideSupervisorId;
-    }
-
-    public EmployeeView getOverrideSupervisor() {
-        return overrideSupervisor;
+    public int getGranterSupervisorId() {
+        return granterSupervisorId;
     }
 
     public LocalDate getStartDate() {

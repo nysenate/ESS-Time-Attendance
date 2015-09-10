@@ -19,7 +19,7 @@ public class MyInfoTemplateCtrl extends BaseTemplateCtrl
 
     @RequestMapping(value="/personnel/summary")
     public String profileSummary() {
-        return MYINFO_TMPL_BASE_URL + "/personnel/transactions";
+        return MYINFO_TMPL_BASE_URL + "/personnel/summary";
     }
 
     @RequestMapping(value="/personnel/transactions")

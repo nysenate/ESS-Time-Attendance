@@ -80,4 +80,12 @@ public interface SupervisorInfoService
      * @throws SupervisorException
      */
     List<SupervisorOverride> getSupervisorGrants(int supId) throws SupervisorException;
+
+    /**
+     *
+     * @param override SupervisorOverride
+     * @throws SupervisorException - SupervisorNotFoundEx if either supervisor could not be found
+     *                               SupervisorNotInChainEx if 'ovrSupId' is not in 'supId's' chain
+     */
+    void updateSupervisorOverride(SupervisorOverride override) throws SupervisorException;
 }

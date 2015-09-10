@@ -6,36 +6,86 @@ essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'Super
        $scope.state = {
            empId: appProps.user.employeeId,
            selectedGrantee: null,
-           grantees: {}
+           grantees: null,   // Stores an ordered list of the supervisors.
+           granteeMap: null, // Map of supId -> sup, allows easy modification of supervisor grant status.
+
+           modified: false,   // If the state has been altered.
+           fetched: false,   // If the data has been fetched.
+           saving: false,
+           saved: false
        };
 
        $scope.init = function() {
+           // Initialize state
+           $scope.state.selectedGrantee = null;
+           $scope.state.grantees = [];
+           $scope.state.granteeMap = {};
+           $scope.state.modified = $scope.state.fetched = $scope.state.saving = $scope.state.saved = false;
+
+           // Fetch supervisor chain
            SupervisorChainApi.get({empId: $scope.state.empId}, function(resp) {
                if (resp.success == true) {
                    angular.forEach(resp.result.supChain, function(sup) {
                        sup.granted = false;
                        sup.grantStart = sup.grantEnd = null;
-                       $scope.state.grantees[sup.employeeId] = sup;
+                       $scope.state.grantees.push(sup);
+                       $scope.state.granteeMap[sup.employeeId] = sup;
                    });
+                   // Link up with any existing grants
                    SupervisorGrantsApi.get({supId: $scope.state.empId}, function(resp) {
                      if (resp.success) {
                          angular.forEach(resp.grants, function(grant) {
-                             if (!$scope.state.grantees[grant.grantSupervisorId]) {
-                                 $scope.state.grantees[grant.grantSupervisorId] = grant.grantSupervisor;
+                             var supId = grant.granteeSupervisorId;
+                             if (!$scope.state.granteeMap[supId]) {
+                                 $scope.state.grantees.push(grant.granteeSupervisor);
+                                 $scope.state.granteeMap[supId] = grant.granteeSupervisor;
                              }
-                             $scope.state.grantees[grant.grantSupervisorId].granted = true;
-                             $scope.state.grantees[grant.grantSupervisorId].grantStart =
+                             $scope.state.granteeMap[supId].granted = true;
+                             $scope.state.granteeMap[supId].grantStart =
                                 (grant.startDate != null) ? moment(grant.startDate).format('MM/DD/YYYY') : null;
-                             $scope.state.grantees[grant.grantSupervisorId].grantEnd =
+                             $scope.state.granteeMap[supId].grantEnd =
                                 (grant.endDate != null) ? moment(grant.endDate).format('MM/DD/YYYY') : null;
                          });
                      }
+                     $scope.state.fetched = true;
                    });
                }
            });
        };
 
+       // Updater
+
+       $scope.saveGrants = function() {
+           if ($scope.state.modified === true && $scope.state.fetched === true) {
+               var modifiedGrantees = $scope.state.grantees.filter(function(grantee) {
+                   return grantee.modified === true;
+               }).map(function(grantee) {
+                   return $scope.createGrantSaveView(grantee);
+               });
+               $scope.state.saving = true;
+               SupervisorGrantsApi.save(modifiedGrantees, function(resp) {
+                   $scope.state.saving = false;
+                   $scope.state.modified = false;
+                   $scope.state.saved = true;
+               });
+           }
+       };
+
+       $scope.createGrantSaveView = function(grantee) {
+           return {
+               granteeSupervisorId: grantee.employeeId,
+               active: grantee.granted,
+               granterSupervisorId: $scope.state.empId,
+               startDate: (grantee.grantStart) ? moment(grantee.grantStart).format('YYYY-MM-DD') : null,
+               endDate: (grantee.grantEnd) ? moment(grantee.grantEnd).format('YYYY-MM-DD') : null
+           };
+       };
+
+       // Modifiers
+
        $scope.setStartDate = function(grantee) {
+           $scope.state.modified = true;
+           grantee.modified = true;
            if (grantee.grantStart) {
                grantee.grantStart = null;
            }
@@ -44,7 +94,9 @@ essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'Super
            }
        };
 
-       $scope.setStartDate = function(grantee) {
+       $scope.setEndDate = function(grantee) {
+           $scope.state.modified = true;
+           grantee.modified = true;
            if (grantee.grantEnd) {
                grantee.grantEnd = null;
            }
@@ -53,9 +105,12 @@ essTime.controller('GrantPrivilegesCtrl', ['$scope', '$http', 'appProps', 'Super
            }
        };
 
+       $scope.toggleGrantStatus = function(grantee) {
+           $scope.state.modified = true;
+           grantee.modified = true;
+       };
+
        $scope.reset = function() {
-           $scope.state.selectedGrantee = null;
-           $scope.state.grantees = {};
            $scope.init();
        };
 

@@ -1,7 +1,6 @@
 package gov.nysenate.seta.client.view;
 
 import gov.nysenate.seta.client.view.base.ListView;
-import gov.nysenate.seta.client.view.base.SalaryRecView;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
 

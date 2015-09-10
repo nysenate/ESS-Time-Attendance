@@ -5,18 +5,15 @@ import com.google.common.collect.Range;
 import com.google.common.eventbus.EventBus;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
-import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
 import gov.nysenate.seta.model.personnel.*;
-import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.cache.EhCacheManageService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +21,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static gov.nysenate.seta.model.transaction.TransactionCode.APP;
-import static gov.nysenate.seta.model.transaction.TransactionCode.RTP;
-import static gov.nysenate.seta.model.transaction.TransactionCode.SUP;
+import java.util.List;
+import java.util.TreeMap;
 
 @Service
 public class EssCachedSupervisorInfoService implements SupervisorInfoService
@@ -129,6 +121,28 @@ public class EssCachedSupervisorInfoService implements SupervisorInfoService
     @Override
     public List<SupervisorOverride> getSupervisorGrants(int supId) throws SupervisorException {
         return supervisorDao.getSupervisorOverrides(supId, SupGrantType.GRANTER);
+    }
+
+    @Override
+    public void updateSupervisorOverride(SupervisorOverride override) throws SupervisorException {
+        if (isSupervisorDuring(override.getGranteeSupervisorId(), Range.all()) &&
+            isSupervisorDuring(override.getGranterSupervisorId(), Range.all())) {
+            // If the override is set to inactive, only apply the override if there is an existing grant
+            // with the given granter -> grantee pair. There's no reason to create it if there isn't one.
+            if (!override.isActive()) {
+                boolean hasExistingGrant = getSupervisorGrants(override.getGranterSupervisorId()).stream()
+                        .filter(ovr -> ovr.getGranteeSupervisorId() == override.getGranteeSupervisorId())
+                        .findAny().isPresent();
+                if (!hasExistingGrant) {
+                    return;
+                }
+            }
+            supervisorDao.setSupervisorOverride(override.getGranterSupervisorId(), override.getGranteeSupervisorId(),
+                    override.isActive(), override.getStartDate().orElse(null), override.getEndDate().orElse(null));
+        }
+        else {
+            throw new SupervisorException("Grantee/Granter for override must both have been a supervisor.");
+        }
     }
 
     private void putSupEmpGroupInCache(SupervisorEmpGroup empGroup) {

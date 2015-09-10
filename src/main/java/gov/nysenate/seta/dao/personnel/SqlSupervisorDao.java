@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -243,7 +244,15 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
 
     /**{@inheritDoc} */
     @Override
-    public void setSupervisorOverride(int supId, int ovrSupId, Range<LocalDate> dateRange) throws SupervisorException {
-        throw new NotImplementedException();
+    public void setSupervisorOverride(int granterSupId, int granteeSupId, boolean active, LocalDate startDate, LocalDate endDate) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("granterSupId", granterSupId);
+        params.addValue("granteeSupId", granteeSupId);
+        params.addValue("status", (active) ? "A" : "I");
+        params.addValue("startDate", toDate(startDate));
+        params.addValue("endDate", toDate(endDate));
+        if (remoteNamedJdbc.update(SqlSupervisorQuery.UPDATE_SUP_GRANT.getSql(schemaMap()), params) == 0) {
+            remoteNamedJdbc.update(SqlSupervisorQuery.INSERT_SUP_GRANT.getSql(schemaMap()), params);
+        }
     }
 }

@@ -58,11 +58,11 @@ public interface SupervisorDao extends BaseDao
      * Sets an override so that 'ovrSupId' can have access to the primary employees of 'supId' during the
      * given date range.
      *
-     * @param supId int - The supervisor granting the override.
-     * @param ovrSupId int - The supervisor receiving the override.
-     * @param dateRange Range<LocalDate> - The date range to set override for.
-     * @throws SupervisorException - SupervisorNotFoundEx if either supervisor could not be found
-     *                               SupervisorNotInChainEx if 'ovrSupId' is not in 'supId's' chain
+     * @param granterSupId int - The supervisor granting the override.
+     * @param granteeSupId int - The supervisor receiving the override.
+     * @param active boolean - Indicates if this grant is active.
+     * @param startDate LocalDate - set to null for no start date.
+     * @param endDate LocalDate - set to null for no end date.
      */
-    void setSupervisorOverride(int supId, int ovrSupId, Range<LocalDate> dateRange) throws SupervisorException;
+    void setSupervisorOverride(int granterSupId, int granteeSupId, boolean active, LocalDate startDate, LocalDate endDate);
 }

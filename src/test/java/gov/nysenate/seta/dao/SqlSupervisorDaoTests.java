@@ -6,6 +6,7 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
+import gov.nysenate.seta.model.personnel.SupGrantType;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -21,16 +22,6 @@ public class SqlSupervisorDaoTests extends BaseTests
 
     @Autowired
     private SupervisorDao supervisorDao;
-
-    @Test
-    public void testGetSupervisorIdForEmpWithDate_ReturnsCorrectSupervisorId() throws Exception {
-        logger.info("{}", supervisorDao.getSupervisorIdForEmp(6221, LocalDate.of(2000, 9, 17)));
-    }
-
-    @Test
-    public void testGetSupervisorChain_ReturnsSupervisorChain() throws Exception {
-        logger.info("{}", OutputUtils.toJson(supervisorDao.getSupervisorChain(10976, LocalDate.now())));
-    }
 
     @Test
     public void testGetSupEmpGroup_ReturnsEmpGroup() throws Exception {
@@ -49,8 +40,12 @@ public class SqlSupervisorDaoTests extends BaseTests
 
     @Test
     public void supOverrideTest() throws Exception {
-        supervisorDao.setSupervisorOverride(11423, 7048, Range.closed(LocalDate.of(2015, 7, 16), LocalDate.of(2015, 7, 29)));
+//        supervisorDao.setSupervisorOverride(11423, 7048, Range.closed(LocalDate.of(2015, 7, 16), LocalDate.of(2015, 7, 29)));
+        logger.info("{}", OutputUtils.toJson(supervisorDao.getSupervisorOverrides(9896, SupGrantType.GRANTER)));
     }
 
-
+    @Test
+    public void testSetSupervisorOverrides() throws Exception {
+        supervisorDao.setSupervisorOverride(9896, 7048, true, null, null);
+    }
 }

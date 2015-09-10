@@ -6,11 +6,22 @@ import java.util.Optional;
 
 public class SupervisorOverride
 {
-    protected int supervisorId;
+    /** The supervisor that's getting permission to view another supervisor's employees. */
+    protected int granteeSupervisorId;
+
+    /** If true, this override is effective. */
     protected boolean active;
-    protected int overrideSupervisorId;
+
+    /** The supervisor that's granting permissions to the grantee supervisor to manage their records. */
+    protected int granterSupervisorId;
+
+    /** Optional start date for which this override is effective from. */
     protected Optional<LocalDate> startDate;
+
+    /** Optional end date for which this override is effective until. */
     protected Optional<LocalDate> endDate;
+
+    /** Audit Dates. */
     protected LocalDateTime originDate;
     protected LocalDateTime updateDate;
 
@@ -20,12 +31,12 @@ public class SupervisorOverride
 
     /** --- Basic Getters/Setters --- */
 
-    public int getSupervisorId() {
-        return supervisorId;
+    public int getGranteeSupervisorId() {
+        return granteeSupervisorId;
     }
 
-    public void setSupervisorId(int supervisorId) {
-        this.supervisorId = supervisorId;
+    public void setGranteeSupervisorId(int granteeSupervisorId) {
+        this.granteeSupervisorId = granteeSupervisorId;
     }
 
     public boolean isActive() {
@@ -36,12 +47,12 @@ public class SupervisorOverride
         this.active = active;
     }
 
-    public int getOverrideSupervisorId() {
-        return overrideSupervisorId;
+    public int getGranterSupervisorId() {
+        return granterSupervisorId;
     }
 
-    public void setOverrideSupervisorId(int overrideSupervisorId) {
-        this.overrideSupervisorId = overrideSupervisorId;
+    public void setGranterSupervisorId(int granterSupervisorId) {
+        this.granterSupervisorId = granterSupervisorId;
     }
 
     public Optional<LocalDate> getStartDate() {
