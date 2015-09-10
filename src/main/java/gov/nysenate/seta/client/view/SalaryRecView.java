@@ -1,5 +1,6 @@
-package gov.nysenate.seta.client.view.base;
+package gov.nysenate.seta.client.view;
 
+import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.payroll.SalaryRec;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -8,7 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @XmlRootElement
-public class SalaryRecView implements ViewObject {
+public class SalaryRecView implements ViewObject
+{
 
     protected BigDecimal salaryRate;
     protected String payType;
