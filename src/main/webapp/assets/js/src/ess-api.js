@@ -41,6 +41,10 @@ essApi.factory('SupervisorChainApi', ['$resource', 'appProps', function ($resour
     return $resource(appProps.apiPath + '/supervisor/chain');
 }]);
 
+essApi.factory('SupervisorOverridesApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/supervisor/overrides');
+}]);
+
 essApi.factory('SupervisorGrantsApi', ['$resource', 'appProps', function ($resource, appProps) {
     return $resource(appProps.apiPath + '/supervisor/grants');
 }]);
@@ -70,4 +74,8 @@ essApi.factory('EmpActiveYearsApi', ['$resource', 'appProps', function($resource
 
 essApi.factory('EmpTransactionsApi', ['$resource', 'appProps', function($resource, appProps) {
     return $resource(appProps.apiPath + '/empTransactions/')
+}]);
+
+essApi.factory('EmpTransactionSnapshotApi', ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/empTransactions/snapshot')
 }]);

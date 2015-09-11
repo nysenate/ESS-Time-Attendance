@@ -19,7 +19,7 @@ public class EmpTransRecordView implements ViewObject
     protected boolean active;
     protected String transCode;
     protected String transDesc;
-    protected Map<String, String> valueMap;
+    protected Map<String, EmpTransItemView> values;
     protected LocalDate effectDate;
     protected LocalDateTime originalDate;
     protected LocalDateTime updateDate;
@@ -31,16 +31,10 @@ public class EmpTransRecordView implements ViewObject
             this.active = record.isActive();
             this.transCode = record.getTransCode().name();
             this.transDesc = record.getTransCode().getDesc();
-            this.valueMap = new HashMap<>();
+            this.values = new HashMap<>();
             record.getValueMap().forEach((k,v) -> {
                 if (TransactionColumn.isValidColumn(k) && StringUtils.isNotBlank(v)) {
-                    String desc = TransactionColumn.valueOf(k).getDesc();
-                    if (!desc.isEmpty()) {
-                        this.valueMap.put(TransactionColumn.valueOf(k).getDesc(), v);
-                    }
-                    else {
-                        this.valueMap.put(k,v);
-                    }
+                    this.values.put(k, new EmpTransItemView(k, v));
                 }
             });
             this.effectDate = record.getEffectDate();
@@ -76,8 +70,8 @@ public class EmpTransRecordView implements ViewObject
     }
 
     @XmlElement
-    public Map<String, String> getValueMap() {
-        return valueMap;
+    public Map<String, EmpTransItemView> getValues() {
+        return values;
     }
 
     @XmlElement

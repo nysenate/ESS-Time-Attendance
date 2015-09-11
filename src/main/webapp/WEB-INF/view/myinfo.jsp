@@ -11,6 +11,7 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/home.js"></script>
 
         <!-- Personnel -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/myinfo/personnel/summary-ctrl.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/myinfo/personnel/transaction-history-ctrl.js"></script>
 
     </jsp:body>

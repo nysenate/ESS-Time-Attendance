@@ -38,9 +38,9 @@
                 <div class="content-container padding-10">
                     <table class="">
                         <tbody>
-                        <tr ng-repeat="(k,v) in tx.valueMap">
-                            <td style="width:200px;">{{k}}</td>
-                            <td>{{v}}</td>
+                        <tr ng-repeat="(k,v) in tx.values">
+                            <td style="width:200px;">{{v.desc}}</td>
+                            <td>{{v.value}}</td>
                         </tr>
                         </tbody>
                     </table>

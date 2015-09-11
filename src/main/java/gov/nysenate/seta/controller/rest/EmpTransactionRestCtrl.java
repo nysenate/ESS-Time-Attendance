@@ -6,7 +6,10 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
+import gov.nysenate.seta.client.response.base.ViewObjectResponse;
+import gov.nysenate.seta.client.view.EmpTransItemView;
 import gov.nysenate.seta.client.view.EmpTransRecordView;
+import gov.nysenate.seta.client.view.base.MapView;
 import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -19,9 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static gov.nysenate.seta.controller.rest.BaseRestCtrl.REST_PATH;
 import static java.util.stream.Collectors.toList;
@@ -48,6 +49,18 @@ public class EmpTransactionRestCtrl extends BaseRestCtrl
                 .getTransRecords(range, codeSet, SortOrder.ASC).stream()
                 .map(EmpTransRecordView::new)
                 .collect(toList()), "transactions");
+    }
+
+    @RequestMapping("/snapshot")
+    public BaseResponse getFlatTransactionByEmpId(@RequestParam Integer empId,
+                                                  @RequestParam(required = false) String date) {
+        LocalDate localDate = (date != null) ? parseISODate(date, "date") : LocalDate.now();
+        Map<String, EmpTransItemView> itemMap = new HashMap<>();
+        transactionService.getTransHistory(empId).getRecordSnapshots()
+            .floorEntry(localDate).getValue().entrySet().stream().forEach(e -> {
+            itemMap.put(e.getKey(), new EmpTransItemView(e.getKey(), e.getValue()));
+        });
+        return new ViewObjectResponse<>(MapView.of(itemMap), "snapshot");
     }
 
     private Set<TransactionCode> getTransCodesFromString(String codes) {
