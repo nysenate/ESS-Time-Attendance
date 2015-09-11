@@ -3,6 +3,7 @@ package gov.nysenate.seta.service.attendance;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 import gov.nysenate.common.SortOrder;
+import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
@@ -12,7 +13,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+@WorkInProgress(author = "Ash", since = "2015/09/11", desc = "Reworking methods in the class")
 public interface TimeRecordService
 {
     /**
@@ -22,6 +25,40 @@ public interface TimeRecordService
      * @return List<Integer>
      */
     List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder);
+
+    /**
+     * Gets a list of active time records. 'Active' records in this case are simply records that
+     * have an employee or supervisor scope. Records that have already been sent to personnel or
+     * approved by personnel are not active.
+     *
+     * @param empId Integer
+     * @return List<TimeRecord>
+     */
+    List<TimeRecord> getActiveTimeRecords(Integer empId);
+
+    /**
+     * Helper method to return just the active time records that are scoped to the 'employee'.
+     *
+     * @param empId Integer
+     * @return List<TimeRecord>
+     */
+    default List<TimeRecord> getEmployeeScopedTimeRecords(Integer empId) {
+        return getActiveTimeRecords(empId).stream()
+            .filter(tr -> tr.getRecordStatus().isUnlockedForEmployee())
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper method to return just the active time records that are scoped to the 'supervisor'.
+     *
+     * @param empId Integer
+     * @return List<TimeRecord>
+     */
+    default List<TimeRecord> getSupervisorScopedTimeRecords(Integer empId) {
+        return getActiveTimeRecords(empId).stream()
+            .filter(tr -> tr.getRecordStatus().isUnlockedForSupervisor())
+            .collect(Collectors.toList());
+    }
 
     /**
      * Get time records for one or more employees, matching certain time record statuses, over a specified date range.
@@ -60,6 +97,7 @@ public interface TimeRecordService
      * @param dateRange Range<LocalDate> - Returned records will be contained within this date range
      * @return List<TimeRecord>
      */
+    /** FIXME: Is this needed? */
     List<TimeRecord> getTimeRecordsWithSupervisor(Integer empId, Integer supId, Range<LocalDate> dateRange);
 
     /**
@@ -86,5 +124,5 @@ public interface TimeRecordService
      * @param record - TimeRecord class object containing data to be updated into the table
      * @return Boolean value, true if data successfully updated else false.
      */
-    boolean saveRecord(TimeRecord record);
+    boolean updateExistingRecord(TimeRecord record);
 }

@@ -9,8 +9,6 @@ import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.view.TimeRecordView;
 import gov.nysenate.seta.client.view.base.ListView;
 import gov.nysenate.seta.client.view.base.MapView;
-import gov.nysenate.seta.dao.attendance.TimeRecordDao;
-import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
@@ -35,7 +33,6 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeRecordRestCtrl.class);
 
-    @Autowired TimeRecordDao timeRecordDao;
     @Autowired TimeRecordService timeRecordService;
     @Autowired AccrualInfoService accrualInfoService;
 
@@ -45,23 +42,14 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      * Get Time Record API
      * -------------------
      *
-     * Get xml or json time records for one or more employees:
-     *      (GET) /api/v1/timerecords[.json]
+     * Get time records for one or more employees:
+     * (GET) /api/v1/timerecords[.json]
      *
      * Request Parameters: empId - int[] - required - Records will be retrieved for these employee ids
      *                     to - Date - default current date - Gets time records that end before or on this date
      *                     from - Date - default Jan 1 on year of 'to' Date - Gets time records that begin on or after this date
      *                     status - String[] - default all statuses - Will only get time records with one of these statuses
      */
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/xml")
-    public BaseResponse getRecordsXml(@RequestParam Integer[] empId,
-                                      @RequestParam(required = false) String from,
-                                      @RequestParam(required = false) String to,
-                                      @RequestParam(required = false) String[] status) {
-        return getRecordResponse(
-                getRecords(empId, from, to, status), true);
-    }
-
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     public BaseResponse getRecordsJson(@RequestParam Integer[] empId,
                                        @RequestParam(required = false) String from,
@@ -72,9 +60,11 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     }
 
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = "application/json")
-    public BaseResponse getActiveRecordsJson(@RequestParam Integer[] empId,
-                                             @RequestParam(required = false) String[] status) {
-        return getRecordResponse(getActiveRecords(empId, status), false);
+    public BaseResponse getActiveRecords(@RequestParam Integer[] empId) {
+        ListMultimap<Integer, TimeRecord> activeRecsPerEmp = ArrayListMultimap.create();
+        Set<Integer> empIdSet = new HashSet<>(Arrays.asList(empId));
+        empIdSet.forEach(eid -> activeRecsPerEmp.putAll(eid, timeRecordService.getActiveTimeRecords(eid)));
+        return getRecordResponse(activeRecsPerEmp, false);
     }
 
     @RequestMapping(value = "/supervisor", method = RequestMethod.GET, produces = "application/json")
@@ -97,7 +87,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      */
     @RequestMapping(value = "active_years")
     public BaseResponse getTimeRecordYears(@RequestParam Integer empId) {
-        return ListViewResponse.ofIntList(timeRecordDao.getTimeRecordYears(empId, SortOrder.ASC), "years");
+        return ListViewResponse.ofIntList(timeRecordService.getTimeRecordYears(empId, SortOrder.ASC), "years");
     }
 
     /**
@@ -113,7 +103,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     public void saveRecord(@RequestBody TimeRecordView record) {
         TimeRecord newRecord = record.toTimeRecord();
         validationService.validateTimeRecord(newRecord);
-        timeRecordDao.saveRecord(newRecord);
+        timeRecordService.updateExistingRecord(newRecord);
     }
 
     @ExceptionHandler(InvalidTimeRecordException.class)
@@ -131,18 +121,9 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
                 .forEach(record -> records.put(record.getEmployeeId(), record));
         return records;
     }
+
     private ListMultimap<Integer, TimeRecord> getRecords(Integer[] empId, String from, String to, String[] status) {
         return getRecords(new HashSet<>(Arrays.asList(empId)), parseDateRange(from, to), parseStatuses(status));
-    }
-    private ListMultimap<Integer, TimeRecord> getActiveRecords(Integer[] empId, String[] status) {
-        RangeSet<LocalDate> activePeriods = TreeRangeSet.create();
-        Set<Integer> empIds = new HashSet<>(Arrays.asList(empId));
-        empIds.forEach(eId ->
-            accrualInfoService.getActiveAttendancePeriods(eId, LocalDate.now(), SortOrder.ASC)
-                .forEach(period -> activePeriods.add(period.getDateRange())));
-        return activePeriods.isEmpty() ?
-                ArrayListMultimap.create() :
-                getRecords(empIds, activePeriods.span(), parseStatuses(status));
     }
 
     private Range<LocalDate> parseDateRange(String from, String to) {

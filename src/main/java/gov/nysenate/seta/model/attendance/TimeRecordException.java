@@ -1,9 +1,8 @@
 package gov.nysenate.seta.model.attendance;
 
-/**
- * Created by riken on 3/4/14.
- */
-public class TimeRecordException extends Exception {
+public class TimeRecordException extends RuntimeException
+{
+    private static final long serialVersionUID = -8720758842907502676L;
 
     public TimeRecordException(){}
 

@@ -1,11 +1,14 @@
 package gov.nysenate.seta.service.attendance;
 
 import com.google.common.collect.*;
+import com.google.common.eventbus.EventBus;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
+import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
+import gov.nysenate.seta.model.attendance.TimeRecordException;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.payroll.PayType;
@@ -16,31 +19,110 @@ import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
+import gov.nysenate.seta.service.cache.EhCacheManageService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import gov.nysenate.seta.service.personnel.SupervisorInfoService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-public class EssTimeRecordService extends SqlDaoBackedService implements TimeRecordService
-{
-    private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordService.class);
+import static gov.nysenate.seta.model.attendance.TimeRecordStatus.*;
+import static java.util.stream.Collectors.toList;
 
+@Service
+@WorkInProgress(author = "Ash", since = "2015/09/11", desc = "Reworking methods in the class, adding caching")
+public class EssCachedTimeRecordService extends SqlDaoBackedService implements TimeRecordService
+{
+    private static final Logger logger = LoggerFactory.getLogger(EssCachedTimeRecordService.class);
+
+    /** --- Caching / Events --- */
+    @Autowired protected EventBus eventBus;
+    @Autowired protected EhCacheManageService cacheManageService;
+    private Cache activeRecordCache;
+
+    /** --- Services --- */
     @Autowired protected EmployeeInfoService empInfoService;
     @Autowired protected EmpTransactionService transService;
     @Autowired protected AccrualInfoService accrualInfoService;
     @Autowired protected SupervisorInfoService supervisorInfoService;
 
+    @PostConstruct
+    public void init() {
+        this.eventBus.register(this);
+        this.activeRecordCache = this.cacheManageService.registerEternalCache("activeRecords");
+    }
+
+    /** Helper class to store a collection of time records in a cache. */
+    protected static class TimeRecordCacheCollection
+    {
+        private int empId;
+        private Map<BigInteger, TimeRecord> cachedTimeRecords = new LinkedHashMap<>();
+
+        public TimeRecordCacheCollection(int empId, Collection<TimeRecord> cachedTimeRecords) {
+            this.empId = empId;
+            cachedTimeRecords.stream().forEach(tr -> this.cachedTimeRecords.put(tr.getTimeRecordId(), tr));
+        }
+
+        public int getEmpId() {
+            return empId;
+        }
+
+        public List<TimeRecord> getTimeRecords() {
+            return this.cachedTimeRecords.values().stream().collect(toList());
+        }
+
+        public void update(TimeRecord record) {
+            if (record.getTimeRecordId() == null)
+                throw new IllegalArgumentException("Time record must have a valid id prior to caching.");
+            cachedTimeRecords.put(record.getTimeRecordId(), record);
+        }
+
+        public void remove(BigInteger timeRecId) {
+            cachedTimeRecords.remove(timeRecId);
+        }
+    }
+
+    /** --- TimeRecordService Implementation --- */
+
+    private static final EnumSet<TimeRecordStatus> activeStatuses =
+        EnumSet.of(NOT_SUBMITTED, SUBMITTED, DISAPPROVED, DISAPPROVED_PERSONNEL);
+
+    /** {@inheritDoc} */
     @Override
     public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
         return timeRecordDao.getTimeRecordYears(empId, yearOrder);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<TimeRecord> getActiveTimeRecords(Integer empId) {
+        activeRecordCache.acquireReadLockOnKey(empId);
+        TimeRecordCacheCollection cachedRecs;
+        Element element = activeRecordCache.get(empId);
+        activeRecordCache.releaseReadLockOnKey(empId);
+        if (element != null) {
+            cachedRecs = (TimeRecordCacheCollection) element.getObjectValue();
+        }
+        else {
+            List<TimeRecord> records = timeRecordDao.getRecordsDuring(empId, Range.all(), activeStatuses);
+            addSupervisors(records);
+            cachedRecs = new TimeRecordCacheCollection(empId, records);
+            activeRecordCache.acquireWriteLockOnKey(empId);
+            activeRecordCache.put(new Element(empId, cachedRecs));
+            activeRecordCache.releaseWriteLockOnKey(empId);
+        }
+        return cachedRecs.getTimeRecords();
     }
 
     /** {@inheritDoc} */
@@ -51,14 +133,14 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         TreeMultimap<PayPeriod, TimeRecord> records = TreeMultimap.create();
         timeRecordDao.getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class)).values().stream()
                 .forEach(rec -> records.put(rec.getPayPeriod(), rec));
-        if (fillMissingRecords && statuses.contains(TimeRecordStatus.NOT_SUBMITTED)) {
+        if (fillMissingRecords && statuses.contains(NOT_SUBMITTED)) {
             empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
         }
         addSupervisors(records.values());
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .peek(this::initializeEntries)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -68,13 +150,13 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
         payPeriods.forEach(period -> dateRanges.add(period.getDateRange()));
         return getTimeRecords(empIds, dateRanges.span(), statuses, fillMissingRecords).stream()
                 .filter(record -> dateRanges.encloses(record.getDateRange()))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
     public List<TimeRecord> getTimeRecordsWithSupervisor(Integer empId, Integer supId, Range<LocalDate> dateRange) {
         List<TimeRecord> timeRecords = getTimeRecords(new HashSet<>(empId), dateRange, TimeRecordStatus.getAll(), false);
-        return timeRecords.stream().filter(t -> t.getSupervisorId().equals(supId)).collect(Collectors.toList());
+        return timeRecords.stream().filter(t -> t.getSupervisorId().equals(supId)).collect(toList());
     }
 
     /** {@inheritDoc} */
@@ -91,20 +173,40 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
 
         // Get and addUsage override employee time records
         empGroup.getOverrideSupIds().forEach(overrideSupId -> {
-                    records.putAll(overrideSupId,
-                            getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
-                                    dateRange, statuses));
-                });
+            records.putAll(overrideSupId,
+                    getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
+                            dateRange, statuses));
+        });
 
         return records;
     }
 
-    /**
-     * TODO.. WIP
-     */
     @Override
-    public boolean saveRecord(TimeRecord record) {
-        return false;
+    @Transactional(value = "remoteTxManager")
+    @WorkInProgress(author = "ash", desc = "Need to test this a bit better...")
+    public boolean updateExistingRecord(TimeRecord record) {
+        if (record.getTimeRecordId() == null) {
+            throw new TimeRecordException("Time record without a record id cannot be saved,");
+        }
+        boolean updated = timeRecordDao.saveRecord(record);
+        if (updated) {
+            int empId = record.getEmployeeId();
+            activeRecordCache.acquireWriteLockOnKey(empId);
+            try {
+                Element elem = activeRecordCache.get(empId);
+                if (elem != null && activeStatuses.contains(record.getRecordStatus())) {
+                    TimeRecordCacheCollection cachedRecs = (TimeRecordCacheCollection) elem.getObjectValue();
+                    cachedRecs.update(record);
+                }
+                else {
+                    activeRecordCache.put(new Element(empId, getActiveTimeRecords(empId)));
+                }
+            }
+            finally {
+                activeRecordCache.releaseWriteLockOnKey(empId);
+            }
+        }
+        return updated;
     }
 
     /** --- Internal Methods --- */
@@ -160,7 +262,7 @@ public class EssTimeRecordService extends SqlDaoBackedService implements TimeRec
                 periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
         return periods.keySet().stream().parallel()
                 .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, false).stream())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     /**

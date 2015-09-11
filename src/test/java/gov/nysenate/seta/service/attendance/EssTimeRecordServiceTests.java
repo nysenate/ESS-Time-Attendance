@@ -3,7 +3,6 @@ package gov.nysenate.seta.service.attendance;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
-import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
@@ -22,7 +21,7 @@ public class EssTimeRecordServiceTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordServiceTests.class);
 
-    @Autowired private EssTimeRecordService timeRecordService;
+    @Autowired private EssCachedTimeRecordService timeRecordService;
 
     @Test
     public void testGetActiveRecords() throws Exception {

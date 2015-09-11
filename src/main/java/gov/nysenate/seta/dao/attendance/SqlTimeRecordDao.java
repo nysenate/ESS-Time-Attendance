@@ -73,6 +73,7 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         return handler.getRecordMap();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
         SqlParameterSource params = new MapSqlParameterSource("empId", empId);
