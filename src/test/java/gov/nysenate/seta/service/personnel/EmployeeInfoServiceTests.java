@@ -1,7 +1,9 @@
 package gov.nysenate.seta.service.personnel;
 
 import com.google.common.collect.RangeSet;
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
+import gov.nysenate.seta.model.personnel.Employee;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,4 +21,15 @@ public class EmployeeInfoServiceTests extends BaseTests {
         RangeSet<LocalDate> activeDates = employeeInfoService.getEmployeeActiveDatesService(1719);
         logger.info("{}", activeDates.asRanges());
     }
+
+    private void printEmpInfoAtDate(int empId, LocalDate date) {
+        Employee emp = employeeInfoService.getEmployee(empId, date);
+        logger.info("{}", OutputUtils.toJson(emp));
+    }
+
+    @Test
+    public void empInfoAtDateTest() {
+        printEmpInfoAtDate(9896, LocalDate.of(2010, 8, 24));
+    }
+
 }

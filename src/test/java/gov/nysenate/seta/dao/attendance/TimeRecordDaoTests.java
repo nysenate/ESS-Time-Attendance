@@ -107,7 +107,8 @@ public class TimeRecordDaoTests extends BaseTests
 
     @Test
     public void testGetRecord() throws Exception {
-        logger.info("{}", OutputUtils.toJson(timeRecordDao.getRecordsDuring(10976, Range.atLeast(LocalDate.of(2015, 5, 1)))));
+        List<TimeRecord> records = timeRecordDao.getRecordsDuring(11423, Range.closedOpen(LocalDate.of(2015, 8, 12), LocalDate.of(2015, 8, 15)));
+        records.forEach(record -> logger.info("{}", record.getBeginDate()));
     }
 
     @Test

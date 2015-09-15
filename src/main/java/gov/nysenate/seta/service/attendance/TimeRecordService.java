@@ -9,6 +9,7 @@ import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.period.PayPeriod;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -62,31 +63,23 @@ public interface TimeRecordService
 
     /**
      * Get time records for one or more employees, matching certain time record statuses, over a specified date range.
-     * Will create time records for uncovered pay periods if desired,
      *
      * @param empIds Set<Integer> - employee ids
      * @param dateRange Range<LocalDate> - interval to check for
      * @param statuses Set<TimeRecordStatus> - time record statuses to retrieve
-     * @param fillMissingRecords boolean - will create new records to fill pay period gaps if true
-     * @return
+     * @return List<TimeRecord>
      */
-    List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
-                                    Set<TimeRecordStatus> statuses,
-                                    boolean fillMissingRecords);
+    List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange, Set<TimeRecordStatus> statuses);
 
     /**
      * Get time records for one or more employees, matching certain time record statuses, for the specified pay periods
-     * Will create time records for uncovered pay periods if desired,
      *
      * @param empIds Set<Integer> - employee ids
      * @param payPeriods Collection<PayPeriod> - pay periods
      * @param statuses Set<TimeRecordStatus> - time record statuses to retrieve
-     * @param fillMissingRecords boolean - will create new records to fill pay period gaps if true
-     * @return
+     * @return List<TimeRecord>
      */
-    List<TimeRecord> getTimeRecords(Set<Integer> empIds, Collection<PayPeriod> payPeriods,
-                                    Set<TimeRecordStatus> statuses,
-                                    boolean fillMissingRecords);
+    List<TimeRecord> getTimeRecords(Set<Integer> empIds, Collection<PayPeriod> payPeriods, Set<TimeRecordStatus> statuses);
 
     /**
      * Retrieves the time records for an employee with employee id 'empId' that were to be approved by the given
@@ -125,4 +118,18 @@ public interface TimeRecordService
      * @return Boolean value, true if data successfully updated else false.
      */
     boolean updateExistingRecord(TimeRecord record);
+
+    /**
+     * Remove the time record with the specified time record id
+     * @param timeRecordId BigInteger
+     * @return true if a time record was removed
+     */
+    boolean deleteRecord(BigInteger timeRecordId);
+
+    /**
+     * @see #deleteRecord(BigInteger)
+     */
+    default boolean deleteRecord(TimeRecord timeRecord) {
+        return timeRecord.getTimeRecordId() != null && deleteRecord(timeRecord.getTimeRecordId());
+    }
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.TreeMultimap;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public enum TimeRecordStatus
     }
 
     public static Set<TimeRecordStatus> getAll() {
-        return new HashSet<>(unlockedForMap.values());
+        return EnumSet.allOf(TimeRecordStatus.class);
     }
 
     public static Set<TimeRecordStatus> unlockedForEmployee() {

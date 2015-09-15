@@ -51,11 +51,8 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public TimeRecord() {}
 
-    public TimeRecord(Employee employee, Range<LocalDate> dateRange, PayPeriod payPeriod, PayType payType, int supervisorId) {
-        this.employeeId = employee.getEmployeeId();
-        this.supervisorId = supervisorId;
-        this.employeeName = employee.getUid().toUpperCase();
-        this.respHeadCode = employee.getRespCenter().getHead().getCode();
+    public TimeRecord(Employee employee, Range<LocalDate> dateRange, PayPeriod payPeriod) {
+        setEmpInfo(employee);
         this.active = true;
         this.beginDate = DateUtils.startOfDateRange(dateRange);
         this.endDate = DateUtils.endOfDateRange(dateRange);
@@ -66,6 +63,29 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.createdDate = LocalDateTime.now();
         this.updateDate = createdDate;
     }
+
+    public TimeRecord(TimeRecord other) {
+        this.timeRecordId = other.timeRecordId;
+        this.employeeId = other.employeeId;
+        this.supervisorId = other.supervisorId;
+        this.employeeName = other.employeeName;
+        this.respHeadCode = other.respHeadCode;
+        this.active = other.active;
+        this.beginDate = other.beginDate;
+        this.endDate = other.endDate;
+        this.payPeriod = other.payPeriod;
+        this.remarks = other.remarks;
+        this.exceptionDetails = other.exceptionDetails;
+        this.processedDate = other.processedDate;
+        this.recordStatus = other.recordStatus;
+        this.originalUserId = other.originalUserId;
+        this.updateUserId = other.updateUserId;
+        this.createdDate = other.createdDate;
+        this.updateDate = other.updateDate;
+        this.timeEntryMap = other.timeEntryMap;
+        this.supervisor = other.supervisor;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -95,13 +115,25 @@ public class TimeRecord implements Comparable<TimeRecord>
     /** --- Functions --- */
 
     public boolean encloses(PayPeriod period) {
-        return Range.closed(beginDate, endDate).encloses(period.getDateRange());
+        return getDateRange().encloses(period.getDateRange());
     }
+
+    /**
+     * Return true iff the employee info in this time record matches the given employee info
+     */
+    public boolean checkEmployeeInfo(Employee empInfo) {
+        return Objects.equal(this.employeeId, empInfo.getEmployeeId()) &&
+                Objects.equal(this.supervisorId, empInfo.getSupervisorId()) &&
+                Objects.equal(this.respHeadCode,
+                        empInfo.getRespCenter() != null && empInfo.getRespCenter().getHead() != null
+                                ? empInfo.getRespCenter().getHead().getCode() : null);
+    }
+
 
     /** --- Functional Getters / Setters --- */
 
     public Range<LocalDate> getDateRange() {
-        return Range.closed(beginDate, endDate);
+        return Range.closedOpen(beginDate, endDate.plusDays(1));
     }
 
     public ImmutableList<TimeEntry> getTimeEntries() {
@@ -116,12 +148,23 @@ public class TimeRecord implements Comparable<TimeRecord>
         timeEntries.forEach(this::addTimeEntry);
     }
 
+    public TimeEntry removeEntry(LocalDate date) {
+        return timeEntryMap.remove(date);
+    }
+
     public boolean containsEntry(LocalDate date) {
         return timeEntryMap.containsKey(date);
     }
 
     public TimeEntry getEntry(LocalDate date) {
         return timeEntryMap.get(date);
+    }
+
+    public void setEmpInfo(Employee employee) {
+        this.employeeId = employee.getEmployeeId();
+        this.supervisorId = employee.getSupervisorId();
+        this.employeeName = employee.getUid().toUpperCase();
+        this.respHeadCode = employee.getRespCenter().getHead().getCode();
     }
 
     /**

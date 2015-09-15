@@ -9,6 +9,7 @@ import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.view.TimeRecordView;
 import gov.nysenate.seta.client.view.base.ListView;
 import gov.nysenate.seta.client.view.base.MapView;
+import gov.nysenate.seta.dao.attendance.TimeRecordDao;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
@@ -117,7 +118,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     private ListMultimap<Integer, TimeRecord> getRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
                                                          Set<TimeRecordStatus> statuses) {
         ListMultimap<Integer, TimeRecord> records = LinkedListMultimap.create();
-        timeRecordService.getTimeRecords(empIds, dateRange, statuses, false)
+        timeRecordService.getTimeRecords(empIds, dateRange, statuses)
                 .forEach(record -> records.put(record.getEmployeeId(), record));
         return records;
     }

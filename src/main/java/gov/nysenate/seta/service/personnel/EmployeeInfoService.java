@@ -3,6 +3,7 @@ package gov.nysenate.seta.service.personnel;
 import com.google.common.collect.RangeSet;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.model.personnel.Employee;
+import gov.nysenate.seta.model.personnel.Person;
 import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
 
 import java.time.LocalDate;
@@ -20,6 +21,19 @@ public interface EmployeeInfoService
      * @exception EmployeeNotFoundEx - If employee with given empId was not found.
      */
     Employee getEmployee(int empId) throws EmployeeNotFoundEx;
+
+    /**
+     * Get a snapshot of an employee at a specific date.
+     * Gets only the fields declared in the Employee class for the specified date
+     * Uses the currently up to date values for the Person fields
+     * @see Person
+     * @see Employee
+     * @param empId int
+     * @param effectiveDate LocalDate
+     * @return Employee
+     * @throws EmployeeNotFoundEx - If an employee with the given empId was not found.
+     */
+    Employee getEmployee(int empId, LocalDate effectiveDate) throws EmployeeNotFoundEx;
 
     RangeSet<LocalDate> getEmployeeActiveDatesService(int empId);
 

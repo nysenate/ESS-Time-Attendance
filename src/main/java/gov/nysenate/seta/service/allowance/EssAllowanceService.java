@@ -1,11 +1,9 @@
 package gov.nysenate.seta.service.allowance;
 
 import com.google.common.collect.*;
-import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.model.allowances.HourlyWorkPayment;
 import gov.nysenate.seta.model.allowances.AllowanceUsage;
-import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.payroll.PayType;
@@ -94,7 +92,7 @@ public class EssAllowanceService implements AllowanceService {
         getSalaryRecs(allowanceUsage, transHistory);
         List<TimeRecord> timeRecords =
                 tRecS.getTimeRecords(Collections.singleton(allowanceUsage.getEmpId()), unpaidPeriods,
-                        EnumSet.allOf(TimeRecordStatus.class), false);
+                        EnumSet.allOf(TimeRecordStatus.class));
 
         allowanceUsage.setRecordMoneyUsed(
                 // Add up hours and calculated payment for time records that have not been paid out yet
