@@ -44,9 +44,6 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected LocalDateTime updateDate;
     protected TreeMap<LocalDate, TimeEntry> timeEntryMap = new TreeMap<>();
 
-    // Initialized via service layer (not dao) based on supervisorId
-    protected Employee supervisor;
-
     /** --- Constructors --- */
 
     public TimeRecord() {}
@@ -292,13 +289,5 @@ public class TimeRecord implements Comparable<TimeRecord>
 
     public void setRespHeadCode(String respHeadCode) {
         this.respHeadCode = respHeadCode;
-    }
-
-    public Employee getSupervisor() {
-        return supervisor;
-    }
-
-    public void setSupervisor(Employee supervisor) {
-        this.supervisor = supervisor;
     }
 }

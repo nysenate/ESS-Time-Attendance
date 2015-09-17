@@ -10,18 +10,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 
 @XmlRootElement
-public class EmployeeView implements ViewObject
+public class EmployeeView extends SimpleEmployeeView implements ViewObject
 {
-    protected int employeeId;
-    protected String uid;
     protected String title;
     protected String firstName;
     protected String lastName;
     protected String initial;
     protected String suffix;
-    protected String fullName;
-    protected boolean active;
-    protected String email;
     protected String workPhone;
     protected String homePhone;
     protected LocalDate dateOfBirth;
@@ -30,17 +25,13 @@ public class EmployeeView implements ViewObject
     public EmployeeView() {}
 
     public EmployeeView(Employee employee) {
+        super(employee);
         if (employee != null) {
-            this.employeeId = employee.getEmployeeId();
-            this.uid = employee.getUid();
             this.title = employee.getTitle();
             this.firstName = employee.getFirstName();
             this.lastName = employee.getLastName();
             this.initial = employee.getInitial();
             this.suffix = employee.getSuffix();
-            this.fullName = employee.getFullName();
-            this.active = employee.isActive();
-            this.email = employee.getEmail();
             this.workPhone = employee.getWorkPhone();
             this.homePhone = employee.getHomePhone();
             this.dateOfBirth = employee.getDateOfBirth();
@@ -75,16 +66,6 @@ public class EmployeeView implements ViewObject
     }
 
     @XmlElement
-    public int getEmployeeId() {
-        return employeeId;
-    }
-
-    @XmlElement
-    public String getUid() {
-        return uid;
-    }
-
-    @XmlElement
     public String getTitle() {
         return title;
     }
@@ -107,21 +88,6 @@ public class EmployeeView implements ViewObject
     @XmlElement
     public String getSuffix() {
         return suffix;
-    }
-
-    @XmlElement
-    public String getFullName() {
-        return fullName;
-    }
-
-    @XmlElement
-    public boolean isActive() {
-        return active;
-    }
-
-    @XmlElement
-    public String getEmail() {
-        return email;
     }
 
     @XmlElement

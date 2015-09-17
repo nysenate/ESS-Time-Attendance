@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.personnel.Employee;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,6 +20,7 @@ public class TimeRecordView implements ViewObject {
     protected String timeRecordId;
     protected Integer employeeId;
     protected Integer supervisorId;
+    protected EmployeeView employee;
     protected EmployeeView supervisor;
     protected String scope;
     protected String employeeName;
@@ -39,12 +41,13 @@ public class TimeRecordView implements ViewObject {
 
     public TimeRecordView() {}
 
-    public TimeRecordView(TimeRecord record) {
+    public TimeRecordView(TimeRecord record, Employee emp, Employee sup) {
         if (record != null) {
             this.timeRecordId = String.valueOf(record.getTimeRecordId());
             this.employeeId = record.getEmployeeId();
+            this.employee = new EmployeeView(emp);
             this.supervisorId = record.getSupervisorId();
-            this.supervisor = new EmployeeView(record.getSupervisor());
+            this.supervisor = new EmployeeView(sup);
             this.employeeName = record.getEmployeeName();
             this.respHeadCode = record.getRespHeadCode();
             this.scope = (record.getRecordStatus() != null) ? record.getRecordStatus().getScope().getCode() : null;
@@ -61,8 +64,8 @@ public class TimeRecordView implements ViewObject {
             this.originalDate = record.getCreatedDate();
             this.updateDate = record.getUpdateDate();
             this.timeEntries = record.getTimeEntries().stream()
-                    .map(TimeEntryView::new)
-                    .collect(Collectors.toList());
+                .map(TimeEntryView::new)
+                .collect(Collectors.toList());
         }
     }
 
@@ -72,7 +75,6 @@ public class TimeRecordView implements ViewObject {
         record.setTimeRecordId(new BigInteger(timeRecordId));
         record.setEmployeeId(employeeId);
         record.setSupervisorId(supervisorId);
-        record.setSupervisor(supervisor.toEmployee());
         record.setEmployeeName(employeeName);
         record.setRespHeadCode(respHeadCode);
         record.setActive(active);
@@ -88,8 +90,8 @@ public class TimeRecordView implements ViewObject {
         record.setCreatedDate(originalDate);
         record.setUpdateDate(updateDate);
         record.addTimeEntries(timeEntries.stream()
-                .map(TimeEntryView::toTimeEntry)
-                .collect(Collectors.toList()));
+            .map(TimeEntryView::toTimeEntry)
+            .collect(Collectors.toList()));
         return record;
     }
 
@@ -101,6 +103,11 @@ public class TimeRecordView implements ViewObject {
     @XmlElement
     public Integer getEmployeeId() {
         return employeeId;
+    }
+
+    @XmlElement
+    public EmployeeView getEmployee() {
+        return employee;
     }
 
     @XmlElement
