@@ -24,7 +24,7 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "    ent.NATXNUPDUSER AS ENT_NATXNUPDUSER, ent.DTTXNORIGIN AS ENT_DTTXNORIGIN, ent.DTTXNUPDATE AS ENT_DTTXNUPDATE,\n" +
         "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE " + "\n" +
         "FROM ${tsSchema}.PM23TIMESHEET rec\n" +
-        "LEFT JOIN " + MASTER_SFMS + ".SL16PERIOD per\n" +
+        "LEFT JOIN ${masterSchema}.SL16PERIOD per\n" +
         "    ON (rec.DTBEGIN BETWEEN per.DTBEGIN AND per.DTEND) AND per.CDPERIOD = 'AF' AND per.CDSTATUS = 'A'\n" +
         "LEFT JOIN ${tsSchema}.PD23TIMESHEET ent\n" +
         "    ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET AND ent.CDSTATUS = 'A'\n" +

@@ -6,10 +6,7 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.common.WorkInProgress;
-import gov.nysenate.seta.model.attendance.TimeEntry;
-import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordException;
-import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.attendance.*;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -95,9 +92,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
 
     /** --- TimeRecordService Implementation --- */
 
-    private static final EnumSet<TimeRecordStatus> activeStatuses =
-        EnumSet.of(NOT_SUBMITTED, SUBMITTED, DISAPPROVED, DISAPPROVED_PERSONNEL);
-
     /** {@inheritDoc} */
     @Override
     public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
@@ -115,8 +109,8 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
             cachedRecs = (TimeRecordCacheCollection) element.getObjectValue();
         }
         else {
-            List<TimeRecord> records = timeRecordDao.getRecordsDuring(empId, Range.all(), activeStatuses);
-            addSupervisors(records);
+            List<TimeRecord> records = timeRecordDao.getRecordsDuring(empId, Range.all(), TimeRecordStatus.inProgress());
+            records.forEach(this::initializeEntries);
             cachedRecs = new TimeRecordCacheCollection(empId, records);
             activeRecordCache.acquireWriteLockOnKey(empId);
             activeRecordCache.put(new Element(empId, cachedRecs));
@@ -136,7 +130,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         if (fillMissingRecords && statuses.contains(NOT_SUBMITTED)) {
             empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
         }
-        addSupervisors(records.values());
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .peek(this::initializeEntries)
@@ -164,27 +157,33 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     public ListMultimap<Integer, TimeRecord> getSupervisorRecords(int supId, Range<LocalDate> dateRange,
                                                                   Set<TimeRecordStatus> statuses)
             throws SupervisorException {
+
         SupervisorEmpGroup empGroup = supervisorInfoService.getSupervisorEmpGroup(supId, dateRange);
         ListMultimap<Integer, TimeRecord> records = ArrayListMultimap.create();
-
-        // Get and addUsage primary employee time records
-        records.putAll(supId,
-                getTimeRecordsForSupInfos(empGroup.getPrimaryEmployees().values(), dateRange, statuses));
-
-        // Get and addUsage override employee time records
-        empGroup.getOverrideSupIds().forEach(overrideSupId -> {
-            records.putAll(overrideSupId,
-                    getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
-                            dateRange, statuses));
+        empGroup.getAllEmployees().forEach(emp -> {
+            records.putAll(emp.getEmpId(), getActiveTimeRecords(emp.getEmpId()).stream()
+                    .filter(tr -> statuses.contains(tr.getRecordStatus()) &&
+                            dateRange.contains(tr.getBeginDate()))
+                    .collect(toList()));
         });
 
+        // Get and addUsage primary employee time records
+//        records.putAll(supId,
+//                getTimeRecordsForSupInfos(empGroup.getPrimaryEmployees().values(), dateRange, statuses));
+
+        // Get and addUsage override employee time records
+//        empGroup.getOverrideSupIds().forEach(overrideSupId -> {
+//            records.putAll(overrideSupId,
+//                    getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
+//                            dateRange, statuses));
+//        });
         return records;
     }
 
     @Override
     @Transactional(value = "remoteTxManager")
     @WorkInProgress(author = "ash", desc = "Need to test this a bit better...")
-    public boolean updateExistingRecord(TimeRecord record) {
+    public synchronized boolean updateExistingRecord(TimeRecord record) {
         if (record.getTimeRecordId() == null) {
             throw new TimeRecordException("Time record without a record id cannot be saved,");
         }
@@ -194,7 +193,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
             activeRecordCache.acquireWriteLockOnKey(empId);
             try {
                 Element elem = activeRecordCache.get(empId);
-                if (elem != null && activeStatuses.contains(record.getRecordStatus())) {
+                if (elem != null && TimeRecordStatus.inProgress().contains(record.getRecordStatus())) {
                     TimeRecordCacheCollection cachedRecs = (TimeRecordCacheCollection) elem.getObjectValue();
                     cachedRecs.update(record);
                 }
@@ -260,30 +259,17 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         SetMultimap<Range<LocalDate>, Integer> periods = HashMultimap.create();
         supInfos.forEach(supInfo ->
                 periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
-        return periods.keySet().stream().parallel()
+        return periods.keySet().stream()
                 .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, false).stream())
                 .collect(toList());
     }
 
     /**
-     * Adds more detailed supervisor information to each of the given time records
-     */
-    private void addSupervisors(Collection<TimeRecord> timeRecords) {
-        ListMultimap<Integer, TimeRecord> supervisorMap = LinkedListMultimap.create();
-        timeRecords.forEach(record -> supervisorMap.put(record.getSupervisorId(), record));
-        supervisorMap.keySet().stream()
-                .map(empInfoService::getEmployee)
-                .forEach(supervisor ->
-                        supervisorMap.get(supervisor.getEmployeeId())
-                                .forEach(record -> record.setSupervisor(supervisor)));
-    }
-
-    /**
-     * Ensures that the given time record contains entries for each day covered
+     * Ensures that the given time record contains entries for each day covered.
+     * @param timeRecord - TimeRecord
      */
     private void initializeEntries(TimeRecord timeRecord) {
         RangeMap<LocalDate, PayType> payTypeMap = null;
-
         for (LocalDate entryDate = timeRecord.getBeginDate(); !entryDate.isAfter(timeRecord.getEndDate());
              entryDate = entryDate.plusDays(1)) {
             if (!timeRecord.containsEntry(entryDate)) {

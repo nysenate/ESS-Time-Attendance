@@ -4,6 +4,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.TreeMultimap;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,6 +40,9 @@ public enum TimeRecordStatus
             unlockedForMap.put(trs.scope, trs);
         }
     }
+
+    private static final EnumSet<TimeRecordStatus> inProgress =
+        EnumSet.of(SUBMITTED, NOT_SUBMITTED, APPROVED, DISAPPROVED, SUBMITTED_PERSONNEL, DISAPPROVED_PERSONNEL);
 
     TimeRecordStatus(String code, String name, TimeRecordScope scope) {
         this.code = code;
@@ -82,9 +86,7 @@ public enum TimeRecordStatus
     }
 
     public static Set<TimeRecordStatus> inProgress() {
-        return Arrays.asList(TimeRecordStatus.values()).stream()
-                .filter(status -> !APPROVED_PERSONNEL.equals(status))
-                .collect(Collectors.toSet());
+        return inProgress;
     }
 
     public String getCode() {

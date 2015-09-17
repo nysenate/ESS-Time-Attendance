@@ -97,7 +97,7 @@ public interface TimeRecordService
      * @param dateRange Range<LocalDate> - Returned records will be contained within this date range
      * @return List<TimeRecord>
      */
-    /** FIXME: Is this needed? */
+    /** FIXME: Is this needed? Maybe for the emp group history viewer? */
     List<TimeRecord> getTimeRecordsWithSupervisor(Integer empId, Integer supId, Range<LocalDate> dateRange);
 
     /**

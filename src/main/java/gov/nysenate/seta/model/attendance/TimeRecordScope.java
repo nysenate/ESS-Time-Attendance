@@ -1,30 +1,50 @@
 package gov.nysenate.seta.model.attendance;
 
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Set;
-import java.util.function.Supplier;
 
 public enum TimeRecordScope
 {
-    EMPLOYEE("E", TimeRecordStatus::unlockedForEmployee),
-    SUPERVISOR("S", TimeRecordStatus::unlockedForSupervisor),
-    PERSONNEL("P", TimeRecordStatus::unlockedForPersonnel)
+    EMPLOYEE("E"),
+    SUPERVISOR("S"),
+    PERSONNEL("P")
     ;
 
     private String code;
 
-    // A supplier is used since the scope lookup map in TimeRecordStatus
-    // is uninitialized when this class is initialized
-    private Supplier<Set<TimeRecordStatus>> statusSupplier;
-
-    TimeRecordScope(String code, Supplier<Set<TimeRecordStatus>> statusSupplier) {
+    TimeRecordScope(String code) {
         this.code = code;
     }
 
     public Set<TimeRecordStatus> getStatuses() {
-        return statusSupplier.get();
+        switch (this) {
+            case EMPLOYEE: return TimeRecordStatus.unlockedForEmployee();
+            case SUPERVISOR: return TimeRecordStatus.unlockedForSupervisor();
+            case PERSONNEL: return TimeRecordStatus.unlockedForPersonnel();
+            default: return Sets.newHashSet();
+        }
     }
 
     public String getCode() {
         return code;
+    }
+
+    public static TimeRecordScope getScopeFromCode(String code) {
+        if (StringUtils.isBlank(code)) {
+            throw new IllegalArgumentException("Code cannot be blank");
+        }
+        code = code.toUpperCase().trim();
+        switch (code) {
+            case "E":
+                return EMPLOYEE;
+            case "S":
+                return SUPERVISOR;
+            case "P":
+                return PERSONNEL;
+            default:
+                throw new IllegalArgumentException("Code did not match nay time record scopes.");
+        }
     }
 }
