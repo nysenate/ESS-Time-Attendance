@@ -101,7 +101,7 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
                 // Generate a list of all the pay periods between the period immediately following the DTPERLSPOST and
                 // before the pay period we are trying to compute available accruals for. We will call these the accrual
                 // gap periods.
-                Range<LocalDate> gapDateRange = Range.openClosed(accrualState.getEndDate(), lastPeriod.getEndDate());
+                Range<LocalDate> gapDateRange = Range.open(accrualState.getEndDate(), lastPeriod.getEndDate().plusDays(1));
                 LinkedList<PayPeriod> gapPeriods = new LinkedList<>(unMatchedPeriods.stream()
                         .filter(p -> gapDateRange.encloses(p.getDateRange()))
                         .collect(Collectors.toList()));
