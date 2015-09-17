@@ -7,6 +7,7 @@ import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,16 +31,16 @@ public class SupervisorEmpGroup
 
     /** Primary employees that directly assigned to this supervisor.
      *  Mapping of empId -> EmployeeSupInfo */
-    protected Map<Integer, EmployeeSupInfo> primaryEmployees;
+    protected Map<Integer, EmployeeSupInfo> primaryEmployees = new HashMap<>();
 
     /** Override employees are specific employees that this supervisor was given access to.
      *  Mapping of empId -> EmployeeSupInfo */
-    protected Map<Integer, EmployeeSupInfo> overrideEmployees;
+    protected Map<Integer, EmployeeSupInfo> overrideEmployees = new HashMap<>();
 
     /** Supervisor override employees are all the primary employees for the supervisors that
      *  granted override access.
      *  Mapping of the (override granter supId, empId) -> EmployeeInfo */
-    protected Table<Integer, Integer, EmployeeSupInfo> supOverrideEmployees;
+    protected Table<Integer, Integer, EmployeeSupInfo> supOverrideEmployees = HashBasedTable.create();
 
     /** --- Constructors --- */
 
@@ -105,6 +106,14 @@ public class SupervisorEmpGroup
 
     public Set<Integer> getOverrideSupIds() {
         return supOverrideEmployees.rowKeySet();
+    }
+
+    public Set<EmployeeSupInfo> getAllEmployees() {
+        Set<EmployeeSupInfo> empSet = new HashSet<>();
+        this.primaryEmployees.values().forEach(empSet::add);
+        this.overrideEmployees.values().forEach(empSet::add);
+        this.supOverrideEmployees.values().forEach(empSet::add);
+        return empSet;
     }
 
     /**

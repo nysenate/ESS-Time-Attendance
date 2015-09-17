@@ -5,6 +5,7 @@ import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Associates a supervisor to an employee during a specific time period.
@@ -39,6 +40,27 @@ public class EmployeeSupInfo
             return Range.atLeast(startDate);
         }
         return Range.closed(startDate, endDate);
+    }
+
+    /** --- Overrides --- */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EmployeeSupInfo)) return false;
+        EmployeeSupInfo that = (EmployeeSupInfo) o;
+        return Objects.equals(empId, that.empId) &&
+                Objects.equals(supId, that.supId) &&
+                Objects.equals(empLastName, that.empLastName) &&
+                Objects.equals(startDate, that.startDate) &&
+                Objects.equals(endDate, that.endDate) &&
+                Objects.equals(supStartDate, that.supStartDate) &&
+                Objects.equals(supEndDate, that.supEndDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(empId, supId, empLastName, startDate, endDate, supStartDate, supEndDate);
     }
 
     /** --- Basic Getters/Setters --- */

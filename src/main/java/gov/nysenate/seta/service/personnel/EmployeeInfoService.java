@@ -7,6 +7,9 @@ import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,6 +23,12 @@ public interface EmployeeInfoService
      * @exception EmployeeNotFoundEx - If employee with given empId was not found.
      */
     Employee getEmployee(int empId) throws EmployeeNotFoundEx;
+
+    default Map<Integer, Employee> getEmployees(Set<Integer> empIds) throws EmployeeNotFoundEx {
+        return empIds.stream()
+            .map(this::getEmployee)
+            .collect(Collectors.toMap(Employee::getEmployeeId, Function.identity()));
+    }
 
     RangeSet<LocalDate> getEmployeeActiveDatesService(int empId);
 

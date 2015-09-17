@@ -21,7 +21,6 @@ public class EssTimeRecordValidationService implements TimeRecordValidationServi
 
     @Autowired private LifeCycleTRV lifeCycleTRV;
 
-
     private ImmutableList<TimeRecordValidator> timeRecordValidators;
 
     @PostConstruct

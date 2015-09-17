@@ -39,7 +39,7 @@ public class EmployeeRestCtrl extends BaseRestCtrl
 
     }
 
-    @RequestMapping(value = "/active_years")
+    @RequestMapping(value = "/activeYears")
     public BaseResponse getEmployeeYearsActive(@RequestParam(required = true) Integer empId) {
         return ListViewResponse.ofIntList(empInfoService.getEmployeeActiveYearsService(empId), "activeYears");
     }
