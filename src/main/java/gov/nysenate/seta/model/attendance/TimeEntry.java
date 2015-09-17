@@ -60,6 +60,31 @@ public class TimeEntry
         this.updateDate = this.originalDate;
     }
 
+    public TimeEntry(TimeEntry other) {
+        this.entryId = other.entryId;
+        this.timeRecordId = other.timeRecordId;
+        this.empId = other.empId;
+        this.employeeName = other.employeeName;
+        this.date = other.date;
+        this.workHours = other.workHours;
+        this.travelHours = other.travelHours;
+        this.holidayHours = other.holidayHours;
+        this.vacationHours = other.vacationHours;
+        this.personalHours = other.personalHours;
+        this.sickEmpHours = other.sickEmpHours;
+        this.sickFamHours = other.sickFamHours;
+        this.miscHours = other.miscHours;
+        this.miscType = other.miscType;
+        this.active = other.active;
+        this.empComment = other.empComment;
+        this.payType = other.payType;
+        this.originalUserId = other.originalUserId;
+        this.updateUserId = other.updateUserId;
+        this.originalDate = other.originalDate;
+        this.updateDate = other.updateDate;
+    }
+
+
     /** --- Functional Getters/Setters --- */
 
     public BigDecimal getDailyTotal() {

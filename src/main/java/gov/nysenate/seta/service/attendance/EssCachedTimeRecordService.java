@@ -122,14 +122,13 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     /** {@inheritDoc} */
     @Override
     public List<TimeRecord> getTimeRecords(Set<Integer> empIds, Range<LocalDate> dateRange,
-                                           Set<TimeRecordStatus> statuses,
-                                           boolean fillMissingRecords) {
+                                           Set<TimeRecordStatus> statuses) {
         TreeMultimap<PayPeriod, TimeRecord> records = TreeMultimap.create();
         timeRecordDao.getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class)).values().stream()
                 .forEach(rec -> records.put(rec.getPayPeriod(), rec));
-        if (fillMissingRecords && statuses.contains(NOT_SUBMITTED)) {
-            empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
-        }
+//        if (fillMissingRecords && statuses.contains(TimeRecordStatus.NOT_SUBMITTED)) {
+//            empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
+//        }
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .peek(this::initializeEntries)
@@ -138,18 +137,18 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
 
     @Override
     public List<TimeRecord> getTimeRecords(Set<Integer> empIds, Collection<PayPeriod> payPeriods,
-                                           Set<TimeRecordStatus> statuses, boolean fillMissingRecords) {
+                                           Set<TimeRecordStatus> statuses) {
         RangeSet<LocalDate> dateRanges = TreeRangeSet.create();
         payPeriods.forEach(period -> dateRanges.add(period.getDateRange()));
-        return getTimeRecords(empIds, dateRanges.span(), statuses, fillMissingRecords).stream()
+        return getTimeRecords(empIds, dateRanges.span(), statuses).stream()
                 .filter(record -> dateRanges.encloses(record.getDateRange()))
                 .collect(toList());
     }
 
     @Override
     public List<TimeRecord> getTimeRecordsWithSupervisor(Integer empId, Integer supId, Range<LocalDate> dateRange) {
-        List<TimeRecord> timeRecords = getTimeRecords(new HashSet<>(empId), dateRange, TimeRecordStatus.getAll(), false);
-        return timeRecords.stream().filter(t -> t.getSupervisorId().equals(supId)).collect(toList());
+        List<TimeRecord> timeRecords = getTimeRecords(Collections.singleton(empId), dateRange, TimeRecordStatus.getAll());
+        return timeRecords.stream().filter(t -> t.getSupervisorId().equals(supId)).collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */
@@ -166,17 +165,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
                             dateRange.contains(tr.getBeginDate()))
                     .collect(toList()));
         });
-
-        // Get and addUsage primary employee time records
-//        records.putAll(supId,
-//                getTimeRecordsForSupInfos(empGroup.getPrimaryEmployees().values(), dateRange, statuses));
-
-        // Get and addUsage override employee time records
-//        empGroup.getOverrideSupIds().forEach(overrideSupId -> {
-//            records.putAll(overrideSupId,
-//                    getTimeRecordsForSupInfos(empGroup.getSupOverrideEmployees(overrideSupId).values(),
-//                            dateRange, statuses));
-//        });
         return records;
     }
 
@@ -206,6 +194,11 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
             }
         }
         return updated;
+    }
+
+    @Override
+    public boolean deleteRecord(BigInteger timeRecordId) {
+        return timeRecordDao.deleteRecord(timeRecordId);
     }
 
     /** --- Internal Methods --- */
@@ -243,8 +236,8 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
                                                      Set<TimeRecord> existingRecords) {
         TreeMap<LocalDate, Integer> supIds = fullHistory.getEffectiveSupervisorIds(period.getDateRange());
         TreeMap<LocalDate, PayType> payTypes = fullHistory.getEffectivePayTypes(period.getDateRange());
-        TimeRecord record = new TimeRecord(employee, period.getDateRange(), period,
-                payTypes.firstEntry().getValue(), supIds.firstEntry().getValue());
+        TimeRecord record = new TimeRecord(employee, period.getDateRange(), period
+        );
         timeRecordDao.saveRecord(record);
         logger.info("Created new record: {}", record.getDateRange());
         return Collections.singleton(record);
@@ -259,8 +252,8 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         SetMultimap<Range<LocalDate>, Integer> periods = HashMultimap.create();
         supInfos.forEach(supInfo ->
                 periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
-        return periods.keySet().stream()
-                .flatMap(period -> getTimeRecords(periods.get(period), period, statuses, false).stream())
+        return periods.keySet().stream().parallel()
+                .flatMap(period -> getTimeRecords(periods.get(period), period, statuses).stream())
                 .collect(toList());
     }
 

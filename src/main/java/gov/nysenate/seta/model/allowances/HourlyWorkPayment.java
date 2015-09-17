@@ -60,7 +60,7 @@ public class HourlyWorkPayment {
 
     /** Return the range of work dates that this payment is compensating for */
     public Range<LocalDate> getWorkingRange() {
-        return Range.closed(effectDate, endDate);
+        return Range.closedOpen(effectDate, endDate.plusDays(1));
     }
 
     /** --- Getters / Setters --- */

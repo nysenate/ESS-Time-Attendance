@@ -48,7 +48,7 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
 
         public PayPeriodCacheTree(TreeSet<PayPeriod> periodSet) {
             periodSet.forEach(p -> {
-                rangeMap.put(Range.closed(p.getStartDate(), p.getEndDate()), p);
+                rangeMap.put(Range.closedOpen(p.getStartDate(), p.getEndDate().plusDays(1)), p);
             });
         }
 

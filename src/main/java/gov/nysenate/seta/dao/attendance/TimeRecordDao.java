@@ -80,5 +80,5 @@ public interface TimeRecordDao extends BaseDao
     /**
      * Remove a TimeRecord from the database
      */
-    void deleteRecord(BigInteger recordId);
+    boolean deleteRecord(BigInteger recordId);
 }

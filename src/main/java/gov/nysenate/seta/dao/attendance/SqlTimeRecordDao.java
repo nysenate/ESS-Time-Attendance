@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
-import gov.nysenate.common.LimitOffset;
 import gov.nysenate.common.OrderBy;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.attendance.mapper.RemoteEntryRowMapper;
@@ -167,10 +166,13 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
     }
 
     @Override
-    public void deleteRecord(BigInteger recordId) {
+    public boolean deleteRecord(BigInteger recordId) {
         MapSqlParameterSource params = new MapSqlParameterSource("timesheetId", new BigDecimal(recordId));
-        remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_SQL.getSql(schemaMap()), params);
-        remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_ENTRIES_SQL.getSql(schemaMap()), params);
+        if (remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_SQL.getSql(schemaMap()), params) > 0) {
+            remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_ENTRIES_SQL.getSql(schemaMap()), params);
+            return true;
+        }
+        return false;
     }
 
     public static MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {

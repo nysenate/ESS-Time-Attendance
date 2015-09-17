@@ -19,7 +19,12 @@ public class Employee extends Person
 
     public Employee() {}
 
+    public Employee(Person person) {
+        super(person);
+    }
+
     public Employee(Employee other) {
+        super(other);
         this.employeeId = other.employeeId;
         this.supervisorId = other.supervisorId;
         this.active = other.active;
@@ -33,7 +38,7 @@ public class Employee extends Person
     /** --- Functional Getters --- */
 
     public boolean isSenator() {
-        return respCenter != null && respCenter.getAgency() != null && respCenter.getAgency().getCode().equals("04210");
+        return respCenter != null && respCenter.getAgency() != null && "04210".equals(respCenter.getAgency().getCode());
     }
 
     /** Basic Getters/Setters */

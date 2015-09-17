@@ -70,7 +70,7 @@ public enum TimeRecordStatus
     }
 
     public static Set<TimeRecordStatus> getAll() {
-        return new HashSet<>(unlockedForMap.values());
+        return EnumSet.allOf(TimeRecordStatus.class);
     }
 
     public static Set<TimeRecordStatus> unlockedForEmployee() {

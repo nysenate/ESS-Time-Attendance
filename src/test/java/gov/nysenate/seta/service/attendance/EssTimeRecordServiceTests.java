@@ -28,7 +28,7 @@ public class EssTimeRecordServiceTests extends BaseTests
         Stopwatch sw = Stopwatch.createStarted();
         List<TimeRecord> timeRecords = timeRecordService.getTimeRecords(Collections.singleton(1719),
                 Range.closed(LocalDate.of(2015, 1, 1), LocalDate.now()),
-                EnumSet.allOf(TimeRecordStatus.class), true);
+                EnumSet.allOf(TimeRecordStatus.class));
         logger.info("{}ms", sw.stop().elapsed(TimeUnit.MILLISECONDS));
     }
 
