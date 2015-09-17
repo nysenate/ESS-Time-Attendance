@@ -1,9 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <h3 class="content-info" style="margin-bottom:0;">
-  Time entries
-  <span ng-if="employee">for {{employee.fullName}}</span>
-  from {{record.beginDate | moment:'l'}} to {{record.endDate | moment:'l'}}
+  Time entries for {{record.employee.fullName}} from {{record.beginDate | moment:'l'}} to {{record.endDate | moment:'l'}}
 </h3>
 <table class="attendance-entry-sub-table ess-table">
   <thead>

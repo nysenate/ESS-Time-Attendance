@@ -54,7 +54,7 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         $scope.iSelectedRecord = 0;
         activeRecordsApi.get({
             empId: empId,
-            status: ['NOT_SUBMITTED', 'DISAPPROVED', 'DISAPPROVED_PERSONNEL']
+            scope: 'E'
         }, function (response) {
             if (empId in response.result.items) {
                 $scope.records = response.result.items[empId];

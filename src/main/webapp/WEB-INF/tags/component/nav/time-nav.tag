@@ -18,8 +18,11 @@
         </ul>
     <shiro:hasRole name="supervisor">
         <h3 class="main-topic">Manage Employees</h3>
-        <ul class="sub-topic-list">
-            <li class="sub-topic"><a href="${ctxPath}/time/record/manage">Review Time Records</a></li>
+        <ul class="sub-topic-list" ng-init="initializePendingRecordsBadge()">
+            <li class="sub-topic">
+                <a href="${ctxPath}/time/record/manage">Review Time Records</a>
+                <badge badge-id="pendingRecordCount" hide-empty="true"></badge>
+            </li>
             <li class="sub-topic"><a href="${ctxPath}/time/record/emphistory">Employee Record History</a></li>
             <li class="sub-topic"><a href="${ctxPath}/time/record/grant">Grant Privileges</a></li>
         </ul>

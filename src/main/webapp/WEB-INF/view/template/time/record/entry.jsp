@@ -103,7 +103,7 @@ Toggle this for temporary emps.
     </div>
     <hr/>
     <form id="timeRecordForm" method="post" action="">
-      <table class="ess-table" id="timeRecordTable" float-thead="floatTheadOpts" ng-model="displayEntries">
+      <table class="ess-table" id="timeRecordTable" ng-model="displayEntries">
         <thead>
         <tr>
           <th>Date</th>
@@ -121,7 +121,7 @@ Toggle this for temporary emps.
         <tbody>
         <tr class="time-record-row" ng-repeat="(i,entry) in displayEntries"
             ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}">
-          <td style="text-align: right;padding-right:20px;">{{entry.date | moment:'ddd M/D/YYYY'}}</td>
+          <td style="width:180px;text-align: right;padding-right:20px;">{{entry.date | moment:'ddd M/D/YYYY'}}</td>
           <td ng-class="{invalid: entry.workHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                    placeholder="--" step=".5" min="0" max="24" ng-disabled="entry.unavailable"

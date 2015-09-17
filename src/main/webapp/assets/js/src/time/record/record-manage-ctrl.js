@@ -1,79 +1,69 @@
 var essApp = angular.module('ess');
 
-essApp.controller('RecordManageCtrl', ['$scope', '$q', 'appProps', 'RecordUtils', 'modals',
+essApp.controller('RecordManageCtrl', ['$scope', '$q', 'appProps', 'RecordUtils', 'modals', 'badgeService',
     'SupervisorTimeRecordsApi', 'EmpInfoApi', 'TimeRecordsApi',
     recordManageCtrl]);
 
-function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsApi, empInfoApi, timeRecordsApi) {
+function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeService, supRecordsApi, empInfoApi, timeRecordsApi) {
 
-    $scope.empInfos = {};
+    $scope.state = {
+        // Data
+        supIds: {},
+        empInfos: {},   // Mapping of empId -> employee data
+        supRecords: {},
 
+        // Page state
+        loading: false,     // If data is being fetched
+        selSupId: null,     // The currently selected id from the supIds map
+        selectedIndices: {} // Mapping of selected record indices, e,g { 3: true }
+    };
+
+    // This key is used for grouping all records under a single item regardless of supervisor.
     var allSupervisorsId = 'all';
 
     function setDefaultValues() {
-        $scope.selSupId = allSupervisorsId;
-
-        $scope.supIds = [allSupervisorsId];
-
-        $scope.supRecords = {};
+        $scope.state.selSupId = allSupervisorsId;
+        $scope.state.supIds = [allSupervisorsId];
+        $scope.state.empInfos = {};
+        $scope.state.supRecords = {};
     }
 
-    $scope.selectedIndices = new Set();
-
     $scope.init = function () {
-        getEmployeeRecords();
+        getEmployeeActiveRecords();
     };
 
     /** --- Api Methods --- */
-
-    // The default status set for the supervisor record api currently matches this
-    //var desiredStatuses =  // everything but APPROVED_PERSONNEL
-    //    ['SUBMITTED', 'NOT_SUBMITTED', 'APPROVED', 'DISAPPROVED', 'SUBMITTED_PERSONNEL', 'DISAPPROVED_PERSONNEL'];
 
     /**
      * Retrieves all active, in progress records that are under supervision of the current user
      * Also gets employee infos for the supervisor, any overridden supervisor, and all employees in the returned records
      */
-    function getEmployeeRecords() {
-        $scope.loading = true;
+    function getEmployeeActiveRecords() {
+        $scope.state.loading = true;
         setDefaultValues();
         var empId = appProps.user.employeeId;
-        console.log('getting employee records...');
-        supRecordsApi.get({supId: empId}, function onSuccess(response) {
-            var missingEmpIds = initializeRecords(response.result.items);
-            $scope.selectNone();
-            console.log('got records', $scope.supRecords);
-            getEmployees(missingEmpIds);
-        }, function onFail(response) {
-            $scope.loading = false;
-            console.log('get employee records failed:', response);
-            // Todo handle failed response
+        supRecordsApi.get({supId: empId}, function onSuccess(resp) {
+            if (resp.success) {
+                initializeRecords(resp.result.items);
+                updateRecordsPendingBadge();
+                $scope.selectNone();
+            }
+            else {
+                // TODO: Handle error
+                console.log("Error with retrieving active employee records.");
+            }
+            $scope.state.loading = false;
+        }, function onFail(resp) {
+            $scope.state.loading = false;
+            console.log('get employee records failed:', resp);
+            // TODO: Handle failed response
         });
     }
 
-    /**
-     * Gets employee info for each of the given employee ids
-     * Stores employee info in $scope.empInfos keyed by employee id
-     * @param empIds - [] of employee ids
-     */
-    function getEmployees (empIds) {
-        if (empIds.length > 0) {
-            console.log('getting employees..');
-            empInfoApi.get({empId: empIds}, function onSuccess(response) {
-                for (var iEmp in response.employees) {
-                    var employee = response.employees[iEmp];
-                    $scope.empInfos[employee.employeeId] = employee;
-                }
-                console.log('got employees', $scope.empInfos);
-                $scope.loading = false;
-            }, function onFail(response) {
-                $scope.loading = false;
-                console.log('get employees failed:', response);
-                // Todo handle failed response
-            });
-        } else {
-            $scope.loading = false;
-        }
+    function updateRecordsPendingBadge() {
+        var submitted = ($scope.state.supRecords[allSupervisorsId].SUBMITTED) ?
+            $scope.state.supRecords[allSupervisorsId].SUBMITTED.length : 0;
+        badgeService.setBadgeValue('pendingRecordCount', submitted);
     }
 
     /**
@@ -87,13 +77,13 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
                 function(response){console.log('success:', record.timeRecordId, response)},
                 function(response){console.log('fail:', record.timeRecordId, response)}).$promise);
         });
-        $scope.loading = true;
+        $scope.state.loading = true;
         return $q.all(promises)
             .then(function onFulfilled() {
                 console.log(records.length, 'records submitted');
-                getEmployeeRecords();
+                getEmployeeActiveRecords();
             }, function onRejected(response) {
-                $scope.loading = false;
+                $scope.state.loading = false;
                 console.log('record submission failed:', response);
                 // Todo handle failed response
             })
@@ -106,8 +96,8 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
      * not the angular way, but you try fitting this into an ng-options
      */
     $scope.getOptionLabel = function(supId) {
-        return (supId == allSupervisorsId ? 'All Supervisors' : $scope.empInfos[supId].fullName) +
-            ' - (' + ($scope.supRecords[supId].SUBMITTED || []).length + ' Pending Records)';
+        return (supId == allSupervisorsId ? 'All Supervisors' : $scope.state.empInfos[supId].fullName) +
+            ' - (' + ($scope.state.supRecords[supId].SUBMITTED || []).length + ' Pending Records)';
     };
 
     /**
@@ -115,22 +105,22 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
      *  i.e. the current supervisor has been granted an override
      */
     $scope.multipleSups = function() {
-        return Object.keys($scope.supRecords).length > 2;
+        return Object.keys($scope.state.supRecords).length > 2;
     };
 
     /**
      * Causes all SUBMITTED records to be selected for review
      */
     $scope.selectAll = function() {
-        for(var i = 0; i < $scope.supRecords[$scope.selSupId].SUBMITTED.length; i++) {
-            $scope.selectedIndices.add(i);
+        for(var i = 0; i < $scope.state.supRecords[$scope.state.selSupId].SUBMITTED.length; i++) {
+            $scope.state.selectedIndices[i] = true;
         }
     };
     /**
      * Clears all SUBMITTED currently selected for review
      */
     $scope.selectNone = function() {
-        $scope.selectedIndices.clear();
+        $scope.state.selectedIndices = {};
     };
 
     /**
@@ -148,28 +138,35 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
      * Upon resolution, the modal will return an object containing
      */
     $scope.review = function() {
-        var selectedRecords = [];
-        $scope.selectedIndices.forEach(function(index) {
-            selectedRecords.push($scope.supRecords[$scope.selSupId].SUBMITTED[index]);
-        });
+        var selectedRecords = getSelectedRecords();
         var params = {
-            records: selectedRecords,
-            empInfos: $scope.empInfos
+            records: selectedRecords
         };
         modals.open('record-review', params)
             .then(submitReviewedRecords)
             .then($scope.selectNone);
     };
 
+    $scope.hasSelections = function() {
+        for (var p in $scope.state.selectedIndices) {
+            if ($scope.state.selectedIndices.hasOwnProperty(p) && $scope.state.selectedIndices[p] === true) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     /**
      * Submits all displayed records that are awaiting supervisor approval as 'APPROVED'
      */
-    $scope.approveAll = function () {
-        var displayedRecords = $scope.supRecords[$scope.selSupId].SUBMITTED;
-        displayedRecords.forEach(function (record) {
-            record.recordStatus = 'APPROVED';
-        });
-        submitRecords(displayedRecords);
+    $scope.approveSelections = function () {
+        var selectedRecords = getSelectedRecords();
+        if (selectedRecords) {
+            selectedRecords.forEach(function (record) {
+                record.recordStatus = 'APPROVED';
+            });
+            submitRecords(selectedRecords);
+        }
     };
 
     /** --- Internal Methods --- */
@@ -179,38 +176,42 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, supRecordsA
      * Puts record into $scope.supRecords keyed by supervisor id and record status
      * Returns a list of employee ids for which we don't yet have employee infos
      */
-    function initializeRecords(recordResponse) {
-        var empIdSet = {};
-        function addToEmpIdSet(empId) {
-            if (!$scope.empInfos.hasOwnProperty(empId)) {
-                empIdSet[empId] = null;
-            }
-        }
-
+    function initializeRecords(recordMap) {
         // All records are stored under an additional supId to facilitate access to all records regardless of supervisor
-        var allRecords = $scope.supRecords[allSupervisorsId] = {};
-        for (var supId in recordResponse) {
-            addToEmpIdSet(supId);   // Add supervisor id to emp info retrieval set
-            if (!$scope.supRecords[supId]) {
-                $scope.supIds.push(supId);
-            }
-            var supRecords = $scope.supRecords[supId] = $scope.supRecords[supId] || {};
-            for (var iRecord in recordResponse[supId]) {
-                var record = recordResponse[supId][iRecord];
-                // Add empId to emp info retrieval set
-                addToEmpIdSet(record.employeeId);
-                // Calculate totals for record
+        var allRecords = $scope.state.supRecords[allSupervisorsId] = {};
+        angular.forEach(recordMap, function(records, empId) {
+            angular.forEach(records, function(record) {
+                // Compute totals for the record
                 recordUtils.calculateDailyTotals(record);
                 record.totals = recordUtils.getRecordTotals(record);
-
-                var statusList = supRecords[record.recordStatus] = supRecords[record.recordStatus] || [];
+                // Store the record under the supervisor, grouped by status code
+                var currSupId = record.supervisorId;
+                var supIdList = $scope.state.supIds;
+                if (supIdList.indexOf(currSupId) == -1) {
+                    $scope.state.supIds.push(currSupId);
+                    $scope.state.empInfos[currSupId] = record.supervisor;
+                }
+                var currSupRecords = $scope.state.supRecords[currSupId] = $scope.state.supRecords[currSupId] || {};
+                var statusList = currSupRecords[record.recordStatus] = currSupRecords[record.recordStatus] || [];
                 var allStatusList = allRecords[record.recordStatus] = allRecords[record.recordStatus] || [];
-
                 statusList.push(record);        // Store under supervisor
                 allStatusList.push(record);     // Store under all
+            });
+        });
+    }
+
+    /**
+     * Returns the records that are selected using the checkboxes.
+     * @returns {Array}
+     */
+    function getSelectedRecords() {
+        var selectedRecords = [];
+        for (var index in $scope.state.selectedIndices) {
+            if ($scope.state.selectedIndices.hasOwnProperty(index)) {
+                selectedRecords.push($scope.state.supRecords[$scope.state.selSupId].SUBMITTED[index]);
             }
         }
-        return Object.keys(empIdSet);
+        return selectedRecords;
     }
 
     /**

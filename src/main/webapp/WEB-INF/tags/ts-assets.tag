@@ -18,7 +18,7 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/ess-routes.js"></script>
 
         <!-- Common Directives -->
-        <%--<script type="text/javascript" src="${ctxPath}/assets/js/src/common/highcharts-directive.js"></script>--%>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/toggle-panel-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ess-notifications.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/loader-indicator-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/odometer-directive.js"></script>
@@ -28,6 +28,8 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/modal-service.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/modal-directive.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/location-service.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/badge-service.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/badge-directive.js"></script>
 
     </c:when>
     <c:when test="${runtimeLevel eq 'test'}">

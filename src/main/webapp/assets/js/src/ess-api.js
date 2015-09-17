@@ -23,12 +23,15 @@ essApi.factory('ActiveTimeRecordsApi', ['$resource', 'appProps', function ($reso
 }]);
 
 essApi.factory('ActiveYearsTimeRecordsApi', ['$resource', 'appProps', function ($resource, appProps) {
-    return $resource(appProps.apiPath + '/timerecords/active_years');
+    return $resource(appProps.apiPath + '/timerecords/activeYears');
 }]);
-
 
 essApi.factory('SupervisorTimeRecordsApi', ['$resource', 'appProps', function ($resource, appProps) {
     return $resource(appProps.apiPath + '/timerecords/supervisor');
+}]);
+
+essApi.factory('SupervisorTimeRecordCountsApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/timerecords/supervisor/count');
 }]);
 
 /** --- Supervisor API --- */
@@ -67,7 +70,7 @@ essApi.factory('EmpInfoApi', ['$resource', 'appProps', function ($resource, appP
 }]);
 
 essApi.factory('EmpActiveYearsApi', ['$resource', 'appProps', function($resource, appProps) {
-    return $resource(appProps.apiPath + '/employees/active_years');
+    return $resource(appProps.apiPath + '/employees/activeYears');
 }]);
 
 /** --- Transaction API --- */

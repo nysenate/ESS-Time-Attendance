@@ -9,6 +9,7 @@
     <jsp:body>
         <ess:ts-assets/>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/home.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/time.js"></script>
 
         <!-- Time Entry -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-directives.js"></script>
@@ -40,9 +41,11 @@
         <base href="/" />
         <ess-component-nav:top-nav activeTopic="time"/>
         <section class="content-wrapper" ng-controller="MainCtrl as main">
-            <ess-component-nav:time-nav/>
-            <div class="view-animate-container">
-                <div ng-view class="view-animate"></div>
+            <div ng-controller="TimeMainCtrl">
+                <ess-component-nav:time-nav/>
+                <div class="view-animate-container">
+                    <div ng-view class="view-animate"></div>
+                </div>
             </div>
         </section>
     </jsp:body>

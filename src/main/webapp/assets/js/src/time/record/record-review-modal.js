@@ -12,7 +12,6 @@ function (appProps, modals, locationService) {
         $scope.iSelectedRecord = 0;
 
         $scope.records = modals.params().records;
-        $scope.empInfos = modals.params().empInfos;
 
         // Settings for floating the time entry table heading
         $scope.floatTheadOpts = {
@@ -119,11 +118,11 @@ function (appProps, modals, locationService) {
 essApp.directive('recordReviewRejectModal', ['modals', function (modals){
     return {
         template:
-            '<p class="content-info no-bottom-margin">Explain the reason for rejecting the time record.</p>' +
-            '<textarea style="resize:none;margin:10px;width:375px;height:100px;" placeholder="Reason for rejection" ng-model="remarks" tabindex="1"></textarea>' +
-            '<div style="padding:.4em;background:#eee;text-align: center;">' +
-            '  <input type="button" class="reject-button" value="Reject Record" ng-click="resolve()"/>' +
-            '  <input type="button" style="float:right;" class="neutral-button" value="Cancel" ng-click="cancel()"/>' +
+            '<p class="content-info no-bottom-margin">Explain the reason for disapproving the time record.</p>' +
+            '<textarea style="resize:none;margin:10px;width:375px;height:100px;" placeholder="Reason for disapproval" ng-model="remarks" tabindex="1"></textarea>' +
+            '<div style="padding:.4em;background:#eee;text-align: center;overflow:auto;clear:both;">' +
+            '  <input type="button" style="float:left;" class="neutral-button" value="Cancel" ng-click="cancel()"/>' +
+            '  <input type="button" style="float:right;" class="reject-button" value="Reject Record" ng-click="resolve()"/>' +
             '</div>',
         link: function($scope, $elem, $attrs) {
             $scope.cancel = modals.reject;

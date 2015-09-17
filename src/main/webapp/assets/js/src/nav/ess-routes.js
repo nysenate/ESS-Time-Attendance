@@ -45,7 +45,6 @@ essApp.config(function($routeProvider, $locationProvider) {
 
     $routeProvider.when(ctxPath + '/time/record/manage', {
         templateUrl: ctxPath + '/template/time/record/manage',
-        controller: 'TestCtrl',
         reloadOnSearch: false
     });
 
@@ -53,24 +52,16 @@ essApp.config(function($routeProvider, $locationProvider) {
         templateUrl: ctxPath + '/template/time/record/grant'
     });
 
-    $routeProvider.when(ctxPath + '/time/timeoff/request', {
-        templateUrl: ctxPath + '/template/time/timeoff/request',
-        controller: 'TestCtrl'
-    });
-
     $routeProvider.when(ctxPath + '/time/period/calendar', {
-        templateUrl: ctxPath + '/template/time/period/calendar',
-        controller: 'TestCtrl'
+        templateUrl: ctxPath + '/template/time/period/calendar'
     });
 
     $routeProvider.when(ctxPath + '/time/accrual/history', {
-        templateUrl: ctxPath + '/template/time/accrual/history',
-        controller: 'TestCtrl'
+        templateUrl: ctxPath + '/template/time/accrual/history'
     });
 
     $routeProvider.when(ctxPath + '/time/accrual/projections', {
-        templateUrl: ctxPath + '/template/time/accrual/projections',
-        controller: 'TestCtrl'
+        templateUrl: ctxPath + '/template/time/accrual/projections'
     });
 
     /** Logout */

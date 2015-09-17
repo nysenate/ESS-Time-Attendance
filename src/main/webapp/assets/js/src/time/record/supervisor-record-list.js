@@ -4,8 +4,8 @@ essApp.directive('supervisorRecordList', ['appProps', 'modals', function (appPro
     return {
         scope: {
             records: '=',           // a list of records to display
-            empInfos: '=',          // a map of employee id -> employee info
-            selectedIndices: '=?'   // a set of selected record indices
+            selectedIndices: '=?'   // a map of selected record indices, where the indices are
+                                    // stored as object properties with a value of true
         },
         templateUrl: appProps.ctxPath + '/template/time/record/supervisor-record-list',
         link: link
@@ -21,7 +21,7 @@ essApp.directive('supervisorRecordList', ['appProps', 'modals', function (appPro
         $scope.showDetails = function(record) {
             var params = {
                 record: record,
-                employee: $scope.empInfos[record.employeeId]
+                employee: record.employee
             };
             modals.open('record-details', params);
         };
@@ -31,10 +31,10 @@ essApp.directive('supervisorRecordList', ['appProps', 'modals', function (appPro
          */
         $scope.toggleSelected = function(index) {
             if ($scope.selectedIndices) {
-                if ($scope.selectedIndices.has(index)) {
-                    $scope.selectedIndices.delete(index);
+                if ($scope.selectedIndices[index] === true) {
+                    delete $scope.selectedIndices[index];
                 } else {
-                    $scope.selectedIndices.add(index);
+                    $scope.selectedIndices[index] = true;
                 }
             }
         };

@@ -103,6 +103,9 @@ input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 
 h1, h2 {
   .font-weight-normal;
@@ -271,6 +274,7 @@ table.simple-table {
 /** --- Home Page --- */
 
 .ess-top-header {
+
   position: fixed;
   width: 100%;
   background: #fafafa;
@@ -1012,7 +1016,17 @@ table.attendance-entry-sub-table {
 /** --- Manage Employee Records Page --- */
 
 table.approve-attendance-rec-table {
+  padding: 10px;
   tbody {
+    tr {
+      &.active {
+        background: #e7e9f6;
+      }
+      &:hover {
+        background: #E4EBFF;
+      }
+      cursor: pointer;
+    }
     td {
       padding: .5em;
     }
@@ -1025,6 +1039,7 @@ table.approve-attendance-rec-table {
 }
 
 #review-records-modal {
+
   #record-selection-pane {
     display:inline-block;
     height:515px;
@@ -1041,16 +1056,16 @@ table.approve-attendance-rec-table {
       tbody {
         tr {
           &:hover {
-            background: rgba(255, 255, 182, 0.77);
+            background: #e9eeff;
             cursor: pointer;
           }
           &.active {
-            background: rgb(255, 255, 182);
+            background: #E4EBFF;
           }
           &.approved {
             background:rgb(207, 252, 158);
           }
-          &.rejected {
+          &.disapproved {
             background: @redorange;
           }
 
@@ -1127,9 +1142,34 @@ table.approve-attendance-rec-table {
 .full-name-hero {
   font-size:2.5em;
   padding:0 .3em;
-  font-weight:300;
+  font-weight:400;
+  color: #444;
   text-align:center;
   border-bottom: 1px solid #ddd;
 }
 
+/** --- Directives --- */
 
+/** Toggle Panel Directive */
+
+.toggle-panel-label {
+  cursor: pointer;
+  &:hover {
+    color: @teal;
+  }
+}
+
+/** --- Badge Directive --- */
+
+.badge {
+  background: @teal;
+  padding: 5px;
+  color: white;
+  border-radius: 25%;
+  display: inline-block;
+  height: 20px;
+  line-height: 10px;
+  text-align: center;
+  font-weight: 600;
+  margin-left: 5px;
+}

@@ -1,16 +1,12 @@
 var essApp = angular.module('ess');
 
+/**
+ * The wrapping controller that is the parent of the nav menu and views.
+ */
 essApp.controller('MainCtrl', ['$scope', '$http', '$route', '$routeParams', '$location',
     function($scope, $http, $route, $routeParams, $location) {
-        $scope.test = 'MOose Kitteh';
         $scope.$route = $route;
         $scope.$location = $location;
         $scope.$routeParams = $routeParams;
-    }
-]);
-
-essApp.controller('TestCtrl', ['$scope', '$http', '$routeParams',
-    function($scope, $http, $routeParams) {
-        $scope.test = "Inside this view wosoo!";
     }
 ]);

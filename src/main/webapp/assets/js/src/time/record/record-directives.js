@@ -57,8 +57,7 @@ essApp.directive('timeRecordInput', [function(){
 essApp.directive('recordDetails', ['appProps', function (appProps) {
     return {
         scope: {
-            record: '=',
-            employee: '=?'
+            record: '='
         },
         templateUrl: appProps.ctxPath + '/template/time/record/details'
     };

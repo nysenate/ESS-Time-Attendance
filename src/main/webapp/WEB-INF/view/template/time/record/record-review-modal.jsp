@@ -1,10 +1,10 @@
-<section id="review-records-modal" class="" title="Review and Approve Records">
+<section id="review-records-modal" class="content-container content-controls" title="Review and Approve Records">
   <p class="content-info no-bottom-margin">
     Click a record from the Employee Record List on the left hand side to review the time record. You can then either
     Approve
     or Reject the record.
   </p>
-
+  <hr/>
   <div id="record-selection-pane">
     <div class="pane-title">
       <span>Employee Record List</span>
@@ -13,17 +13,18 @@
            float-thead="floatTheadOpts" ng-model="records">
       <thead>
         <tr>
-          <th colspan="2">Employee</th>
+          <th>Employee</th>
           <th>Pay Period</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat='record in records' ng-class="{'active' : iSelectedRecord === $index}"
+        <tr ng-repeat='record in records' ng-class="{'active': iSelectedRecord === $index,
+                                                     'approved': getApprovalStatus(record) === 'approved',
+                                                     'disapproved': getApprovalStatus(record) === 'disapproved'}"
             ng-click="selectRecord($index)" id="{{record.timeRecordId}}">
-          <td> <div class="small-employee-profile-pic">&nbsp;</div> </td>
-          <td class="name-column" ng-init="empInfo = empInfos[record.employeeId]">
-            {{empInfo.firstName[0]}}. {{empInfo.lastName}}
+          <td class="name-column">
+            {{record.employee.fullName}}
           </td>
           <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
           <td ng-switch="getApprovalStatus(record)" style="width: 10em">
@@ -36,25 +37,25 @@
     </table>
   </div>
   <div id="record-details-view">
-    <div record-details record="records[iSelectedRecord]" employee="empInfos[records[iSelectedRecord].employeeId]"></div>
-    <div>
+    <div record-details record="records[iSelectedRecord]"></div>
+      <hr/>
       <div id="action-container">
         <div ng-switch="getApprovalStatus(records[iSelectedRecord])" class="record-approval-buttons">
-          <input type="button" value="Undo Approval" class="neutral-button"
+          <input type="button" value="Undo Approval" class="reject-button"
                  ng-switch-when="approved" ng-click="cancelRecord()"/>
           <input type="button" value="Undo Disapproval" class="neutral-button"
                  ng-switch-when="disapproved" ng-click="cancelRecord()"/>
-          <input type="button" value="Disapprove Record" class="reject-button"
-                 ng-switch-default ng-click="rejectRecord()"/>
           <input type="button" value="Approve Record" class="submit-button"
                  ng-switch-default ng-click="approveRecord()"/>
+          <input type="button" value="Disapprove Record" class="reject-button"
+                 ng-switch-default ng-click="rejectRecord()"/>
+
         </div>
         <div>
-          <input type="button" class="neutral-button" value="Submit"
+          <input type="button" class="submit-button" value="Submit Changes"
                  ng-click="resolve()" ng-disabled="submissionEmpty()"/>
           <input type="button" class="neutral-button" value="Cancel" ng-click="close()"/>
         </div>
       </div>
     </div>
-  </div>
 </section>
