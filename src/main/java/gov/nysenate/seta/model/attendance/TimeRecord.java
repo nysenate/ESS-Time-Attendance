@@ -80,7 +80,6 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.createdDate = other.createdDate;
         this.updateDate = other.updateDate;
         this.timeEntryMap = other.timeEntryMap;
-        this.supervisor = other.supervisor;
     }
 
 

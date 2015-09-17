@@ -13,8 +13,8 @@ import org.springframework.ldap.NameNotFoundException;
 import javax.naming.Name;
 import javax.naming.ldap.LdapName;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class SenateLdapDaoTests extends BaseTests
 {
