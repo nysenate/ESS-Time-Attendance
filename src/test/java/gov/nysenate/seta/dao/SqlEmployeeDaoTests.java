@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -75,6 +76,12 @@ public class SqlEmployeeDaoTests extends BaseTests
         logger.info("Duplicates: " + dups);
         assertTrue("Duplicate employees records exist!", dups.size() == 0);
         logger.info("Employee count: " + employees.size());      */
+    }
+
+    @Test
+    public void getActiveEmpsTest() {
+
+        logger.info("{}", employeeDao.getActiveEmployeeIds(LocalDate.now().withDayOfYear(1)).size());
     }
 
     @Test

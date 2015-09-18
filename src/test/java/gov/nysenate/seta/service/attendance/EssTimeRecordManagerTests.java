@@ -1,5 +1,6 @@
 package gov.nysenate.seta.service.attendance;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import gov.nysenate.common.SortOrder;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -30,21 +32,22 @@ public class EssTimeRecordManagerTests extends BaseTests {
     @Autowired EmpTransactionService transService;
 
     private static void printRecords(Collection<TimeRecord> records) {
-        records.forEach(record -> {
+        records.stream().sorted().forEach(record -> {
             logger.info("{}", record.getDateRange());
-            record.getTimeEntries().stream()
-                    .filter(entry -> !entry.isEmpty())
-                    .forEach(entry -> logger.info("{}: {}", entry.getDate(), entry.getDailyTotal()));
+//            record.getTimeEntries().stream()
+//                    .filter(entry -> !entry.isEmpty())
+//                    .forEach(entry -> logger.info("{}: {}", entry.getDate(), entry.getDailyTotal()));
         });
     }
 
     @Test
-    public void generateTimeRecordsTest() {
-        int empId = 9052;
+    public void ensureRecordsTest() {
+        int empId = 1719;
         int year = 2015;
         LocalDate startDate = LocalDate.of(year, 1, 1);
+        Range<LocalDate> dateRange = Range.closed(startDate.minusMonths(1), LocalDate.now().plusMonths(1));
         List<PayPeriod> payPeriods =
-                periodService.getPayPeriods(PayPeriodType.AF, Range.closedOpen(startDate, startDate.plusYears(1)), SortOrder.ASC);
+                periodService.getPayPeriods(PayPeriodType.AF, dateRange, SortOrder.ASC);
         // Print existing records
         Set<TimeRecord> existingRecords =
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll())
@@ -52,15 +55,21 @@ public class EssTimeRecordManagerTests extends BaseTests {
         logger.info("\n-------- EXISTING RECORDS --------");
         printRecords(existingRecords);
 
+        Stopwatch sw = Stopwatch.createStarted();
         // Generate records
-        manager.generateRecords(empId, periodService.getPayPeriods(PayPeriodType.AF,
-                Range.closedOpen(LocalDate.ofYearDay(year, 1), LocalDate.ofYearDay(year + 1, 1)), SortOrder.ASC));
+        manager.ensureRecords(empId, payPeriods);
+        logger.info("generation took {} ms", sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         // Print difference
         Set<TimeRecord> newRecords = new TreeSet<>(
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll()));
         logger.info("\n-------- NEW RECORDS --------");
         printRecords(Sets.difference(newRecords, existingRecords));
+    }
+
+    @Test
+    public void ensureAllRecordsTest() {
+        manager.ensureAllActiveRecords();
     }
 
 }

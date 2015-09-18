@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static gov.nysenate.seta.dao.base.BaseMapper.getLocalDateFromRs;
 import static gov.nysenate.seta.dao.base.BaseMapper.getLocalDateTimeFromRs;
@@ -54,7 +55,7 @@ public class TransRecordRowMapper implements RowMapper<TransactionRecord>
          * since they represent the initial snapshot of the data.
          */
         Map<String, String> valueMap = new HashMap<>();
-        List<String> columns = (code.isAppointType() || (options.shouldInitialize() && rs.isFirst()))
+        Set<String> columns = (code.isAppointType() || (options.shouldInitialize() && rs.isFirst()))
                 ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList();
         for (String col : columns) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));

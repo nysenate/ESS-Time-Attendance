@@ -72,13 +72,62 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         return handler.getRecordMap();
     }
 
+    @Override
+    public ListMultimap<Integer, TimeRecord> getRecordsDuring(Range<LocalDate> dateRange) {
+        Set<String> statusCodes = TimeRecordStatus.getAll().stream()
+                .map(TimeRecordStatus::getCode)
+                .collect(Collectors.toSet());
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("startDate", toDate(DateUtils.startOfDateRange(dateRange)));
+        params.addValue("endDate", toDate(DateUtils.endOfDateRange(dateRange)));
+        params.addValue("statuses", statusCodes);
+        TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
+        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES.getSql(schemaMap()), params, handler);
+        return handler.getRecordMap();
+    }
+
     /** {@inheritDoc} */
     @Override
     public List<Integer> getTimeRecordYears(Integer empId, SortOrder yearOrder) {
         SqlParameterSource params = new MapSqlParameterSource("empId", empId);
         OrderBy orderBy = new OrderBy("year", yearOrder);
         return remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_DISTINCT_YEARS.getSql(schemaMap(), orderBy), params,
-            new SingleColumnRowMapper<>());
+                new SingleColumnRowMapper<>());
+    }
+
+    @Override
+    public boolean saveRecord(TimeRecord record) {
+
+        MapSqlParameterSource params = getTimeRecordParams(record);
+
+        boolean isUpdate = true;
+
+        if (record.getTimeRecordId() == null ||
+                remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(schemaMap()), params)==0) {
+            isUpdate = false;
+            KeyHolder tsIdHolder = new GeneratedKeyHolder();
+            if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(schemaMap()), params,
+                    tsIdHolder, new String[] {"NUXRTIMESHEET"}) == 0) {
+                return false;
+            }
+            record.setTimeRecordId(((BigDecimal) tsIdHolder.getKeys().get("NUXRTIMESHEET")).toBigInteger());
+        }
+        // Insert each entry from the time record
+        final TimeRecord oldRecord = isUpdate ? getTimeRecord(record.getTimeRecordId()) : null;
+        record.getTimeEntries().stream()
+                .filter(entry -> shouldInsert(entry, oldRecord))
+                .forEach(timeEntryDao::updateTimeEntry);
+        return true;
+    }
+
+    @Override
+    public boolean deleteRecord(BigInteger recordId) {
+        MapSqlParameterSource params = new MapSqlParameterSource("timesheetId", new BigDecimal(recordId));
+        if (remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_SQL.getSql(schemaMap()), params) > 0) {
+            remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_ENTRIES_SQL.getSql(schemaMap()), params);
+            return true;
+        }
+        return false;
     }
 
     /** --- Helper Classes --- */
@@ -121,58 +170,6 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         public List<TimeRecord> getRecordList() {
             return recordList;
         }
-    }
-
-    public List<TimeRecord> getRecordByEmployeeId(int empId) throws TimeRecordNotFoundException {
-
-        List<TimeRecord> timeRecordList;
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("empId", empId);
-
-        try{
-            timeRecordList = remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TREC_BY_EMPID.getSql(schemaMap()), params,
-                    new RemoteRecordRowMapper());
-        } catch (DataRetrievalFailureException ex){
-            logger.warn("Retrieve Time Records of {} error: {}", empId, ex.getMessage());
-            throw new TimeRecordNotFoundException("No matching Time Records for employee id: " + empId);
-        }
-        return  timeRecordList;
-
-    }
-
-    @Override
-    public boolean saveRecord(TimeRecord record) {
-
-        MapSqlParameterSource params = getTimeRecordParams(record);
-
-        boolean isUpdate = true;
-
-        if (record.getTimeRecordId() == null ||
-                remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(schemaMap()), params)==0) {
-            isUpdate = false;
-            KeyHolder tsIdHolder = new GeneratedKeyHolder();
-            if (remoteNamedJdbc.update(SqlTimeRecordQuery.INSERT_TIME_REC.getSql(schemaMap()), params,
-                    tsIdHolder, new String[] {"NUXRTIMESHEET"}) == 0) {
-                return false;
-            }
-            record.setTimeRecordId(((BigDecimal) tsIdHolder.getKeys().get("NUXRTIMESHEET")).toBigInteger());
-        }
-        // Insert each entry from the time record
-        final TimeRecord oldRecord = isUpdate ? getTimeRecord(record.getTimeRecordId()) : null;
-        record.getTimeEntries().stream()
-                .filter(entry -> shouldInsert(entry, oldRecord))
-                .forEach(timeEntryDao::updateTimeEntry);
-        return true;
-    }
-
-    @Override
-    public boolean deleteRecord(BigInteger recordId) {
-        MapSqlParameterSource params = new MapSqlParameterSource("timesheetId", new BigDecimal(recordId));
-        if (remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_SQL.getSql(schemaMap()), params) > 0) {
-            remoteNamedJdbc.update(SqlTimeRecordQuery.DELETE_TIME_REC_ENTRIES_SQL.getSql(schemaMap()), params);
-            return true;
-        }
-        return false;
     }
 
     public static MapSqlParameterSource getTimeRecordParams(TimeRecord timeRecord) {

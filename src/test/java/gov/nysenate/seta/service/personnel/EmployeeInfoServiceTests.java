@@ -22,6 +22,12 @@ public class EmployeeInfoServiceTests extends BaseTests {
         logger.info("{}", activeDates.asRanges());
     }
 
+    @Test
+    public void getEmpInfoTest() {
+        Employee emp = employeeInfoService.getEmployee(3562);
+        logger.info("{}", OutputUtils.toJson(emp));
+    }
+
     private void printEmpInfoAtDate(int empId, LocalDate date) {
         Employee emp = employeeInfoService.getEmployee(empId, date);
         logger.info("{}", OutputUtils.toJson(emp));
@@ -29,7 +35,10 @@ public class EmployeeInfoServiceTests extends BaseTests {
 
     @Test
     public void empInfoAtDateTest() {
-        printEmpInfoAtDate(9896, LocalDate.of(2010, 8, 24));
+        int empId = 3562;
+//        LocalDate date = LocalDate.of(2015, 8, 24);
+        LocalDate date = LocalDate.now();
+        printEmpInfoAtDate(empId, date);
     }
 
 }

@@ -77,8 +77,8 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
         try {
             employee.setPayType(PayType.valueOf(transHistory.latestValueOf("CDPAYTYPE", effectiveDate, true).orElse(null)));
         } catch (NullPointerException | IllegalArgumentException ignored) {}
-        employee.setRespCenter(getRespCenterAtDate(transHistory, effectiveDate));
-        employee.setWorkLocation(getWorkLocAtDate(transHistory, effectiveDate));
+        setRespCenterAtDate(employee, transHistory, effectiveDate);
+        getWorkLocAtDate(employee, transHistory, effectiveDate);
         return employee;
     }
 
@@ -112,29 +112,34 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
      * TODO
      *  you can't get every value of these objects from the transaction layer
      */
-    private static ResponsibilityCenter getRespCenterAtDate(TransactionHistory transHistory, LocalDate effectiveDate) {
-        ResponsibilityCenter rctr = new ResponsibilityCenter();
-        rctr.setCode(Integer.parseInt(transHistory.latestValueOf("CDRESPCTR", effectiveDate, true).orElse("0")));
-        rctr.setAgency(getAgencyAtDate(transHistory, effectiveDate));
-        rctr.setHead(getRespHeadAtDate(transHistory, effectiveDate));
-        return rctr;
+    private static void setRespCenterAtDate(Employee emp, TransactionHistory transHistory, LocalDate effectiveDate) {
+        if (emp.getRespCenter() == null) {
+            emp.setRespCenter(new ResponsibilityCenter());
+        }
+        ResponsibilityCenter rctr = emp.getRespCenter();
+        rctr.setCode(Integer.parseInt(transHistory.latestValueOf("CDRESPCTR", effectiveDate, true).orElse(Integer.toString(rctr.getCode()))));
+        setAgencyAtDate(rctr, transHistory, effectiveDate);
+        getRespHeadAtDate(rctr, transHistory, effectiveDate);
     }
-    
-    private static Agency getAgencyAtDate(TransactionHistory transHistory, LocalDate effectiveDate) {
-        Agency agency = new Agency();
-        agency.setCode(transHistory.latestValueOf("CDAGENCY", effectiveDate, true).orElse(null));
-        return agency;
+    private static void setAgencyAtDate(ResponsibilityCenter respCtr, TransactionHistory transHistory, LocalDate effectiveDate) {
+        if (respCtr.getAgency() == null) {
+            respCtr.setAgency(new Agency());
+        }
+        Agency agency = respCtr.getAgency();
+        agency.setCode(transHistory.latestValueOf("CDAGENCY", effectiveDate, true).orElse(agency.getCode()));
     }
-    
-    private static ResponsibilityHead getRespHeadAtDate(TransactionHistory transHistory, LocalDate effectiveDate) {
-        ResponsibilityHead rHead = new ResponsibilityHead();
-        rHead.setCode(transHistory.latestValueOf("CDRESPCTRHD", effectiveDate, true).orElse(null));
-        return rHead;
+    private static void getRespHeadAtDate(ResponsibilityCenter respCtr, TransactionHistory transHistory, LocalDate effectiveDate) {
+        if (respCtr.getHead() == null) {
+            respCtr.setHead(new ResponsibilityHead());
+        }
+        ResponsibilityHead rHead = respCtr.getHead();
+        rHead.setCode(transHistory.latestValueOf("CDRESPCTRHD", effectiveDate, false).orElse(rHead.getCode()));
     }
-    
-    private static Location getWorkLocAtDate(TransactionHistory transHistory, LocalDate effectiveDate) {
-        Location loc = new Location();
-        loc.setCode(transHistory.latestValueOf("CDLOCAT", effectiveDate, true).orElse(null));
-        return loc;
+    private static void getWorkLocAtDate(Employee emp, TransactionHistory transHistory, LocalDate effectiveDate) {
+        if (emp.getWorkLocation() == null) {
+            emp.setWorkLocation(new Location());
+        }
+        Location loc = emp.getWorkLocation();
+        loc.setCode(transHistory.latestValueOf("CDLOCAT", effectiveDate, true).orElse(loc.getCode()));
     }
 }

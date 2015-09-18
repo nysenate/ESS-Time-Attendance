@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.personnel;
 
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.personnel.mapper.EmployeeRowMapper;
 import gov.nysenate.seta.model.personnel.Employee;
@@ -11,10 +12,8 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 import static gov.nysenate.seta.dao.personnel.SqlEmployeeQuery.*;
 
@@ -62,6 +61,14 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
         return employee;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Set<Integer> getActiveEmployeeIds(LocalDate startDate) {
+        MapSqlParameterSource params = new MapSqlParameterSource("startDate", DateUtils.toDate(startDate));
+        return new HashSet<>(remoteNamedJdbc.query(GET_ACTIVE_EMP_IDS_AFTER_DATE_SQL.getSql(schemaMap()), params,
+                (rs, rowNum) -> rs.getInt("NUXREFEM")));
+    }
+
     /**
      * Helper method to create employee id -> Employee object mappings.
      * @param sql String - The sql query to execute
@@ -78,7 +85,7 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     }
 
     /** Returns a EmployeeRowMapper that's configured for use in this dao */
-    private EmployeeRowMapper getEmployeeRowMapper() {
+    private static EmployeeRowMapper getEmployeeRowMapper() {
         return new EmployeeRowMapper("", "RCTR_", "RCTRHD_", "AGCY_", "LOC_");
     }
 }
