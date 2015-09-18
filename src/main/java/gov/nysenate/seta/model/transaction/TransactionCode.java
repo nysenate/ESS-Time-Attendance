@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.transaction;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -117,20 +118,34 @@ public enum TransactionCode
 
     /** --- Functional Getters/Setters --- */
 
-    public List<String> getDbColumnList() {
+
+    public Set<String> getDbColumnList() {
         return (this.usesAllColumns())
             ? getAllDbColumnsList()
-            : Arrays.asList(StringUtils.split(dbColumns, ","));
+            : Sets.newHashSet(StringUtils.split(dbColumns, ","));
     }
 
-    public static List<String> getAllDbColumnsList() {
-        List<String> columns = new ArrayList<>();
+    public static Set<String> getAllDbColumnsList() {
+        Set<String> columns = new HashSet<>();
         for (TransactionCode t : TransactionCode.values()) {
             if (!t.usesAllColumns()) {
                 columns.addAll(t.getDbColumnList());
             }
         }
         return columns;
+    }
+
+    public static Set<String> getTypeDbColumnsList(TransactionType type) {
+        return getTransactionsOfType(type).stream()
+                .filter(code -> !code.usesAllColumns())
+                .flatMap(code -> code.getDbColumnList().stream())
+                .collect(Collectors.toSet());
+    }
+
+    public static Set<TransactionCode> getTransactionsOfType(TransactionType type) {
+        return Arrays.stream(TransactionCode.values())
+                .filter(code -> code.type == type)
+                .collect(Collectors.toSet());
     }
 
     /** --- Basic Getters/Setters --- */

@@ -3,8 +3,10 @@ package gov.nysenate.seta.service.attendance;
 import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
+import gov.nysenate.common.SortOrder;
 import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.dao.attendance.TimeRecordDao;
+import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
@@ -22,10 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@WorkInProgress(author = "Sam", since = "2015/09/15", desc = "building and testing time record generation methods")
+@WorkInProgress(author = "Sam", since = "2015/09/15", desc = "testing time record generation methods")
 @Service
 public class EssTimeRecordManager implements TimeRecordManager {
 
@@ -33,15 +36,48 @@ public class EssTimeRecordManager implements TimeRecordManager {
 
     @Autowired TimeRecordService timeRecordService;
     @Autowired TimeRecordDao timeRecordDao;
+    @Autowired EmployeeDao employeeDao;
     @Autowired PayPeriodService payPeriodService;
     @Autowired EmpTransactionService transService;
     @Autowired EmployeeInfoService empInfoService;
 
+    /**
+     * The active period in this context is defined as the start of the current year to the current date.
+     * preActivePeriod and postActivePeriod are used to extend this period to provide a buffer
+     */
+    private Period preActivePeriod = Period.ofMonths(1);
+    private Period postActivePeriod = Period.ofMonths(1);
+
+    /** {@inheritDoc} */
     @Override
-    public void generateRecords(int empId, Collection<PayPeriod> payPeriods) {
+    public int ensureRecords(int empId, Collection<PayPeriod> payPeriods) {
         List<TimeRecord> existingRecords =
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll());
-        generateRecords(empId, payPeriods, existingRecords);
+        return ensureRecords(empId, payPeriods, existingRecords, true);
+    }
+
+    @Override
+    public void ensureAllActiveRecords() {
+        Range<LocalDate> activeDateRange = Range.closed(
+                LocalDate.now().withDayOfYear(1).minus(preActivePeriod),
+                LocalDate.now().plus(postActivePeriod));
+        List<PayPeriod> payPeriods = payPeriodService.getPayPeriods(PayPeriodType.AF, activeDateRange, SortOrder.ASC);
+
+        // Extend the active date range to include all dates covered by the retrieved pay periods
+        RangeSet<LocalDate> periodRangeSet = TreeRangeSet.create();
+        payPeriods.forEach(payPeriod -> periodRangeSet.add(payPeriod.getDateRange()));
+        activeDateRange = periodRangeSet.span();
+
+        Set<Integer> empIds = employeeDao.getActiveEmployeeIds(DateUtils.startOfDateRange(activeDateRange));
+        logger.info("getting time records for {} employees over {}", empIds.size(), activeDateRange);
+        ListMultimap<Integer, TimeRecord> existingRecordMap = timeRecordDao.getRecordsDuring(activeDateRange);
+
+        int totalSaved = existingRecordMap.keySet().stream()
+                .map(empId -> ensureRecords(empId, payPeriods,
+                        Optional.of(existingRecordMap.get(empId)).orElse(Collections.emptyList()),
+                        false))
+                .reduce(0, Integer::sum);
+        logger.info("saved {} records", totalSaved);
     }
 
     /** --- Internal Methods --- */
@@ -49,19 +85,31 @@ public class EssTimeRecordManager implements TimeRecordManager {
     /**
      * Ensure that the employee has up to date records that cover all given pay periods
      * Existing records are split/modified as needed to ensure correctness
+     * If createTempRecords is false, then records will only be created for periods with annual pay work days
      */
-    private void generateRecords(int empId, Collection<PayPeriod> payPeriods, Collection<TimeRecord> existingRecords) {
+    private int ensureRecords(int empId, Collection<PayPeriod> payPeriods, Collection<TimeRecord> existingRecords,
+                              boolean createTempRecords) {
+        logger.info("Generating records for {} over {} pay periods with {} existing records",
+                empId, payPeriods.size(), existingRecords.size());
+
         // Get a set of ranges for which there should be time records
-        List<Range<LocalDate>> recordRanges = getRecordRanges(payPeriods, empId);
+        LinkedHashSet<Range<LocalDate>> recordRanges = getRecordRanges(payPeriods, empId);
         List<TimeRecord> recordsToSave = new LinkedList<>();
 
         // Check that existing records correspond to the record ranges
         // Split any records that span multiple ranges
         //  also ensure that existing records and entries contain up to date information
-        recordsToSave.addAll(patchExistingRecords(empId, recordRanges, existingRecords));
+        List<TimeRecord> patchedRecords = patchExistingRecords(empId, recordRanges, existingRecords);
+        patchedRecords = patchedRecords.stream()
+                .filter(record -> createTempRecords || !record.isEmpty())
+                .peek(recordsToSave::add)
+                .collect(Collectors.toList());
 
         // Create new records for all ranges not covered by existing records
+        // TODO: prevent creation of new records if the employee is new/reappointed
+        // todo    and doesn't have the necessary transactions yet
         recordRanges.stream()
+                .filter(range -> createTempRecords || isRADuringRange(empId, range))
                 .map(range -> createTimeRecord(empId, range))
                 .forEach(recordsToSave::add);
 
@@ -72,6 +120,9 @@ public class EssTimeRecordManager implements TimeRecordManager {
                 timeRecordDao.saveRecord(record);
             }
         });
+        logger.info("Saved {} records for {}:\t{} new\t{} patched/split",
+                recordsToSave.size(), empId, recordRanges.size(), patchedRecords.size());
+        return recordsToSave.size();
     }
 
     /**
@@ -82,7 +133,7 @@ public class EssTimeRecordManager implements TimeRecordManager {
      * @return List<TimeRecord> - a list of existing records that were modified
      */
     private List<TimeRecord> patchExistingRecords(
-            int empId, List<Range<LocalDate>> recordRanges, Collection<TimeRecord> existingRecords) {
+            int empId, LinkedHashSet<Range<LocalDate>> recordRanges, Collection<TimeRecord> existingRecords) {
         List<TimeRecord> recordsToSave = new LinkedList<>();
         existingRecords.forEach(record -> {
             List<Range<LocalDate>> rangesUnderRecord = recordRanges.stream()
@@ -127,7 +178,7 @@ public class EssTimeRecordManager implements TimeRecordManager {
 
         if (rangeIterator.hasNext()) {
             // Shorten the existing time record to match the first of the ranges
-            // remove all entries occurring outside the first range
+            // remove all entries occurring outside the first date range
             TreeMap<LocalDate, TimeEntry> existingEntryMap = new TreeMap<>();
             LocalDate newEndDate = DateUtils.endOfDateRange(rangeIterator.next());
             for (LocalDate date = newEndDate.plusDays(1); !date.isAfter(record.getEndDate()); date = date.plusDays(1)) {
@@ -189,10 +240,18 @@ public class EssTimeRecordManager implements TimeRecordManager {
     }
 
     /**
+     * Return true iff the employee was a Regular Annual employee at any point during the given date range
+     */
+    private boolean isRADuringRange(int empId, Range<LocalDate> dateRange) {
+        TransactionHistory transHistory = transService.getTransHistory(empId);
+        return transHistory.getEffectivePayTypes(dateRange).containsValue(PayType.RA);
+    }
+
+    /**
      * Get ranges corresponding to record dates for over a range of dates
      * Determined by pay periods, supervisor changes, and active dates of service
      */
-    private List<Range<LocalDate>> getRecordRanges(Collection<PayPeriod> periods, int empId) {
+    private LinkedHashSet<Range<LocalDate>> getRecordRanges(Collection<PayPeriod> periods, int empId) {
         TransactionHistory transHistory = transService.getTransHistory(empId);
 
         // Get dates when there was a change of supervisor
@@ -208,6 +267,6 @@ public class EssTimeRecordManager implements TimeRecordManager {
                 .flatMap(periodRange -> RangeUtils.splitRange(periodRange, newSupDates).stream())
                 // get the intersection of each range with the active dates of service
                 .flatMap(range -> activeDates.subRangeSet(range).asRanges().stream())
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

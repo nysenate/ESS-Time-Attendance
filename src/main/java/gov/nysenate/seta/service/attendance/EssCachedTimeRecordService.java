@@ -186,7 +186,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
                     cachedRecs.update(record);
                 }
                 else {
-                    activeRecordCache.put(new Element(empId, getActiveTimeRecords(empId)));
+                    activeRecordCache.put(new Element(empId, new TimeRecordCacheCollection(empId, getActiveTimeRecords(empId))));
                 }
             }
             finally {

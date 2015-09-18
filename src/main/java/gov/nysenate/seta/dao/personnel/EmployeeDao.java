@@ -1,11 +1,14 @@
 package gov.nysenate.seta.dao.personnel;
 
+import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Data access layer for retrieving employee information.
@@ -38,4 +41,6 @@ public interface EmployeeDao extends BaseDao
      * @return Map - {emp id (Integer) -> Employee} or empty map if no ids could be matched
      */
     public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds);
+
+    public Set<Integer> getActiveEmployeeIds(LocalDate startDate);
 }

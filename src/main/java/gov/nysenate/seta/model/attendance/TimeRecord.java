@@ -183,8 +183,6 @@ public class TimeRecord implements Comparable<TimeRecord>
         return usage;
     }
 
-    /** --- Functional Getters/Setters --- */
-
     public BigDecimal getSumOfTimeEntries(Function<? super TimeEntry, Optional<BigDecimal>> mapper) {
         return timeEntryMap.values().stream()
                 .map(entry -> mapper.apply(entry).orElse(BigDecimal.ZERO))
@@ -197,6 +195,14 @@ public class TimeRecord implements Comparable<TimeRecord>
     public void setTimeRecordId(BigInteger timeRecordId) {
         this.timeRecordId = timeRecordId;
         timeEntryMap.forEach(((date, entry) -> entry.setTimeRecordId(timeRecordId)));
+    }
+
+    /** Return true if this record contains no entered data */
+    public boolean isEmpty() {
+        return recordStatus == TimeRecordStatus.NOT_SUBMITTED &&
+                remarks == null &&
+                exceptionDetails == null &&
+                timeEntryMap.values().stream().allMatch(TimeEntry::isEmpty);
     }
 
     /** --- Basic Getters/Setters --- */
