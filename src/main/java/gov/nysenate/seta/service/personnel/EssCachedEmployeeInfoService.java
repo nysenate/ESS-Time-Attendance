@@ -1,5 +1,6 @@
 package gov.nysenate.seta.service.personnel;
 
+import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.eventbus.EventBus;
@@ -86,7 +87,7 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
     public RangeSet<LocalDate> getEmployeeActiveDatesService(int empId) {
         TransactionHistory transHistory = transService.getTransHistory(empId);
         RangeSet<LocalDate> employedDates = TreeRangeSet.create();
-        RangeUtils.toRangeMap(transHistory.getEffectiveEmpStatus(DateUtils.ALL_DATES), DateUtils.THE_FUTURE)
+        RangeUtils.toRangeMap(transHistory.getEffectiveEmpStatus(DateUtils.ALL_DATES))
                 .asMapOfRanges().forEach((range, employed) -> {
             if (employed) {
                 employedDates.add(range);

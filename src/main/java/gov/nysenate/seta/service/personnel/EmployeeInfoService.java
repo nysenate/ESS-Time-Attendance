@@ -1,5 +1,6 @@
 package gov.nysenate.seta.service.personnel;
 
+import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.model.personnel.Employee;

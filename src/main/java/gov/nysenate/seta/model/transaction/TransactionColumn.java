@@ -37,6 +37,8 @@ public enum TransactionColumn
     CDMARITALYON(""),
     CDNEGUNIT("Negotiation Unit"),
     CDPAYTYPE("Pay Type"),
+    CDRESPCTR("Responsibility Center Code"),
+    CDRESPCTRHD("Responsibility Head Code"),
     CDSEX("Sex"),
     CDSTATPER("Personnel Status"),
     DEDAYSLOST(""),

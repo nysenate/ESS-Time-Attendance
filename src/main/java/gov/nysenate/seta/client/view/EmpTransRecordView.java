@@ -9,8 +9,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @XmlRootElement
 public class EmpTransRecordView implements ViewObject
@@ -31,7 +33,7 @@ public class EmpTransRecordView implements ViewObject
             this.active = record.isActive();
             this.transCode = record.getTransCode().name();
             this.transDesc = record.getTransCode().getDesc();
-            this.values = new HashMap<>();
+            this.values = new TreeMap<>();
             record.getValueMap().forEach((k,v) -> {
                 if (TransactionColumn.isValidColumn(k) && StringUtils.isNotBlank(v)) {
                     this.values.put(k, new EmpTransItemView(k, v));

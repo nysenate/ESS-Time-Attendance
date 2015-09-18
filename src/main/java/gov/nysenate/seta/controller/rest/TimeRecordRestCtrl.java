@@ -108,7 +108,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
             throws SupervisorException {
         Range<LocalDate> dateRange = parseDateRange(from, to);
         Set<TimeRecordStatus> statuses = parseStatuses(status, TimeRecordStatus.inProgress());
-        return getRecordResponse(timeRecordService.getSupervisorRecords(supId, dateRange, statuses), true);
+        return getRecordResponse(timeRecordService.getSupervisorRecords(supId, dateRange, statuses), false);
     }
 
     @RequestMapping(value = "/supervisor/count", method = RequestMethod.GET, produces = "application/json")

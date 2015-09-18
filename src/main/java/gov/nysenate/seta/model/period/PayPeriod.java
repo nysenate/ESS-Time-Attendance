@@ -116,6 +116,7 @@ public class PayPeriod implements Comparable<PayPeriod>
     public Range<LocalDate> getDateRange() {
         if (startDate != null && endDate != null) {
             return Range.closedOpen(startDate, endDate.plusDays(1));
+//            return Range.closed(startDate, endDate);
         }
         throw new IllegalArgumentException("Cannot return date range since start and/or end dates are null!");
     }

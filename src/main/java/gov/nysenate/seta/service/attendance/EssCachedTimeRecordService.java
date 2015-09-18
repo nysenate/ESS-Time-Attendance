@@ -98,7 +98,10 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         return timeRecordDao.getTimeRecordYears(empId, yearOrder);
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}
+     *
+     * The active time records for an employee will be cached.
+     */
     @Override
     public List<TimeRecord> getActiveTimeRecords(Integer empId) {
         activeRecordCache.acquireReadLockOnKey(empId);
@@ -126,9 +129,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         TreeMultimap<PayPeriod, TimeRecord> records = TreeMultimap.create();
         timeRecordDao.getRecordsDuring(empIds, dateRange, EnumSet.allOf(TimeRecordStatus.class)).values().stream()
                 .forEach(rec -> records.put(rec.getPayPeriod(), rec));
-//        if (fillMissingRecords && statuses.contains(TimeRecordStatus.NOT_SUBMITTED)) {
-//            empIds.forEach(empId -> fillMissingRecords(empId, records, dateRange));
-//        }
         return records.values().stream()
                 .filter(record -> statuses.contains(record.getRecordStatus()))
                 .peek(this::initializeEntries)
@@ -202,60 +202,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     }
 
     /** --- Internal Methods --- */
-
-    /**
-     * Detects pay periods that are not fully covered by time records for a single employee during a given date range
-     * Creates and saves new records to fill these pay periods
-     */
-    private void fillMissingRecords(int empId, TreeMultimap<PayPeriod, TimeRecord> records, Range<LocalDate> dateRange) {
-        // Todo: what if a split-triggering transaction is posted within a pay period that already has a record created
-        //       eg. a record is initially created for 7/16 - 7/29, but a supervisor change occurs on 7/22
-        RangeSet<LocalDate> activeDates = empInfoService.getEmployeeActiveDatesService(empId);
-        List<PayPeriod> openPeriods =
-            accrualInfoService.getActiveAttendancePeriods(empId, DateUtils.endOfDateRange(dateRange), SortOrder.ASC);
-        TreeSet<PayPeriod> incompletePeriods = openPeriods.stream()
-                // Pay period is within the requested date range
-                .filter(payPeriod -> dateRange.contains(payPeriod.getStartDate()))
-                // Pay period is not covered by existing records
-                .filter(payPeriod -> !payPeriod.isEnclosedBy(records.get(payPeriod)))
-                // Pay period intersects with employee active dates
-                .filter(payPeriod -> !activeDates.subRangeSet(payPeriod.getDateRange()).isEmpty())
-                .collect(Collectors.toCollection(TreeSet::new));
-        if (!incompletePeriods.isEmpty()) {
-            Employee employee = empInfoService.getEmployee(empId);
-            TransactionHistory history = transService.getTransHistory(empId);
-            incompletePeriods.forEach(period ->
-                    records.putAll(period, createEmptyTimeRecords(employee, period, history, records.get(period))));
-        }
-    }
-
-    /**
-     * Creates and saves new time records as needed for a single employee over a single pay period
-     */
-    private Set<TimeRecord> createEmptyTimeRecords(Employee employee, PayPeriod period, TransactionHistory fullHistory,
-                                                     Set<TimeRecord> existingRecords) {
-        TreeMap<LocalDate, Integer> supIds = fullHistory.getEffectiveSupervisorIds(period.getDateRange());
-        TreeMap<LocalDate, PayType> payTypes = fullHistory.getEffectivePayTypes(period.getDateRange());
-        TimeRecord record = new TimeRecord(employee, period.getDateRange(), period
-        );
-        timeRecordDao.saveRecord(record);
-        logger.info("Created new record: {}", record.getDateRange());
-        return Collections.singleton(record);
-    }
-
-    /**
-     * Gets time records for the employees and durations specified by the given collection of supervisor infos
-     */
-    private List<TimeRecord> getTimeRecordsForSupInfos(Collection<EmployeeSupInfo> supInfos,
-                                                       Range<LocalDate> dateRange, Set<TimeRecordStatus> statuses) {
-        // Group employee ids by date range to reduce number of queries
-        SetMultimap<Range<LocalDate>, Integer> periods = HashMultimap.create();
-        supInfos.forEach(supInfo ->
-                periods.put(dateRange.intersection(supInfo.getEffectiveDateRange()), supInfo.getEmpId()));
-        return periods.keySet().stream().parallel()
-                .flatMap(period -> getTimeRecords(periods.get(period), period, statuses).stream())
-                .collect(toList());
-    }
 
     /**
      * Ensures that the given time record contains entries for each day covered.

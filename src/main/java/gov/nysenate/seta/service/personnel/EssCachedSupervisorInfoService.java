@@ -3,7 +3,9 @@ package gov.nysenate.seta.service.personnel;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.seta.client.view.SupervisorGrantView;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
 import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.exception.SupervisorException;
@@ -75,8 +77,7 @@ public class EssCachedSupervisorInfoService implements SupervisorInfoService
         Element cachedElem = supEmployeeGroupCache.get(supId);
         supEmployeeGroupCache.releaseReadLockOnKey(supId);
         if (cachedElem == null) {
-            empGroup = supervisorDao.getSupervisorEmpGroup(supId, DateUtils.ALL_DATES);
-            putSupEmpGroupInCache(empGroup);
+            empGroup = getAndCacheSupEmpGroup(supId);
         }
         else {
             empGroup = (SupervisorEmpGroup) cachedElem.getObjectValue();
@@ -139,10 +140,18 @@ public class EssCachedSupervisorInfoService implements SupervisorInfoService
             }
             supervisorDao.setSupervisorOverride(override.getGranterSupervisorId(), override.getGranteeSupervisorId(),
                     override.isActive(), override.getStartDate().orElse(null), override.getEndDate().orElse(null));
+            getAndCacheSupEmpGroup(override.getGranteeSupervisorId());
+            eventBus.post(new SupervisorGrantUpdateEvent(override));
         }
         else {
             throw new SupervisorException("Grantee/Granter for override must both have been a supervisor.");
         }
+    }
+
+    private SupervisorEmpGroup getAndCacheSupEmpGroup(int supId) throws SupervisorException {
+        SupervisorEmpGroup supervisorEmpGroup = supervisorDao.getSupervisorEmpGroup(supId, DateUtils.ALL_DATES);
+        putSupEmpGroupInCache(supervisorEmpGroup);
+        return supervisorEmpGroup;
     }
 
     private void putSupEmpGroupInCache(SupervisorEmpGroup empGroup) {
