@@ -4,13 +4,16 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
+import com.google.common.eventbus.EventBus;
 import gov.nysenate.common.SortOrder;
+import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
-import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
-import gov.nysenate.seta.service.base.BaseCachingService;
+import gov.nysenate.seta.service.cache.EhCacheManageService;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +28,20 @@ import java.util.List;
 import java.util.TreeSet;
 
 @Service
-public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> implements PayPeriodService
+public class EssCachedPayPeriodService implements PayPeriodService
 {
     private static final Logger logger = LoggerFactory.getLogger(EssCachedPayPeriodService.class);
 
     @Autowired private PayPeriodDao payPeriodDao;
+    @Autowired private EventBus eventBus;
+    @Autowired private EhCacheManageService cacheManageService;
+
+    private Cache payPeriodCache;
 
     @PostConstruct
     public void init() {
-        super.init();
-        warmCaches();
+        this.eventBus.register(this);
+        this.payPeriodCache = this.cacheManageService.registerEternalCache("pay-periods");
     }
 
     /**
@@ -48,7 +55,7 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
 
         public PayPeriodCacheTree(TreeSet<PayPeriod> periodSet) {
             periodSet.forEach(p -> {
-                rangeMap.put(Range.closedOpen(p.getStartDate(), p.getEndDate().plusDays(1)), p);
+                rangeMap.put(Range.closed(p.getStartDate(), p.getEndDate()), p);
             });
         }
 
@@ -69,38 +76,59 @@ public class EssCachedPayPeriodService extends BaseCachingService<PayPeriod> imp
 
     @Override
     public PayPeriod getPayPeriod(PayPeriodType type, LocalDate date) throws PayPeriodNotFoundEx {
-        if (isCacheReady() && this.primaryCache.get(type) != null) {
-            PayPeriodCacheTree payPeriodCacheTree = (PayPeriodCacheTree) this.primaryCache.get(type).get();
-            return payPeriodCacheTree.getPayPeriod(date);
+        if (type.equals(PayPeriodType.AF)) {
+            PayPeriodCacheTree cacheTree = getCachedPayPeriodTree(type, true);
+            if (cacheTree != null) {
+                cacheTree.getPayPeriod(date);
+            }
         }
         return payPeriodDao.getPayPeriod(type, date);
     }
 
     @Override
     public List<PayPeriod> getPayPeriods(PayPeriodType type, Range<LocalDate> dateRange, SortOrder dateOrder) {
-        if (isCacheReady() && this.primaryCache.get(type) != null) {
-            PayPeriodCacheTree payPeriodCacheTree = (PayPeriodCacheTree) this.primaryCache.get(type).get();
-            return payPeriodCacheTree.getPayPeriodsInRange(dateRange, dateOrder);
+        if (type.equals(PayPeriodType.AF)) {
+            PayPeriodCacheTree cacheTree = getCachedPayPeriodTree(type, true);
+            if (cacheTree != null) {
+                cacheTree.getPayPeriodsInRange(dateRange, dateOrder);
+            }
         }
         return payPeriodDao.getPayPeriods(type, dateRange, dateOrder);
     }
 
-    @Override
-    public ContentCache getCacheType() {
-        return ContentCache.PAY_PERIOD;
+    private PayPeriodCacheTree getCachedPayPeriodTree(PayPeriodType type, boolean createIfEmpty) {
+        payPeriodCache.acquireReadLockOnKey(type);
+        Element element = payPeriodCache.get(type);
+        payPeriodCache.releaseReadLockOnKey(type);
+        if (element != null) {
+            return (PayPeriodCacheTree) element.getObjectValue();
+        }
+        if (createIfEmpty) {
+            cachePayPeriods(type);
+            // Try again.
+            payPeriodCache.acquireReadLockOnKey(type);
+            element = payPeriodCache.get(type);
+            payPeriodCache.releaseReadLockOnKey(type);
+            if (element == null) throw new IllegalStateException(type + " Pay Periods are not caching properly.");
+            return (PayPeriodCacheTree) element.getObjectValue();
+        }
+        return null;
     }
 
-    @Override
-    @Scheduled(cron = "0 0 * * * *") // Refresh once a day
-    public void warmCaches() {
-        preCacheWarm();
-        evictCaches();
-        logger.debug("Fetching all AF pay period recs for caching...");
+    @Scheduled(fixedDelay = 43200000L) // Refresh the AF pay period cache every 12 hours
+    private void cacheAfPayPeriods() {
+        cachePayPeriods(PayPeriodType.AF);
+    }
+
+    private void cachePayPeriods(PayPeriodType type) {
+        logger.debug("Fetching all {} pay period recs for caching...", type);
         Range<LocalDate> cacheRange = Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED);
         TreeSet<PayPeriod> payPeriods =
-            new TreeSet<>(payPeriodDao.getPayPeriods(PayPeriodType.AF, cacheRange, SortOrder.ASC));
-        this.primaryCache.put(PayPeriodType.AF, new PayPeriodCacheTree(payPeriods));
-        logger.info("Done caching {} AF pay period records.", payPeriods.size());
-        postCacheWarm();
+            new TreeSet<>(payPeriodDao.getPayPeriods(type, cacheRange, SortOrder.ASC));
+        payPeriodCache.acquireWriteLockOnKey(type);
+        payPeriodCache.remove(type);
+        payPeriodCache.put(new Element(type, new PayPeriodCacheTree(payPeriods)));
+        payPeriodCache.releaseWriteLockOnKey(type);
+        logger.info("Done caching {} {} pay period records.", payPeriods.size(), type);
     }
 }

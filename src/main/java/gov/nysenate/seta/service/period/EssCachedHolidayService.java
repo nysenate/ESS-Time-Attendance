@@ -2,12 +2,16 @@ package gov.nysenate.seta.service.period;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
+import com.google.common.eventbus.EventBus;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.dao.period.HolidayDao;
 import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.payroll.Holiday;
 import gov.nysenate.seta.service.base.BaseCachingService;
+import gov.nysenate.seta.service.cache.EhCacheManageService;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +25,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class EssCachedHolidayService extends BaseCachingService<Holiday> implements HolidayService
+public class EssCachedHolidayService implements HolidayService
 {
     private static final Logger logger = LoggerFactory.getLogger(EssCachedHolidayService.class);
     private static final String HOLIDAY_CACHE_KEY = "holiday";
+
+    @Autowired private HolidayDao holidayDao;
+    @Autowired private EventBus eventBus;
+    @Autowired private EhCacheManageService cacheManageService;
+
+    private Cache holidayCache;
 
     private static final class HolidayCacheTree
     {
@@ -44,59 +54,57 @@ public class EssCachedHolidayService extends BaseCachingService<Holiday> impleme
         }
     }
 
-    @Autowired private HolidayDao holidayDao;
-
     @PostConstruct
     public void init() {
-        super.init();
-        warmCaches();
+        this.eventBus.register(this);
+        this.holidayCache = this.cacheManageService.registerEternalCache(ContentCache.HOLIDAY.name());
     }
 
     @Override
     public Optional<Holiday> getHoliday(LocalDate date) {
-        if (isCacheReady() && this.primaryCache.get(HOLIDAY_CACHE_KEY) != null) {
-            HolidayCacheTree cacheTree = (HolidayCacheTree) this.primaryCache.get(HOLIDAY_CACHE_KEY).get();
-            return cacheTree.getHoliday(date);
-        }
-        try {
-            Holiday holiday = holidayDao.getHoliday(date);
-            return Optional.of(holiday);
-        }
-        catch (EmptyResultDataAccessException ex) {
-            return Optional.empty();
-        }
+        return getHolidayCacheTree(true).getHoliday(date);
     }
 
     @Override
     public List<Holiday> getHolidays(Range<LocalDate> dateRange, boolean includeQuestionable, SortOrder dateOrder) {
-        if (isCacheReady() && this.primaryCache.get(HOLIDAY_CACHE_KEY) != null) {
-            HolidayCacheTree cacheTree = (HolidayCacheTree) this.primaryCache.get(HOLIDAY_CACHE_KEY).get();
-            List<Holiday> holidays = cacheTree.getHolidays(dateRange);
-            if (!includeQuestionable) {
-                holidays = holidays.stream().filter(h -> !h.isQuestionable()).collect(Collectors.toList());
-            }
-            if (dateOrder.equals(SortOrder.DESC)) {
-                Collections.reverse(holidays);
-            }
-            return holidays;
+        List<Holiday> holidays = getHolidayCacheTree(true).getHolidays(dateRange);
+        if (!includeQuestionable) {
+            holidays = holidays.stream().filter(h -> !h.isQuestionable()).collect(Collectors.toList());
         }
-        return holidayDao.getHolidays(dateRange, includeQuestionable, dateOrder);
+        if (dateOrder.equals(SortOrder.DESC)) {
+            Collections.reverse(holidays);
+        }
+        return holidays;
     }
 
-    @Override
-    public ContentCache getCacheType() {
-        return ContentCache.HOLIDAY;
+    private HolidayCacheTree getHolidayCacheTree(boolean createIfEmpty) {
+        holidayCache.acquireReadLockOnKey(HOLIDAY_CACHE_KEY);
+        Element elem = holidayCache.get(HOLIDAY_CACHE_KEY);
+        holidayCache.releaseReadLockOnKey(HOLIDAY_CACHE_KEY);
+        if (elem == null) {
+            if (!createIfEmpty) throw new IllegalStateException("Holidays are not cached yet!");
+            cacheHolidays();
+            holidayCache.acquireReadLockOnKey(HOLIDAY_CACHE_KEY);
+            elem = holidayCache.get(HOLIDAY_CACHE_KEY);
+            holidayCache.releaseReadLockOnKey(HOLIDAY_CACHE_KEY);
+            if (elem == null) throw new IllegalStateException("Holidays are not caching properly.");
+        }
+        if (elem.getObjectValue() == null) throw new IllegalStateException("Holidays are not caching properly.");
+        return (HolidayCacheTree) elem.getObjectValue();
     }
 
-    @Override
-    @Scheduled(cron = "0 0 * * * *") // Refresh once a day
-    public void warmCaches() {
-        preCacheWarm();
-        evictCaches();
+    @Scheduled(fixedDelay = 43200000L) // Refresh the cache every 12 hours
+    private void cacheHolidays() {
         logger.info("Caching holidays...");
-        this.primaryCache.put(HOLIDAY_CACHE_KEY, new HolidayCacheTree(
-            holidayDao.getHolidays(Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED), true, SortOrder.ASC)));
+        holidayCache.acquireWriteLockOnKey(HOLIDAY_CACHE_KEY);
+        try {
+            this.holidayCache.remove(HOLIDAY_CACHE_KEY);
+            this.holidayCache.put(new Element(HOLIDAY_CACHE_KEY, new HolidayCacheTree(
+                    holidayDao.getHolidays(Range.upTo(LocalDate.now().plusYears(2), BoundType.CLOSED), true, SortOrder.ASC))));
+        }
+        finally {
+            holidayCache.releaseWriteLockOnKey(HOLIDAY_CACHE_KEY);
+        }
         logger.info("Done caching holidays.");
-        postCacheWarm();
     }
 }
