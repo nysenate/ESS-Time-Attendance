@@ -10,7 +10,10 @@ essTime.controller('AccrualHistoryCtrl',
         accSummaries: {},
         activeYears: [],
         selectedYear: null,
-        searching: false
+
+        // Page state
+        searching: false,
+        error: null
     };
 
     $scope.getAccSummaries = function(year) {
@@ -27,6 +30,7 @@ essTime.controller('AccrualHistoryCtrl',
                 toDate: toDate.format('YYYY-MM-DD')
             }, function(resp) {
                 if (resp.success) {
+                    $scope.state.error = null;
                     $scope.state.accSummaries[year] = resp.result;
                     // Compute deltas
                     for (var i = 0; i < $scope.state.accSummaries[year].length; i++) {
@@ -46,7 +50,10 @@ essTime.controller('AccrualHistoryCtrl',
                     }
                 }
                 else {
-                    alert("Error while fetching accruals.");
+                    $scope.state.error = {
+                        title: "Could not retrieve accrual information.",
+                        message: "If you are eligible for accruals please try again later."
+                    }
                 }
                 $scope.state.searching = false;
             });

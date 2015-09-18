@@ -25,7 +25,10 @@
       <td>
         <div class="small-employee-profile-pic">&nbsp;</div>
       </td>
-      <td>{{record.employee.fullName || record.employeeId}}</td>
+      <td>{{record.employee.fullName || record.employeeId}}
+        <br/>
+        <small class="light-teal">Supervisor: {{record.supervisor.lastName}}</small>
+      </td>
       <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
       <td>{{record.totals.workHours}}</td>
       <td>{{record.totals.holidayHours}}</td>

@@ -73,7 +73,9 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
                 if (resp.success) {
                     $scope.state.recordYears = resp.years.reverse();
                     $scope.state.selectedRecYear = $scope.state.recordYears[0];
-                    $scope.getTimeRecordForEmpByYear(emp, $scope.state.selectedRecYear);
+                    if (resp.years.length > 0) {
+                        $scope.getTimeRecordForEmpByYear(emp, $scope.state.selectedRecYear);
+                    }
                 }
             });
         };

@@ -11,6 +11,10 @@
 
     <div loader-indicator ng-show="state.searching === true"></div>
 
+    <ess-notification ng-show="state.searching === false && state.error !== null" level="warn"
+                     title="{{state.error.title}}" message="{{state.error.message}}">
+    </ess-notification>
+
     <div class="content-container" ng-show="state.searching === false && state.accSummaries[state.selectedYear]">
         <h1 class="teal">Running Accrual Summary</h1>
         <p class="content-info">The hours accrued, used, and remaining are listed in the table below.<br/>

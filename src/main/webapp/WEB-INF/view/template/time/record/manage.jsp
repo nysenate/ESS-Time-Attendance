@@ -25,7 +25,7 @@
         <li style="margin-right:10px;"><a ng-click="selectNone()">Select None</a></li>
       </ul>
       <div supervisor-record-list records="state.supRecords[state.selSupId]['SUBMITTED']"
-           emp-infos="state.empInfos" selected-indices="state.selectedIndices"></div>
+           sup-id="state.selSupId" selected-indices="state.selectedIndices"></div>
       <div style="padding:.5em;text-align:right;">
         <input type="button" class="submit-button" value="Approve Selected" ng-disabled="hasSelections() == false"
                ng-click="approveSelections()"/>

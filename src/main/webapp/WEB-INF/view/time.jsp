@@ -40,12 +40,10 @@
     <jsp:body>
         <base href="/" />
         <ess-component-nav:top-nav activeTopic="time"/>
-        <section class="content-wrapper" ng-controller="MainCtrl as main">
-            <div ng-controller="TimeMainCtrl">
-                <ess-component-nav:time-nav/>
-                <div class="view-animate-container">
-                    <div ng-view class="view-animate"></div>
-                </div>
+        <section class="content-wrapper" ng-controller="TimeMainCtrl">
+            <ess-component-nav:time-nav/>
+            <div class="view-animate-container">
+                <div ng-view class="view-animate"></div>
             </div>
         </section>
     </jsp:body>
