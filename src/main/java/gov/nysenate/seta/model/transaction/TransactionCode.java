@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static gov.nysenate.seta.model.transaction.TransactionType.PAY;
 import static gov.nysenate.seta.model.transaction.TransactionType.PER;
@@ -120,9 +119,11 @@ public enum TransactionCode
 
 
     public Set<String> getDbColumnList() {
-        return (this.usesAllColumns())
-            ? getAllDbColumnsList()
-            : Sets.newHashSet(StringUtils.split(dbColumns, ","));
+        return (this.isAppointType())
+                ? getTypeDbColumnsList(type)
+                : Arrays.stream(StringUtils.split(dbColumns, ","))
+                        .map(String::trim)
+                        .collect(Collectors.toSet());
     }
 
     public static Set<String> getAllDbColumnsList() {

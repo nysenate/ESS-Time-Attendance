@@ -44,10 +44,11 @@ public class CachedTransactionServiceTests extends BaseTests {
     @Test
     public void invalidateTest() {
         int empId = 5803;
-        cacheTest();
+        timedGet(empId);
+        timedGet(empId);
         logger.info("invalidating {}!", empId);
         eventBus.post(new CacheEvictIdEvent<>(ContentCache.TRANSACTION, empId));
-        cacheTest();
+        timedGet(empId);
     }
 
     @Test

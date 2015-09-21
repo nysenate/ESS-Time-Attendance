@@ -7,7 +7,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A TransactionRecord represents a single unit of change that was made to an
@@ -115,6 +120,26 @@ public class TransactionRecord
     }
     public BigDecimal getBigDecimalValue(String colName) {
         return getBigDecimalValue(colName, true);
+    }
+
+    /**
+     * @return Map<String, String> - a map containing only column names -> values that are explicitly set by this transaction's code
+     */
+    public Map<String, String> getValuesForCode() {
+        return getValuesForCols(transCode.getDbColumnList());
+    }
+
+    /**
+     * Get a map of column names -> values for the given column names
+     * @param colNames Collection<String>
+     * @return Map<String, String>
+     */
+    public Map<String, String> getValuesForCols(Set<String> colNames) {
+        Map<String, String> subValueMap = new HashMap<>();
+        colNames.stream()
+                .filter(valueMap::containsKey)
+                .forEach(colName -> subValueMap.put(colName, valueMap.get(colName)));
+        return subValueMap;
     }
 
     /** --- Basic Getters/Setters --- */
