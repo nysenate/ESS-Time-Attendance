@@ -47,12 +47,23 @@ master.schema =
 # The schema containing read-write tables for timesheets
 ts.schema =
 
+# --- Mail Configuration ------------------------------------------------------
+
+# Connection information for sending emails
+mail.smtp.host = imap.gmail.com
+mail.smtp.port = 587
+mail.smtp.auth = true
+mail.smtp.starttls.enable = true
+mail.smtp.user = nysenatedev
+mail.smtp.password =
+mail.debug = false
+
 # --- Eh Cache Configuration --------------------------------------------------
 
-# The amount of memory to allocate to Eh Cache for all heap based caches (in MB).
-# This value cannot exceed the maximum jvm heap size or the application will fail
-# to startup. (Recommended: 600)
-cache.max.size = 600
+# The amount of memory to allocate to Eh Cache for all heap based caches (MB).
+# This value cannot exceed the maximum jvm heap size or the application will
+# fail to startup. (Recommended: 1000)
+cache.max.size = 1000
 
 # Delay (ms) during which the transactions cache is refreshed from the DB.
 cache.poll.delay.transactions = 60000
