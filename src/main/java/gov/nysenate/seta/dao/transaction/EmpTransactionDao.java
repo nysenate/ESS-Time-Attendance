@@ -48,5 +48,7 @@ public interface EmpTransactionDao
 
     /** --- Check updates --- */
 
+    LocalDateTime getMaxUpdateDateTime();
+
     List<TransactionRecord> updatedRecordsSince(LocalDateTime dateTime);
 }

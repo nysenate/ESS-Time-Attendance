@@ -12,9 +12,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -22,7 +25,6 @@ import java.util.stream.Collectors;
 
 import static gov.nysenate.seta.dao.transaction.SqlEmpTransactionQuery.GET_TRANS_HISTORY_SQL;
 import static gov.nysenate.seta.dao.transaction.SqlEmpTransactionQuery.GET_TRANS_HISTORY_SQL_FILTER_BY_CODE;
-import static gov.nysenate.seta.dao.transaction.SqlEmpTransactionQuery.GET_TRANS_HISTORY_TEMPLATE;
 
 @Repository
 public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDao
@@ -66,6 +68,12 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
         TransHistoryHandler handler = new TransHistoryHandler(empId, "", "", codes, options);
         remoteNamedJdbc.query(sql, params, handler);
         return handler.getTransactionHistory();
+    }
+
+    @Override
+    public LocalDateTime getMaxUpdateDateTime() {
+        return DateUtils.getLocalDateTime(
+            remoteJdbc.queryForObject(SqlEmpTransactionQuery.GET_MAX_UPDATE_DATE_TIME_SQL.getSql(schemaMap()), null, Timestamp.class));
     }
 
     @Override

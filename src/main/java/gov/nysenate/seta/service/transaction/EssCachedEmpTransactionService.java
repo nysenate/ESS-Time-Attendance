@@ -33,11 +33,13 @@ public class EssCachedEmpTransactionService implements EmpTransactionService
 
     private Cache transCache;
     private LocalDateTime lastCheckTime;
+    private LocalDateTime lastUpdateDateTime;
 
     @PostConstruct
     public void init() {
         eventBus.register(this);
         transCache = ehCacheManageService.registerEternalCache(ContentCache.TRANSACTION.name());
+        lastUpdateDateTime = transactionDao.getMaxUpdateDateTime();
         lastCheckTime = LocalDateTime.now();
     }
 
@@ -80,8 +82,8 @@ public class EssCachedEmpTransactionService implements EmpTransactionService
 
     @Scheduled(fixedDelayString = "${cache.poll.delay.transactions:60000}")
     private void syncTransHistory() {
-        logger.debug("Checking for transaction updates since {}...", lastCheckTime);
-        List<TransactionRecord> transRecs = transactionDao.updatedRecordsSince(lastCheckTime);
+        logger.debug("Checking for transaction updates since {}...", lastUpdateDateTime);
+        List<TransactionRecord> transRecs = transactionDao.updatedRecordsSince(lastUpdateDateTime);
         lastCheckTime = LocalDateTime.now();
         if (!transRecs.isEmpty()) {
             transRecs.stream().map(TransactionRecord::getEmployeeId).distinct().forEach(empId -> {
@@ -89,6 +91,7 @@ public class EssCachedEmpTransactionService implements EmpTransactionService
                 TransactionHistory transHistory = getTransHistoryFromDao(empId);
                 putTransactionHistoryInCache(empId, transHistory);
             });
+            lastUpdateDateTime = transactionDao.getMaxUpdateDateTime();
             // Post the update event
             eventBus.post(new TransactionHistoryUpdateEvent(transRecs, lastCheckTime));
         }
