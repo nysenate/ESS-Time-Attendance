@@ -2,6 +2,7 @@ package gov.nysenate.seta.service.attendance;
 
 import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
@@ -199,6 +200,22 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     @Override
     public boolean deleteRecord(BigInteger timeRecordId) {
         return timeRecordDao.deleteRecord(timeRecordId);
+    }
+
+    @Subscribe
+    public void handleActiveTimeRecordCacheEvict(ActiveTimeRecordCacheEvictEvent event) {
+        if (event != null) {
+            if (event.allRecords) {
+                logger.debug("Clearing out all cached active time records...");
+                activeRecordCache.removeAll();
+            }
+            else {
+                for (Integer empId : event.affectedEmployees) {
+                    logger.debug("Clearing out active time records for {}", empId);
+                    activeRecordCache.remove(empId);
+                }
+            }
+        }
     }
 
     /** --- Internal Methods --- */

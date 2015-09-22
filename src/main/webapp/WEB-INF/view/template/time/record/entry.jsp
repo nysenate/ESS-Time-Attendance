@@ -193,7 +193,49 @@ Toggle this for temporary emps.
         <div class="clearfix"></div>
       </div>
     </form>
+
     <div modal-container>
+      <div ng-if="isOpen('submit-indicator')">
+        <div ng-hide="state.submitting || state.submitted">
+          <h3 class="content-info" style="margin-bottom:0;">
+            Before submitting, you must acknowledge the following:
+          </h3>
+          <div style="padding:20px;text-align:left;">
+            <p>1. For purposes of submitting a timesheet, the username and password is the electronic signature of the employee.
+              As liability attaches to each timesheet, the employee should ensure that his or her username and password is
+              securely kept and used.
+            </p>
+            <hr/>
+            <p>2. The hours recorded on the Submitted Time and Attendance Record accurately reflect time actually spent by me
+              in the performance of my assigned duties.
+            </p>
+            <hr/>
+            <p>3. You will be saving and submitting this Time and Attendance Record to your T&A Supervisor.
+              Once submitted, you will no longer have the ability to edit this Record unless your supervisor or personnel
+              disapproves the record.
+            </p>
+            <hr/>
+            <div style="text-align: center;">
+              <input ng-click="submitRecord()" class="submit-button" style="margin-right: 20px;" type="button" value="I acknowledge"/>
+              <input ng-click="closeSaveModal()" class="reject-button" type="button" value="Cancel"/>
+            </div>
+          </div>
+
+        </div>
+        <div ng-show="state.submitting" class="save-progress-modal">
+          <h3 class="content-info" style="margin-bottom:0;">
+            Saving time record...
+          </h3>
+          <loader-indicator></loader-indicator>
+        </div>
+        <div ng-show="state.submitted" class="save-progress-modal">
+          <h3 class="content-info" style="margin-bottom:0;">Your time record has been submitted.</h3>
+          <h4>What would you like to do next?</h4>
+          <input ng-click="logout()" class="reject-button" type="button" value="Log out of ESS"/>
+          <input ng-click="closeModal()" class="submit-button" type="button" value="Go back to ESS"/>
+        </div>
+      </div>
+
       <div ng-if="isOpen('save-indicator')" class="save-progress-modal">
         <div ng-show="state.saving">
           <h3 class="content-info" style="margin-bottom:0;">
@@ -205,7 +247,7 @@ Toggle this for temporary emps.
           <h3 class="content-info" style="margin-bottom:0;">Your time record has been saved.</h3>
           <h4>What would you like to do next?</h4>
           <input ng-click="logout()" class="reject-button" type="button" value="Log out of ESS"/>
-          <input ng-click="closeSaveModal()" class="submit-button" type="button" value="Go back to ESS"/>
+          <input ng-click="closeModal()" class="submit-button" type="button" value="Go back to ESS"/>
         </div>
       </div>
     </div>
