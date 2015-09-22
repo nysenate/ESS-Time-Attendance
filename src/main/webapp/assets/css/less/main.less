@@ -332,19 +332,13 @@ table.simple-table {
             font-weight: 600;
           }
           &.teal {
-            &.active {
-              background: fade(@light-teal, 40%);
-            }
-            &:hover {
-              background: fade(@light-teal, 20%);
+            &.active, &:hover {
+              border-bottom: 3px solid @light-teal;
             }
           }
-          &.orange {
-            &.active {
-              background: fade(@orange, 40%);
-            }
-            &:hover {
-              background: fade(@orange, 20%);
+          &.green {
+            &.active, &:hover {
+              border-bottom: 3px solid @green;
             }
           }
           .nav-icon {
@@ -471,8 +465,8 @@ table.simple-table {
   &.teal {
     background: darken(@teal, 5%);
   }
-  &.orange {
-    background: darken(@orange, 10%);
+  &.green {
+    background: darken(@green, 10%);
   }
   .border-radius(2px 0 0 0);
   color: #eee;
@@ -1145,9 +1139,11 @@ table.approve-attendance-rec-table {
 
 .full-name-hero {
   font-size:2.5em;
-  padding:0 .3em;
+  padding:.3em;
+  margin: 0;
   font-weight:400;
-  color: #444;
+  color: white;
+  background: @green;
   text-align:center;
   border-bottom: 1px solid #ddd;
 }
