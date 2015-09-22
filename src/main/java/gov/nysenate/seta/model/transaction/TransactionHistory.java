@@ -4,7 +4,6 @@ import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
-import gov.nysenate.seta.model.allowances.HourlyWorkPayment;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.payroll.SalaryRec;
 import org.apache.commons.lang3.StringUtils;
@@ -107,7 +106,7 @@ public class TransactionHistory
 
     public TreeMap<LocalDate, Boolean> getEffectiveAccrualStatus(Range<LocalDate> dateRange) {
         TreeMap<LocalDate, Boolean> minHrs = new TreeMap<>();
-        getEffectiveEntriesDuring("CDACCRUE", dateRange, true).forEach((k,v) -> minHrs.put(k, v.equals("Y")));
+        getEffectiveEntriesDuring("CDACCRUE", dateRange, true).forEach((k, v) -> minHrs.put(k, v.equals("Y")));
         return minHrs;
     }
 
@@ -146,18 +145,24 @@ public class TransactionHistory
      *
      * @param record TransactionRecord
      */
-    private void addTransactionRecord(TransactionRecord record) {
+    private void addTransactionRecord(TransactionRecord record, Set<String> initDocIds) {
         if (record != null) {
             recordsByCode.put(record.getTransCode(), record);
             LocalDate effectDate = record.getEffectDate();
             if (recordSnapshots.isEmpty()) {
                 // Initialize the snapshot map
                 recordSnapshots.put(effectDate, record.getValueMap());
-            }
-            else {
+            } else {
                 // Update the previous map with the newly updated values
                 Map<String, String> valueMap = Maps.newHashMap(recordSnapshots.lastEntry().getValue());
-                valueMap.putAll(record.getValueMap());
+                // If the record is a PAY transaction with the same doc id as an appoint record,
+                //  extract the values of all PAY columns as effective values
+                if (initDocIds.contains(record.getDocumentId()) &&
+                        record.getTransCode().getType() == TransactionType.PAY) {
+                    valueMap.putAll(record.getValuesForCols(TransactionCode.getTypeDbColumnsList(TransactionType.PAY)));
+                } else {
+                    valueMap.putAll(record.getValuesForCode());
+                }
                 recordSnapshots.put(effectDate, valueMap);
             }
         }
@@ -172,9 +177,20 @@ public class TransactionHistory
      * @param recordsList List<TransactionRecord>
      */
     private void addTransactionRecords(List<TransactionRecord> recordsList) {
-        if (!recordsList.isEmpty()) {
-            recordsList.forEach(this::addTransactionRecord);
-        }
+        Set<String> initDocIds = getInitDocIds(recordsList);
+        recordsList.forEach(record -> addTransactionRecord(record, initDocIds));
+    }
+
+    /**
+     * Get the document numbers of any initializing transactions (APP, RTP) in the given list
+     * @param recordsList List<TransactionRecord>
+     * @return Set<String> - document numbers
+     */
+    private static Set<String> getInitDocIds(List<TransactionRecord> recordsList) {
+        return recordsList.stream()
+                .filter(record -> record.getTransCode().isAppointType())
+                .map(TransactionRecord::getDocumentId)
+                .collect(Collectors.toSet());
     }
 
     /**

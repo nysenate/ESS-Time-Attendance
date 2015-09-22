@@ -56,7 +56,7 @@ public class TransRecordRowMapper implements RowMapper<TransactionRecord>
          */
         Map<String, String> valueMap = new HashMap<>();
         Set<String> columns = (code.isAppointType() || (options.shouldInitialize() && rs.isFirst()))
-                ? TransactionCode.getAllDbColumnsList() : code.getDbColumnList();
+                ? TransactionCode.getAllDbColumnsList() : TransactionCode.getTypeDbColumnsList(code.getType());
         for (String col : columns) {
             valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
         }
