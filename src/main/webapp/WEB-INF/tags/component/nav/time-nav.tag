@@ -27,8 +27,8 @@
             <li class="sub-topic"><a href="${ctxPath}/time/record/grant">Grant Privileges</a></li>
         </ul>
     </shiro:hasRole>
-    <h3 class="main-topic">Preferences</h3>
-    <ul class="sub-topic-list">
-        <li class="sub-topic"><a href="${ctxPath}/ui/time/emailprefs">Email Reminders</a></li>
-    </ul>
+    <%--<h3 class="main-topic">Preferences</h3>--%>
+    <%--<ul class="sub-topic-list">--%>
+        <%--<li class="sub-topic"><a href="${ctxPath}/ui/time/emailprefs">Email Reminders</a></li>--%>
+    <%--</ul>--%>
 </section>

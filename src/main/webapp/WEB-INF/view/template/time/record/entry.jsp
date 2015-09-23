@@ -57,7 +57,7 @@ Toggle this for temporary emps.
 
   <div ess-notification level="warn" title="No time records available to enter."
        ng-show="state.fetchedRecs === true && records.length == 0"
-       message="Please contact Senate Personnel at XXX-XXX-XXXX for more details."></div>
+       message="Please contact Senate Personnel at (518) 455-3376 if you require any assistance."></div>
 
   <div class="content-container" ng-show="displayEntries">
     <p class="content-info">All hours available need approval from appointing authority.</p>
@@ -217,7 +217,7 @@ Toggle this for temporary emps.
             <hr/>
             <div style="text-align: center;">
               <input ng-click="submitRecord()" class="submit-button" style="margin-right: 20px;" type="button" value="I acknowledge"/>
-              <input ng-click="closeSaveModal()" class="reject-button" type="button" value="Cancel"/>
+              <input ng-click="closeModal()" class="reject-button" type="button" value="Cancel"/>
             </div>
           </div>
 

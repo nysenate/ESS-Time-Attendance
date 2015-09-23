@@ -11,6 +11,5 @@ essApp.controller('TimeMainCtrl', ['$scope', 'appProps', 'badgeService', 'Superv
                 badgeService.setBadgeValue('pendingRecordCount', resp.result.count);
             });
         };
-
     }
 ]);

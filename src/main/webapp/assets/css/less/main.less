@@ -531,7 +531,7 @@ table.simple-table {
     color: @teal;
   }
 
-  .content-info {
+  > .content-info {
     border-bottom: none;
   }
 }
@@ -765,11 +765,15 @@ table#timeRecordTable {
   tbody {
     tr {
       border-bottom: 1px solid #eee !important;
+      cursor: pointer;
       &:hover {
-        background: fade(@teal, 5%);
+        background: #e9eeff;
       }
       &:nth-child(even) {
         background: fade(#333, 5%);
+        &:hover {
+          background: #e9eeff;
+        }
       }
       td {
         padding: .5em;
@@ -787,12 +791,7 @@ record-detail-modal, [record-detail-modal] {
   padding: 0.4em;
 }
 
-record-review-modal, [record-review-modal] {
-  width: 85em;
-  padding: 0.4em;
-}
-
-.record-remarks {
+.record-details-section {
   padding: .3em;
   text-align: center;
 }
@@ -1036,19 +1035,22 @@ table.approve-attendance-rec-table {
   background-image: url("http://strangebeaver.com/wp-content/uploads/2011/01/fb/16.jpg");
 }
 
-#review-records-modal {
+record-review-modal, [record-review-modal] {
+  width: 1140px;
+  padding: 0.4em;
+}
 
+#review-records-modal {
   #record-selection-pane {
     display:inline-block;
-    height:515px;
-    width:400px;
+    height:585px;
+    width:280px;
     margin:0;
     vertical-align: top;
     border-right: 1px solid #ccc;
     background: #f5f5f5;
     overflow-y: scroll;
     overflow-x: hidden;
-
     #record-selection-table {
       background:white;
       tbody {
@@ -1080,7 +1082,7 @@ table.approve-attendance-rec-table {
 
   #record-details-view {
     display: inline-block;
-    width: 670px;
+    width: 830px;
     margin: 0;
 
     #remarks-container {

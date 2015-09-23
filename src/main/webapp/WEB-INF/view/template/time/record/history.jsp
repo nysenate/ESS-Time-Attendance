@@ -36,7 +36,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="record in records.employee">
+        <tr ng-repeat="record in records.employee" title="Click to view record details">
           <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
           <td>{{record.payPeriod.payPeriodNum}}</td>
           <td>{{record.recordStatus | timeRecordStatus}}</td>
@@ -59,8 +59,7 @@
     <h1>Historical Attendance Records</h1>
 
     <p class="content-info" style="">Time records that have been submitted for pay periods during {{year}} are listed
-      in the table below.<br/>You can view details about each pay period by clicking the 'View Details' link to the
-      right.</p>
+      in the table below.<br/>You can view details about each pay period by clicking on the row.</p>
     <div class="padding-10">
       <table id="attendance-history-table" class="ess-table attendance-listing-table"
              float-thead="floatTheadOpts" ng-model="records.other">
@@ -77,11 +76,11 @@
           <th>Sick Fam</th>
           <th>Misc</th>
           <th>Total</th>
-          <th>Actions</th>
+          <%--<th>Actions</th>--%>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="record in records.other">
+        <tr ng-repeat="record in records.other" ng-click="showDetails(record)">
           <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
           <td>{{record.payPeriod.payPeriodNum}}</td>
           <td>{{record.recordStatus | timeRecordStatus}}</td>
@@ -93,7 +92,7 @@
           <td>{{record.totals.sickFamHours}}</td>
           <td>{{record.totals.miscHours}}</td>
           <td>{{record.totals.total}}</td>
-          <td><a class="action-link" ng-click="showDetails(record)">View Details</a></td>
+          <%--<td><a class="action-link" ng-click="showDetails(record)">View Details</a></td>--%>
         </tr>
         <tr style="border-top:2px solid teal;">
           <td colspan="2"></td>
