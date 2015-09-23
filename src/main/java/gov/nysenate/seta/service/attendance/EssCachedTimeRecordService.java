@@ -9,6 +9,7 @@ import gov.nysenate.common.SortOrder;
 import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.model.attendance.*;
 import gov.nysenate.seta.model.exception.SupervisorException;
+import gov.nysenate.seta.model.payroll.Holiday;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
@@ -18,6 +19,7 @@ import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
 import gov.nysenate.seta.service.cache.EhCacheManageService;
+import gov.nysenate.seta.service.period.HolidayService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import gov.nysenate.seta.service.personnel.SupervisorInfoService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -54,6 +57,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     @Autowired protected EmpTransactionService transService;
     @Autowired protected AccrualInfoService accrualInfoService;
     @Autowired protected SupervisorInfoService supervisorInfoService;
+    @Autowired protected HolidayService holidayService;
 
     @PostConstruct
     public void init() {
@@ -235,6 +239,11 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
                             transHistory.getEffectivePayTypes(timeRecord.getDateRange()), timeRecord.getEndDate());
                 }
                 timeRecord.addTimeEntry(new TimeEntry(timeRecord, payTypeMap.get(entryDate), entryDate));
+            }
+            // Set holiday hours if applicable
+            Optional<Holiday> holiday = holidayService.getHoliday(entryDate);
+            if (holiday.isPresent()) {
+                timeRecord.getEntry(entryDate).setHolidayHours(new BigDecimal("7"));
             }
         }
     }
