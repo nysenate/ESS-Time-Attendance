@@ -81,7 +81,7 @@ public class SqlEmployeeDaoTests extends BaseTests
     @Test
     public void getActiveEmpsTest() {
 
-        logger.info("{}", employeeDao.getActiveEmployeeIds(LocalDate.now().withDayOfYear(1)).size());
+        logger.info("{}", employeeDao.getActiveEmployeeIds().size());
     }
 
     @Test

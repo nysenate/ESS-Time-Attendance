@@ -40,14 +40,10 @@ public enum SqlEmployeeQuery implements BasicSqlQuery
     GET_ACTIVE_EMPS_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.CDEMPSTATUS = 'A'")),
     GET_EMPS_BY_IDS_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NUXREFEM IN :empIdSet")),
 
-    GET_ACTIVE_EMP_IDS_AFTER_DATE_SQL(
-        "SELECT DISTINCT NUXREFEM FROM (\n" +
-        "   SELECT NUXREFEM FROM ${masterSchema}.PM21PERSONN\n" +
-        "   WHERE CDSTATUS = 'A' AND CDEMPSTATUS = 'A'\n" +
-        "   UNION\n" +
-        "   SELECT NUXREFEM FROM ${masterSchema}.PD21PTXNCODE\n" +
-        "   WHERE CDSTATUS = 'A' AND CDTRANS = 'EMP' AND DTEFFECT > :startDate\n" +
-        ")"
+    GET_ACTIVE_EMP_IDS(
+        "SELECT DISTINCT NUXREFEM\n" +
+        "FROM ${masterSchema}.PM23ATTEND\n" +
+        "WHERE CDSTATUS = 'A' AND (DTCLOSE IS NULL OR DTCLOSE > SYSDATE)"
     ),
     ;
 

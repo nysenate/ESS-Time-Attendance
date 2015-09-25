@@ -3,12 +3,9 @@ package gov.nysenate.seta.dao.attendance;
 import gov.nysenate.seta.dao.base.BasicSqlQuery;
 import gov.nysenate.seta.dao.base.DbVendor;
 
-import static gov.nysenate.seta.dao.base.DbSchema.MASTER_SFMS;
-
 public enum SqlTimeRecordQuery implements BasicSqlQuery
 {
-    GET_TIME_REC_SQL_TEMPLATE(
-        "SELECT \n" +
+    TIME_RECORD_COLUMNS(
         /**   PM23TIMESHEET columns (no alias needed) */
         "    rec.NUXRTIMESHEET, rec.NUXREFEM, rec.NATXNORGUSER, rec.NATXNUPDUSER, rec.NAUSER, rec.DTTXNORIGIN, rec.DTTXNUPDATE,\n" +
         "    rec.CDSTATUS, rec.CDTSSTAT, rec.DTBEGIN, rec.DTEND, rec.DEREMARKS, rec.NUXREFSV, rec.DEEXCEPTION,\n" +
@@ -22,46 +19,40 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "    ent.NUVACATION AS ENT_NUVACATION, ent.NAUSER AS ENT_NAUSER, ent.NUPERSONAL AS ENT_NUPERSONAL, ent.NUSICKEMP AS ENT_NUSICKEMP,\n" +
         "    ent.NUSICKFAM AS ENT_NUSICKFAM, ent.NUMISC AS ENT_NUMISC, ent.NUXRMISC AS ENT_NUXRMISC, ent.NATXNORGUSER AS ENT_NATXNORGUSER,\n" +
         "    ent.NATXNUPDUSER AS ENT_NATXNUPDUSER, ent.DTTXNORIGIN AS ENT_DTTXNORIGIN, ent.DTTXNUPDATE AS ENT_DTTXNUPDATE,\n" +
-        "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE " + "\n" +
-        "FROM ${tsSchema}.PM23TIMESHEET rec\n" +
-        "LEFT JOIN ${masterSchema}.SL16PERIOD per\n" +
-        "    ON (rec.DTBEGIN BETWEEN per.DTBEGIN AND per.DTEND) AND per.CDPERIOD = 'AF' AND per.CDSTATUS = 'A'\n" +
+        "    ent.CDSTATUS AS ENT_CDSTATUS, ent.DECOMMENTS AS ENT_DECOMMENTS, ent.CDPAYTYPE AS ENT_CDPAYTYPE "
+    ),
+    GET_TIME_REC_SQL_TEMPLATE(
+        "SELECT \n" + TIME_RECORD_COLUMNS.getSql() + "\n" +
+        "FROM ${masterSchema}.PM23ATTEND att\n" +
+        "JOIN ${masterSchema}.SL16PERIOD per\n" +
+        "    ON att.DTPERIODYEAR = per.DTPERIODYEAR\n" +
+        "JOIN ${tsSchema}.PM23TIMESHEET rec\n" +
+        "    ON rec.NUXREFEM = att.NUXREFEM AND rec.DTBEGIN BETWEEN per.DTBEGIN AND per.DTEND\n" +
         "LEFT JOIN ${tsSchema}.PD23TIMESHEET ent\n" +
         "    ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET AND ent.CDSTATUS = 'A'\n" +
-        "WHERE rec.CDSTATUS = 'A' %s" + "\n" +
-        "ORDER BY rec.NUXREFEM ASC, rec.DTBEGIN ASC, ent.DTDAY ASC"
+        "WHERE att.CDSTATUS = 'A' AND per.CDSTATUS = 'A' AND rec.CDSTATUS = 'A'\n" +
+        "    AND per.CDPERIOD = 'AF'\n"
     ),
     GET_TIME_REC_BY_ID(
-        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(), "AND rec.NUXRTIMESHEET = :timesheetId")
-    ),
-    GET_TIME_REC_BY_DATES_BASE(
-        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-            "AND (rec.DTBEGIN BETWEEN :startDate AND :endDate\n" +
-            "       OR rec.DTEND BETWEEN :startDate AND :endDate)\n" +
-            "   AND rec.CDTSSTAT IN (:statuses)\n" +
-            "   %s")
+        GET_TIME_REC_SQL_TEMPLATE.getSql() + "  AND rec.NUXRTIMESHEET = :timesheetId"
     ),
     GET_TIME_REC_BY_DATES(
-            String.format(GET_TIME_REC_BY_DATES_BASE.getSql(), "")
+        GET_TIME_REC_SQL_TEMPLATE.getSql() +
+        "    AND (rec.DTBEGIN BETWEEN :startDate AND :endDate\n" +
+        "        OR rec.DTEND BETWEEN :startDate AND :endDate)\n" +
+        "    AND rec.CDTSSTAT IN (:statuses)\n"
     ),
     GET_TIME_REC_BY_DATES_EMP_ID(
-            String.format(GET_TIME_REC_BY_DATES_BASE.getSql(), "AND rec.NUXREFEM IN (:empIds)")
+        GET_TIME_REC_BY_DATES.getSql() + "    AND att.NUXREFEM IN (:empIds)\n"
     ),
-    GET_TIME_REC_BY_DATES_SUP(
-            String.format(GET_TIME_REC_BY_DATES_BASE.getSql(), "AND :supId IN (rec.NUXREFSV, ")
+    GET_ACTIVE_TIME_REC(
+        GET_TIME_REC_SQL_TEMPLATE.getSql() +
+        "    AND (att.DTCLOSE IS NULL OR att.DTCLOSE > SYSDATE)\n"
     ),
-    GET_TREC_BY_EMPID(
-        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(), "NUXREFEM = :empId")
+    GET_ACTIVE_TIME_REC_BY_EMP_IDS(
+        GET_ACTIVE_TIME_REC.getSql() +
+        "    AND (att.NUXREFEM IN (:empIds))\n"
     ),
-    GET_TREC_BY_DATE(
-        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-        "DTBEGIN = :startDate AND DTEND = :endDate")
-    ),
-    GET_TREC_BY_RECSTATUS(
-        String.format(GET_TIME_REC_SQL_TEMPLATE.getSql(),
-        "CDTSSTAT = :tSStatusId AND NUXREFEM = :empId AND DTBEGIN = :startDate AND DTEND = :endDate")
-    ),
-
 
     GET_TREC_DISTINCT_YEARS(
         "SELECT DISTINCT EXTRACT(YEAR FROM DTEND) AS year\n" +

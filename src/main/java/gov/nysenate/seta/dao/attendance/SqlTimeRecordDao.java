@@ -12,12 +12,10 @@ import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.period.mapper.PayPeriodRowMapper;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordNotFoundException;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -41,6 +39,9 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
     private static final Logger logger = LoggerFactory.getLogger(SqlTimeRecordDao.class);
 
     @Autowired private TimeEntryDao timeEntryDao;
+
+    private static final OrderBy timeRecordOrder =
+            new OrderBy("rec.NUXREFEM", SortOrder.ASC, "rec.DTBEGIN", SortOrder.ASC, "ent.DTDAY", SortOrder.ASC);
 
     /** {@inheritDoc} */
     @Override
@@ -68,22 +69,27 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
         params.addValue("endDate", toDate(DateUtils.endOfDateRange(dateRange)));
         params.addValue("statuses", statusCodes);
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES_EMP_ID.getSql(schemaMap()), params, handler);
+        remoteNamedJdbc.query(
+                SqlTimeRecordQuery.GET_TIME_REC_BY_DATES_EMP_ID.getSql(schemaMap(), timeRecordOrder), params, handler);
         return handler.getRecordMap();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public ListMultimap<Integer, TimeRecord> getRecordsDuring(Range<LocalDate> dateRange) {
-        Set<String> statusCodes = TimeRecordStatus.getAll().stream()
-                .map(TimeRecordStatus::getCode)
-                .collect(Collectors.toSet());
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("startDate", toDate(DateUtils.startOfDateRange(dateRange)));
-        params.addValue("endDate", toDate(DateUtils.endOfDateRange(dateRange)));
-        params.addValue("statuses", statusCodes);
+    public ListMultimap<Integer, TimeRecord> getAllActiveRecords() {
         TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
-        remoteNamedJdbc.query(SqlTimeRecordQuery.GET_TIME_REC_BY_DATES.getSql(schemaMap()), params, handler);
+        remoteNamedJdbc.query( SqlTimeRecordQuery.GET_ACTIVE_TIME_REC.getSql(schemaMap(), timeRecordOrder), handler);
         return handler.getRecordMap();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<TimeRecord> getActiveRecords(Integer empId) {
+        TimeRecordRowCallbackHandler handler = new TimeRecordRowCallbackHandler();
+        MapSqlParameterSource params = new MapSqlParameterSource("empIds", empId);
+        remoteNamedJdbc.query(
+                SqlTimeRecordQuery.GET_ACTIVE_TIME_REC_BY_EMP_IDS.getSql(schemaMap(), timeRecordOrder), params, handler);
+        return handler.getRecordList();
     }
 
     /** {@inheritDoc} */

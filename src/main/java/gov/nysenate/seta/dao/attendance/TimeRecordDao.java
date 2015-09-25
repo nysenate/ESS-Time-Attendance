@@ -37,12 +37,17 @@ public interface TimeRecordDao extends BaseDao
                                                        Set<TimeRecordStatus> statuses);
 
     /**
-     * Retrieves all time records (for any employee or status), during the specified date range
-     * @param dateRange Range<LocalDate>
-     * @param statuses Set<TimeRecordStatus>
-     * @return
+     * Retrieves all time records (for any employee or status) for all currently active attendance periods
+     * @return ListMultiMap<Integer, TimeRecord>
      */
-    ListMultimap<Integer, TimeRecord> getRecordsDuring(Range<LocalDate> dateRange);
+    ListMultimap<Integer, TimeRecord> getAllActiveRecords();
+
+    /**
+     * Get all records from the given employee's currently active attendance periods
+     * @param empId Integer - employee id
+     * @return List<TimeRecord>
+     */
+    List<TimeRecord> getActiveRecords(Integer empId);
 
     /**
      * Gets the distinct years that an employee has at least one time record for.

@@ -1,6 +1,5 @@
 package gov.nysenate.seta.dao.personnel;
 
-import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.personnel.mapper.EmployeeRowMapper;
 import gov.nysenate.seta.model.personnel.Employee;
@@ -12,7 +11,6 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static gov.nysenate.seta.dao.personnel.SqlEmployeeQuery.*;
@@ -63,9 +61,8 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
 
     /** {@inheritDoc} */
     @Override
-    public Set<Integer> getActiveEmployeeIds(LocalDate startDate) {
-        MapSqlParameterSource params = new MapSqlParameterSource("startDate", DateUtils.toDate(startDate));
-        return new HashSet<>(remoteNamedJdbc.query(GET_ACTIVE_EMP_IDS_AFTER_DATE_SQL.getSql(schemaMap()), params,
+    public Set<Integer> getActiveEmployeeIds(){
+        return new HashSet<>(remoteNamedJdbc.query(GET_ACTIVE_EMP_IDS.getSql(schemaMap()),
                 (rs, rowNum) -> rs.getInt("NUXREFEM")));
     }
 

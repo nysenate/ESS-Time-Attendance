@@ -1,12 +1,9 @@
 package gov.nysenate.seta.service.period;
 
-import com.google.common.collect.BoundType;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
+import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
 import gov.nysenate.common.SortOrder;
-import gov.nysenate.common.WorkInProgress;
+import gov.nysenate.seta.dao.attendance.AttendanceDao;
 import gov.nysenate.seta.dao.period.PayPeriodDao;
 import gov.nysenate.seta.model.exception.PayPeriodNotFoundEx;
 import gov.nysenate.seta.model.period.PayPeriod;
@@ -35,6 +32,7 @@ public class EssCachedPayPeriodService implements PayPeriodService
     @Autowired private PayPeriodDao payPeriodDao;
     @Autowired private EventBus eventBus;
     @Autowired private EhCacheManageService cacheManageService;
+    @Autowired private AttendanceDao attendanceDao;
 
     private Cache payPeriodCache;
 
@@ -95,6 +93,14 @@ public class EssCachedPayPeriodService implements PayPeriodService
         }
         return payPeriodDao.getPayPeriods(type, dateRange, dateOrder);
     }
+
+    @Override
+    public List<PayPeriod> getOpenPayPeriods(PayPeriodType type, Integer empId, SortOrder dateOrder) {
+        RangeSet<LocalDate> openDates = attendanceDao.getOpenDates(empId);
+        return openDates.isEmpty() ? Collections.emptyList() : getPayPeriods(type, openDates.span(), dateOrder);
+    }
+
+    /** --- Internal Methods --- */
 
     private PayPeriodCacheTree getCachedPayPeriodTree(PayPeriodType type, boolean createIfEmpty) {
         payPeriodCache.acquireReadLockOnKey(type);
