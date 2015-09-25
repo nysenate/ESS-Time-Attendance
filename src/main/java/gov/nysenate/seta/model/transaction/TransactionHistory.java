@@ -25,11 +25,19 @@ public class TransactionHistory
 {
     private static final Logger logger = LoggerFactory.getLogger(TransactionHistory.class);
 
+    /** A string assigned to the transactions that are used to create an initial snapshot for employees
+     * appointed before the SFMS system was put in place (employees without APP or RPT transactions.)
+     * This is not an official document identifier, it is only used in this context
+     */
+    private static final String PRE_SFMS_APP_DOC_ID = "PRE_SFMS_APP";
+
     /** The employee id that this history refers to. */
     protected int employeeId;
 
     /** Records the code of the original transaction (in case it's overwritten as APP). */
     protected TransactionCode originalFirstCode;
+
+    protected TreeMultimap<String, TransactionRecord> appointDocuments = TreeMultimap.create();
 
     /** A collection of TransactionRecords grouped via the TransactionCode. */
     protected LinkedListMultimap<TransactionCode, TransactionRecord> recordsByCode;
@@ -138,6 +146,33 @@ public class TransactionHistory
         return salaryRecs;
     }
 
+    /**
+     * @return true if the employee is not in the middle of an appoint transaction
+     *      ie. they have received a PER and a PAY transaction for the last appointment
+     */
+    public boolean isFullyAppointed() {
+        Range<LocalDate> testRange = Range.closed(LocalDate.now().minusDays(1), LocalDate.now());
+        // Return true if the employee is not currently appointed
+        if (getEffectiveEmpStatus(testRange).isEmpty() || !getEffectiveEmpStatus(testRange).lastEntry().getValue()) {
+            return true;
+        }
+        String latestAppointDoc = null;
+        LocalDate latestAppDocDate = LocalDate.MIN;
+        for (String appointDoc : appointDocuments.keySet()) {
+            TransactionRecord firstRecord = appointDocuments.get(appointDoc).first();
+            if (firstRecord.getEffectDate().isAfter(latestAppDocDate)) {
+                latestAppointDoc = appointDoc;
+                latestAppDocDate = firstRecord.getEffectDate();
+            }
+        }
+        return latestAppointDoc != null &&
+                // the latest appoint document has records of both transaction types
+                appointDocuments.get(latestAppointDoc).stream()
+                        .map(TransactionRecord::getTransType)
+                        .distinct()
+                        .count() > 1;
+    }
+
     /** --- Functional Getters/Setters --- */
 
     /**
@@ -145,21 +180,31 @@ public class TransactionHistory
      *
      * @param record TransactionRecord
      */
-    private void addTransactionRecord(TransactionRecord record, Set<String> initDocIds) {
+    private void addTransactionRecord(TransactionRecord record) {
         if (record != null) {
             recordsByCode.put(record.getTransCode(), record);
             LocalDate effectDate = record.getEffectDate();
             if (recordSnapshots.isEmpty()) {
                 // Initialize the snapshot map
                 recordSnapshots.put(effectDate, record.getValueMap());
+                // Add the first record as an appoint transaction if no proper appoint transactions were found
+                if (appointDocuments.isEmpty()) {
+                    appointDocuments.put(PRE_SFMS_APP_DOC_ID, record);
+                }
             } else {
                 // Update the previous map with the newly updated values
                 Map<String, String> valueMap = Maps.newHashMap(recordSnapshots.lastEntry().getValue());
-                // If the record is a PAY transaction with the same doc id as an appoint record,
-                //  extract the values of all PAY columns as effective values
-                if (initDocIds.contains(record.getDocumentId()) &&
-                        record.getTransCode().getType() == TransactionType.PAY) {
-                    valueMap.putAll(record.getValuesForCols(TransactionCode.getTypeDbColumnsList(TransactionType.PAY)));
+                // If the transaction record belongs to an appoint document, and has a transaction type different from the appoint transaction
+                //  extract the values of all columns of the record's transaction type as effective values
+                if (appointDocuments.containsKey(PRE_SFMS_APP_DOC_ID) &&
+                        appointDocuments.get(PRE_SFMS_APP_DOC_ID).size() == 1 &&
+                        appointDocuments.get(PRE_SFMS_APP_DOC_ID).first().getTransType() != record.getTransType()) {
+                    valueMap.putAll(record.getValuesForCols(TransactionCode.getTypeDbColumnsList(record.getTransType())));
+                    appointDocuments.put(PRE_SFMS_APP_DOC_ID, record);
+                } else if (appointDocuments.keySet().contains(record.getDocumentId()) &&
+                        appointDocuments.get(record.getDocumentId()).first().getTransType() != record.getTransType()) {
+                    valueMap.putAll(record.getValuesForCols(TransactionCode.getTypeDbColumnsList(record.getTransType())));
+                    appointDocuments.put(record.getDocumentId(), record);
                 } else {
                     valueMap.putAll(record.getValuesForCode());
                 }
@@ -177,20 +222,19 @@ public class TransactionHistory
      * @param recordsList List<TransactionRecord>
      */
     private void addTransactionRecords(List<TransactionRecord> recordsList) {
-        Set<String> initDocIds = getInitDocIds(recordsList);
-        recordsList.forEach(record -> addTransactionRecord(record, initDocIds));
+        getInitDocIds(recordsList);
+        recordsList.forEach(this::addTransactionRecord);
     }
 
     /**
      * Get the document numbers of any initializing transactions (APP, RTP) in the given list
+     *   and add them to the appoint records map
      * @param recordsList List<TransactionRecord>
-     * @return Set<String> - document numbers
      */
-    private static Set<String> getInitDocIds(List<TransactionRecord> recordsList) {
-        return recordsList.stream()
+    private void getInitDocIds(List<TransactionRecord> recordsList) {
+        recordsList.stream()
                 .filter(record -> record.getTransCode().isAppointType())
-                .map(TransactionRecord::getDocumentId)
-                .collect(Collectors.toSet());
+                .forEach(record -> appointDocuments.put(record.getDocumentId(), record));
     }
 
     /**

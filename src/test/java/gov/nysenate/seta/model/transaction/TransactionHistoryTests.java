@@ -4,9 +4,11 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.common.OutputUtils;
+import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.dao.transaction.EmpTransactionDao;
 import gov.nysenate.seta.model.allowances.HourlyWorkPayment;
 import gov.nysenate.seta.model.payroll.SalaryRec;
+import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static gov.nysenate.seta.dao.transaction.EmpTransDaoOption.NONE;
 
@@ -21,8 +25,9 @@ public class TransactionHistoryTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(TransactionHistoryTests.class);
 
-    @Autowired
-    private EmpTransactionDao transactionDao;
+    @Autowired private EmpTransactionDao transactionDao;
+    @Autowired private EmpTransactionService transService;
+    @Autowired private EmployeeDao empDao;
 
     @Test
     public void testHasRecords() throws Exception {
@@ -54,6 +59,18 @@ public class TransactionHistoryTests extends BaseTests
     @Test
     public void testGetAllTransRecords() throws Exception {
 
+    }
+
+    @Test
+    public void isFullyAppointedTest() {
+        TreeSet<Integer> activeEmpIds = new TreeSet<>(
+                empDao.getActiveEmployeeIds());
+        for (int empId : activeEmpIds) {
+            TransactionHistory transHistory = transService.getTransHistory(empId);
+            if (!transHistory.isFullyAppointed()) {
+                logger.info("{} is not fully appointed !!!", empId);
+            }
+        }
     }
 
 //    @Test

@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.transaction;
 
+import com.google.common.collect.ComparisonChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * employee's personnel or payroll data and is identified by a TransactionCode.
  * A map of the values affected in the database are stored in this record.
  */
-public class TransactionRecord
+public class TransactionRecord implements Comparable<TransactionRecord>
 {
     private static final Logger logger = LoggerFactory.getLogger(TransactionRecord.class);
 
@@ -140,6 +141,20 @@ public class TransactionRecord
                 .filter(valueMap::containsKey)
                 .forEach(colName -> subValueMap.put(colName, valueMap.get(colName)));
         return subValueMap;
+    }
+
+    public TransactionType getTransType() {
+        return transCode.getType();
+    }
+
+    /** --- Overridden Methods --- */
+
+    @Override
+    public int compareTo(TransactionRecord o) {
+        return ComparisonChain.start()
+                .compare(this.effectDate, o.effectDate)
+                .compare(this.originalDate, o.originalDate)
+                .result();
     }
 
     /** --- Basic Getters/Setters --- */
