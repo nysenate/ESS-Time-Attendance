@@ -16,6 +16,7 @@ import gov.nysenate.seta.model.attendance.TimeRecordStatus;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
+import gov.nysenate.seta.service.attendance.ActiveTimeRecordCacheEvictEvent;
 import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
 import gov.nysenate.seta.service.attendance.TimeRecordManager;
 import gov.nysenate.seta.service.attendance.TimeRecordService;
@@ -36,8 +37,8 @@ import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping(REST_PATH + "/timerecords")
-public class TimeRecordRestCtrl extends BaseRestCtrl {
-
+public class TimeRecordRestCtrl extends BaseRestCtrl
+{
     private static final Logger logger = LoggerFactory.getLogger(TimeRecordRestCtrl.class);
 
     @Autowired EmployeeInfoService employeeInfoService;
@@ -72,9 +73,9 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
      * Get Active Time Record API
      * --------------------------
      *
-     * @param empId
-     * @param scope
-     * @return
+     * @param empId Integer
+     * @param scope String (accepted values are 'E', 'S', 'P', for employee, supervisor, and personnel respectively.
+     * @return TimeRecord ListView Response
      */
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = "application/json")
     public BaseResponse getActiveRecords(@RequestParam Integer[] empId,
@@ -89,28 +90,6 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
                 .filter(tr -> scopes.contains(tr.getRecordStatus().getScope()))
                 .collect(toList())));
         return getRecordResponse(activeRecsPerEmp, false);
-    }
-
-    /**
-     * Get Active Supervisor Record
-     * ----------------------------
-     *
-     * @param supId
-     * @param from
-     * @param to
-     * @param status
-     * @return
-     * @throws SupervisorException
-     */
-    @RequestMapping(value = "/supervisor", method = RequestMethod.GET, produces = "application/json")
-    public BaseResponse getActiveSupervisorRecords(@RequestParam int supId,
-                                                   @RequestParam(required = false) String from,
-                                                   @RequestParam(required = false) String to,
-                                                   @RequestParam(required = false) String[] status)
-            throws SupervisorException {
-        Range<LocalDate> dateRange = parseDateRange(from, to);
-        Set<TimeRecordStatus> statuses = parseStatuses(status, TimeRecordStatus.inProgress());
-        return getRecordResponse(timeRecordService.getSupervisorRecords(supId, dateRange, statuses), false);
     }
 
     @RequestMapping(value = "/supervisor/count", method = RequestMethod.GET, produces = "application/json")
@@ -145,6 +124,28 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     }
 
     /**
+     * Get Active Supervisor Record
+     * ----------------------------
+     *
+     * @param supId
+     * @param from
+     * @param to
+     * @param status
+     * @return
+     * @throws SupervisorException
+     */
+    @RequestMapping(value = "/supervisor", method = RequestMethod.GET, produces = "application/json")
+    public BaseResponse getActiveSupervisorRecords(@RequestParam int supId,
+                                                   @RequestParam(required = false) String from,
+                                                   @RequestParam(required = false) String to,
+                                                   @RequestParam(required = false) String[] status)
+            throws SupervisorException {
+        Range<LocalDate> dateRange = parseDateRange(from, to);
+        Set<TimeRecordStatus> statuses = parseStatuses(status, TimeRecordStatus.inProgress());
+        return getRecordResponse(timeRecordService.getSupervisorRecords(supId, dateRange, statuses), false);
+    }
+
+    /**
      * Save Time Record API
      * --------------------
      *
@@ -164,6 +165,32 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     public BaseResponse handleInvalidTimeRecordException(InvalidTimeRecordException ex) {
         // TODO: create response from invalid record ex
         return new SimpleResponse(false, "uh oh D:", "invalid time record");
+    }
+
+    /**
+     * Admin Time Record API
+     * --------------------
+     *
+     * Active record cache eviction API
+     * (POST) /api/v1/timerecords/active/cacheEvict
+     *
+     * Params:
+     * all [required] (true/false) - Indicate if active time records for all employees should be evicted
+     * empId [optional,list] (integer) - List the employee ids that you want to evict active time records for otherwise.
+     */
+    @RequestMapping(value = "/active/cacheEvict", method = RequestMethod.DELETE, produces = "application/json")
+    public BaseResponse evictActiveRecords(@RequestParam(required = true) boolean all,
+                                           @RequestParam(required = false) Integer[] empId) {
+        String responseType = "time record cache evict";
+        if (all) {
+            eventBus.post(new ActiveTimeRecordCacheEvictEvent(true, null));
+            return new SimpleResponse(true, "Sent out all active time record cache clear event", responseType);
+        }
+        else if (empId != null && empId.length > 0) {
+            eventBus.post(new ActiveTimeRecordCacheEvictEvent(false, Sets.newHashSet(empId)));
+            return new SimpleResponse(true, "Sent out active time record cache clear event for given emp ids.", responseType);
+        }
+        return new SimpleResponse(false, "Did not send out any active time record cache evictions", responseType);
     }
 
     /** --- Internal Methods --- */

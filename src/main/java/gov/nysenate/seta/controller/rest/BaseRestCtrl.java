@@ -2,6 +2,7 @@ package gov.nysenate.seta.controller.rest;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
+import com.google.common.eventbus.EventBus;
 import gov.nysenate.seta.client.response.error.ErrorCode;
 import gov.nysenate.seta.client.response.error.ErrorResponse;
 import gov.nysenate.seta.client.response.error.ViewObjectErrorResponse;
@@ -14,11 +15,13 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +34,13 @@ public class BaseRestCtrl
     private static final Logger logger = LoggerFactory.getLogger(BaseRestCtrl.class);
 
     protected static final String REST_PATH = "/api/v1/";
+
+    @Autowired protected EventBus eventBus;
+
+    @PostConstruct
+    public void init() {
+        this.eventBus.register(this);
+    }
 
     /** --- Request Parsers / Getters --- */
 

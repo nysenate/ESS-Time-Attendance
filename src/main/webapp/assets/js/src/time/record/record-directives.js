@@ -54,12 +54,15 @@ essApp.directive('timeRecordInput', [function(){
 /**
  * A table that displays details for a specific time record
  */
-essApp.directive('recordDetails', ['appProps', function (appProps) {
+essApp.directive('recordDetails', ['appProps', 'modals', function (appProps, modals) {
     return {
         scope: {
             record: '='
         },
-        templateUrl: appProps.ctxPath + '/template/time/record/details'
+        templateUrl: appProps.ctxPath + '/template/time/record/details',
+        link: function($scope, $elem, attrs) {
+            $scope.close = modals.reject;
+        }
     };
 }]);
 

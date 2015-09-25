@@ -13,7 +13,7 @@
                 </div>
             </div>
             <ul class="top-nav-list">
-                <li id="dashboardLink" class="main-topic orange <c:if test='${activeTopic == "myinfo"}'>active</c:if>">
+                <li id="dashboardLink" class="main-topic green <c:if test='${activeTopic == "myinfo"}'>active</c:if>">
                     <a target="_self" href="${ctxPath}/myinfo"><img class="nav-icon" src="${ctxPath}/assets/img/user.png"/>My Info</a>
                 </li>
                 <li id="timeAttendanceLink" class="main-topic teal <c:if test='${activeTopic == "time"}'>active</c:if>">

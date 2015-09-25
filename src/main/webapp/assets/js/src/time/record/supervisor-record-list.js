@@ -14,6 +14,7 @@ essApp.directive('supervisorRecordList', ['appProps', 'modals', function (appPro
 
     function link($scope, $elem, $attr) {
 
+
         /** --- Display Methods --- */
 
         /**

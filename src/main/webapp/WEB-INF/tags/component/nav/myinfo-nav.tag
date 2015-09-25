@@ -3,7 +3,7 @@
 <%@ taglib prefix="ess-component-nav" tagdir="/WEB-INF/tags/component/nav" %>
 
 <section class="left-nav" ess-navigation>
-    <ess-component-nav:nav-header topicTitle="My Info Menu" colorClass="orange"/>
+    <ess-component-nav:nav-header topicTitle="My Info Menu" colorClass="green"/>
     <h3 class="main-topic">Personnel</h3>
     <ul class="sub-topic-list">
         <li class="sub-topic"><a href="${ctxPath}/myinfo/personnel/summary">Current Info</a></li>

@@ -7,10 +7,15 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                          recordsApi, accrualPeriodApi, recordUtils, locationService, modals) {
 
     $scope.state = {
+        // Data
         accrual: null,
+
+        // Page state
         searching: false,
         fetchedRecs: false,
-        saving: false
+        saving: false,
+        submitting: false,
+        submitted: false
     };
 
     $scope.miscLeaves = appProps.miscLeaves;
@@ -84,28 +89,45 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
 
     // Saves the currently selected record.  If the submit parameter is true, modifies the record status
     $scope.saveRecord = function(submit) {
-        $scope.state.saving = true;
         var record = $scope.records[$scope.iSelectedRecord];
         if (submit) {
             // todo ensure totals hours are in line
             record.recordStatus = nextStatusMap[record.recordStatus];
         }
         console.log(submit ? 'submitting' : 'saving', 'record', record);
-        // Open the modal to indicate save
-        modals.open('save-indicator', {'record': record});
-        recordsApi.save(record, function (response) {
-            if (submit) {
-                $scope.getRecords();
-                console.log('submitted');
-            } else {
+        // Open the modal to indicate save/submit
+        if (submit) {
+            $scope.state.submitted = false;
+            modals.open('submit-indicator', {'record': record});
+        }
+        else {
+            modals.open('save-indicator', {'record': record});
+            $scope.state.saving = true;
+            recordsApi.save(record, function (resp) {
                 record.updateDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
                 record.savedDate = record.updateDate;
                 record.dirty = false;
-                console.log('saved');
-            }
-            $scope.state.saving = false;
-        }, function (response) {
-            // todo handle invalid record response
+                $scope.state.saving = false;
+            }, function (resp) {
+                alert("Failed to save record!");
+                console.log(resp);
+                $scope.state.saving = false;
+            });
+        }
+    };
+
+    $scope.submitRecord = function() {
+        var record = $scope.records[$scope.iSelectedRecord];
+        $scope.state.submitting = true;
+        recordsApi.save(record, function (resp) {
+            $scope.state.submitting = false;
+            $scope.state.submitted = true;
+            $scope.getRecords();
+        }, function (resp) {
+            alert("Failed to save time record!");
+            console.log(resp);
+            $scope.state.submitting = false;
+            $scope.state.submitted = false;
         });
     };
 
@@ -114,7 +136,7 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         locationService.go('/logout', true);
     };
 
-    $scope.closeSaveModal = function() {
+    $scope.closeModal = function() {
         modals.resolve();
     };
 

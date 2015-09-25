@@ -29,7 +29,16 @@ public enum SqlEmpTransactionQuery implements BasicSqlQuery
 
     GET_LAST_UPDATED_RECS_SQL(
         String.format(GET_TRANS_HISTORY_TEMPLATE.sql, "WHERE PTX.DTTXNUPDATE > :lastDateTime AND PTX.CDSTATUS = 'A'\n")
-    );
+    ),
+
+    GET_MAX_UPDATE_DATE_TIME_SQL(
+        "SELECT CAST (MAX(PTX.DTTXNUPDATE) AS TIMESTAMP) AS MAX_DTTXNUPDATE\n" +
+        "FROM ${masterSchema}.PM21PERAUDIT AUD\n" +
+        "JOIN ${masterSchema}.PD21PTXNCODE PTX ON AUD.NUCHANGE = PTX.NUCHANGE"
+    )
+    ;
+
+
 
     private String sql;
 

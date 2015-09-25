@@ -6,9 +6,9 @@
                       message="You do not have any supervisors that you can delegate your employee's record approvals to. Please contact Senate Personnel for more information.">
     </ess-notification>
 
-    <div class="content-container content-controls">
-        <div loader-indicator ng-show="state.fetched === false"></div>
+    <div loader-indicator ng-show="state.fetched === false"></div>
 
+    <div class="content-container content-controls">
         <div ng-show="state.fetched === true && state.grantees.length > 0">
             <p class="content-info">Grant another supervisor privileges to review and/or approve your direct employee's time records.</p>
             <div class="padding-10">

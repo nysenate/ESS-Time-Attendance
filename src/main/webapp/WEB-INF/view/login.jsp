@@ -3,7 +3,6 @@
 <%@ taglib prefix="ess-component" tagdir="/WEB-INF/tags/component" %>
 <%@ taglib prefix="ess-layout" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
 <ess-layout:head>
     <jsp:attribute name="pageTitle">Timesheet Login</jsp:attribute>
     <jsp:body>
@@ -11,9 +10,9 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/auth/login.js"></script>
     </jsp:body>
 </ess-layout:head>
-
 <ess-layout:body>
     <jsp:body>
+        <input type="hidden" value="0LOKZECwqdNGvKZFy3uB"> <!-- Used by angular to check if response is the login page. -->
         <c:if test="${runtimeLevel != 'prod'}">
             <div ess-notification level="info" title="Running in ${runtimeLevel} mode"
                  message="Actions performed here will not affect the production database."></div>
