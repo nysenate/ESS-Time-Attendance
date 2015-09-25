@@ -74,8 +74,10 @@
 
     <div modal-container>
       <div record-detail-modal ng-if="isOpen('record-details')"></div>
-      <div record-review-modal ng-if="isOpen('record-review')" ng-class="{'background-modal': top != 'record-review'}"></div>
+      <div record-review-modal ng-if="isOpen('record-review')"
+           ng-class="{'background-modal': top != 'record-review'}"></div>
       <div record-review-reject-modal ng-if="isOpen('record-review-reject')"></div>
+      <div record-approve-submit-modal ng-if="isOpen('record-approval-submit')"></div>
     </div>
   </div>
 </div>

@@ -10,11 +10,11 @@
       <span>Employee Record List</span>
     </div>
     <table id="record-selection-table" class="ess-table approve-attendance-rec-table"
-           float-thead="floatTheadOpts" ng-model="records">
+           ng-model="records">
       <thead>
         <tr>
           <th>Employee</th>
-          <th>Pay Period</th>
+          <th style="width:130px;">Pay Period</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -24,9 +24,9 @@
                                                      'disapproved': getApprovalStatus(record) === 'disapproved'}"
             ng-click="selectRecord($index)" id="{{record.timeRecordId}}">
           <td class="name-column">
-            {{record.employee.fullName}}
+            {{record.employee.lastName}}
           </td>
-          <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
+          <td>{{record.beginDate | moment:'MM/DD'}} - {{record.endDate | moment:'MM/DD'}}</td>
           <td ng-switch="getApprovalStatus(record)" style="width: 10em">
             <span ng-switch-when="approved">Approve</span>
             <span ng-switch-when="disapproved">Disapprove</span>
@@ -53,7 +53,7 @@
         </div>
         <div>
           <input type="button" class="submit-button" value="Submit Changes"
-                 ng-click="resolve()" ng-disabled="submissionEmpty()"/>
+                 ng-click="submitChanges()" ng-disabled="submissionEmpty()"/>
           <input type="button" class="neutral-button" value="Cancel" ng-click="close()"/>
         </div>
       </div>

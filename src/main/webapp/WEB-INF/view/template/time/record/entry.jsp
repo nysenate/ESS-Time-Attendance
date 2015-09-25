@@ -13,7 +13,7 @@ Toggle this for temporary emps.
 </div> -->
 
 <div ng-controller="RecordEntryController">
-  <div id="record-selection-container" class="content-container content-controls" ng-show="records.length > 0">
+  <div id="record-selection-container" class="record-selection-container content-container content-controls" ng-show="records.length > 0">
     <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>
     <table class="simple-table">
       <thead>
@@ -45,6 +45,9 @@ Toggle this for temporary emps.
       </tr>
       </tbody>
     </table>
+    <select ng-if="records.length > 5" class="record-selection-menu" ng-options="record.payPeriod.endDate for record in records" ng-model="record">
+
+    </select>
   </div>
 
   <div loader-indicator ng-show="state.searching"></div>
@@ -103,7 +106,7 @@ Toggle this for temporary emps.
     </div>
     <hr/>
     <form id="timeRecordForm" method="post" action="">
-      <table class="ess-table" id="timeRecordTable" ng-model="displayEntries">
+      <table class="ess-table time-record-entry-table" id="timeRecordTable" ng-model="displayEntries">
         <thead>
         <tr>
           <th>Date</th>
@@ -251,6 +254,5 @@ Toggle this for temporary emps.
         </div>
       </div>
     </div>
-
-    </div>
+  </div>
 </div>

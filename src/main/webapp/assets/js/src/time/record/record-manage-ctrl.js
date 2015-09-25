@@ -60,6 +60,10 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
         });
     }
 
+    /**
+     * Gets the total number of time records that require action and updates any badges that displays
+     * this count.
+     */
     function updateRecordsPendingBadge() {
         var submitted = ($scope.state.supRecords[allSupervisorsId].SUBMITTED) ?
             $scope.state.supRecords[allSupervisorsId].SUBMITTED.length : 0;
@@ -156,6 +160,11 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
         return false;
     };
 
+    $scope.submitPrompt = function(records) {
+        var params = {approved: records};
+        return modals.open('record-approval-submit', params);
+    };
+
     /**
      * Submits all displayed records that are awaiting supervisor approval as 'APPROVED'
      */
@@ -165,7 +174,10 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
             selectedRecords.forEach(function (record) {
                 record.recordStatus = 'APPROVED';
             });
-            submitRecords(selectedRecords);
+            $scope.submitPrompt(selectedRecords).then(function() {
+                console.log("meow");
+                submitRecords(selectedRecords);
+            });
         }
     };
 
