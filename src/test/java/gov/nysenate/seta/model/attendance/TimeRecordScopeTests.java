@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model.attendance;
 
-import gov.nysenate.seta.util.ProperTest;
+import gov.nysenate.common.ProperTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

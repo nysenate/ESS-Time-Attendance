@@ -72,7 +72,7 @@ public class TimeRecordView implements ViewObject {
     @JsonIgnore
     public TimeRecord toTimeRecord() {
         TimeRecord record = new TimeRecord();
-        record.setTimeRecordId(new BigInteger(timeRecordId));
+        record.setTimeRecordId(timeRecordId != null ? new BigInteger(timeRecordId) : null);
         record.setEmployeeId(employeeId);
         record.setSupervisorId(supervisorId);
         record.setEmployeeName(employeeName);

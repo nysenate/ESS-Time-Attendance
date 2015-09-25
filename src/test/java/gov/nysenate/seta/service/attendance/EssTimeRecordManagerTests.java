@@ -42,7 +42,7 @@ public class EssTimeRecordManagerTests extends BaseTests {
 
     @Test
     public void ensureRecordsTest() {
-        int empId = 1719;
+        int empId = 1491;
         int year = 2015;
         LocalDate startDate = LocalDate.of(year, 1, 1);
         Range<LocalDate> dateRange = Range.closed(startDate.minusMonths(1), LocalDate.now().plusMonths(1));
@@ -52,18 +52,18 @@ public class EssTimeRecordManagerTests extends BaseTests {
         Set<TimeRecord> existingRecords =
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll())
                         .stream().map(TimeRecord::new).collect(Collectors.toSet());
-        logger.info("\n-------- EXISTING RECORDS --------");
+        logger.info("-------- EXISTING RECORDS --------");
         printRecords(existingRecords);
 
         Stopwatch sw = Stopwatch.createStarted();
         // Generate records
-        manager.ensureRecords(empId, payPeriods);
+        manager.ensureRecords(empId);
         logger.info("generation took {} ms", sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         // Print difference
         Set<TimeRecord> newRecords = new TreeSet<>(
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll()));
-        logger.info("\n-------- NEW RECORDS --------");
+        logger.info("-------- NEW RECORDS --------");
         printRecords(Sets.difference(newRecords, existingRecords));
     }
 

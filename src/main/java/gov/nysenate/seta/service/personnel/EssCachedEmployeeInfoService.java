@@ -6,6 +6,7 @@ import com.google.common.collect.TreeRangeSet;
 import com.google.common.eventbus.EventBus;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
+import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
@@ -68,6 +69,8 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
     }
 
     @Override
+    @WorkInProgress(author = "Sam", since = "9/23/2015", desc = "The transaction layer cannot get all employee info on its own")
+    // Todo: make a basic employee object that can encapsulate this data with a better fit than Employee
     public Employee getEmployee(int empId, LocalDate effectiveDate) throws EmployeeNotFoundEx {
         Employee employee = getEmployee(empId);
         TransactionHistory transHistory = transService.getTransHistory(empId);

@@ -24,11 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@WorkInProgress(author = "Sam", since = "2015/09/15", desc = "testing time record generation methods")
+@WorkInProgress(author = "Sam", since = "2015/09/15",
+        desc = "currently in testing.  Dependencies EmpTransactionService and EmployeeInfoService still have some bugs")
 @Service
 public class EssTimeRecordManager implements TimeRecordManager {
 
@@ -41,43 +41,47 @@ public class EssTimeRecordManager implements TimeRecordManager {
     @Autowired EmpTransactionService transService;
     @Autowired EmployeeInfoService empInfoService;
 
-    /**
-     * The active period in this context is defined as the start of the current year to the current date.
-     * preActivePeriod and postActivePeriod are used to extend this period to provide a buffer
-     */
-    private Period preActivePeriod = Period.ofMonths(1);
-    private Period postActivePeriod = Period.ofMonths(1);
-
     /** {@inheritDoc} */
     @Override
-    public int ensureRecords(int empId, Collection<PayPeriod> payPeriods) {
+    public int ensureRecords(int empId) {
+        List<PayPeriod> payPeriods = payPeriodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC);
         List<TimeRecord> existingRecords =
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll());
-        return ensureRecords(empId, payPeriods, existingRecords, true);
+        return ensureRecords(empId, payPeriods, existingRecords, false);
     }
 
     @Override
     public void ensureAllActiveRecords() {
-        Range<LocalDate> activeDateRange = Range.closed(
-                LocalDate.now().withDayOfYear(1).minus(preActivePeriod),
-                LocalDate.now().plus(postActivePeriod));
-        List<PayPeriod> payPeriods = payPeriodService.getPayPeriods(PayPeriodType.AF, activeDateRange, SortOrder.ASC);
+        // Get all employees that were active during the active range, also get all of their time records
+        Set<Integer> empIds = employeeDao.getActiveEmployeeIds();
+        logger.info("getting active time records...");
+        ListMultimap<Integer, TimeRecord> existingRecordMap = timeRecordDao.getAllActiveRecords();
 
-        // Extend the active date range to include all dates covered by the retrieved pay periods
-        RangeSet<LocalDate> periodRangeSet = TreeRangeSet.create();
-        payPeriods.forEach(payPeriod -> periodRangeSet.add(payPeriod.getDateRange()));
-        activeDateRange = periodRangeSet.span();
-
-        Set<Integer> empIds = employeeDao.getActiveEmployeeIds(DateUtils.startOfDateRange(activeDateRange));
-        logger.info("getting time records for {} employees over {}", empIds.size(), activeDateRange);
-        ListMultimap<Integer, TimeRecord> existingRecordMap = timeRecordDao.getRecordsDuring(activeDateRange);
-
-        int totalSaved = existingRecordMap.keySet().stream()
-                .map(empId -> ensureRecords(empId, payPeriods,
+        int totalSaved = empIds.stream()
+                .map(empId -> ensureRecords(empId,
+                        payPeriodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC),
                         Optional.of(existingRecordMap.get(empId)).orElse(Collections.emptyList()),
                         false))
                 .reduce(0, Integer::sum);
         logger.info("saved {} records", totalSaved);
+    }
+
+    @Override
+    public List<TimeRecord> getUnusedRecords(int empId, Collection<TimeRecord> existingRecords) {
+        // Generate a range set of dates that are covered by existing records
+        RangeSet<LocalDate> coveredDates = TreeRangeSet.create();
+        existingRecords.forEach(record -> coveredDates.add(record.getDateRange()));
+
+        List<PayPeriod> openPayPeriods = payPeriodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC);
+        RangeMap<LocalDate, PayType> payTypes = getPayTypeRangeMap(empId);
+        // Get all viable record ranges, filter out ranges that are already covered or that do not contain days
+        //  where the employee is TE, and generate (but don't save) new records for each of these ranges
+        LinkedHashSet<Range<LocalDate>> recordRanges = getRecordRanges(openPayPeriods, empId);
+        return recordRanges.stream()
+                .filter(range -> !coveredDates.encloses(range))
+                .filter(range -> payTypes.subRangeMap(range).asMapOfRanges().containsValue(PayType.TE))
+                .map(range -> createTimeRecord(empId, range))
+                .collect(Collectors.toList());
     }
 
     /** --- Internal Methods --- */
@@ -95,23 +99,29 @@ public class EssTimeRecordManager implements TimeRecordManager {
         // Get a set of ranges for which there should be time records
         LinkedHashSet<Range<LocalDate>> recordRanges = getRecordRanges(payPeriods, empId);
         List<TimeRecord> recordsToSave = new LinkedList<>();
+        TransactionHistory transHistory = transService.getTransHistory(empId);
 
         // Check that existing records correspond to the record ranges
         // Split any records that span multiple ranges
         //  also ensure that existing records and entries contain up to date information
+        // Remove ranges that are covered by existing records
         List<TimeRecord> patchedRecords = patchExistingRecords(empId, recordRanges, existingRecords);
-        patchedRecords = patchedRecords.stream()
-                .filter(record -> createTempRecords || !record.isEmpty())
+        long patchedRecordsSaved = patchedRecords.stream()
+                .filter(record -> createTempRecords || record.getTimeRecordId() != null)
                 .peek(recordsToSave::add)
-                .collect(Collectors.toList());
+                .count();
 
+        RangeMap<LocalDate, PayType> payTypeRangeMap = getPayTypeRangeMap(empId);
         // Create new records for all ranges not covered by existing records
-        // TODO: prevent creation of new records if the employee is new/reappointed
-        // todo    and doesn't have the necessary transactions yet
-        recordRanges.stream()
-                .filter(range -> createTempRecords || isRADuringRange(empId, range))
-                .map(range -> createTimeRecord(empId, range))
-                .forEach(recordsToSave::add);
+        long newRecordsSaved = 0;
+        if (transHistory.isFullyAppointed()) {
+            newRecordsSaved = recordRanges.stream()
+                    .filter(range -> createTempRecords || payTypeRangeMap.subRangeMap(range)
+                                                                .asMapOfRanges().containsValue(PayType.RA))
+                    .map(range -> createTimeRecord(empId, range))
+                    .peek(recordsToSave::add)
+                    .count();
+        }
 
         recordsToSave.forEach(record -> {
             if (record.getTimeRecordId() != null) {
@@ -120,8 +130,13 @@ public class EssTimeRecordManager implements TimeRecordManager {
                 timeRecordDao.saveRecord(record);
             }
         });
-        logger.info("Saved {} records for {}:\t{} new\t{} patched/split",
-                recordsToSave.size(), empId, recordRanges.size(), patchedRecords.size());
+
+        if (recordsToSave.isEmpty()) {
+            logger.info("No changes for {}", empId);
+        } else {
+            logger.info("Saved {} records for {}:\t{} new\t{} patched/split",
+                    recordsToSave.size(), empId, newRecordsSaved, patchedRecordsSaved);
+        }
         return recordsToSave.size();
     }
 
@@ -225,9 +240,7 @@ public class EssTimeRecordManager implements TimeRecordManager {
     private boolean patchEntries(TimeRecord record) {
         boolean modifiedEntries = false;
         // Get effective pay types for the record
-        TransactionHistory transHistory = transService.getTransHistory(record.getEmployeeId());
-        RangeMap<LocalDate, PayType> payTypes = RangeUtils.toRangeMap(
-                transHistory.getEffectivePayTypes(record.getDateRange()), DateUtils.THE_FUTURE);
+        RangeMap<LocalDate, PayType> payTypes = getPayTypeRangeMap(record.getEmployeeId());
         // Check the pay types for each entry
         for (TimeEntry entry : record.getTimeEntries()) {
             PayType correctPayType = payTypes.get(entry.getDate());
@@ -240,11 +253,11 @@ public class EssTimeRecordManager implements TimeRecordManager {
     }
 
     /**
-     * Return true iff the employee was a Regular Annual employee at any point during the given date range
+     * Get a range map containing the effective pay types for all employed dates of the given employee
      */
-    private boolean isRADuringRange(int empId, Range<LocalDate> dateRange) {
-        TransactionHistory transHistory = transService.getTransHistory(empId);
-        return transHistory.getEffectivePayTypes(dateRange).containsValue(PayType.RA);
+    private RangeMap<LocalDate, PayType> getPayTypeRangeMap(int empId) {
+        return RangeUtils.toRangeMap(
+                transService.getTransHistory(empId).getEffectivePayTypes(Range.all()));
     }
 
     /**

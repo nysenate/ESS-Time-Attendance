@@ -17,6 +17,7 @@ import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
+import gov.nysenate.seta.service.attendance.TimeRecordManager;
 import gov.nysenate.seta.service.attendance.TimeRecordService;
 import gov.nysenate.seta.service.attendance.TimeRecordValidationService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
@@ -42,6 +43,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl {
     @Autowired EmployeeInfoService employeeInfoService;
     @Autowired TimeRecordService timeRecordService;
     @Autowired AccrualInfoService accrualInfoService;
+    @Autowired TimeRecordManager timeRecordManager;
 
     @Autowired TimeRecordValidationService validationService;
 

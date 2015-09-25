@@ -21,7 +21,7 @@ public class EssTimeRecordServiceTests extends BaseTests
 {
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordServiceTests.class);
 
-    @Autowired private EssCachedTimeRecordService timeRecordService;
+    @Autowired private TimeRecordService timeRecordService;
 
     @Test
     public void testGetActiveRecords() throws Exception {
@@ -40,6 +40,13 @@ public class EssTimeRecordServiceTests extends BaseTests
                 timeRecordService.getSupervisorRecords(9896, Range.closed(LocalDate.of(now.getYear(), 1, 1), now));
         logger.info("{}ms", sw.stop().elapsed(TimeUnit.MILLISECONDS));
         supRecords.keySet().forEach(supId -> logger.info("supId {}: {} records", supId, supRecords.get(supId).size()));
+    }
+
+    @Test
+    public void tempActiveRecordsTest() {
+        int empId = 11711;
+        List<TimeRecord> tRecs = timeRecordService.getActiveTimeRecords(empId);
+        tRecs.forEach(record -> logger.info("{} - {}", record.getDateRange(), record.getTimeRecordId()));
     }
 
     @Test

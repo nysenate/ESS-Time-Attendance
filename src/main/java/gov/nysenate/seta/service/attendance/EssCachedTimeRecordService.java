@@ -49,6 +49,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     private Cache activeRecordCache;
 
     /** --- Services --- */
+    @Autowired protected TimeRecordManager timeRecordManager;
     @Autowired protected EmployeeInfoService empInfoService;
     @Autowired protected EmpTransactionService transService;
     @Autowired protected AccrualInfoService accrualInfoService;
@@ -65,10 +66,11 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     {
         private int empId;
         private Map<BigInteger, TimeRecord> cachedTimeRecords = new LinkedHashMap<>();
+        private RangeMap<LocalDate, TimeRecord> unsavedTimeRecords = TreeRangeMap.create();
 
         public TimeRecordCacheCollection(int empId, Collection<TimeRecord> cachedTimeRecords) {
             this.empId = empId;
-            cachedTimeRecords.stream().forEach(tr -> this.cachedTimeRecords.put(tr.getTimeRecordId(), tr));
+            cachedTimeRecords.stream().forEach(this::update);
         }
 
         public int getEmpId() {
@@ -76,13 +78,25 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         }
 
         public List<TimeRecord> getTimeRecords() {
-            return this.cachedTimeRecords.values().stream().collect(toList());
+            List<TimeRecord> result = new ArrayList<>();
+            result.addAll(cachedTimeRecords.values());
+            result.addAll(unsavedTimeRecords.asMapOfRanges().values());
+            result.sort(TimeRecord::compareTo);
+            return result;
         }
 
         public void update(TimeRecord record) {
-            if (record.getTimeRecordId() == null)
-                throw new IllegalArgumentException("Time record must have a valid id prior to caching.");
-            cachedTimeRecords.put(record.getTimeRecordId(), record);
+            RangeUtils.removeIntersecting(unsavedTimeRecords, record.getDateRange());
+            if (record.getTimeRecordId() == null) {
+                if (cachedTimeRecords.values().stream()
+                        .anyMatch(existingRec ->
+                                RangeUtils.intersects(existingRec.getDateRange(), record.getDateRange()))) {
+                    throw new IllegalArgumentException("Attempt to insert overlapping time records into cache");
+                }
+                unsavedTimeRecords.put(record.getDateRange(), record);
+            } else {
+                cachedTimeRecords.put(record.getTimeRecordId(), record);
+            }
         }
 
         public void remove(BigInteger timeRecId) {
@@ -112,7 +126,9 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
             cachedRecs = (TimeRecordCacheCollection) element.getObjectValue();
         }
         else {
-            List<TimeRecord> records = timeRecordDao.getRecordsDuring(empId, Range.all(), TimeRecordStatus.inProgress());
+            List<TimeRecord> records = getOpenTimeRecords(empId).stream()
+                    .filter(record -> TimeRecordStatus.inProgress().contains(record.getRecordStatus()))
+                    .collect(Collectors.toList());
             records.forEach(this::initializeEntries);
             cachedRecs = new TimeRecordCacheCollection(empId, records);
             activeRecordCache.acquireWriteLockOnKey(empId);
@@ -172,9 +188,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     @Transactional(value = "remoteTxManager")
     @WorkInProgress(author = "ash", desc = "Need to test this a bit better...")
     public synchronized boolean updateExistingRecord(TimeRecord record) {
-        if (record.getTimeRecordId() == null) {
-            throw new TimeRecordException("Time record without a record id cannot be saved,");
-        }
         boolean updated = timeRecordDao.saveRecord(record);
         if (updated) {
             int empId = record.getEmployeeId();
@@ -202,6 +215,18 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     }
 
     /** --- Internal Methods --- */
+
+    /**
+     * Get all time records for the employee's open attendance periods
+     * Create unsaved records for any uncovered periods where the employee is temporary
+     * @param empId Integer - employee Id
+     * @return List<TimeRecord>
+     */
+    private List<TimeRecord> getOpenTimeRecords(Integer empId) {
+        List<TimeRecord> existingRecords = timeRecordDao.getActiveRecords(empId);
+        existingRecords.addAll(timeRecordManager.getUnusedRecords(empId, existingRecords));
+        return existingRecords;
+    }
 
     /**
      * Ensures that the given time record contains entries for each day covered.
