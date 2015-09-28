@@ -588,19 +588,24 @@ table.time-record-entry-table {
       }
 
       &.weekend {
-        background: #e8e8e8;
+        background: #eee;
       }
 
       td {
         text-align: center;
         border-right: 1px solid #dedede;
         input[type="text"], input[type="number"] {
-          width: 55px;
-          height: 32px;
+          width: 100%;
+          height: 35px;
           font-size: 1.1em;
           text-align: center;
           border: 0;
           background: none;
+        }
+        /** Credit css-tricks */
+        input:disabled {
+          background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==) repeat;
+          cursor: not-allowed;
         }
 
         &.today {
