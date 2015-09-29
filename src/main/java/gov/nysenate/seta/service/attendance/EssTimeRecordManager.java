@@ -1,5 +1,6 @@
 package gov.nysenate.seta.service.attendance;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.*;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
@@ -123,19 +124,13 @@ public class EssTimeRecordManager implements TimeRecordManager {
                     .count();
         }
 
-        recordsToSave.forEach(record -> {
-            if (record.getTimeRecordId() != null) {
-                timeRecordService.updateExistingRecord(record);
-            } else {
-                timeRecordDao.saveRecord(record);
-            }
-        });
+        recordsToSave.forEach(timeRecordService::saveRecord);
 
         if (recordsToSave.isEmpty()) {
-            logger.info("No changes for {}", empId);
+            logger.info("empId {}: no changes", empId);
         } else {
-            logger.info("Saved {} records for {}:\t{} new\t{} patched/split",
-                    recordsToSave.size(), empId, newRecordsSaved, patchedRecordsSaved);
+            logger.info("empId {}:\t{} periods\t{} existing\t{} saved:\t{} new\t{} patched/split",
+                    empId, payPeriods.size(), existingRecords.size(), recordsToSave.size(), newRecordsSaved, patchedRecordsSaved);
         }
         return recordsToSave.size();
     }
@@ -155,7 +150,8 @@ public class EssTimeRecordManager implements TimeRecordManager {
                     .filter(range -> range.isConnected(record.getDateRange()) &&
                             !range.intersection(record.getDateRange()).isEmpty())
                     .collect(Collectors.toList());
-            if (rangesUnderRecord.size() > 1) {
+            if (rangesUnderRecord.size() != 1 ||
+                    !rangesUnderRecord.get(0).equals(record.getDateRange())) {
                 recordsToSave.addAll(splitRecord(rangesUnderRecord, record, empId));
             } else if (patchRecord(record)) {
                 recordsToSave.add(record);
@@ -179,30 +175,34 @@ public class EssTimeRecordManager implements TimeRecordManager {
     /**
      * Splits an existing time record according to the given date ranges
      * @param ranges List<Range<LocalDate>> - ranges corresponding to dates for which there should be distinct time records
+     *               These ranges should all intersect with the existing time record
      * @param record TimeRecord
      * @param empId int
      * @return List<TimeRecord> - the records resulting from the split
      */
     private List<TimeRecord> splitRecord(List<Range<LocalDate>> ranges, TimeRecord record, int empId) {
+        if (ranges.stream().anyMatch(range -> !RangeUtils.intersects(range, record.getDateRange()))) {
+            throw new IllegalArgumentException("split ranges should all intersect with the record to be split");
+        }
+
         Iterator<Range<LocalDate>> rangeIterator = ranges.iterator();
         List<TimeRecord> splitResult = new LinkedList<>();
 
-        // First ensure that the supervisor is correct at the start of the range
-        // and that the existing entries have correct pay types
-        patchRecord(record);
-
         if (rangeIterator.hasNext()) {
-            // Shorten the existing time record to match the first of the ranges
-            // remove all entries occurring outside the first date range
+            // Adjust the begin and end dates of the existing record to match the first range
+            // patch the existing record + entries, ensuring correct supervisor and pay types
+            record.setDateRange(rangeIterator.next());
+            patchRecord(record);
+
+            // Prune any existing entries with dates outside of the first range,
+            // saving them to be added to any appropriate new records that are created
             TreeMap<LocalDate, TimeEntry> existingEntryMap = new TreeMap<>();
-            LocalDate newEndDate = DateUtils.endOfDateRange(rangeIterator.next());
-            for (LocalDate date = newEndDate.plusDays(1); !date.isAfter(record.getEndDate()); date = date.plusDays(1)) {
-                TimeEntry entry = record.removeEntry(date);
-                if (entry != null) {
-                    existingEntryMap.put(entry.getDate(), entry);
-                }
-            }
-            record.setEndDate(newEndDate);
+            record.getTimeEntries().stream()
+                    .map(TimeEntry::getDate)
+                    .filter(date -> !record.getDateRange().contains(date))
+                    .map(record::removeEntry)
+                    .forEach(entry -> existingEntryMap.put(entry.getDate(), entry));
+
             splitResult.add(record);
 
             // Generate time records for the remaining ranges, adding the existing time records as appropriate
@@ -245,8 +245,8 @@ public class EssTimeRecordManager implements TimeRecordManager {
         for (TimeEntry entry : record.getTimeEntries()) {
             PayType correctPayType = payTypes.get(entry.getDate());
             if (!Objects.equals(entry.getPayType(), correctPayType)) {
-                entry.setPayType(correctPayType);
                 modifiedEntries = true;
+                entry.setPayType(correctPayType);
             }
         }
         return modifiedEntries;

@@ -158,7 +158,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl
     public void saveRecord(@RequestBody TimeRecordView record) {
         TimeRecord newRecord = record.toTimeRecord();
         validationService.validateTimeRecord(newRecord);
-        timeRecordService.updateExistingRecord(newRecord);
+        timeRecordService.saveRecord(newRecord);
     }
 
     @ExceptionHandler(InvalidTimeRecordException.class)

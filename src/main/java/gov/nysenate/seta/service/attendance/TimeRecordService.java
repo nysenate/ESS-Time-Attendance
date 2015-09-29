@@ -117,7 +117,7 @@ public interface TimeRecordService
      * @param record - TimeRecord class object containing data to be updated into the table
      * @return Boolean value, true if data successfully updated else false.
      */
-    boolean updateExistingRecord(TimeRecord record);
+    boolean saveRecord(TimeRecord record);
 
     /**
      * Remove the time record with the specified time record id

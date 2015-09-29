@@ -117,7 +117,7 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
         if (env.acceptsProfiles("!test")) {
             logger.debug("Refreshing employee cache..");
             empCache.removeAll();
-            employeeDao.getActiveEmployeeIds(LocalDate.now())
+            employeeDao.getActiveEmployeeIds()
                     .parallelStream().forEach((empId) -> {
                 logger.debug("Fetching employee {}", empId);
                 getEmployeeAndPutInCache(empId);

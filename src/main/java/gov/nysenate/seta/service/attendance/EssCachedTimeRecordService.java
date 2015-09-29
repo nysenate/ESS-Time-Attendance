@@ -161,6 +161,9 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
                                            Set<TimeRecordStatus> statuses) {
         RangeSet<LocalDate> dateRanges = TreeRangeSet.create();
         payPeriods.forEach(period -> dateRanges.add(period.getDateRange()));
+        if (dateRanges.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getTimeRecords(empIds, dateRanges.span(), statuses).stream()
                 .filter(record -> dateRanges.encloses(record.getDateRange()))
                 .collect(toList());
@@ -192,7 +195,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     @Override
     @Transactional(value = "remoteTxManager")
     @WorkInProgress(author = "ash", desc = "Need to test this a bit better...")
-    public synchronized boolean updateExistingRecord(TimeRecord record) {
+    public synchronized boolean saveRecord(TimeRecord record) {
         boolean updated = timeRecordDao.saveRecord(record);
         if (updated) {
             int empId = record.getEmployeeId();
