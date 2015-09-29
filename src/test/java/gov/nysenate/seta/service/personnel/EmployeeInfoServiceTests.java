@@ -35,9 +35,9 @@ public class EmployeeInfoServiceTests extends BaseTests {
 
     @Test
     public void empInfoAtDateTest() {
-        int empId = 3562;
-//        LocalDate date = LocalDate.of(2015, 8, 24);
-        LocalDate date = LocalDate.now();
+        int empId = 11755;
+        LocalDate date = LocalDate.of(2015, 8, 24);
+//        LocalDate date = LocalDate.now();
         printEmpInfoAtDate(empId, date);
     }
 

@@ -132,6 +132,11 @@ public class TimeRecord implements Comparable<TimeRecord>
         return Range.closedOpen(beginDate, endDate.plusDays(1));
     }
 
+    public void setDateRange(Range<LocalDate> dateRange) {
+        this.beginDate = DateUtils.startOfDateRange(dateRange);
+        this.endDate = DateUtils.endOfDateRange(dateRange);
+    }
+
     public ImmutableList<TimeEntry> getTimeEntries() {
         return ImmutableList.copyOf(timeEntryMap.values());
     }
@@ -159,7 +164,7 @@ public class TimeRecord implements Comparable<TimeRecord>
     public void setEmpInfo(Employee employee) {
         this.employeeId = employee.getEmployeeId();
         this.supervisorId = employee.getSupervisorId();
-        this.employeeName = employee.getUid().toUpperCase();
+        this.employeeName = employee.getUid() != null ? employee.getUid().toUpperCase() : null;
         this.respHeadCode = employee.getRespCenter().getHead().getCode();
     }
 

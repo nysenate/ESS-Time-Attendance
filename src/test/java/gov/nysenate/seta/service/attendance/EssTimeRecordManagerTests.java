@@ -42,12 +42,9 @@ public class EssTimeRecordManagerTests extends BaseTests {
 
     @Test
     public void ensureRecordsTest() {
-        int empId = 1491;
-        int year = 2015;
-        LocalDate startDate = LocalDate.of(year, 1, 1);
-        Range<LocalDate> dateRange = Range.closed(startDate.minusMonths(1), LocalDate.now().plusMonths(1));
+        int empId = 11525;
         List<PayPeriod> payPeriods =
-                periodService.getPayPeriods(PayPeriodType.AF, dateRange, SortOrder.ASC);
+                periodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC);
         // Print existing records
         Set<TimeRecord> existingRecords =
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll())
