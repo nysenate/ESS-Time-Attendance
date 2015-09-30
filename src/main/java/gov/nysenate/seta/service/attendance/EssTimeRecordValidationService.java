@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Optional;
 
 @Service
 public class EssTimeRecordValidationService implements TimeRecordValidationService {
@@ -33,7 +34,9 @@ public class EssTimeRecordValidationService implements TimeRecordValidationServi
 
     @Override
     public void validateTimeRecord(TimeRecord record) throws InvalidTimeRecordException {
-        TimeRecord prevState = timeRecordDao.getTimeRecord(record.getTimeRecordId());
+        Optional<TimeRecord> prevState = record.getTimeRecordId() != null
+                ? Optional.of(timeRecordDao.getTimeRecord(record.getTimeRecordId()))
+                : Optional.empty();
         timeRecordValidators.stream()
                 .filter(validator -> validator.isApplicable(record, prevState))
                 .forEach(validator -> validator.checkTimeRecord(record, prevState));

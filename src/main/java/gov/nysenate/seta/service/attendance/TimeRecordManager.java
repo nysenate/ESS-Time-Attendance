@@ -25,15 +25,4 @@ public interface TimeRecordManager {
      * @see #ensureRecords(int)
      */
     public void ensureAllActiveRecords();
-
-    /**
-     * A method that will generate and return unregistered time records for any ranges in the employee's open pay periods
-     *  that are not covered by the given existing time records
-     * This method is used for temporary employees who do not necessarily need a time record for all employed pay periods
-     *   but need to have records available to fill out upon request
-     * @param empId int - employee id
-     * @param existingRecords Collection<TimeRecord> - time records
-     * @return List<TimeRecords> - the newly generated unregistered time records
-     */
-    public List<TimeRecord> getUnusedRecords(int empId, Collection<TimeRecord> existingRecords);
 }

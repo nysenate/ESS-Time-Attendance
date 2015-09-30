@@ -3,7 +3,6 @@ package gov.nysenate.seta.dao.attendance;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
-import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.attendance.TimeEntry;
 import gov.nysenate.seta.model.attendance.TimeRecord;
@@ -39,7 +38,7 @@ public class TimeRecordDaoTests extends BaseTests
         testRecord = new TimeRecord();
 
         testRecord.setEmployeeId(11423);
-        testRecord.setEmployeeName("STOUFFER");
+        testRecord.setLastUpdater("STOUFFER");
         testRecord.setActive(true);
         testRecord.setRecordStatus(TimeRecordStatus.SUBMITTED);
         testRecord.setRemarks("Hello world");

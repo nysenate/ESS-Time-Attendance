@@ -34,7 +34,14 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "    AND per.CDPERIOD = 'AF'\n"
     ),
     GET_TIME_REC_BY_ID(
-        GET_TIME_REC_SQL_TEMPLATE.getSql() + "  AND rec.NUXRTIMESHEET = :timesheetId"
+        "SELECT \n" + TIME_RECORD_COLUMNS.getSql() + "\n" +
+        "FROM ${tsSchema}.PM23TIMESHEET rec\n" +
+        "JOIN ${masterSchema}.SL16PERIOD per\n" +
+        "    ON rec.DTBEGIN BETWEEN per.DTBEGIN AND per.DTEND\n" +
+        "LEFT JOIN ${tsSchema}.PD23TIMESHEET ent\n" +
+        "    ON rec.NUXRTIMESHEET = ent.NUXRTIMESHEET AND ent.CDSTATUS = 'A'\n" +
+        "WHERE per.CDSTATUS = 'A' AND per.CDPERIOD = 'AF'\n" +
+        "   AND rec.NUXRTIMESHEET = :timesheetId"
     ),
     GET_TIME_REC_BY_DATES(
         GET_TIME_REC_SQL_TEMPLATE.getSql() +
@@ -73,7 +80,7 @@ public enum SqlTimeRecordQuery implements BasicSqlQuery
         "SET \n" +
         "  NUXREFEM = :empId, CDSTATUS = :status, CDTSSTAT = :tSStatusId,\n" +
         "  DTBEGIN = :beginDate, DTEND = :endDate, DEREMARKS = :remarks, NUXREFSV = :supervisorId,\n" +
-        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :employeeName, CDRESPCTRHD = :respCtr\n" +
+        "  DEEXCEPTION = :excDetails, DTPROCESS = :procDate, NAUSER = :lastUpdater, CDRESPCTRHD = :respCtr\n" +
         "WHERE NUXRTIMESHEET = :timesheetId"
     ),
 

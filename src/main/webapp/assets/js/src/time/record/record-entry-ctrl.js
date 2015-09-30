@@ -93,6 +93,8 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         if (submit) {
             // todo ensure totals hours are in line
             record.recordStatus = nextStatusMap[record.recordStatus];
+        } else {
+            record.recordStatus = 'NOT_SUBMITTED';
         }
         console.log(submit ? 'submitting' : 'saving', 'record', record);
         // Open the modal to indicate save/submit

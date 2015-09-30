@@ -42,8 +42,8 @@ public class EssTimeRecordManagerTests extends BaseTests {
 
     @Test
     public void ensureRecordsTest() {
-        int empId = 11525;
-        List<PayPeriod> payPeriods =
+        int empId = 782;
+                List<PayPeriod> payPeriods =
                 periodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC);
         // Print existing records
         Set<TimeRecord> existingRecords =
