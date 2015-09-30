@@ -13,7 +13,7 @@ Toggle this for temporary emps.
 </div> -->
 
 <div ng-controller="RecordEntryController">
-  <div id="record-selection-container" class="content-container content-controls" ng-show="records.length > 0">
+  <div id="record-selection-container" class="record-selection-container content-container content-controls" ng-show="records.length > 0">
     <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>
     <table class="simple-table">
       <thead>
@@ -45,6 +45,9 @@ Toggle this for temporary emps.
       </tr>
       </tbody>
     </table>
+    <select ng-if="records.length > 5" class="record-selection-menu" ng-options="record.payPeriod.endDate for record in records" ng-model="record">
+
+    </select>
   </div>
 
   <div loader-indicator ng-show="state.searching"></div>
@@ -103,7 +106,7 @@ Toggle this for temporary emps.
     </div>
     <hr/>
     <form id="timeRecordForm" method="post" action="">
-      <table class="ess-table" id="timeRecordTable" ng-model="displayEntries">
+      <table class="ess-table time-record-entry-table" id="timeRecordTable" ng-model="displayEntries">
         <thead>
         <tr>
           <th>Date</th>
@@ -133,32 +136,32 @@ Toggle this for temporary emps.
           </td>
           <td ng-class="{invalid: entry.vacationHours > 0 && !validation.accruals.vacation || entry.vacationHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                   placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                   placeholder="--" step=".5" min="0" max="7"
                    ng-model="entry.vacationHours" name="numVacationHours" tabindex="{{$index+15}}"/>
           </td>
           <td ng-class="{invalid: entry.personalHours > 0 && !validation.accruals.personal || entry.personalHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                   placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                   placeholder="--" step=".5" min="0" max="7"
                    ng-model="entry.personalHours" name="numPersonalHours"/>
           </td>
           <td ng-class="{invalid: entry.sickEmpHours > 0 && !validation.accruals.sick || entry.sickEmpHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                   placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                   placeholder="--" step=".5" min="0" max="7"
                    ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
           </td>
           <td ng-class="{invalid: entry.sickFamHours > 0 && !validation.accruals.sick || entry.sickFamHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                   placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                   placeholder="--" step=".5" min="0" max="7"
                    ng-model="entry.sickFamHours" name="numSickFamHours"/>
           </td>
           <td ng-class="{invalid: entry.miscHours === undefined}">
             <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                   placeholder="--" step=".5" min="0" max="7" ng-disabled="entry.unavailable"
+                   placeholder="--" step=".5" min="0" max="7"
                    ng-model="entry.miscHours" name="numMiscHours"/>
           </td>
           <td>
             <select style="font-size:.9em;" name="miscHourType"
-                    ng-model="entry.miscType" ng-disabled="entry.unavailable" ng-change="setDirty()"
+                    ng-model="entry.miscType" ng-change="setDirty()"
                     ng-options="type as label for (type, label) in miscLeaves">
               <option value="">No Misc Hours</option>
             </select>
@@ -251,6 +254,5 @@ Toggle this for temporary emps.
         </div>
       </div>
     </div>
-
-    </div>
+  </div>
 </div>

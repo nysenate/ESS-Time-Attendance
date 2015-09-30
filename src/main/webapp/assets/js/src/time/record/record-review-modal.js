@@ -10,13 +10,7 @@ function (appProps, modals, locationService) {
     function link($scope, $elem, $attrs) {
 
         $scope.iSelectedRecord = 0;
-
         $scope.records = modals.params().records;
-
-        // Settings for floating the time entry table heading
-        $scope.floatTheadOpts = {
-            scrollingTop: 47
-        };
 
         /**
          *  Records are categorized under approved or disapproved, keyed by time record id
@@ -25,6 +19,16 @@ function (appProps, modals, locationService) {
         var disapproved = {};
 
         /** --- Display Methods --- */
+
+        $scope.submitChanges = function() {
+            console.log(approved);
+            modals.open('record-approval-submit', {
+                approved: approved,
+                disapproved: disapproved
+            }).then(function submitted() {
+                $scope.resolve();
+            });
+        };
 
         /**
          * Resolves the modal, returning the records that were selected as approved/disapproved
@@ -115,21 +119,31 @@ function (appProps, modals, locationService) {
     }
 }]);
 
-essApp.directive('recordReviewRejectModal', ['modals', function (modals){
+essApp.directive('recordReviewRejectModal', ['modals', 'appProps', function(modals, appProps) {
     return {
-        template:
-            '<p class="content-info no-bottom-margin">Explain the reason for disapproving the time record.</p>' +
-            '<textarea style="resize:none;margin:10px;width:375px;height:100px;" placeholder="Reason for disapproval" ng-model="remarks" tabindex="1"></textarea>' +
-            '<div style="padding:.4em;background:#eee;text-align: center;overflow:auto;clear:both;">' +
-            '  <input type="button" style="float:left;" class="neutral-button" value="Cancel" ng-click="cancel()"/>' +
-            '  <input type="button" style="float:right;" class="reject-button" value="Reject Record" ng-click="resolve()"/>' +
-            '</div>',
+        templateUrl: appProps.ctxPath + '/template/time/record/record-reject-modal',
         link: function($scope, $elem, $attrs) {
             $scope.cancel = modals.reject;
-
             $scope.resolve = function() {
                 modals.resolve($scope.remarks)
             };
         }
     };
+}]);
+
+essApp.directive('recordApproveSubmitModal', ['modals', 'appProps', function(modals, appProps) {
+    return {
+        templateUrl: appProps.ctxPath + '/template/time/record/record-approve-submit-modal',
+        link: function($scope, $elem, $attrs) {
+            $scope.approved = modals.params().approved;
+            $scope.approvedCount = ($scope.approved) ? Object.keys($scope.approved).length : 0;
+            $scope.disapproved = modals.params().disapproved;
+            $scope.disapprovedCount = ($scope.disapproved) ? Object.keys($scope.disapproved).length : 0;
+
+            $scope.cancel = modals.reject;
+            $scope.resolve = function() {
+                modals.resolve();
+            };
+        }
+    }
 }]);

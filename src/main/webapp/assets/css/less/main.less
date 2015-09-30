@@ -550,7 +550,7 @@ table.simple-table {
 
 /** --- Time Record Entry Page --- */
 
-table#timeRecordTable {
+table.time-record-entry-table {
   thead {
     background: white;
     tr {
@@ -588,19 +588,24 @@ table#timeRecordTable {
       }
 
       &.weekend {
-        background: #e8e8e8;
+        background: #eee;
       }
 
       td {
         text-align: center;
         border-right: 1px solid #dedede;
         input[type="text"], input[type="number"] {
-          width: 55px;
-          height: 32px;
+          width: 100%;
+          height: 35px;
           font-size: 1.1em;
           text-align: center;
           border: 0;
           background: none;
+        }
+        /** Credit css-tricks */
+        input:disabled {
+          background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==) repeat;
+          cursor: not-allowed;
         }
 
         &.today {
@@ -611,7 +616,7 @@ table#timeRecordTable {
   }
 }
 
-#record-selection-container {
+.record-selection-container {
   text-align: center;
   padding-bottom: 10px;
   border-bottom: 1px solid fade(@teal, 55%);
@@ -634,6 +639,10 @@ table#timeRecordTable {
     th, td {
       padding: 5px;
     }
+  }
+
+  .record-selection-menu {
+    width: 90%;
   }
 }
 
@@ -1110,6 +1119,45 @@ record-review-modal, [record-review-modal] {
     padding: .4em;
     font-weight: 600;
     background: white;
+  }
+}
+
+// Reject Modals
+
+.reject-modal-textarea {
+  resize:none;
+  margin:10px;
+  width:375px;
+  height:100px;
+}
+
+.reject-modal-button-wrapper {
+  padding:.4em;
+  background:#eee;
+  text-align: center;
+  overflow:auto;
+  clear:both;
+}
+
+// Record Approve Submit Confirmation Dialog
+
+.approve-submit-modal-details {
+  text-align: center;
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+  .review-listing {
+    padding: 10px;
+  }
+  div.review-listing:last-child {
+    margin-bottom: 20px;
+  }
+  div.approve-input-container {
+    margin-bottom: 10px;
+    input:first-child {
+      margin-right: 20px;
+    }
   }
 }
 
