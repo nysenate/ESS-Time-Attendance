@@ -1,6 +1,7 @@
 package gov.nysenate.seta.service.attendance;
 
 import com.google.common.collect.*;
+import com.google.common.eventbus.Subscribe;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
@@ -16,17 +17,22 @@ import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionHistoryUpdateEvent;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.service.period.PayPeriodService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static gov.nysenate.seta.model.transaction.TransactionCode.*;
 
 @WorkInProgress(author = "Sam", since = "2015/09/15",
         desc = "currently in testing.  Dependencies EmpTransactionService and EmployeeInfoService still have some bugs")
@@ -34,6 +40,8 @@ import java.util.stream.Collectors;
 public class EssTimeRecordManager implements TimeRecordManager {
 
     private static final Logger logger = LoggerFactory.getLogger(EssTimeRecordManager.class);
+
+    private static final ImmutableSet recordAlteringTransCodes = ImmutableSet.of(SUP, TYP, EMP, RSH);
 
     @Autowired TimeRecordService timeRecordService;
     @Autowired TimeRecordDao timeRecordDao;
@@ -63,10 +71,32 @@ public class EssTimeRecordManager implements TimeRecordManager {
                 .sorted()
                 .map(empId -> ensureRecords(empId,
                         payPeriodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC),
-                        Optional.of(existingRecordMap.get(empId)).orElse(Collections.emptyList())
-                ))
+                        Optional.of(existingRecordMap.get(empId)).orElse(Collections.emptyList()) ))
                 .reduce(0, Integer::sum);
         logger.info("saved {} records", totalSaved);
+    }
+
+    /**
+     * invokes the ensureAllActiveRecords method according to the configured cron value
+     * @see #ensureAllActiveRecords()
+     */
+    @Scheduled(cron = "${scheduler.timerecord.ensureall}")
+    public synchronized void scheduledEnsureAll() {
+        ensureAllActiveRecords();
+    }
+
+    /**
+     * Modifies records when new transactions are posted
+     * @param event TransactionHistoryUpdateEvent
+     */
+    @Subscribe
+    @WorkInProgress(author = "sam", since = "9/30/2015", desc = "has not been tested, need to simulate transaction posts")
+    public synchronized void handleTransactionHistoryUpdateEvent(TransactionHistoryUpdateEvent event) {
+        event.getTransRecs().stream()
+                .filter(transRec -> recordAlteringTransCodes.contains(transRec.getTransCode()))
+                .map(TransactionRecord::getEmployeeId)
+                .distinct()
+                .forEach(this::ensureRecords);
     }
 
     /** --- Internal Methods --- */
