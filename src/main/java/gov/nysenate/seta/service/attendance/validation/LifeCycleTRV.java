@@ -1,8 +1,8 @@
-package gov.nysenate.seta.service.attendance.validators;
+package gov.nysenate.seta.service.attendance.validation;
 
+import gov.nysenate.seta.client.view.error.InvalidParameterView;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.attendance.TimeRecordStatus;
-import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -28,14 +28,16 @@ public class LifeCycleTRV implements TimeRecordValidator {
 
     /** {@inheritDoc} */
     @Override
-    public void checkTimeRecord(TimeRecord record, Optional<TimeRecord> previousState) throws InvalidTimeRecordException {
-        TimeRecordStatus newStatus = record.getRecordStatus();
-        TimeRecordStatus prevStatus = previousState.isPresent() ? previousState.get().getRecordStatus() : null;
+    public void checkTimeRecord(TimeRecord record, Optional<TimeRecord> previousState) throws TimeRecordErrorException {
+        Optional<TimeRecordStatus> newStatus = Optional.of(record.getRecordStatus());
+        Optional<TimeRecordStatus> prevStatus = previousState.map(TimeRecord::getRecordStatus);
         // Get valid statuses that occur after previous status and ensure that the new status is contained in this set
         Set<TimeRecordStatus> validStatuses = getValidStatuses(prevStatus);
-        if (!validStatuses.contains(newStatus)) {
-            throw new InvalidTimeRecordException(InvalidTimeRecordCode.INVALID_STATUS_CHANGE,
-                    String.format("Cannot post a %s time record when the previous status is %s", newStatus, prevStatus));
+        if (!newStatus.isPresent() || !validStatuses.contains(newStatus.get())) {
+            throw new TimeRecordErrorException(TimeRecordErrorCode.INVALID_STATUS_CHANGE,
+                    new InvalidParameterView("recordStatus", "TimeRecordStatus",
+                            prevStatus.map(Enum::name).orElse("null") + " -> " + validStatuses.toString(),
+                            newStatus.map(Enum::name).orElse("null")));
         }
     }
 
@@ -44,11 +46,11 @@ public class LifeCycleTRV implements TimeRecordValidator {
     /**
      * Get a set of statuses that can follow the previous status
      */
-    private static Set<TimeRecordStatus> getValidStatuses(TimeRecordStatus prevStatus) {
-        if (prevStatus == null) {
+    private static Set<TimeRecordStatus> getValidStatuses(Optional<TimeRecordStatus> prevStatus) {
+        if (!prevStatus.isPresent()) {
             return newHashSet(NOT_SUBMITTED);
         }
-        switch (prevStatus) {
+        switch (prevStatus.get()) {
             case NOT_SUBMITTED:
             case DISAPPROVED:
             case DISAPPROVED_PERSONNEL:

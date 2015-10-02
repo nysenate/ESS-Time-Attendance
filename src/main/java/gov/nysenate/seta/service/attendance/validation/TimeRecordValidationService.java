@@ -1,4 +1,4 @@
-package gov.nysenate.seta.service.attendance;
+package gov.nysenate.seta.service.attendance.validation;
 
 import gov.nysenate.seta.model.attendance.TimeRecord;
 
@@ -8,7 +8,7 @@ import gov.nysenate.seta.model.attendance.TimeRecord;
 public interface TimeRecordValidationService
 {
     /**
-     * Checks the given TimeRecord for incongruencies with NY Senate time and attendence policy
+     * Checks the given TimeRecord for inconsistencies with NY Senate time and attendence policy
      * Ensures that :
      *  - All used accrual time is subtractable from the employees accruals to date
      *  - The employee is permitted to use accrual time if it is spent

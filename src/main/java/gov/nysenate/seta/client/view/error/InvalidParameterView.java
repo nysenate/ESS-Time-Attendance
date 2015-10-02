@@ -9,10 +9,17 @@ public class InvalidParameterView implements ViewObject {
     protected ConstrainedParameterView parameterConstraint;
     protected String receivedValue;
 
+    public InvalidParameterView(ConstrainedParameterView parameterConstraint, String receivedValue) {
+        this.parameterConstraint = parameterConstraint;
+        this.receivedValue = receivedValue;
+    }
+
+    public InvalidParameterView(String paramName, String paramType, String constraint, String receivedValue) {
+        this(new ConstrainedParameterView(paramName, paramType, constraint), receivedValue);
+    }
+
     public InvalidParameterView(InvalidRequestParamEx ex) {
-        this.parameterConstraint = new ConstrainedParameterView(ex.getParameterName(), ex.getParameterType(),
-                ex.getParameterConstraint());
-        this.receivedValue = ex.getParameterValue();
+        this(ex.getParameterName(), ex.getParameterType(), ex.getParameterConstraint(), ex.getParameterValue());
     }
 
     @Override

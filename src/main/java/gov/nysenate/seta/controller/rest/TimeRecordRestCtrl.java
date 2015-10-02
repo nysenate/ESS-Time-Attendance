@@ -6,6 +6,7 @@ import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
 import gov.nysenate.seta.client.response.base.SimpleResponse;
 import gov.nysenate.seta.client.response.base.ViewObjectResponse;
+import gov.nysenate.seta.client.response.error.InvalidTimeRecordResponse;
 import gov.nysenate.seta.client.view.TimeRecordView;
 import gov.nysenate.seta.client.view.base.ListView;
 import gov.nysenate.seta.client.view.base.MapView;
@@ -17,14 +18,15 @@ import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
 import gov.nysenate.seta.service.attendance.ActiveTimeRecordCacheEvictEvent;
-import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
+import gov.nysenate.seta.service.attendance.validation.InvalidTimeRecordException;
 import gov.nysenate.seta.service.attendance.TimeRecordManager;
 import gov.nysenate.seta.service.attendance.TimeRecordService;
-import gov.nysenate.seta.service.attendance.TimeRecordValidationService;
+import gov.nysenate.seta.service.attendance.validation.TimeRecordValidationService;
 import gov.nysenate.seta.service.personnel.EmployeeInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -162,9 +164,9 @@ public class TimeRecordRestCtrl extends BaseRestCtrl
     }
 
     @ExceptionHandler(InvalidTimeRecordException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public BaseResponse handleInvalidTimeRecordException(InvalidTimeRecordException ex) {
-        // TODO: create response from invalid record ex
-        return new SimpleResponse(false, "uh oh D:", "invalid time record");
+        return new InvalidTimeRecordResponse(getTimeRecordView(ex.getTimeRecord()), ex.getDetectedErrors());
     }
 
     /**
@@ -255,5 +257,11 @@ public class TimeRecordRestCtrl extends BaseRestCtrl
 
     private ViewObjectResponse<?> getRecordResponse(ListMultimap<Integer, TimeRecord> records, boolean supervisor) {
         return getRecordResponse(records, supervisor, false);
+    }
+
+    private TimeRecordView getTimeRecordView(TimeRecord record) {
+        return new TimeRecordView(record,
+                employeeInfoService.getEmployee(record.getEmployeeId()),
+                employeeInfoService.getEmployee(record.getSupervisorId()));
     }
 }
