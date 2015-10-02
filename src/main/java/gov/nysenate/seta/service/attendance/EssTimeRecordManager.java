@@ -25,6 +25,7 @@ import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,10 @@ public class EssTimeRecordManager implements TimeRecordManager {
     @Autowired PayPeriodService payPeriodService;
     @Autowired EmpTransactionService transService;
     @Autowired EmployeeInfoService empInfoService;
+
+    /** When set to false, the scheduled run of ensureAllRecords wont run */
+    @Value("${scheduler.timerecord.ensureall.enabled:false}")
+    private boolean ensureAllEnabled;
 
     /** {@inheritDoc} */
     @Override
@@ -80,9 +85,11 @@ public class EssTimeRecordManager implements TimeRecordManager {
      * invokes the ensureAllActiveRecords method according to the configured cron value
      * @see #ensureAllActiveRecords()
      */
-    @Scheduled(cron = "${scheduler.timerecord.ensureall}")
+    @Scheduled(cron = "${scheduler.timerecord.ensureall.cron}")
     public synchronized void scheduledEnsureAll() {
-        ensureAllActiveRecords();
+        if (ensureAllEnabled) {
+            ensureAllActiveRecords();
+        }
     }
 
     /**
