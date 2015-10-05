@@ -97,11 +97,7 @@ public class EssAllowanceService implements AllowanceService {
         allowanceUsage.setRecordMoneyUsed(
                 // Add up hours and calculated payment for time records that have not been paid out yet
                 timeRecords.stream()
-                        .flatMap(record -> record.getTimeEntries().stream())
-                        .filter(entry -> {
-                            SalaryRec salary = allowanceUsage.getSalaryRec(entry.getDate());
-                            return salary != null && salary.getPayType() == PayType.TE; })
-                        .map(entry -> entry.getWorkHours().orElse(BigDecimal.ZERO))
+                        .map(allowanceUsage::getRecordCost)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
     }

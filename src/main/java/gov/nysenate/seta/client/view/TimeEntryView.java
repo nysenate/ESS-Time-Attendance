@@ -68,7 +68,9 @@ public class TimeEntryView implements ViewObject {
 
     @JsonIgnore
     public TimeEntry toTimeEntry() {
-        TimeEntry entry = new TimeEntry(new BigInteger(timeRecordId), empId);
+        TimeEntry entry = new TimeEntry(
+                timeRecordId != null && timeRecordId.matches("\\d+") ? new BigInteger(timeRecordId) : null,
+                empId);
         entry.setEntryId(entryId != null ? new BigInteger(entryId) : null);
         entry.setEmployeeName(employeeName);
         entry.setDate(date);

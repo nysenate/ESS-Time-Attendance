@@ -102,7 +102,18 @@ public class TransactionHistory
 
     public TreeMap<LocalDate, Boolean> getEffectiveEmpStatus(Range<LocalDate> dateRange) {
         TreeMap<LocalDate, Boolean> empStatuses = new TreeMap<>();
-        getEffectiveEntriesDuring("CDEMPSTATUS", dateRange, true).forEach((k,v) -> empStatuses.put(k, v.equals("A")));
+        getUniqueEntriesDuring(Sets.newHashSet("CDEMPSTATUS", "CDSTATPER"), dateRange, true)
+                .rowMap().forEach((date, vals) -> {
+            if (StringUtils.equals(vals.get("CDEMPSTATUS"), "A")) {
+                empStatuses.put(date, true);
+            } else if (StringUtils.equals(vals.get("CDEMPSTATUS"), "I")) {
+                if (StringUtils.equals(vals.get("CDSTATPER"), "RETD")) {
+                    empStatuses.put(date, false);
+                } else {
+                    empStatuses.put(date.plusDays(1), false);
+                }
+            }
+        });
         return empStatuses;
     }
 

@@ -17,7 +17,7 @@ public class EssAllowanceServiceTests extends BaseTests {
 
     @Test
     public void getAllowanceTest() {
-        AllowanceUsage usage = allowanceService.getAllowanceUsage(4856, 2015);
+        AllowanceUsage usage = allowanceService.getAllowanceUsage(3003, 2015);
         logger.info("{}", OutputUtils.toJson(usage));
     }
 }

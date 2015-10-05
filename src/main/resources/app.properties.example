@@ -70,7 +70,6 @@ cache.poll.delay.transactions = 60000
 # Delay (ms) during which the employee cache is refreshed entirely from the DB.
 cache.poll.delay.employees = 43200000
 
-
 # --- URL Configuration -------------------------------------------------------
 
 # The url path to be used for accessing resources (css/js)
@@ -83,3 +82,17 @@ resource.location = /assets/
 
 login.url = /login
 login.success.url = /time/record/entry
+
+# --- Scheduling Configuration ------------------------------------------------
+
+# Determines if the scheduled ensure all time records function will run
+# (Default: false)
+scheduler.timerecord.ensureall.enabled = false
+
+# Cron expressions that dictate scheduling for scheduled services
+# Format "{second} {minute} {hour} {day of month} {month} {day of week}"
+
+# Determines when the function that checks/generates time records for all employees runs
+# (Default every night at midnight: 0 0 0 * * *)
+scheduler.timerecord.ensureall.cron = 0 0 0 * * *
+

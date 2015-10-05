@@ -23,7 +23,7 @@ public class TimeRecordView implements ViewObject {
     protected EmployeeView employee;
     protected EmployeeView supervisor;
     protected String scope;
-    protected String employeeName;
+    protected String lastUpdater;
     protected String respHeadCode;
     protected boolean active;
     protected PayPeriodView payPeriod;
@@ -48,7 +48,7 @@ public class TimeRecordView implements ViewObject {
             this.employee = new EmployeeView(emp);
             this.supervisorId = record.getSupervisorId();
             this.supervisor = new EmployeeView(sup);
-            this.employeeName = record.getEmployeeName();
+            this.lastUpdater = record.getLastUpdater();
             this.respHeadCode = record.getRespHeadCode();
             this.scope = (record.getRecordStatus() != null) ? record.getRecordStatus().getScope().getCode() : null;
             this.active = record.isActive();
@@ -72,10 +72,10 @@ public class TimeRecordView implements ViewObject {
     @JsonIgnore
     public TimeRecord toTimeRecord() {
         TimeRecord record = new TimeRecord();
-        record.setTimeRecordId(timeRecordId != null ? new BigInteger(timeRecordId) : null);
+        record.setTimeRecordId(timeRecordId != null && timeRecordId.matches("\\d+") ? new BigInteger(timeRecordId) : null);
         record.setEmployeeId(employeeId);
         record.setSupervisorId(supervisorId);
-        record.setEmployeeName(employeeName);
+        record.setLastUpdater(lastUpdater);
         record.setRespHeadCode(respHeadCode);
         record.setActive(active);
         record.setPayPeriod(payPeriod.toPayPeriod());
@@ -121,8 +121,8 @@ public class TimeRecordView implements ViewObject {
     }
 
     @XmlElement
-    public String getEmployeeName() {
-        return employeeName;
+    public String getLastUpdater() {
+        return lastUpdater;
     }
 
     @XmlElement

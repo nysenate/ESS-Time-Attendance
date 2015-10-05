@@ -50,7 +50,7 @@ public class TimeEntry
     public TimeEntry(TimeRecord record, PayType payType, LocalDate date) {
         this.timeRecordId = record.getTimeRecordId();
         this.empId = record.getEmployeeId();
-        this.employeeName = record.getEmployeeName();
+        this.employeeName = record.getLastUpdater();
         this.date = date;
         this.active = true;
         this.payType = payType;

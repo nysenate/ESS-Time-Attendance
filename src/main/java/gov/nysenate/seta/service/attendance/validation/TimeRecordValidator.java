@@ -1,7 +1,8 @@
-package gov.nysenate.seta.service.attendance.validators;
+package gov.nysenate.seta.service.attendance.validation;
 
 import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.service.attendance.InvalidTimeRecordException;
+
+import java.util.Optional;
 
 /**
  * An interface for a class that performs time record validation according to a specific time record rule
@@ -14,14 +15,14 @@ public interface TimeRecordValidator {
      * @param previousState TimeRecord - The most recently saved version of the posted time record
      * @return boolean - true iff the rule can be applied
      */
-    boolean isApplicable(TimeRecord record, TimeRecord previousState);
+    boolean isApplicable(TimeRecord record, Optional<TimeRecord> previousState);
 
     /**
      * Performs a check on a time record, throwing an exception if the time record is found to be invalid
      * @param record TimeRecord - A posted time record in the process of validation
      * @param previousState TimeRecord - The most recently saved version of the posted time record
-     * @throws InvalidTimeRecordException if the provided time record contains erroneous data
+     * @throws TimeRecordErrorException if the provided time record contains erroneous data
      */
-    void checkTimeRecord(TimeRecord record, TimeRecord previousState) throws InvalidTimeRecordException;
+    void checkTimeRecord(TimeRecord record, Optional<TimeRecord> previousState) throws TimeRecordErrorException;
 
 }

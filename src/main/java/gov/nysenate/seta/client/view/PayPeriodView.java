@@ -94,4 +94,9 @@ public class PayPeriodView implements ViewObject
     public boolean isCurrent() {
         return current;
     }
+
+    @XmlElement
+    public boolean isActive() {
+        return active;
+    }
 }

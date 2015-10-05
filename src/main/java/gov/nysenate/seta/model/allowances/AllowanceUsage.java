@@ -3,6 +3,8 @@ package gov.nysenate.seta.model.allowances;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
+import gov.nysenate.seta.model.attendance.TimeRecord;
+import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.payroll.SalaryRec;
 
 import java.math.BigDecimal;
@@ -47,6 +49,13 @@ public class AllowanceUsage {
 
     public ImmutableList<SalaryRec> getSalaryRecs() {
         return ImmutableList.copyOf(salaryRecMap.asMapOfRanges().values());
+    }
+
+    public BigDecimal getRecordCost(TimeRecord record) {
+        return record.getTimeEntries().stream()
+                .filter(entry -> entry.getPayType() == PayType.TE)
+                .map(entry -> entry.getDailyTotal().multiply(getSalaryRec(entry.getDate()).getSalaryRate()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /** --- Getters / Setters --- */

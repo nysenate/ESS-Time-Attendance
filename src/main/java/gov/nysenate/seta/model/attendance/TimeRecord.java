@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.seta.model.accrual.PeriodAccUsage;
-import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.personnel.Employee;
 
@@ -28,7 +27,7 @@ public class TimeRecord implements Comparable<TimeRecord>
     protected BigInteger timeRecordId;
     protected Integer employeeId;
     protected Integer supervisorId;
-    protected String employeeName;
+    protected String lastUpdater;
     protected String respHeadCode;
     protected boolean active;
     protected LocalDate beginDate;
@@ -55,8 +54,8 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.endDate = DateUtils.endOfDateRange(dateRange);
         this.payPeriod = payPeriod;
         this.recordStatus = TimeRecordStatus.NOT_SUBMITTED;
-        this.originalUserId = this.employeeName;
-        this.updateUserId = this.employeeName;
+        this.originalUserId = this.lastUpdater;
+        this.updateUserId = this.lastUpdater;
         this.createdDate = LocalDateTime.now();
         this.updateDate = createdDate;
     }
@@ -65,7 +64,7 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.timeRecordId = other.timeRecordId;
         this.employeeId = other.employeeId;
         this.supervisorId = other.supervisorId;
-        this.employeeName = other.employeeName;
+        this.lastUpdater = other.lastUpdater;
         this.respHeadCode = other.respHeadCode;
         this.active = other.active;
         this.beginDate = other.beginDate;
@@ -164,7 +163,7 @@ public class TimeRecord implements Comparable<TimeRecord>
     public void setEmpInfo(Employee employee) {
         this.employeeId = employee.getEmployeeId();
         this.supervisorId = employee.getSupervisorId();
-        this.employeeName = employee.getUid() != null ? employee.getUid().toUpperCase() : null;
+        this.lastUpdater = employee.getUid() != null ? employee.getUid().toUpperCase() : null;
         this.respHeadCode = employee.getRespCenter().getHead().getCode();
     }
 
@@ -232,12 +231,12 @@ public class TimeRecord implements Comparable<TimeRecord>
         this.supervisorId = supervisorId;
     }
 
-    public String getEmployeeName() {
-        return employeeName;
+    public String getLastUpdater() {
+        return lastUpdater;
     }
 
-    public void setEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
+    public void setLastUpdater(String lastUpdater) {
+        this.lastUpdater = lastUpdater;
     }
 
     public boolean isActive() {

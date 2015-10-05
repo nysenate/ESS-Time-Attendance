@@ -137,6 +137,8 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
         if (submit) {
             // TODO: Ensure totals hours are in line.
             record.recordStatus = nextStatusMap[record.recordStatus];
+        } else {
+            record.recordStatus = 'NOT_SUBMITTED';
         }
         console.log(submit ? 'submitting' : 'saving', 'record', record);
         // TODO: Validate the current record

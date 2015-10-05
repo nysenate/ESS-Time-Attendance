@@ -3,7 +3,6 @@ package gov.nysenate.seta.service.attendance;
 import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.common.WorkInProgress;
@@ -12,8 +11,6 @@ import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.payroll.Holiday;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
-import gov.nysenate.seta.model.personnel.Employee;
-import gov.nysenate.seta.model.personnel.EmployeeSupInfo;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
 import gov.nysenate.seta.service.accrual.AccrualInfoService;
@@ -38,7 +35,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static gov.nysenate.seta.model.attendance.TimeRecordStatus.*;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -71,7 +67,6 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     {
         private int empId;
         private Map<BigInteger, TimeRecord> cachedTimeRecords = new LinkedHashMap<>();
-        private RangeMap<LocalDate, TimeRecord> unsavedTimeRecords = TreeRangeMap.create();
 
         public TimeRecordCacheCollection(int empId, Collection<TimeRecord> cachedTimeRecords) {
             this.empId = empId;
@@ -83,25 +78,14 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
         }
 
         public List<TimeRecord> getTimeRecords() {
-            List<TimeRecord> result = new ArrayList<>();
-            result.addAll(cachedTimeRecords.values());
-            result.addAll(unsavedTimeRecords.asMapOfRanges().values());
-            result.sort(TimeRecord::compareTo);
-            return result;
+            return new ArrayList<>(cachedTimeRecords.values());
         }
 
         public void update(TimeRecord record) {
-            RangeUtils.removeIntersecting(unsavedTimeRecords, record.getDateRange());
             if (record.getTimeRecordId() == null) {
-                if (cachedTimeRecords.values().stream()
-                        .anyMatch(existingRec ->
-                                RangeUtils.intersects(existingRec.getDateRange(), record.getDateRange()))) {
-                    throw new IllegalArgumentException("Attempt to insert overlapping time records into cache");
-                }
-                unsavedTimeRecords.put(record.getDateRange(), record);
-            } else {
-                cachedTimeRecords.put(record.getTimeRecordId(), record);
+                throw new IllegalArgumentException("Attempt to insert time record with null id into cache");
             }
+            cachedTimeRecords.put(record.getTimeRecordId(), record);
         }
 
         public void remove(BigInteger timeRecId) {
@@ -131,9 +115,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
             cachedRecs = (TimeRecordCacheCollection) element.getObjectValue();
         }
         else {
-            List<TimeRecord> records = getOpenTimeRecords(empId).stream()
-                    .filter(record -> TimeRecordStatus.inProgress().contains(record.getRecordStatus()))
-                    .collect(Collectors.toList());
+            List<TimeRecord> records = timeRecordDao.getActiveRecords(empId);
             records.forEach(this::initializeEntries);
             cachedRecs = new TimeRecordCacheCollection(empId, records);
             activeRecordCache.acquireWriteLockOnKey(empId);
@@ -198,21 +180,16 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     public synchronized boolean saveRecord(TimeRecord record) {
         boolean updated = timeRecordDao.saveRecord(record);
         if (updated) {
-            int empId = record.getEmployeeId();
-            activeRecordCache.acquireWriteLockOnKey(empId);
-            try {
-                Element elem = activeRecordCache.get(empId);
-                if (elem != null && TimeRecordStatus.inProgress().contains(record.getRecordStatus())) {
-                    TimeRecordCacheCollection cachedRecs = (TimeRecordCacheCollection) elem.getObjectValue();
-                    cachedRecs.update(record);
-                }
-                else {
-                    activeRecordCache.put(new Element(empId, new TimeRecordCacheCollection(empId, getActiveTimeRecords(empId))));
-                }
+            if (record.isActive() && record.getRecordStatus().getScope() != TimeRecordScope.EMPLOYEE) {
+                // If the record is not in the employee scope i.e. it has been submitted,
+                // set any earlier, unsubmitted records as inactive
+                getActiveTimeRecords(record.getEmployeeId()).stream()
+                        .filter(otherRec -> otherRec.getBeginDate().isBefore(record.getBeginDate()))
+                        .filter(otherRec -> otherRec.getRecordStatus().getScope() == TimeRecordScope.EMPLOYEE)
+                        .peek(otherRec -> otherRec.setActive(false))
+                        .forEach(this::saveRecord);
             }
-            finally {
-                activeRecordCache.releaseWriteLockOnKey(empId);
-            }
+            updateCache(record);
         }
         return updated;
     }
@@ -241,15 +218,26 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     /** --- Internal Methods --- */
 
     /**
-     * Get all time records for the employee's open attendance periods
-     * Create unsaved records for any uncovered periods where the employee is temporary
-     * @param empId Integer - employee Id
-     * @return List<TimeRecord>
+     * Updates the active time record cache with the given record
+     * If the record is active and in progress, it is added/updated, otherwise it is removed
+     * @param record TimeRecord
      */
-    private List<TimeRecord> getOpenTimeRecords(Integer empId) {
-        List<TimeRecord> existingRecords = timeRecordDao.getActiveRecords(empId);
-        existingRecords.addAll(timeRecordManager.getUnusedRecords(empId, existingRecords));
-        return existingRecords;
+    private void updateCache(TimeRecord record) {
+        int empId = record.getEmployeeId();
+        activeRecordCache.acquireWriteLockOnKey(empId);
+        try {
+            Element elem = activeRecordCache.get(empId);
+            if (elem != null) {
+                TimeRecordCacheCollection cachedRecs = (TimeRecordCacheCollection) elem.getObjectValue();
+                if (record.isActive() && TimeRecordStatus.inProgress().contains(record.getRecordStatus())) {
+                    cachedRecs.update(record);
+                } else {
+                    cachedRecs.remove(record.getTimeRecordId());
+                }
+            }
+        } finally {
+            activeRecordCache.releaseWriteLockOnKey(empId);
+        }
     }
 
     /**

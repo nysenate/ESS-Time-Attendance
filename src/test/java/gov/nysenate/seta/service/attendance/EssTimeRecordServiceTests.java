@@ -44,7 +44,7 @@ public class EssTimeRecordServiceTests extends BaseTests
 
     @Test
     public void tempActiveRecordsTest() {
-        int empId = 11711;
+        int empId = 2868;
         List<TimeRecord> tRecs = timeRecordService.getActiveTimeRecords(empId);
         tRecs.forEach(record -> logger.info("{} - {}", record.getDateRange(), record.getTimeRecordId()));
     }
