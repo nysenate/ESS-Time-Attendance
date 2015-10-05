@@ -1,24 +1,43 @@
 var essApp = angular.module('ess')
-        .controller('RecordEntryController', ['$scope', '$http', '$filter', 'appProps', 'ActiveTimeRecordsApi',
+        .controller('RecordEntryController', ['$scope', '$filter', 'appProps', 'ActiveTimeRecordsApi',
                                             'TimeRecordsApi', 'AccrualPeriodApi', 'RecordUtils', 'LocationService',
                                              'modals', recordEntryCtrl]);
 
-function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
+function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
                          recordsApi, accrualPeriodApi, recordUtils, locationService, modals) {
 
-    $scope.state = {
-        // Data
-        accrual: null,
+    var initialState = {
+        empId: appProps.user.employeeId,  // Employee Id
+        miscLeaves: appProps.miscLeaves,  // Listing of misc leave types
+        accrual: null,                    // Accrual info for selected record
+        records: [],                      // All active employee records
+        iSelectedRecord: 0,               // Index of the currently selected record,
+        displayEntries: [],               // The entries that are being displayed
 
         // Page state
-        searching: false,
-        fetchedRecs: false,
-        saving: false,
-        submitting: false,
-        submitted: false
+        pageState: 0                      // References the values from $scope.pageStates
     };
 
-    $scope.miscLeaves = appProps.miscLeaves;
+    $scope.state = null;                  // The container for all the state variables for this page
+
+    // Enumeration of the possible page states.
+    $scope.pageStates = {
+        INITIAL: 0,
+        FETCHING: 1,
+        FETCHED: 2,
+        SAVING: 3,
+        SAVED: 4,
+        SAVE_FAILURE: 5,
+        SUBMIT_ACK: 6,
+        SUBMITTING: 7,
+        SUBMITTED: 8,
+        SUBMIT_FAILURE: 9
+    };
+
+    // Create a new state from the values in the default state.
+    $scope.initializeState = function() {
+        $scope.state = angular.extend({}, initialState);
+    };
 
     // Get a clean validation object where everything is set as valid
     function getDefaultValidation() {
@@ -39,148 +58,194 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         DISAPPROVED_PERSONNEL: "SUBMITTED_PERSONNEL"
     };
 
-    // Settings for floating the time entry table heading
-    $scope.floatTheadOpts = {
-        scrollingTop: 47
-    };
-
     $scope.init = function() {
-        console.log('rec init');
+        console.log('Time record initialization');
+        $scope.initializeState();
         $scope.getRecords();
     };
 
+    /** --- Watches --- */
+
+    // Update accruals, display entries, totals when a new record is selected
+    $scope.$watchGroup(['state.records', 'state.iSelectedRecord'], function() {
+        if ($scope.state.records && $scope.state.records[$scope.state.iSelectedRecord]) {
+            $scope.validation = getDefaultValidation();
+            $scope.getAccrualForSelectedRecord();
+            setDisplayEntries();
+            onRecordChange();
+            setRecordSearchParams();
+        }
+    });
+
     /** --- API Methods --- */
 
-    // Get active employee scoped records for the current user
-    $scope.getRecords = function () {
-        var empId = appProps.user.employeeId;
-        $scope.state.searching = true;
-        $scope.records = [];
-        $scope.iSelectedRecord = 0;
+    /**
+     * Fetches the employee's active records from the server, auto-selecting a record
+     * if it's end date is supplied in the query params.
+     */
+    $scope.getRecords = function() {
+        $scope.state.pageState = $scope.pageStates.FETCHING;
         activeRecordsApi.get({
-            empId: empId,
+            empId: $scope.state.empId,
             scope: 'E'
         }, function (response) {
-            if (empId in response.result.items) {
-                $scope.records = response.result.items[empId];
-                angular.forEach($scope.records, function(record){
+            if ($scope.state.empId in response.result.items) {
+                $scope.state.records = response.result.items[$scope.state.empId];
+                angular.forEach($scope.state.records, function(record){
+                    // Compute the due from dates for each record
                     var endDateMoment = moment(record.endDate);
                     record.dueFromNowStr = endDateMoment.fromNow(false);
                     record.isDue = endDateMoment.isBefore(moment().add(1, 'days').startOf('day'));
                 });
-                linkToRecord();
+                // Change the selected record based on the query param if it exists
+                linkRecordFromQueryParam();
             }
-            $scope.state.searching = false;
-            $scope.state.fetchedRecs = true;
+        }).$promise.finally(function() {
+            $scope.state.pageState = $scope.pageStates.FETCHED;
         });
     };
 
-    // Gets accrual usage and allowances pertinent to the currently selected time record
+    /**
+     * Returns the currently selected record.
+     * @returns timeRecord object
+     */
+    $scope.getSelectedRecord = function() {
+        return $scope.state.record[$scope.state.iSelectedRecord];
+    };
+
+    /**
+     * Fetches the accruals for the currently selected time record from the server.
+     */
     $scope.getAccrualForSelectedRecord = function() {
-        var empId = appProps.user.employeeId;
-        var record = $scope.records[$scope.iSelectedRecord];
+        var empId = $scope.state.empId;
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
         var periodStartMoment = moment(record.payPeriod.startDate);
-        accrualPeriodApi.get({empId: empId, beforeDate: periodStartMoment.format('YYYY-MM-DD')}, function(resp){
+        accrualPeriodApi.get({empId: empId, beforeDate: periodStartMoment.format('YYYY-MM-DD')}, function(resp) {
             if (resp.success) {
                 $scope.state.accrual = resp.result;
             }
         });
     };
 
-    // Saves the currently selected record.  If the submit parameter is true, modifies the record status
+    /**
+     * Validates and saves the currently selected record.
+     * @param submit - Set to true if user is also submitting the record. This will modify the record status if
+     *                 it completes successfully.
+     */
     $scope.saveRecord = function(submit) {
-        var record = $scope.records[$scope.iSelectedRecord];
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
         if (submit) {
-            // todo ensure totals hours are in line
+            // TODO: Ensure totals hours are in line.
             record.recordStatus = nextStatusMap[record.recordStatus];
         }
         console.log(submit ? 'submitting' : 'saving', 'record', record);
+        // TODO: Validate the current record
         // Open the modal to indicate save/submit
         if (submit) {
-            $scope.state.submitted = false;
+            $scope.state.pageState = $scope.pageStates.SUBMIT_ACK;
             modals.open('submit-indicator', {'record': record});
         }
         else {
             modals.open('save-indicator', {'record': record});
-            $scope.state.saving = true;
+            $scope.state.pageState = $scope.pageStates.SAVING;
             recordsApi.save(record, function (resp) {
                 record.updateDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
                 record.savedDate = record.updateDate;
                 record.dirty = false;
-                $scope.state.saving = false;
+                $scope.state.pageState = $scope.pageStates.SAVED;
             }, function (resp) {
                 alert("Failed to save record!");
                 console.log(resp);
-                $scope.state.saving = false;
+                $scope.state.pageState = $scope.pageStates.SAVE_FAILURE;
             });
         }
     };
 
+    /**
+     * Submits the currently selected record. This assumes any necessary validation has already been
+     * made on this record.
+     */
     $scope.submitRecord = function() {
-        var record = $scope.records[$scope.iSelectedRecord];
-        $scope.state.submitting = true;
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
+        $scope.state.pageState = $scope.pageStates.SUBMITTING;
         recordsApi.save(record, function (resp) {
-            $scope.state.submitting = false;
-            $scope.state.submitted = true;
-            $scope.getRecords();
+            $scope.state.pageState = $scope.pageStates.SUBMITTED;
         }, function (resp) {
-            alert("Failed to save time record!");
+            alert("Failed to submit time record!");
             console.log(resp);
-            $scope.state.submitting = false;
-            $scope.state.submitted = false;
+            $scope.state.pageState = $scope.pageStates.SUBMIT_FAILURE;
         });
     };
 
-    /** TODO: This needs to be moved to a common module. */
-    $scope.logout = function() {
-        locationService.go('/logout', true);
+    $scope.finishSubmitModal = function() {
+        $scope.closeModal();
+        $scope.init();
     };
 
+    /**
+     * Closes any open modals by resolving them.
+     */
     $scope.closeModal = function() {
         modals.resolve();
     };
 
     /** --- Display Methods --- */
 
-    // Returns true if the given date is on the weekend
+    /**
+     * Returns true if the given date falls on a weekend.
+     * @param date - ISO, JS, or Moment Date
+     * @returns {boolean} - true if weekend, false otherwise.
+     */
     $scope.isWeekend = function(date) {
         return $filter('momentIsDOW')(date, [0, 6]);
     };
 
-    // Returns true if all validation fields are true in the validation object
+    /**
+     * Returns true if all validation fields are true in the validation object.
+     * @returns {boolean}
+     */
     $scope.recordValid = function() {
         return allTrue($scope.validation);
     };
 
-    // This function is called every time a field is modified on the selected record
+    /**
+     * This method is called every time a field is modified on the currently selected record.
+     */
     $scope.setDirty = function() {
-        $scope.records[$scope.iSelectedRecord].dirty = true;
+        $scope.state.records[$scope.state.iSelectedRecord].dirty = true;
         onRecordChange();
     };
 
-    // Returns true if the record is submittable, i.e. it exists, passes validation, and has already ended
+    /**
+     * Returns true if the record is submittable, i.e. it exists, passes all validations, and has ended or will end
+     * today.
+     * @returns {boolean}
+     */
     $scope.recordSubmittable = function () {
-        var record = $scope.records[$scope.iSelectedRecord];
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
         return record && $scope.recordValid() && !moment(record.endDate).isAfter(moment(), 'day');
     };
 
     /** --- Internal Methods --- */
 
-    // Refreshes totals and validates a record when a change occurs on a record
+    /**
+     * Refreshes totals and validates a record when a change occurs on a record.
+     */
     function onRecordChange() {
-        var record = $scope.records[$scope.iSelectedRecord];
-
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
         recordUtils.calculateDailyTotals(record);
         $scope.totals = recordUtils.getRecordTotals(record);
-
         validateRecord();
     }
 
-    // Creates a displayEntries array for a given record, filling in dates that the record doesn't cover with dummy entries
+    /**
+     * Creates a displayEntries array for a given record, filling in dates that the record doesn't cover with
+     * dummy entries.
+     */
     function setDisplayEntries() {
-        var record = $scope.records[$scope.iSelectedRecord];
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
         console.log('new selected record:', moment(record.beginDate).format('l'), record);
-        $scope.displayEntries = [];
+        $scope.state.displayEntries = [];
         var entryIndex = 0;
         for (var date = moment(record.payPeriod.startDate), periodEnd = moment(record.payPeriod.endDate);
                 !date.isAfter(periodEnd); date = date.add(1, 'days')) {
@@ -191,11 +256,15 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
                 entry = {dummyEntry: true};
             }
             entry.unavailable = date.isAfter(moment(), 'day');
-            $scope.displayEntries.push(entry);
+            $scope.state.displayEntries.push(entry);
         }
     }
 
-    // Recursively ensures that all boolean fields are true within the given object (see $scope.recordValid)
+    /**
+     * Recursively ensures that all boolean fields are true within the given object. (see $scope.recordValid)
+     * @param object
+     * @returns {boolean}
+     */
     function allTrue(object) {
         if (typeof object === 'boolean') {
             return object;
@@ -208,17 +277,21 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         return true;
     }
 
-    // Performs a series of validation checks on the active record, updating $scope.validation with the result of the checks
+    /**
+     * Performs a series of validation checks on the active record, updating $scope.validation with the result of
+     * the checks.
+     */
     function validateRecord() {
         validateAccruals();
         // todo validate more things
     }
 
-    // Ensures that the active record does not use more hours than they have accrued
+    /**
+     * Ensures that the active record does not use more hours than they have accrued.
+     */
     function validateAccruals() {
         var accValidation = $scope.validation.accruals;
         var accrual = $scope.state.accrual;
-
         if (accrual) {
             var sickUsage = $scope.totals.sickEmpHours + $scope.totals.sickFamHours;
             accValidation.sick = sickUsage <= accrual.sickAvailable;
@@ -227,40 +300,31 @@ function recordEntryCtrl($scope, $http, $filter, appProps, activeRecordsApi,
         }
     }
 
-    // Sets search params pertaining to the current active record
+    /**
+     * Sets the search params to indicate the currently active record.
+     */
     function setRecordSearchParams() {
-        var record = $scope.records[$scope.iSelectedRecord];
+        var record = $scope.state.records[$scope.state.iSelectedRecord];
         locationService.setSearchParam('record', record.beginDate);
     }
 
-    // Checks for a 'record' search param
-    // If a record exists with a start date equal to the 'record' param, set that record as selected record
-    function linkToRecord() {
+    /**
+     * Checks for a 'record' search param in the url and if it exists, the record with a start date that matches
+     * the given date will be set as the selected record.
+     */
+    function linkRecordFromQueryParam() {
         var recordParam = locationService.getSearchParam('record');
         if (recordParam) {
-            console.log('linking to', recordParam);
-            for(var iRecord in $scope.records) {
-                var record = $scope.records[iRecord];
+            // Need to break out early, hence no angular.forEach.
+            for (var iRecord in $scope.state.records) {
+                var record = $scope.state.records[iRecord];
                 if (record.beginDate === recordParam) {
-                    $scope.iSelectedRecord = iRecord;
+                    $scope.state.iSelectedRecord = iRecord;
                     break;
                 }
             }
         }
     }
-
-    /** --- Watches --- */
-
-    // Update accruals, display entries, totals when a new record is selected
-    $scope.$watchGroup(['records', 'iSelectedRecord'], function() {
-        if ($scope.records && $scope.records[$scope.iSelectedRecord]) {
-            $scope.validation = getDefaultValidation();
-            $scope.getAccrualForSelectedRecord();
-            setDisplayEntries();
-            onRecordChange();
-            setRecordSearchParams();
-        }
-    });
 
     $scope.init();
 }

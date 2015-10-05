@@ -18,7 +18,7 @@
       the right.</p>
     <div class="padding-10">
       <table id="attendance-active-table" class="ess-table attendance-listing-table"
-             float-thead="floatTheadOpts" ng-model="records.employee">
+             ng-model="records.employee">
         <thead>
         <tr>
           <th>Date Range</th>
@@ -62,7 +62,7 @@
       in the table below.<br/>You can view details about each pay period by clicking on the row.</p>
     <div class="padding-10">
       <table id="attendance-history-table" class="ess-table attendance-listing-table"
-             float-thead="floatTheadOpts" ng-model="records.other">
+             ng-model="records.other">
         <thead>
         <tr>
           <th>Date Range</th>
