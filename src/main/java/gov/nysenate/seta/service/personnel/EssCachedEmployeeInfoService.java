@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Service
 public class EssCachedEmployeeInfoService implements EmployeeInfoService
@@ -105,11 +106,20 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
      */
     private Employee getEmployeeAndPutInCache(int empId) {
         Employee employee = employeeDao.getEmployeeById(empId);
+        cacheEmployee(employee);
+        return employee;
+    }
+
+    /**
+     * Saves the given employee info into the employee cache
+     * @param employee Employee
+     */
+    private void cacheEmployee(Employee employee) {
+        int empId = employee.getEmployeeId();
         fixFullNameFormat(employee);
         empCache.acquireWriteLockOnKey(empId);
         empCache.put(new Element(empId, employee));
         empCache.releaseWriteLockOnKey(empId);
-        return employee;
     }
 
     @Scheduled(fixedDelayString = "${cache.poll.delay.employees:43200000}")
@@ -117,12 +127,9 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
         if (env.acceptsProfiles("!test")) {
             logger.debug("Refreshing employee cache..");
             empCache.removeAll();
-            employeeDao.getActiveEmployeeIds()
-                    .parallelStream().forEach((empId) -> {
-                logger.debug("Fetching employee {}", empId);
-                getEmployeeAndPutInCache(empId);
-            });
-            logger.debug("Finished refreshing employee cache");
+            Set<Employee> activeEmployees = employeeDao.getActiveEmployees();
+            activeEmployees.forEach(this::cacheEmployee);
+            logger.debug("Finished refreshing employee cache: {} employees cached", activeEmployees.size());
         }
     }
 

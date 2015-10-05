@@ -32,13 +32,21 @@ public enum SqlEmployeeQuery implements BasicSqlQuery
         "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16RESPCTR WHERE CDSTATUS = 'A') rctr ON per.CDRESPCTR = rctr.CDRESPCTR AND per.CDAGENCY = rctr.CDAGENCY\n" +
         "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16RSPCTRHD WHERE CDSTATUS = 'A') rctrhd ON rctr.CDRESPCTRHD = rctrhd.CDRESPCTRHD\n" +
         "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16AGENCY WHERE CDSTATUS = 'A') agcy ON rctr.CDAGENCY = agcy.CDAGENCY\n" +
-        "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n" +
-        "WHERE %s \n"),
+        "LEFT JOIN (SELECT * FROM ${masterSchema}.SL16LOCATION WHERE CDSTATUS = 'A') loc ON per.CDLOCAT = loc.CDLOCAT\n"
+    ),
 
-    GET_EMP_BY_ID_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NUXREFEM = :empId")),
-    GET_EMP_BY_EMAIL_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NAEMAIL = :email")),
-    GET_ACTIVE_EMPS_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.CDEMPSTATUS = 'A'")),
-    GET_EMPS_BY_IDS_SQL(String.format(GET_EMP_SQL_TMPL.sql, "per.NUXREFEM IN :empIdSet")),
+    GET_EMP_BY_ID_SQL(
+            GET_EMP_SQL_TMPL.getSql() +  "WHERE per.NUXREFEM = :empId"
+    ),
+    GET_EMP_BY_EMAIL_SQL(
+            GET_EMP_SQL_TMPL.getSql() + "WHERE per.NAEMAIL = :email"
+    ),
+    GET_ACTIVE_EMPS_SQL(
+            GET_EMP_SQL_TMPL.getSql() + "WHERE per.CDEMPSTATUS = 'A'"
+    ),
+    GET_EMPS_BY_IDS_SQL(
+            GET_EMP_SQL_TMPL.getSql() + "WHERE per.NUXREFEM IN :empIdSet"
+    ),
 
     GET_ACTIVE_EMP_IDS(
         "SELECT DISTINCT NUXREFEM\n" +

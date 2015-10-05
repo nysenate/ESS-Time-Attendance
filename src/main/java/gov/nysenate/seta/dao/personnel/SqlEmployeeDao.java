@@ -61,6 +61,12 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
 
     /** {@inheritDoc} */
     @Override
+    public Set<Employee> getActiveEmployees() {
+        return new HashSet<>(remoteNamedJdbc.query(GET_ACTIVE_EMPS_SQL.getSql(schemaMap()), getEmployeeRowMapper()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Set<Integer> getActiveEmployeeIds(){
         return new HashSet<>(remoteNamedJdbc.query(GET_ACTIVE_EMP_IDS.getSql(schemaMap()),
                 (rs, rowNum) -> rs.getInt("NUXREFEM")));

@@ -43,6 +43,11 @@ public interface EmployeeDao extends BaseDao
     public Map<Integer, Employee> getEmployeesByIds(List<Integer> empIds);
 
     /**
+     * @return Employee info objects for all currently active employees
+     */
+    public Set<Employee> getActiveEmployees();
+
+    /**
      * @return The ids for all currently active employees
      */
     public Set<Integer> getActiveEmployeeIds();
