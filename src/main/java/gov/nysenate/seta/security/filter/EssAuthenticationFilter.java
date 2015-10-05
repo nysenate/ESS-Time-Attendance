@@ -1,6 +1,7 @@
 package gov.nysenate.seta.security.filter;
 
 import gov.nysenate.common.HttpResponseUtils;
+import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.client.response.auth.AuthenticationResponse;
 import gov.nysenate.seta.model.auth.AuthenticationStatus;
 import gov.nysenate.seta.model.auth.SenateLdapPerson;

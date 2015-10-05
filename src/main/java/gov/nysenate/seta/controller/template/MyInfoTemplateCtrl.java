@@ -26,6 +26,4 @@ public class MyInfoTemplateCtrl extends BaseTemplateCtrl
     public String personnelTransactions() {
         return MYINFO_TMPL_BASE_URL + "/personnel/transactions";
     }
-
-
 }

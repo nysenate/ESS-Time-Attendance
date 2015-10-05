@@ -1,6 +1,5 @@
 package gov.nysenate.seta.dao.personnel;
 
-import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeException;

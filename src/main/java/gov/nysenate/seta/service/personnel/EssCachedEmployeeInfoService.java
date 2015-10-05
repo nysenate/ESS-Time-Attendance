@@ -6,7 +6,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
-import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.personnel.*;
@@ -64,8 +63,6 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
 
     /** {@inheritDoc} */
     @Override
-    @WorkInProgress(author = "Sam", since = "9/23/2015", desc = "The transaction layer cannot get all employee info on its own")
-    // Todo: make a basic employee object that can encapsulate this data with a better fit than Employee
     public Employee getEmployee(int empId, LocalDate effectiveDate) throws EmployeeNotFoundEx {
         Employee employee = getEmployee(empId);
         TransactionHistory transHistory = transService.getTransHistory(empId);
@@ -112,7 +109,7 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
         return employee;
     }
 
-    @Scheduled(fixedDelayString = "${cache.poll.delay.employees:43200000}")
+//    @Scheduled(fixedDelayString = "${cache.poll.delay.employees:43200000}")
     public void cacheActiveEmployees() {
         if (env.acceptsProfiles("!test")) {
             logger.debug("Refreshing employee cache..");

@@ -1,5 +1,6 @@
 package gov.nysenate.seta.controller.template;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,14 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
         return TIME_TMPL_BASE_URL + "/record/history";
     }
 
+    @RequestMapping(value="/record/details")
+    public String recordDetails() {
+        return TIME_TMPL_BASE_URL + "/record/details";
+    }
+
+
+    /** --- Supervisor Records --- */
+
     @RequestMapping(value="/record/manage")
     public String manage() {
         return TIME_TMPL_BASE_URL + "/record/manage";
@@ -42,11 +51,6 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
         return TIME_TMPL_BASE_URL + "/record/grant";
     }
 
-    @RequestMapping(value="/record/details")
-    public String recordDetails() {
-        return TIME_TMPL_BASE_URL + "/record/details";
-    }
-
     @RequestMapping(value = "/record/supervisor-record-list")
     public String recordList() {
         return TIME_TMPL_BASE_URL + "/record/supervisor-record-list";
@@ -57,23 +61,21 @@ public class TimeTemplateCtrl extends BaseTemplateCtrl
         return TIME_TMPL_BASE_URL + "/record/record-review-modal";
     }
 
+    @RequestMapping(value = "/record/record-reject-modal")
+    public String recordRejectModal() {
+        return TIME_TMPL_BASE_URL + "/record/record-reject-modal";
+    }
+
+    @RequestMapping(value = "/record/record-approve-submit-modal")
+    public String recordApproveSubmitModal() {
+        return TIME_TMPL_BASE_URL + "/record/record-approve-submit-modal";
+    }
+
     /** --- Accruals --- */
 
     @RequestMapping(value="/accrual/history")
     public String accrualHistory() {
         return TIME_TMPL_BASE_URL + "/accrual/history";
-    }
-
-    @RequestMapping(value="/accrual/projections")
-    public String accrualProjections() {
-        return TIME_TMPL_BASE_URL + "/accrual/projections";
-    }
-
-    /** --- Time Off --- */
-
-    @RequestMapping(value="/timeoff/request")
-    public String timeOffRequest() {
-        return TIME_TMPL_BASE_URL + "/timeoff/request";
     }
 
     /** --- Calendar --- */

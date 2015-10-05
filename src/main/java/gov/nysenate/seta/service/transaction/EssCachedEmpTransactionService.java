@@ -85,13 +85,17 @@ public class EssCachedEmpTransactionService implements EmpTransactionService
         logger.debug("Checking for transaction updates since {}...", lastUpdateDateTime);
         List<TransactionRecord> transRecs = transactionDao.updatedRecordsSince(lastUpdateDateTime);
         lastCheckTime = LocalDateTime.now();
+        logger.debug("{} new transaction records have been found.", transRecs.size());
         if (!transRecs.isEmpty()) {
+            // Get the last updated record date/time
+            lastUpdateDateTime = transRecs.stream()
+                .map(TransactionRecord::getUpdateDate).max(LocalDateTime::compareTo).get();
+            // Gather a set of affected employee ids and refresh their transaction cache
             transRecs.stream().map(TransactionRecord::getEmployeeId).distinct().forEach(empId -> {
-                logger.debug("Caching transactions for employee {}", empId);
+                logger.debug("Re-Caching transactions for employee {}", empId);
                 TransactionHistory transHistory = getTransHistoryFromDao(empId);
                 putTransactionHistoryInCache(empId, transHistory);
             });
-            lastUpdateDateTime = transactionDao.getMaxUpdateDateTime();
             // Post the update event
             eventBus.post(new TransactionHistoryUpdateEvent(transRecs, lastCheckTime));
         }

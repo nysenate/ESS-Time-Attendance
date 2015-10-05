@@ -45,10 +45,10 @@ public class EmployeeRowMapper extends BaseRowMapper<Employee>
         emp.setHomePhone(rs.getString(pfx + "ADPHONENUM"));
         emp.setWorkPhone(rs.getString(pfx + "ADPHONENUMW"));
         emp.setJobTitle(rs.getString(pfx + "FFDEEMPTITLL"));
-        emp.setPayType(PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")));
-        emp.setGender(Gender.valueOf(rs.getString(pfx + "CDSEX")));
+        emp.setPayType(rs.getString(pfx + "CDPAYTYPE") != null ? PayType.valueOf(rs.getString(pfx + "CDPAYTYPE")) : null);
+        emp.setGender(rs.getString(pfx + "CDSEX") != null ? Gender.valueOf(rs.getString(pfx + "CDSEX")) : null);
         emp.setDateOfBirth(getLocalDate(rs, pfx + "DTBIRTH"));
-        emp.setMaritalStatus(MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL")));
+        emp.setMaritalStatus(rs.getString(pfx + "CDMARITAL") != null ? MaritalStatus.valueOfCode(rs.getString(pfx + "CDMARITAL")) : null);
         emp.setHomeAddress(addressRowMapper.mapRow(rs, rowNum));
         emp.setRespCenter(respCenterRowMapper.mapRow(rs, rowNum));
         emp.setWorkLocation(locationRowMapper.mapRow(rs, rowNum));

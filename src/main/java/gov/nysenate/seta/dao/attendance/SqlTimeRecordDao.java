@@ -103,11 +103,8 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
 
     @Override
     public boolean saveRecord(TimeRecord record) {
-
         MapSqlParameterSource params = getTimeRecordParams(record);
-
         boolean isUpdate = true;
-
         if (record.getTimeRecordId() == null ||
                 remoteNamedJdbc.update(SqlTimeRecordQuery.UPDATE_TIME_REC_SQL.getSql(schemaMap()), params)==0) {
             isUpdate = false;

@@ -22,9 +22,6 @@ public class MailUtils
     @Value("${mail.debug:false}") private boolean debug;
     @Value("${mail.smtp.starttls.enable:}") private boolean stlsEnable;
 
-    @Value("${mail.store.protocol:imaps}") private String storeProtocol;
-    @Value("${mail.imaps.ssl.protocols:SSLv3}") private String imapsSSLProtocol;
-
     private Properties mailProperties;
 
     @PostConstruct
@@ -37,8 +34,6 @@ public class MailUtils
         mailProperties.put("mail.smtp.user", smtpUser);
         mailProperties.put("mail.smtp.pass", smtpPass);
         mailProperties.put("mail.debug", debug);
-        mailProperties.put("mail.store.protocol", storeProtocol);
-        mailProperties.put("mail.imaps.ssl.protocols", imapsSSLProtocol);
     }
 
     /**
@@ -59,46 +54,6 @@ public class MailUtils
 
     public Properties getMailProperties() {
         return mailProperties;
-    }
-
-    /**
-     * Establishes a connection to a mail server and returns the resulting connection object
-     * The store must be closed on its own.
-     *
-     * @param host the mail host
-     * @param user the username of the mail account
-     * @param password the password for the username
-     * @return Store
-     * @throws MessagingException if a connection cannot be established
-     */
-    public Store getStore(String host, String user, String password)
-            throws MessagingException {
-        Store store = getImapsSession().getStore(storeProtocol);
-        try {
-            store.connect(host, user, password);
-        }
-        catch (MessagingException ex) {
-            store.close();
-            throw ex;
-        }
-        return store;
-    }
-
-    /**
-     * Navigates through the given mail store to get the folder specified by the given path
-     *
-     * @param path The path to navigate to
-     * @param store The mail store to navigate through
-     * @return Folder - the resulting folder
-     * @throws MessagingException If the folder cannot be found
-     */
-    public Folder navigateToFolder(String path, Store store) throws MessagingException {
-        String[] splitPath = path.split("/");
-        Folder folder = store.getFolder(splitPath[0]);
-        for(int i=1; i<splitPath.length; i++) {
-            folder = folder.getFolder(splitPath[i]);
-        }
-        return folder;
     }
 
     /** --- Internal Methods --- */
