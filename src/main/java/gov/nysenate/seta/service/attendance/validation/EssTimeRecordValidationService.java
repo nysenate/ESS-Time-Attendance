@@ -22,14 +22,18 @@ public class EssTimeRecordValidationService implements TimeRecordValidationServi
     @Autowired private TimeRecordService timeRecordService;
     @Autowired private TimeRecordDao timeRecordDao;
 
+    @Autowired private PermittedModificationTRV permittedModificationTRV;
     @Autowired private LifeCycleTRV lifeCycleTRV;
+    @Autowired private AllowanceTRV allowanceTRV;
 
     private ImmutableList<TimeRecordValidator> timeRecordValidators;
 
     @PostConstruct
     public void init() {
         timeRecordValidators = ImmutableList.<TimeRecordValidator>builder()
+                .add(permittedModificationTRV)
                 .add(lifeCycleTRV)
+                .add(allowanceTRV)
                 // TODO: ADD SOME more VALIDATORS
                 .build();
     }
