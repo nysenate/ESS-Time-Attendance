@@ -16,6 +16,7 @@ import static gov.nysenate.seta.dao.payroll.SqlPaycheckQuery.GET_EMPLOYEE_PAYCHE
 public class SqlPaycheckDao extends SqlBaseDao implements PayCheckDao
 {
     @Autowired EssCachedEmployeeInfoService employeeInfoService;
+    @Autowired DeductionDao deductionDao;
 
     /** {@inheritDoc} */
     @Override
@@ -24,7 +25,7 @@ public class SqlPaycheckDao extends SqlBaseDao implements PayCheckDao
         params.addValue("empId", empId)
               .addValue("year", year);
         String sql = GET_EMPLOYEE_PAYCHECKS_BY_YEAR.getSql(schemaMap());
-        PaycheckHandler handler = new PaycheckHandler(employeeInfoService, empId);
+        PaycheckHandler handler = new PaycheckHandler(empId, deductionDao, employeeInfoService);
         remoteNamedJdbc.query(sql, params, handler);
         return handler.getPaychecks();
     }

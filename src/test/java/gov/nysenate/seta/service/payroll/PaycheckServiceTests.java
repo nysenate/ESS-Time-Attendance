@@ -2,7 +2,7 @@ package gov.nysenate.seta.service.payroll;
 
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.model.payroll.Paycheck;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,15 @@ public class PaycheckServiceTests extends BaseTests
     @Autowired PaycheckService paycheckService;
     private final int empId = 11168;
     private final int year = 2015;
+    private List<Paycheck> paychecks;
+
+    @Before
+    public void before() {
+        paychecks = paycheckService.getEmployeePaychecksForYear(empId, year);
+    }
 
     @Test
     public void serviceCorrectlyInitializesPaycheck() {
-        List<Paycheck> paychecks = paycheckService.getEmployeePaychecksForYear(empId, year);
         assertTrue(paychecks.size() >= 1);
         for (Paycheck paycheck : paychecks) {
             assertThat(paycheck.getCheckDate().getYear(), is(year));
@@ -34,7 +39,7 @@ public class PaycheckServiceTests extends BaseTests
             assertTrue(paycheck.getPayPeriod().matches("[0-9]{1,2}")); //
             assertTrue(paycheck.getGrossIncome() != null);
             assertTrue(paycheck.getNetIncome() != null);
-//            assertTrue(paycheck.getDeductions() != null); // TODO: deductions
+            assertTrue(paycheck.getDeductions() != null);
             assertTrue(paycheck.getDirectDepositAmount() != null);
             assertTrue(paycheck.getCheckAmount() != null);
         }
@@ -42,14 +47,14 @@ public class PaycheckServiceTests extends BaseTests
 
     @Test
     public void sumOfDirectDepositsAndCheckShouldEqualNetIncome() {
-        Paycheck paycheck = paycheckService.getEmployeePaychecksForYear(empId, year).get(0);
+        Paycheck paycheck = paychecks.get(0);
         assertThat(paycheck.getDirectDepositAmount().add(paycheck.getCheckAmount()), is(paycheck.getNetIncome()));
     }
 
-    @Ignore
     @Test
     public void grossIncomeMinusDeductionsShouldEqualNetIncome() {
-        Paycheck paycheck = paycheckService.getEmployeePaychecksForYear(empId, year).get(0);
-        assertTrue(paycheck.getGrossIncome().subtract(paycheck.getTotalDeductions()).equals(paycheck.getNetIncome()));
+        Paycheck paycheck = paychecks.get(0);
+        assertTrue("Gross Income: " + paycheck.getGrossIncome() + " - " + paycheck.getTotalDeductions() + " != " + paycheck.getNetIncome(),
+                   paycheck.getGrossIncome().subtract(paycheck.getTotalDeductions()).equals(paycheck.getNetIncome()));
     }
 }

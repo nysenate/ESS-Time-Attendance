@@ -37,12 +37,8 @@ public class Paycheck
 
     /** Functional Methods */
 
-    public BigDecimal calculateNetIncome() {
-       return null;
-    }
-
     public BigDecimal getTotalDeductions() {
-        return null;
+        return deductions.stream().map(Deduction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /** Basic Getters */
