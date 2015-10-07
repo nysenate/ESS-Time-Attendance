@@ -8,7 +8,9 @@ import java.util.List;
 
 public class Paycheck
 {
-    private final Employee employee;
+    private final BigDecimal payRate;
+    private final String empFullName;
+    private final String empJobTitle;
     private final String payPeriod;
     private final LocalDate checkDate;
     private final String agencyCode;
@@ -21,9 +23,12 @@ public class Paycheck
     /** Amount payed via check. */
     private final BigDecimal checkAmount;
 
-    public Paycheck(Employee employee, String payPeriod, LocalDate checkDate, String agencyCode, String lineNum, BigDecimal grossIncome,
-                    BigDecimal netIncome, List<Deduction> deductions, BigDecimal directDepositAmount, BigDecimal checkAmount) {
-        this.employee = employee;
+    public Paycheck(BigDecimal payRate, String empFullName, String empJobTitle, String payPeriod, LocalDate checkDate,
+                    String agencyCode, String lineNum, BigDecimal grossIncome, BigDecimal netIncome,
+                    List<Deduction> deductions, BigDecimal directDepositAmount, BigDecimal checkAmount) {
+        this.payRate = payRate;
+        this.empFullName = empFullName;
+        this.empJobTitle = empJobTitle;
         this.payPeriod = payPeriod;
         this.checkDate = checkDate;
         this.agencyCode = agencyCode;
@@ -43,8 +48,16 @@ public class Paycheck
 
     /** Basic Getters */
 
-    public Employee getEmployee() {
-        return employee;
+    public BigDecimal getPayRate() {
+        return payRate;
+    }
+
+    public String getEmpFullName() {
+        return empFullName;
+    }
+
+    public String getEmpJobTitle() {
+        return empJobTitle;
     }
 
     public String getPayPeriod() {

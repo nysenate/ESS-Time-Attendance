@@ -15,30 +15,22 @@ import java.util.List;
 public class PaycheckHandler extends BaseHandler
 {
     private DeductionDao deductionDao;
-    private EssCachedEmployeeInfoService employeeInfoService;
-    private Employee employee;
     private int empId;
     private List<Paycheck> paychecks;
 
-    public PaycheckHandler(int empId, DeductionDao deductionDao, EssCachedEmployeeInfoService employeeInfoService) {
+    public PaycheckHandler(int empId, DeductionDao deductionDao) {
         this.deductionDao = deductionDao;
-        this.employeeInfoService = employeeInfoService;
         this.empId = empId;
         paychecks = new ArrayList<>();
     }
 
     @Override
     public void processRow(ResultSet rs) throws SQLException {
-        if (employee == null) {
-            this.employee = employeeInfoService.getEmployee(empId);
-        }
         List<Deduction> deductions = deductionDao.getDeductionsForPaycheck(empId, getLocalDateFromRs(rs, "DTCHECK"));
-
-        Paycheck paycheck = new Paycheck(this.employee, rs.getString("NUPERIOD"), getLocalDateFromRs(rs, "DTCHECK"),
-                                         rs.getString("CDAGENCY"), rs.getString("NULINE"), rs.getBigDecimal("MOGROSS"),
-                                         rs.getBigDecimal("MONET"), deductions, rs.getBigDecimal("MOADVICEAMT"),
-                                         rs.getBigDecimal("MOCHECKAMT"));
-
+        Paycheck paycheck = new Paycheck(rs.getBigDecimal("MOANNUALSAL"), rs.getString("NAEMPPAYSR"), rs.getString("DEEMPTITLE"),
+                                         rs.getString("NUPERIOD"), getLocalDateFromRs(rs, "DTCHECK"), rs.getString("CDAGENCY"),
+                                         rs.getString("NULINE"), rs.getBigDecimal("MOGROSS"), rs.getBigDecimal("MONET"),
+                                         deductions, rs.getBigDecimal("MOADVICEAMT"), rs.getBigDecimal("MOCHECKAMT"));
         paychecks.add(paycheck);
     }
 
