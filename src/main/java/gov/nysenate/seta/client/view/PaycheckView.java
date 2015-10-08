@@ -1,6 +1,7 @@
 package gov.nysenate.seta.client.view;
 
 import gov.nysenate.seta.client.view.base.ViewObject;
+import gov.nysenate.seta.model.payroll.Deduction;
 import gov.nysenate.seta.model.payroll.Paycheck;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -8,8 +9,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.TreeMap;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @XmlRootElement
 public class PaycheckView implements ViewObject
@@ -23,7 +26,8 @@ public class PaycheckView implements ViewObject
     protected String lineNum;
     protected BigDecimal grossIncome;
     protected BigDecimal netIncome;
-    protected List<DeductionView> deductions;
+    /** Map of deduction code to deduction for a paycheck. Makes for less work displaying in client. */
+    protected TreeMap<String, DeductionView> deductions;
     protected BigDecimal directDepositAmount;
     protected BigDecimal checkAmount;
 
@@ -37,7 +41,7 @@ public class PaycheckView implements ViewObject
         this.lineNum = paycheck.getLineNum();
         this.grossIncome = paycheck.getGrossIncome();
         this.netIncome = paycheck.getNetIncome();
-        this.deductions = paycheck.getDeductions().stream().map(DeductionView::new).collect(toList());
+        this.deductions = paycheck.getDeductions().stream().collect(toMap(Deduction::getDescription, DeductionView::new, (a,b) -> a, TreeMap::new));
         this.directDepositAmount = paycheck.getDirectDepositAmount();
         this.checkAmount = paycheck.getCheckAmount();
     }
@@ -94,7 +98,7 @@ public class PaycheckView implements ViewObject
     }
 
     @XmlElement
-    public List<DeductionView> getDeductions() {
+    public TreeMap<String, DeductionView> getDeductions() {
         return deductions;
     }
 
