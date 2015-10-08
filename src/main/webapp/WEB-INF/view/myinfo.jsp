@@ -13,6 +13,8 @@
         <!-- Personnel -->
         <script type="text/javascript" src="${ctxPath}/assets/js/src/myinfo/personnel/summary-ctrl.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/myinfo/personnel/transaction-history-ctrl.js"></script>
+        <!-- Payroll -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/myinfo/payroll/check-history-ctrl.js"></script>
 
     </jsp:body>
 </ess-layout:head>
