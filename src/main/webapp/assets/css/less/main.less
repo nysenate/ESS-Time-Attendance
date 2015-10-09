@@ -223,6 +223,10 @@ a {
   opacity: 0.5;
 }
 
+.scroll-x {
+  overflow-x: scroll;
+}
+
 /** --- Icons --- */
 
 .close-red {
@@ -1118,6 +1122,36 @@ record-review-modal, [record-review-modal] {
     padding: .4em;
     font-weight: 600;
     background: white;
+  }
+}
+
+/** --- Paycheck History Page --- */
+
+#paycheck-history-table {
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee !important;
+      &:hover {
+        background: #e9eeff;
+      }
+      &:nth-child(even) {
+        background: fade(#333, 5%);
+        &:hover {
+          background: #e9eeff;
+        }
+      }
+      td {
+        white-space: nowrap;
+        padding: .5em;
+        border: 0;
+      }
+      &.yearly-totals {
+        border-top: 2px solid teal;
+        td {
+          .font-weight-bold;
+        }
+      }
+    }
   }
 }
 

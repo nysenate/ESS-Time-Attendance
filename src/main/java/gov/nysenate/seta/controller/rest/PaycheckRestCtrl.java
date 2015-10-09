@@ -29,7 +29,7 @@ public class PaycheckRestCtrl extends BaseRestCtrl
     @RequestMapping(value = "", params = {"empId", "year"})
     public BaseResponse getPaychecksByYear(@RequestParam Integer empId, @RequestParam Integer year, WebRequest webRequest) {
         List<Paycheck> paychecks = paycheckService.getEmployeePaychecksForYear(empId, year);
-        return ListViewResponse.of(paychecks.stream().map(PaycheckView::new).collect(toList()), "paycheck");
+        return ListViewResponse.of(paychecks.stream().map(PaycheckView::new).collect(toList()), "paychecks");
     }
 
 }
