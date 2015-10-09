@@ -6,9 +6,11 @@ import gov.nysenate.seta.dao.base.DbVendor;
 public enum SqlPaycheckQuery implements BasicSqlQuery
 {
     GET_EMPLOYEE_PAYCHECKS_BY_YEAR(
-            "SELECT NUXREFEM, MOANNUALSAL, NAEMPPAYSR, DEEMPTITLE, MONET, MOGROSS, MOCHECKAMT, " +
-            "MOADVICEAMT, NUPERIOD, CDAGENCY, NULINE, DTCHECK\n" +
-            "from ${masterSchema}.PM25SALLEDG where NUXREFEM = :empId and EXTRACT(YEAR FROM DTCHECK) = :year"
+           "SELECT m.NUXREFEM, m.MOANNUALSAL, m.NAEMPPAYSR, m.DEEMPTITLE, m.MONET, m.MOGROSS, m.MOCHECKAMT,\n" +
+           "m.MOADVICEAMT, m.NUPERIOD, m.CDAGENCY, m.NULINE, m.DTCHECK, l.CDDEDUCTION, l.DEDEDUCTIONF, d.MODEDUCTION\n" +
+           "from ESS_DEV.PM25SALLEDG m join ESS_DEV.PD25SALLEDG d on m.nuxrefem = d.nuxrefem and m.dtcheck = d.dtcheck\n" +
+           "join ESS_DEV.PL25DEDUCTCD l on d.CDDEDUCTION = l.CDDEDUCTION\n" +
+           "where m.NUXREFEM = :empId and EXTRACT(YEAR FROM m.DTCHECK) = :year and d.cdstatus = 'A'"
     );
 
     private String sql;
