@@ -21,6 +21,7 @@ public class HolidayRowMapper extends BaseRowMapper<Holiday>
         holiday.setDate(getLocalDateFromRs(rs, "DTHOLIDAY"));
         holiday.setName(rs.getString("DEHOLIDAY"));
         holiday.setQuestionable(rs.getString("CDQUEST").equals("Y"));
+        holiday.setHours(rs.getBigDecimal("NUHOLHRS"));
         return holiday;
     }
 }

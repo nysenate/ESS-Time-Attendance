@@ -256,10 +256,11 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
                 }
                 timeRecord.addTimeEntry(new TimeEntry(timeRecord, payTypeMap.get(entryDate), entryDate));
             }
-            // Set holiday hours if applicable
-            Optional<Holiday> holiday = holidayService.getHoliday(entryDate);
-            if (holiday.isPresent()) {
-                timeRecord.getEntry(entryDate).setHolidayHours(new BigDecimal("7"));
+            if (timeRecord.getEntry(entryDate).getPayType() != PayType.TE) {
+                // Set holiday hours if applicable
+                Optional<Holiday> holiday = holidayService.getHoliday(entryDate);
+                timeRecord.getEntry(entryDate).setHolidayHours(
+                        holiday.map(Holiday::getHours).orElse(null));
             }
         }
     }

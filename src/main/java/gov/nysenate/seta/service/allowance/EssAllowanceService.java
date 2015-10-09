@@ -92,14 +92,13 @@ public class EssAllowanceService implements AllowanceService {
         getSalaryRecs(allowanceUsage, transHistory);
         List<TimeRecord> timeRecords =
                 tRecS.getTimeRecords(Collections.singleton(allowanceUsage.getEmpId()), unpaidPeriods,
-                        EnumSet.allOf(TimeRecordStatus.class));
+                        Sets.difference(TimeRecordStatus.getAll(), TimeRecordStatus.unlockedForEmployee()));
 
         allowanceUsage.setRecordMoneyUsed(
-                // Add up hours and calculated payment for time records that have not been paid out yet
+                // Add up hours and calculated payment for submitted time records that have not been paid out yet
                 timeRecords.stream()
                         .map(allowanceUsage::getRecordCost)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-        );
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     /**
@@ -108,7 +107,6 @@ public class EssAllowanceService implements AllowanceService {
      * @return List<HourlyWorkPayment>
      */
     private static List<HourlyWorkPayment> getHourlyPayments(int year, TransactionHistory transHistory) {
-        logger.info("getting hourly payments for {}", year);
         LocalDate prevYearStart = LocalDate.of(year - 1, 1, 1);
         LocalDate nextYearEnd = LocalDate.of(year + 1, 12, 31);
         Range<LocalDate> auditDateRange = Range.closed(prevYearStart, nextYearEnd);
@@ -156,8 +154,8 @@ public class EssAllowanceService implements AllowanceService {
      * Get salary recs for an allowance usage year
      */
     private static void getSalaryRecs(AllowanceUsage allowanceUsage, TransactionHistory transHistory) {
-        Range<LocalDate> yearRange = Range.closed(
-                LocalDate.of(allowanceUsage.getYear(), 1, 1), LocalDate.of(allowanceUsage.getYear() + 1, 1, 1));
+        Range<LocalDate> yearRange = Range.closedOpen(
+                LocalDate.ofYearDay(allowanceUsage.getYear(), 1), LocalDate.ofYearDay(allowanceUsage.getYear() + 1, 1));
 
         allowanceUsage.addSalaryRecs(transHistory.getEffectiveSalaryRecs(yearRange).values());
     }

@@ -48,12 +48,15 @@ essTime.service('RecordUtils', [function () {
     }
 
     // Gets the total number of hours used for a specific time usage type over an entire time record
-    function getTotal(record, type) {
+    // If payTypes is passed in, only entries with a pay type that exists in payTypes will be counted
+    function getTotal(record, type, payTypes) {
         var total = 0;
         var entries = record.timeEntries;
         if (entries) {
             for (var i = 0; i < entries.length; i++) {
-                total += +(entries[i][type] || 0);
+                if (!payTypes || payTypes.indexOf(entries[i].payType) >= 0) {
+                    total += +(entries[i][type] || 0);
+                }
             }
         }
         return total;
@@ -67,6 +70,8 @@ essTime.service('RecordUtils', [function () {
             var field = timeEntryFields[iField];
             totals[field] = getTotal(record, field);
         }
+        totals.raSaWorkHours = getTotal(record, 'workHours', ['RA', 'SA']);
+        totals.tempWorkHours = getTotal(record, 'workHours', ['TE']);
         totals.total = getTotal(record, 'total');
         return totals;
     }

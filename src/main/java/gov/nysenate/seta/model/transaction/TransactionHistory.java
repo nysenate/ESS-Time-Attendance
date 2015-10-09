@@ -143,7 +143,7 @@ public class TransactionHistory
         SalaryRec lastRec = null;
         for (LocalDate effectDate : effectiveSalEntries.rowKeySet()) {
             if (lastRec != null) {
-                lastRec.setEndDate(effectDate);
+                lastRec.setEndDate(effectDate.minusDays(1));
             }
             lastRec = new SalaryRec(
                     new BigDecimal(effectiveSalEntries.get(effectDate, "MOSALBIWKLY")),

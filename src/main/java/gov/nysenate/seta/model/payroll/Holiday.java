@@ -1,5 +1,6 @@
 package gov.nysenate.seta.model.payroll;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -10,6 +11,7 @@ public class Holiday
     protected LocalDate date;
     protected String name;
     protected boolean active;
+    protected BigDecimal hours;
 
     /** Questionable holidays are declared at the discretion of the senate. */
     protected boolean questionable;
@@ -48,5 +50,13 @@ public class Holiday
 
     public void setQuestionable(boolean questionable) {
         this.questionable = questionable;
+    }
+
+    public BigDecimal getHours() {
+        return hours;
+    }
+
+    public void setHours(BigDecimal hours) {
+        this.hours = hours;
     }
 }

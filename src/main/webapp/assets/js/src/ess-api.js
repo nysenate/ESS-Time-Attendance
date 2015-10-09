@@ -82,3 +82,9 @@ essApi.factory('EmpTransactionsApi', ['$resource', 'appProps', function($resourc
 essApi.factory('EmpTransactionSnapshotApi', ['$resource', 'appProps', function($resource, appProps) {
     return $resource(appProps.apiPath + '/empTransactions/snapshot')
 }]);
+
+/** --- Allowance API --- */
+
+essApi.factory('AllowanceApi', ['$resource', 'appProps', function ($resource, appProps) {
+    return $resource(appProps.apiPath + '/allowances');
+}]);

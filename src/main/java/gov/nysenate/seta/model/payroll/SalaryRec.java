@@ -32,7 +32,7 @@ public class SalaryRec {
     /** --- Functional Getters --- */
 
     public Range<LocalDate> getEffectiveRange() {
-        return Range.closedOpen(effectDate, endDate);
+        return Range.closedOpen(effectDate, endDate.plusDays(1));
     }
 
     /** --- Getters / Setters --- */

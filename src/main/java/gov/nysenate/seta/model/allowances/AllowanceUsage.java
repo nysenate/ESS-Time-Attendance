@@ -22,7 +22,7 @@ public class AllowanceUsage {
     /** The amount of money that has been paid out this year (according to  transactions) */
     protected BigDecimal baseMoneyUsed;
 
-    /** The amount of money used as recorded in time records for periods not covered in transaction history */
+    /** The amount of money used as recorded in submitted time records for periods not covered in transaction history */
     protected BigDecimal recordMoneyUsed;
 
     /** The employees salary recs over the year */
@@ -54,7 +54,8 @@ public class AllowanceUsage {
     public BigDecimal getRecordCost(TimeRecord record) {
         return record.getTimeEntries().stream()
                 .filter(entry -> entry.getPayType() == PayType.TE)
-                .map(entry -> entry.getDailyTotal().multiply(getSalaryRec(entry.getDate()).getSalaryRate()))
+                .map(entry -> entry.getWorkHours().orElse(BigDecimal.ZERO)
+                        .multiply(getSalaryRec(entry.getDate()).getSalaryRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

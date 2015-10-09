@@ -12,7 +12,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * This validator ensures that new time records are not generated and that saved time records do not contain illegal modifications
+ * This validator ensures that new time records are not saved by users
+ * and that saved time records do not contain illegal modifications
  */
 @Service
 public class PermittedModificationTRV implements TimeRecordValidator {
@@ -30,6 +31,7 @@ public class PermittedModificationTRV implements TimeRecordValidator {
             throw new TimeRecordErrorException(TimeRecordErrorCode.NO_EXISTING_RECORD);
         }
         TimeRecord prevRecord = previousState.get();
+        // Check various user-immutable fields to ensure there are no changeS
         checkTimeRecordField(record, prevRecord, "timeRecordId", "String", TimeRecord::getTimeRecordId);
         checkTimeRecordField(record, prevRecord, "employeeId", "integer", TimeRecord::getEmployeeId);
         checkTimeRecordField(record, prevRecord, "supervisorId", "integer", TimeRecord::getSupervisorId);
@@ -45,6 +47,10 @@ public class PermittedModificationTRV implements TimeRecordValidator {
 
     /** --- Internal Methods --- */
 
+    /**
+     * Checks the two field values to ensure they are equal
+     * @throws TimeRecordErrorException expressing the fields' immutability if they are not equal
+     */
     private static void checkField(Object newVal, Object prevVal, String fieldName, String fieldType)
             throws TimeRecordErrorException {
         if (!Objects.equals(prevVal, newVal)) {
@@ -54,13 +60,21 @@ public class PermittedModificationTRV implements TimeRecordValidator {
         }
     }
 
+    /**
+     * Checks that the two given time records contain equal values for a particular field
+     * @see #checkField(Object, Object, String, String)
+     */
     private static void checkTimeRecordField(TimeRecord newRecord, TimeRecord prevRecord,
                                              String fieldName, String fieldType, Function<TimeRecord, ?> fieldGetter)
             throws TimeRecordErrorException {
         checkField(fieldGetter.apply(newRecord), fieldGetter.apply(prevRecord), fieldName, fieldType);
     }
 
-    private static void checkTimeEntries(TimeRecord record, TimeRecord prevState) {
+    /**
+     * Checks to ensure that a saved record contains no new time entries
+     *   and that no changes in pay type were made
+     */
+    private static void checkTimeEntries(TimeRecord record, TimeRecord prevState) throws TimeRecordErrorException {
         for (TimeEntry entry : record.getTimeEntries()) {
             TimeEntry prevEntry = prevState.getEntry(entry.getDate());
             if (prevEntry == null) {

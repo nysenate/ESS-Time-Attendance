@@ -1,18 +1,24 @@
 var essApp = angular.module('ess')
-        .controller('RecordEntryController', ['$scope', '$filter', 'appProps', 'ActiveTimeRecordsApi',
-                                            'TimeRecordsApi', 'AccrualPeriodApi', 'RecordUtils', 'LocationService',
-                                             'modals', recordEntryCtrl]);
+        .controller('RecordEntryController', ['$scope', '$filter', '$q', '$timeout', 'appProps',
+                                              'ActiveTimeRecordsApi', 'TimeRecordsApi', 'AccrualPeriodApi', 'AllowanceApi',
+                                              'RecordUtils', 'LocationService', 'modals', recordEntryCtrl]);
 
-function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
-                         recordsApi, accrualPeriodApi, recordUtils, locationService, modals) {
+function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsApi,
+                         recordsApi, accrualPeriodApi, allowanceApi, recordUtils, locationService, modals) {
 
     var initialState = {
         empId: appProps.user.employeeId,  // Employee Id
         miscLeaves: appProps.miscLeaves,  // Listing of misc leave types
         accrual: null,                    // Accrual info for selected record
+        allowances: {},                   // A map that stores yearly temp employee allowances
+        selectedYear: 0,                  // The year of the selected record (makes it easy to get the selected record's allowance)
         records: [],                      // All active employee records
         iSelectedRecord: 0,               // Index of the currently selected record,
-        displayEntries: [],               // The entries that are being displayed
+        salaryRecs: [],                   // A list of salary recs that are active during the selected record's date range
+        iSelSalRec: 0,                    // Index of the selected salary rec (used when there is a salary change mid record)
+        tempEntries: false,               // True if the selected record contains TE pay entries
+        annualEntries: false,             // True if the selected record contains RA or SA entries
+        totals: {},                       // Stores record wide totals for time entry fields of the selected record
 
         // Page state
         pageState: 0                      // References the values from $scope.pageStates
@@ -70,10 +76,16 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
     $scope.$watchGroup(['state.records', 'state.iSelectedRecord'], function() {
         if ($scope.state.records && $scope.state.records[$scope.state.iSelectedRecord]) {
             $scope.validation = getDefaultValidation();
-            $scope.getAccrualForSelectedRecord();
-            setDisplayEntries();
-            onRecordChange();
-            setRecordSearchParams();
+            detectPayTypes();
+            $q.all([    // Get Accruals/Allowances for the record and then call record update methods
+                $scope.getAccrualForSelectedRecord(),
+                $scope.getAllowanceForSelRecord()
+            ]).then(function() {
+                console.log('allowances/accruals got, calling update functions');
+                getSelectedSalaryRecs();
+                onRecordChange();
+                setRecordSearchParams();
+            });
         }
     });
 
@@ -84,6 +96,7 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
      * if it's end date is supplied in the query params.
      */
     $scope.getRecords = function() {
+        $scope.initializeState();
         $scope.state.pageState = $scope.pageStates.FETCHING;
         activeRecordsApi.get({
             empId: $scope.state.empId,
@@ -106,40 +119,12 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
     };
 
     /**
-     * Returns the currently selected record.
-     * @returns timeRecord object
-     */
-    $scope.getSelectedRecord = function() {
-        return $scope.state.record[$scope.state.iSelectedRecord];
-    };
-
-    /**
-     * Fetches the accruals for the currently selected time record from the server.
-     */
-    $scope.getAccrualForSelectedRecord = function() {
-        var empId = $scope.state.empId;
-        var record = $scope.state.records[$scope.state.iSelectedRecord];
-        var periodStartMoment = moment(record.payPeriod.startDate);
-        accrualPeriodApi.get({empId: empId, beforeDate: periodStartMoment.format('YYYY-MM-DD')}, function(resp) {
-            if (resp.success) {
-                $scope.state.accrual = resp.result;
-            }
-        });
-    };
-
-    /**
      * Validates and saves the currently selected record.
      * @param submit - Set to true if user is also submitting the record. This will modify the record status if
      *                 it completes successfully.
      */
     $scope.saveRecord = function(submit) {
         var record = $scope.state.records[$scope.state.iSelectedRecord];
-        if (submit) {
-            // TODO: Ensure totals hours are in line.
-            record.recordStatus = nextStatusMap[record.recordStatus];
-        } else {
-            record.recordStatus = 'NOT_SUBMITTED';
-        }
         console.log(submit ? 'submitting' : 'saving', 'record', record);
         // TODO: Validate the current record
         // Open the modal to indicate save/submit
@@ -150,6 +135,8 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
         else {
             modals.open('save-indicator', {'record': record});
             $scope.state.pageState = $scope.pageStates.SAVING;
+            var currentStatus = record.recordStatus;
+            record.recordStatus = 'NOT_SUBMITTED';
             recordsApi.save(record, function (resp) {
                 record.updateDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
                 record.savedDate = record.updateDate;
@@ -159,6 +146,7 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
                 alert("Failed to save record!");
                 console.log(resp);
                 $scope.state.pageState = $scope.pageStates.SAVE_FAILURE;
+                record.recordStatus = currentStatus;
             });
         }
     };
@@ -169,6 +157,8 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
      */
     $scope.submitRecord = function() {
         var record = $scope.state.records[$scope.state.iSelectedRecord];
+        var currentStatus = record.recordStatus;
+        record.recordStatus = 'SUBMITTED';
         $scope.state.pageState = $scope.pageStates.SUBMITTING;
         recordsApi.save(record, function (resp) {
             $scope.state.pageState = $scope.pageStates.SUBMITTED;
@@ -176,7 +166,64 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
             alert("Failed to submit time record!");
             console.log(resp);
             $scope.state.pageState = $scope.pageStates.SUBMIT_FAILURE;
+            record.recordStatus = currentStatus;
         });
+    };
+
+    /**
+     * Fetches the accruals for the currently selected time record from the server.
+     * @returns Promise that is fulfilled when the accruals are received
+     */
+    $scope.getAccrualForSelectedRecord = function() {
+        if ($scope.state.annualEntries) {
+            var empId = $scope.state.empId;
+            var record = $scope.state.records[$scope.state.iSelectedRecord];
+            var periodStartMoment = moment(record.payPeriod.startDate);
+            return accrualPeriodApi.get({
+                empId: empId,
+                beforeDate: periodStartMoment.format('YYYY-MM-DD')
+            }, function (resp) {
+                if (resp.success) {
+                    $scope.state.accrual = resp.result;
+                }
+            }).$promise;
+        }
+        // Return an automatically resolving promise if no request was made
+        return $q(function (resolve) {resolve()});
+    };
+
+    /**
+     * Gets the allowance state for the year of the selected record, if it hasn't already been retrieved
+     * @returns Promise that is fulfilled when the allowances are received
+     */
+    $scope.getAllowanceForSelRecord = function() {
+        var record = $scope.getSelectedRecord();
+        $scope.state.selectedYear = moment(record.beginDate).year();
+        if ($scope.state.tempEntries && !$scope.state.allowances.hasOwnProperty($scope.state.selectedYear)) {
+            var params = {
+                empId: $scope.state.empId,
+                year: $scope.state.selectedYear
+            };
+            return allowanceApi.get(params, function(response) {
+                for (var i in response.result) {
+                    var allowance = response.result[i];
+                    console.log('got allowance', allowance.empId, allowance.year);
+                    $scope.state.allowances[allowance.year] = allowance;
+                }
+            }).$promise;
+        }
+        // Return an automatically resolving promise if no request was made
+        return $q(function (resolve) {resolve()});
+    };
+
+    /** --- Display Methods --- */
+
+    /**
+     * Returns the currently selected record.
+     * @returns timeRecord object
+     */
+    $scope.getSelectedRecord = function() {
+        return $scope.state.records[$scope.state.iSelectedRecord];
     };
 
     $scope.finishSubmitModal = function() {
@@ -190,8 +237,6 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
     $scope.closeModal = function() {
         modals.resolve();
     };
-
-    /** --- Display Methods --- */
 
     /**
      * Returns true if the given date falls on a weekend.
@@ -228,6 +273,59 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
         return record && $scope.recordValid() && !moment(record.endDate).isAfter(moment(), 'day');
     };
 
+    /**
+     * Get the number of available work hours at the selected salary rate
+     *  such that the record cost does not exceed the employee's annual allowance
+     * @returns {number}
+     */
+    $scope.getAvailableHours = function() {
+        var record = $scope.getSelectedRecord();
+        var allowance = $scope.state.allowances[$scope.state.selectedYear];
+        var salaryRec = $scope.state.salaryRecs[$scope.state.iSelSalRec];
+
+        if (!record || !allowance || !salaryRec) {
+            return 0;
+        }
+
+        var availableMoney = allowance.yearlyAllowance - allowance.moneyUsed - record.moneyUsed;
+        var availableHours = availableMoney / salaryRec.salaryRate;
+        // Adjust hours into a multiple of 0.25
+        return Math.round((availableHours - Math.abs(availableHours) % 0.25) * 4) / 4;
+    };
+
+    /**
+     *
+     * @param salaryRec
+     * @returns {string}
+     */
+    $scope.getSalRecDateRange = function(salaryRec) {
+        var record = $scope.getSelectedRecord();
+        var beginDate = moment(salaryRec.effectDate).isAfter(record.beginDate) ? salaryRec.effectDate : record.beginDate;
+        var endDate = moment(salaryRec.endDate).isAfter(record.endDate) ? record.endDate : salaryRec.endDate;
+        return moment(beginDate).format('M/D') + ' - ' + moment(endDate).format('M/D');
+    };
+
+
+    /**
+     * Get the start date of the given salary rec with respect to the selected record
+     * @param salaryRec
+     * @returns {Date}
+     */
+    $scope.getSalRecStartDate = function(salaryRec) {
+        var record = $scope.getSelectedRecord();
+        return moment(salaryRec.effectDate).isAfter(record.beginDate) ? salaryRec.effectDate : record.beginDate;
+    };
+
+    /**
+     * Get the start date of the given salary rec with respect to the selected record
+     * @param salaryRec
+     * @returns {Date}
+     */
+    $scope.getSalRecEndDate = function(salaryRec) {
+        var record = $scope.getSelectedRecord();
+        return moment(salaryRec.endDate).isAfter(record.endDate) ? record.endDate : salaryRec.endDate;
+    };
+
     /** --- Internal Methods --- */
 
     /**
@@ -235,31 +333,106 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
      */
     function onRecordChange() {
         var record = $scope.state.records[$scope.state.iSelectedRecord];
+        // Todo delay sanitation to allow entry of .25 and .75
+        //sanitizeEntries(record);
         recordUtils.calculateDailyTotals(record);
-        $scope.totals = recordUtils.getRecordTotals(record);
+        $scope.state.totals = recordUtils.getRecordTotals(record);
+        calculateAllowanceUsage();
         validateRecord();
     }
 
     /**
-     * Creates a displayEntries array for a given record, filling in dates that the record doesn't cover with
-     * dummy entries.
+     * Ensure that all time entered is in multiples of 0.25 or 0.5 for Temporary and Annual entries respectively
+     * @param record
      */
-    function setDisplayEntries() {
-        var record = $scope.state.records[$scope.state.iSelectedRecord];
-        console.log('new selected record:', moment(record.beginDate).format('l'), record);
-        $scope.state.displayEntries = [];
-        var entryIndex = 0;
-        for (var date = moment(record.payPeriod.startDate), periodEnd = moment(record.payPeriod.endDate);
-                !date.isAfter(periodEnd); date = date.add(1, 'days')) {
-            var entry;
-            if (entryIndex < record.timeEntries.length && date.isSame(record.timeEntries[entryIndex].date, 'day')) {
-                entry = record.timeEntries[entryIndex++];
-            } else {
-                entry = {dummyEntry: true};
+    function sanitizeEntries(record) {
+        var timeEntryFields = recordUtils.getTimeEntryFields();
+        angular.forEach(record.timeEntries, function (entry) {
+            var validInterval = entry.payType == 'TE' ? 0.25 : 0.5;
+            var inverse = 1/validInterval;
+            angular.forEach(timeEntryFields, function(fieldName) {
+                var value = entry[fieldName];
+                if (value) {
+                    entry[fieldName] = Math.round((value - Math.abs(value) % validInterval) * inverse) / inverse
+                }
+            })
+        });
+    }
+
+    /**
+     * Iterates through the entries of the currently selected record,
+     * setting the state to indicate if the record has TE pay entries, RA/SA entries or both
+     * @param record
+     */
+    function detectPayTypes() {
+        $scope.state.tempEntries = $scope.state.annualEntries = false;
+        if ($scope.state.records.length > 0) {
+            var record = $scope.getSelectedRecord();
+            for (var iEntry in record.timeEntries) {
+                var entry = record.timeEntries[iEntry];
+                if (entry.payType === 'TE') {
+                    $scope.state.tempEntries = true;
+                } else if (entry.payType === 'RA' || entry.payType === 'SA') {
+                    $scope.state.annualEntries = true;
+                }
             }
-            entry.unavailable = date.isAfter(moment(), 'day');
-            $scope.state.displayEntries.push(entry);
         }
+    }
+
+    /**
+     * Adds all salaryRecs relevant to the selected record to the salaryRecs state object
+     */
+    function getSelectedSalaryRecs() {
+        var salaryRecs = [];
+        $scope.state.salaryRecs = salaryRecs;
+        $scope.state.iSelSalRec = 0;
+        if (!$scope.state.tempEntries) return;
+        var allowance = $scope.state.allowances[$scope.state.selectedYear];
+        var record = $scope.getSelectedRecord();
+        angular.forEach(allowance.salaryRecs, function (salaryRec) {
+            // Select only temporary salaries that are effective during the record date range
+            if (salaryRec.payType === 'TE' &&
+                    !moment(salaryRec.effectDate).isAfter(record.endDate) &&
+                    !moment(record.beginDate).isAfter(salaryRec.endDate)) {
+                salaryRecs.push(salaryRec);
+            }
+        });
+    }
+
+    /**
+     * Computes the payout cost of the selected time record
+     */
+    function calculateAllowanceUsage() {
+        if ($scope.state.records.length > 0 && $scope.state.tempEntries) {
+            var record = $scope.getSelectedRecord();
+            record.moneyUsed = 0;
+            for (var i in record.timeEntries) {
+                var entry = record.timeEntries[i];
+                if (entry.payType === 'TE' && entry.workHours) {
+                    record.moneyUsed += entry.workHours * getSalaryAtDate(entry.date);
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the employee's hourly salary at the given date
+     * @param date
+     * @returns {Number}
+     */
+    function getSalaryAtDate(date) {
+        var momentDate = moment(date);
+        if (momentDate.isValid() && $scope.state.allowances.hasOwnProperty(momentDate.year())) {
+            var year = momentDate.year();
+            var allowance = $scope.state.allowances[year];
+            for (var i in allowance.salaryRecs) {
+                var salaryRec = allowance.salaryRecs[i];
+                if (!momentDate.isAfter(salaryRec.endDate) && !momentDate.isBefore(salaryRec.effectDate)) {
+                    return salaryRec.salaryRate;
+                }
+            }
+        }
+        return "no salary for date...";
     }
 
     /**
@@ -295,10 +468,10 @@ function recordEntryCtrl($scope, $filter, appProps, activeRecordsApi,
         var accValidation = $scope.validation.accruals;
         var accrual = $scope.state.accrual;
         if (accrual) {
-            var sickUsage = $scope.totals.sickEmpHours + $scope.totals.sickFamHours;
+            var sickUsage = $scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours;
             accValidation.sick = sickUsage <= accrual.sickAvailable;
-            accValidation.personal = $scope.totals.personalHours <= accrual.personalAvailable;
-            accValidation.vacation = $scope.totals.vacationHours <= accrual.vacationAvailable;
+            accValidation.personal = $scope.state.totals.personalHours <= accrual.personalAvailable;
+            accValidation.vacation = $scope.state.totals.vacationHours <= accrual.vacationAvailable;
         }
     }
 

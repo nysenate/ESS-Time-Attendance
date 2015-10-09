@@ -5,6 +5,7 @@ import gov.nysenate.seta.model.payroll.Holiday;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @XmlRootElement(name = "holiday")
@@ -12,6 +13,7 @@ public class HolidayView implements ViewObject
 {
     protected LocalDate date;
     protected String name;
+    protected BigDecimal hours;
     protected boolean unofficial;
 
     public HolidayView(Holiday holiday) {
@@ -19,6 +21,7 @@ public class HolidayView implements ViewObject
             this.date = holiday.getDate();
             this.name = holiday.getName();
             this.unofficial = holiday.isQuestionable();
+            this.hours = holiday.getHours();
         }
     }
 
@@ -41,5 +44,10 @@ public class HolidayView implements ViewObject
     @XmlElement
     public boolean isUnofficial() {
         return unofficial;
+    }
+
+    @XmlElement
+    public BigDecimal getHours() {
+        return hours;
     }
 }

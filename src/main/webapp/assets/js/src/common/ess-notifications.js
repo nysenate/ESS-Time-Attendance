@@ -11,9 +11,11 @@ essApp.directive('essNotification', [function() {
             dialog: '@',
             dialogShow: '@'
         },
+        transclude: true,
         template: '<div class="ess-notification {{level}}">' +
-                    '<h2>{{title}}</h2>' +
-                    '<p>{{message}}</p>' +
+                    '<h2 ng-if="title" ng-bind="title"></h2>' +
+                    '<p ng-if="message" ng-bind="message"></p>'+
+                    '<ng-transclude></ng-transclude>' +
                   '</div>',
         link: function(scope, element, attrs) {
             if (scope.dialog === 'true') {
