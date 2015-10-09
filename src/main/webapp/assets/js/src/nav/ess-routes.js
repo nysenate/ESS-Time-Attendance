@@ -25,6 +25,10 @@ essApp.config(function($routeProvider, $locationProvider) {
         templateUrl: ctxPath + '/template/myinfo/personnel/transactions'
     });
 
+    $routeProvider.when(ctxPath + '/myinfo/payroll/checkhistory', {
+        templateUrl: ctxPath + '/template/myinfo/payroll/checkhistory'
+    });
+
     /** Time and Attendance */
     $routeProvider.when(ctxPath + '/time', {
        redirectTo: ctxPath + '/time/record/entry'

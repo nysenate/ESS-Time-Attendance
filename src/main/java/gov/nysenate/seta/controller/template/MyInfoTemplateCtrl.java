@@ -26,4 +26,9 @@ public class MyInfoTemplateCtrl extends BaseTemplateCtrl
     public String personnelTransactions() {
         return MYINFO_TMPL_BASE_URL + "/personnel/transactions";
     }
+
+    @RequestMapping(value="/payroll/checkhistory")
+    public String checkHistory() {
+        return MYINFO_TMPL_BASE_URL + "/payroll/checkhistory";
+    }
 }

@@ -88,3 +88,9 @@ essApi.factory('EmpTransactionSnapshotApi', ['$resource', 'appProps', function($
 essApi.factory('AllowanceApi', ['$resource', 'appProps', function ($resource, appProps) {
     return $resource(appProps.apiPath + '/allowances');
 }]);
+
+/** --- Paycheck History API --- */
+
+essApi.factory('EmpCheckHistoryApi',  ['$resource', 'appProps', function($resource, appProps) {
+    return $resource(appProps.apiPath + '/paychecks.json')
+}]);
