@@ -17,13 +17,8 @@ import static java.util.stream.Collectors.toMap;
 @XmlRootElement
 public class PaycheckView implements ViewObject
 {
-    protected String empFullName;
-    protected String empJobTitle;
-    protected BigDecimal payRate;
     protected String payPeriod;
     protected LocalDate checkDate;
-    protected String agencyCode;
-    protected String lineNum;
     protected BigDecimal grossIncome;
     protected BigDecimal netIncome;
     /** Map of deduction code to deduction for a paycheck. Makes for less work displaying in client. */
@@ -32,13 +27,8 @@ public class PaycheckView implements ViewObject
     protected BigDecimal checkAmount;
 
     public PaycheckView(Paycheck paycheck) {
-        this.empFullName = paycheck.getEmpFullName();
-        this.empJobTitle = paycheck.getEmpJobTitle();
-        this.payRate = paycheck.getPayRate();
         this.payPeriod = paycheck.getPayPeriod();
         this.checkDate = paycheck.getCheckDate();
-        this.agencyCode = paycheck.getAgencyCode();
-        this.lineNum = paycheck.getLineNum();
         this.grossIncome = paycheck.getGrossIncome();
         this.netIncome = paycheck.getNetIncome();
         this.deductions = paycheck.getDeductions().stream().collect(toMap(Deduction::getDescription, DeductionView::new, (a,b) -> a, TreeMap::new));
@@ -53,21 +43,6 @@ public class PaycheckView implements ViewObject
     }
 
     @XmlElement
-    public String getEmpFullName() {
-        return empFullName;
-    }
-
-    @XmlElement
-    public String getEmpJobTitle() {
-        return empJobTitle;
-    }
-
-    @XmlElement
-    public BigDecimal getPayRate() {
-        return payRate;
-    }
-
-    @XmlElement
     public String getPayPeriod() {
         return payPeriod;
     }
@@ -75,16 +50,6 @@ public class PaycheckView implements ViewObject
     @XmlElement
     public LocalDate getCheckDate() {
         return checkDate;
-    }
-
-    @XmlElement
-    public String getAgencyCode() {
-        return agencyCode;
-    }
-
-    @XmlElement
-    public String getLineNum() {
-        return lineNum;
     }
 
     @XmlElement

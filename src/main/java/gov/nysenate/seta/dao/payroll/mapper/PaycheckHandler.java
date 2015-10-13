@@ -28,10 +28,9 @@ public class PaycheckHandler extends BaseHandler
             dateToPaycheck.get(date).addDeduction(deduction);
         }
         else {
-            Paycheck paycheck = new Paycheck(rs.getBigDecimal("MOANNUALSAL"), rs.getString("NAEMPPAYSR"), rs.getString("DEEMPTITLE"),
-                                         rs.getString("NUPERIOD"), getLocalDateFromRs(rs, "DTCHECK"), rs.getString("CDAGENCY"),
-                                         rs.getString("NULINE"), rs.getBigDecimal("MOGROSS"), rs.getBigDecimal("MONET"),
-                                         rs.getBigDecimal("MOADVICEAMT"), rs.getBigDecimal("MOCHECKAMT"));
+            Paycheck paycheck = new Paycheck(rs.getString("NUPERIOD"), getLocalDateFromRs(rs, "DTCHECK"),
+                                             rs.getBigDecimal("MOGROSS"), rs.getBigDecimal("MONET"),
+                                             rs.getBigDecimal("MOADVICEAMT"), rs.getBigDecimal("MOCHECKAMT"));
             Deduction deduction = new Deduction(
                     rs.getString("CDDEDUCTION"), rs.getString("DEDEDUCTIONF"), rs.getBigDecimal("MODEDUCTION"));
             paycheck.addDeduction(deduction);

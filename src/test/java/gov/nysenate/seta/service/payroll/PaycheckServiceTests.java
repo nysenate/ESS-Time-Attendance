@@ -33,11 +33,6 @@ public class PaycheckServiceTests extends BaseTests
         assertTrue(paychecks.size() >= 1);
         for (Paycheck paycheck : paychecks) {
             assertThat(paycheck.getCheckDate().getYear(), is(year));
-            assertTrue(paycheck.getPayRate() != null);
-            assertTrue(paycheck.getEmpFullName() != null);
-            assertTrue(paycheck.getEmpJobTitle() != null);
-            assertTrue(paycheck.getAgencyCode().matches("[0-9]{5}")); // All Agency codes are 5 characters.
-            assertTrue(paycheck.getLineNum().matches("[0-9]{5}")); // All Line numbers are 5 characters.
             assertTrue(paycheck.getPayPeriod().matches("[0-9]{1,2}")); //
             assertTrue(paycheck.getGrossIncome() != null);
             assertTrue(paycheck.getNetIncome() != null);

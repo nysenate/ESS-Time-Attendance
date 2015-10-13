@@ -9,13 +9,8 @@ import java.util.List;
 
 public class Paycheck
 {
-    private final BigDecimal payRate;
-    private final String empFullName;
-    private final String empJobTitle;
     private final String payPeriod;
     private final LocalDate checkDate;
-    private final String agencyCode;
-    private final String lineNum;
     private final BigDecimal grossIncome;
     private final BigDecimal netIncome;
     private List<Deduction> deductions;
@@ -24,16 +19,10 @@ public class Paycheck
     /** Amount payed via check. */
     private final BigDecimal checkAmount;
 
-    public Paycheck(BigDecimal payRate, String empFullName, String empJobTitle, String payPeriod, LocalDate checkDate,
-                    String agencyCode, String lineNum, BigDecimal grossIncome, BigDecimal netIncome,
+    public Paycheck(String payPeriod, LocalDate checkDate, BigDecimal grossIncome, BigDecimal netIncome,
                     BigDecimal directDepositAmount, BigDecimal checkAmount) {
-        this.payRate = payRate;
-        this.empFullName = empFullName;
-        this.empJobTitle = empJobTitle;
         this.payPeriod = payPeriod;
         this.checkDate = checkDate;
-        this.agencyCode = agencyCode;
-        this.lineNum = lineNum;
         this.grossIncome = grossIncome;
         this.netIncome = netIncome;
         this.directDepositAmount = directDepositAmount;
@@ -53,32 +42,12 @@ public class Paycheck
 
     /** Basic Getters */
 
-    public BigDecimal getPayRate() {
-        return payRate;
-    }
-
-    public String getEmpFullName() {
-        return empFullName;
-    }
-
-    public String getEmpJobTitle() {
-        return empJobTitle;
-    }
-
     public String getPayPeriod() {
         return payPeriod;
     }
 
     public LocalDate getCheckDate() {
         return checkDate;
-    }
-
-    public String getAgencyCode() {
-        return agencyCode;
-    }
-
-    public String getLineNum() {
-        return lineNum;
     }
 
     public BigDecimal getGrossIncome() {
