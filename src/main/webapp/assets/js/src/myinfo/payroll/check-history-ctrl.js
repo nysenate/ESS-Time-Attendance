@@ -36,7 +36,7 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
                     year: $scope.checkHistory.year.toString()
                 };
                 EmpCheckHistoryApi.get(params, function(response) {
-                    $scope.paychecks = response.paychecks;
+                    $scope.paychecks = response.paychecks.sort(function(a, b) {return new Date(a.checkDate) - new Date(b.checkDate)});
                     initializeYtdValues(response.paychecks);
                     processDeductions(response.paychecks);
                     $scope.checkHistory.searching = false;
