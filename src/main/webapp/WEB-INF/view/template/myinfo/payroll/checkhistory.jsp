@@ -17,8 +17,6 @@
         <tr>
           <th>Check Date</th>
           <th>Pay Period</th>
-          <%--<th>Agency</th>--%>
-          <%--<th>Line Number</th>--%>
           <th>Gross</th>
           <th ng-repeat="(desc, value) in deductionSet">{{desc | formatDeductionHeader}}</th>
           <th>Direct Deposit</th>
@@ -29,8 +27,6 @@
         <tr ng-repeat="paycheck in paychecks">
           <td>{{paycheck.checkDate | moment:'l'}}</td>
           <td>{{paycheck.payPeriod}}</td>
-          <%--<td>{{paycheck.agencyCode}}</td>--%>
-          <%--<td>{{paycheck.lineNum}}</td>--%>
           <td>{{paycheck.grossIncome | currency}}</td>
           <td ng-repeat="(desc, value) in deductionSet">{{paycheck.deductions[desc].amount || 0 | currency}}</td>
           <td>{{paycheck.directDepositAmount | currency}}</td>
