@@ -86,7 +86,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 console.log('allowances/accruals got, calling update functions');
                 getSelectedSalaryRecs();
                 onRecordChange();
-                setRecordSearchParams();
+                //setRecordSearchParams();
             });
         }
     });
@@ -112,8 +112,6 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                     record.dueFromNowStr = endDateMoment.fromNow(false);
                     record.isDue = endDateMoment.isBefore(moment().add(1, 'days').startOf('day'));
                 });
-                // Change the selected record based on the query param if it exists
-                linkRecordFromQueryParam();
             }
         }).$promise.finally(function() {
             $scope.state.pageState = $scope.pageStates.FETCHED;
@@ -326,6 +324,15 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     $scope.getSalRecEndDate = function(salaryRec) {
         var record = $scope.getSelectedRecord();
         return moment(salaryRec.endDate).isAfter(record.endDate) ? record.endDate : salaryRec.endDate;
+    };
+
+    /**
+     * Returns a formatted string displaying the date range of the given record
+     * @param record
+     * @returns {string}
+     */
+    $scope.getRecordRangeDisplay = function (record) {
+        return moment(record.beginDate).format('l') + ' - ' + moment(record.endDate).format('l');
     };
 
     /** --- Internal Methods --- */

@@ -37,12 +37,11 @@
     <% /** Record selection menu for cases when there are many active records (i.e. temporary employees). */ %>
     <%-- TODO make this pretty --%>
     <div ng-if="state.records.length > 5">
-      <select class="record-selection-menu" ng-model="state.iSelectedRecord">
-        <option ng-repeat="record in state.records" value="{{$index}}">
-          <span>Pay Period: {{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}</span>
-        </option>
-      </select>
       <div class="record-selection-menu-details">
+        <label class="bold">Record Dates:
+          <select class="record-selection-menu" ng-model="$parent.state.iSelectedRecord"
+                  ng-options="state.records.indexOf(record) as getRecordRangeDisplay(record) for record in state.records"></select>
+        </label>
         <span><span class="bold">Supervisor: </span>{{state.records[state.iSelectedRecord].supervisor.fullName}}</span>
         <span><span class="margin-left-10 bold">Status: </span>{{state.records[state.iSelectedRecord].recordStatus | timeRecordStatus}}</span>
         <span class="margin-left-10 bold">Last Updated: </span>
@@ -229,11 +228,11 @@
                 Record Usage
               </div>
               <div class="hours-display" style="font-size:1em">
-                <div class="ytd-hours">
+                <div class="ytd-hours" style="flex-grow: 1.5">
                   <div class="hours-caption">Used</div>
                   {{state.records[state.iSelectedRecord].moneyUsed | currency}}
                 </div>
-                <div class="ytd-hours" ng-if="state.salaryRecs.length > 1">
+                <div class="ytd-hours" ng-if="state.salaryRecs.length > 1" style="flex-grow: 0.4">
                   <div class="hours-caption">Salary Dates</div>
                   <select ng-model="state.iSelSalRec" style="margin-right: 3px"
                           ng-options="state.salaryRecs.indexOf(salRec) as getSalRecDateRange(salRec) for salRec in state.salaryRecs"></select>

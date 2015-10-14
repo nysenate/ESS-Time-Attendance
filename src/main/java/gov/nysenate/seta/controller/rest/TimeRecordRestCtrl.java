@@ -248,6 +248,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl
             records.keySet().stream()
                 .map(id -> new AbstractMap.SimpleEntry<>((xml) ? (supervisor ? "sup" : "emp") + "Id-" + id : id,
                                 ListView.of(records.get(id).stream()
+                                        .sorted()
                                         .map(tr -> new TimeRecordView(tr, empMap.get(tr.getEmployeeId()), empMap.get(tr.getSupervisorId())))
                                         .collect(toList())))
                 )
