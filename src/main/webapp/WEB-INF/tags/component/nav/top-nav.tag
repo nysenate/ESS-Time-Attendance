@@ -19,8 +19,8 @@
                 <li id="timeAttendanceLink" class="main-topic teal <c:if test='${activeTopic == "time"}'>active</c:if>">
                     <a target="_self" href="${ctxPath}/time"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/clock.png"/>Time</a>
                 </li>
-                <li id="helpLink" class="main-topic">
-                    <a target="_self"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/question.png"/>Help</a>
+                <li id="helpLink" class="main-topic orange <c:if test='${activeTopic == "help"}'>active</c:if>">
+                    <a target="_self" href="${ctxPath}/help"><img class="nav-icon" src="${ctxPath}/assets/img/20px-ffffff/question.png"/>Help</a>
                 </li>
             </ul>
         </div>

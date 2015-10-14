@@ -8,7 +8,6 @@
     <jsp:attribute name="pageTitle">ESS - Time and Attendance</jsp:attribute>
     <jsp:body>
         <ess:ts-assets/>
-        <script type="text/javascript" src="${ctxPath}/assets/js/src/nav/home.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/time.js"></script>
 
         <!-- Time Entry -->

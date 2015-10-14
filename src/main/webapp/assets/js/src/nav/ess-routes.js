@@ -68,6 +68,12 @@ essApp.config(function($routeProvider, $locationProvider) {
         templateUrl: ctxPath + '/template/time/accrual/projections'
     });
 
+    /** Help */
+
+    $routeProvider.when(ctxPath + '/help/ta/plan', {
+        templateUrl: ctxPath + '/template/help/ta/plan'
+    });
+
     /** Logout */
     //$routeProvider.when(ctxPath + '/logout', {
     //    redirectTo: ctxPath + '/logout',

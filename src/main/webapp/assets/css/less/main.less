@@ -295,8 +295,6 @@ table.simple-table {
   width: 100%;
   background: #fafafa;
   box-shadow: 0 1px 1px #ccc;
-  //background: #3d3d3d;
-  //border-bottom: 1px solid #222;
   height:45px;
   z-index: 100;
   color: white;
@@ -351,6 +349,11 @@ table.simple-table {
           &.green {
             &.active, &:hover {
               border-bottom: 3px solid @green;
+            }
+          }
+          &.orange {
+            &.active, &:hover {
+              border-bottom: 3px solid @orange;
             }
           }
           .nav-icon {
@@ -480,6 +483,10 @@ table.simple-table {
   &.green {
     background: darken(@green, 10%);
   }
+  &.orange {
+    background: darken(@orange, 5%);
+  }
+
   .border-radius(2px 0 0 0);
   color: #eee;
   font-size: 1.1em;

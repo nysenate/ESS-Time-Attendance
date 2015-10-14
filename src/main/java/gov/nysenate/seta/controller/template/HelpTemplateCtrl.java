@@ -14,4 +14,12 @@ public class HelpTemplateCtrl extends BaseTemplateCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(HelpTemplateCtrl.class);
     protected static final String HELP_TMPL_BASE_URL = TMPL_BASE_URL + "/help";
+
+    /** --- T&A --- */
+
+    @RequestMapping(value="/ta/plan")
+    public String taPlan() {
+        return HELP_TMPL_BASE_URL + "/ta/plan";
+    }
+
 }
