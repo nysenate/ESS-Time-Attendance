@@ -677,13 +677,12 @@ table.time-record-entry-table {
   }
 
   .record-selection-menu {
-    width: 250px;
-    float: left;
-    margin: 5px 10px 5px 40px;
+    width: 185px;
+    margin: 5px 10px 5px 5px;
   }
   .record-selection-menu-details {
     float: left;
-    margin: 5px;
+    margin: 5px 5px 5px 25px;
     line-height: 29px;
   }
 }
@@ -794,7 +793,7 @@ table.time-record-entry-table {
 
 .allowance-component {
   text-align: center;
-  display: flex;
+  flex-grow: 1;
 
   .captioned-hour-square {
     margin: 5px auto;
@@ -808,6 +807,7 @@ table.time-record-entry-table {
     }
 
     .hours-display {
+      display: flex;
       font-size: 1.2em;
       background: white;
       .font-weight-bold;
@@ -821,7 +821,7 @@ table.time-record-entry-table {
 
     .ytd-hours {
       border-right:1px solid #ddd;
-      min-width:135px;
+      flex-grow: 1;
       display:inline-block;
     }
   }

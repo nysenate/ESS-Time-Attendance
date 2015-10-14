@@ -6,23 +6,25 @@ var essApp = angular.module('ess')
 function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsApi,
                          recordsApi, accrualPeriodApi, allowanceApi, recordUtils, locationService, modals) {
 
-    var initialState = {
-        empId: appProps.user.employeeId,  // Employee Id
-        miscLeaves: appProps.miscLeaves,  // Listing of misc leave types
-        accrual: null,                    // Accrual info for selected record
-        allowances: {},                   // A map that stores yearly temp employee allowances
-        selectedYear: 0,                  // The year of the selected record (makes it easy to get the selected record's allowance)
-        records: [],                      // All active employee records
-        iSelectedRecord: 0,               // Index of the currently selected record,
-        salaryRecs: [],                   // A list of salary recs that are active during the selected record's date range
-        iSelSalRec: 0,                    // Index of the selected salary rec (used when there is a salary change mid record)
-        tempEntries: false,               // True if the selected record contains TE pay entries
-        annualEntries: false,             // True if the selected record contains RA or SA entries
-        totals: {},                       // Stores record wide totals for time entry fields of the selected record
+    function getInitialState() {
+        return {
+            empId: appProps.user.employeeId,  // Employee Id
+                miscLeaves: appProps.miscLeaves,  // Listing of misc leave types
+            accrual: null,                    // Accrual info for selected record
+            allowances: {},                   // A map that stores yearly temp employee allowances
+            selectedYear: 0,                  // The year of the selected record (makes it easy to get the selected record's allowance)
+                records: [],                      // All active employee records
+            iSelectedRecord: 0,               // Index of the currently selected record,
+            salaryRecs: [],                   // A list of salary recs that are active during the selected record's date range
+            iSelSalRec: 0,                    // Index of the selected salary rec (used when there is a salary change mid record)
+            tempEntries: false,               // True if the selected record contains TE pay entries
+            annualEntries: false,             // True if the selected record contains RA or SA entries
+            totals: {},                       // Stores record wide totals for time entry fields of the selected record
 
-        // Page state
-        pageState: 0                      // References the values from $scope.pageStates
-    };
+            // Page state
+            pageState: 0                      // References the values from $scope.pageStates
+        }
+    }
 
     $scope.state = null;                  // The container for all the state variables for this page
 
@@ -42,7 +44,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
 
     // Create a new state from the values in the default state.
     $scope.initializeState = function() {
-        $scope.state = angular.extend({}, initialState);
+        $scope.state = getInitialState();
     };
 
     // Get a clean validation object where everything is set as valid
@@ -84,7 +86,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 console.log('allowances/accruals got, calling update functions');
                 getSelectedSalaryRecs();
                 onRecordChange();
-                setRecordSearchParams();
+                //setRecordSearchParams();
             });
         }
     });
@@ -110,8 +112,6 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                     record.dueFromNowStr = endDateMoment.fromNow(false);
                     record.isDue = endDateMoment.isBefore(moment().add(1, 'days').startOf('day'));
                 });
-                // Change the selected record based on the query param if it exists
-                linkRecordFromQueryParam();
             }
         }).$promise.finally(function() {
             $scope.state.pageState = $scope.pageStates.FETCHED;
@@ -324,6 +324,15 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     $scope.getSalRecEndDate = function(salaryRec) {
         var record = $scope.getSelectedRecord();
         return moment(salaryRec.endDate).isAfter(record.endDate) ? record.endDate : salaryRec.endDate;
+    };
+
+    /**
+     * Returns a formatted string displaying the date range of the given record
+     * @param record
+     * @returns {string}
+     */
+    $scope.getRecordRangeDisplay = function (record) {
+        return moment(record.beginDate).format('l') + ' - ' + moment(record.endDate).format('l');
     };
 
     /** --- Internal Methods --- */
