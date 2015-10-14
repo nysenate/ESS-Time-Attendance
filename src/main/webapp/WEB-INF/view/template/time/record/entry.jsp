@@ -36,16 +36,22 @@
     </table>
     <% /** Record selection menu for cases when there are many active records (i.e. temporary employees). */ %>
     <%-- TODO make this pretty --%>
-    <select ng-if="state.records.length > 5" class="record-selection-menu" ng-model="state.iSelectedRecord">
-      <option ng-repeat="record in state.records" value="{{$index}}">
-        <span>
-          <span class="bold">Period:</span>
-          {{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}
-        </span>
-        <span><span class="bold">Supervisor:</span>{{record.supervisor.fullName}}</span>
-        <span><span class="bold">Status:</span>{{record.recordStatus | timeRecordStatus}}</span>
-      </option>
-    </select>
+    <div ng-if="state.records.length > 5">
+      <select class="record-selection-menu" ng-model="state.iSelectedRecord">
+        <option ng-repeat="record in state.records" value="{{$index}}">
+          <span>Pay Period: {{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}</span>
+        </option>
+      </select>
+      <div class="record-selection-menu-details">
+        <span><span class="bold">Supervisor: </span>{{state.records[state.iSelectedRecord].supervisor.fullName}}</span>
+        <span><span class="margin-left-10 bold">Status: </span>{{state.records[state.iSelectedRecord].recordStatus | timeRecordStatus}}</span>
+        <span class="margin-left-10 bold">Last Updated: </span>
+      <span ng-show="state.records[state.iSelectedRecord].updateDate | momentCmp:'=':state.records[state.iSelectedRecord].originalDate:'second' | not">
+            {{state.records[state.iSelectedRecord].updateDate | moment: 'lll'}}
+      </span>
+        <span ng-show="state.records[state.iSelectedRecord].updateDate | momentCmp:'=':state.records[state.iSelectedRecord].originalDate:'second'">New</span>
+      </div>
+    </div>
   </div>
 
   <div loader-indicator ng-show="state.pageState === pageStates.FETCHING"></div>

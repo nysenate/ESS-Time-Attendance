@@ -173,12 +173,20 @@ a {
   text-align: left;
 }
 
+.margin-left-10 {
+  margin-left: 10px;
+}
+
 .clearfix {
   clear: both;
 }
 
 .hidden {
   display: none;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .bold-text {
@@ -638,6 +646,8 @@ table.time-record-entry-table {
   text-align: center;
   padding-bottom: 10px;
   border-bottom: 1px solid fade(@teal, 55%);
+  overflow: auto;
+
   table {
     text-align: center;
     width: 90%;
@@ -660,14 +670,14 @@ table.time-record-entry-table {
   }
 
   .record-selection-menu {
-    width: 90%;
-    //option {
-    //  display: flex;
-    //  justify-content: flex-end;
-    //  span {
-    //    flex-grow: 1;
-    //  }
-    //}
+    width: 250px;
+    float: left;
+    margin: 5px 10px 5px 40px;
+  }
+  .record-selection-menu-details {
+    float: left;
+    margin: 5px;
+    line-height: 29px;
   }
 }
 
@@ -804,7 +814,7 @@ table.time-record-entry-table {
 
     .ytd-hours {
       border-right:1px solid #ddd;
-      min-width:100px;
+      min-width:135px;
       display:inline-block;
     }
   }
