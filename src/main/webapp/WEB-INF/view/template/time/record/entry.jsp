@@ -142,7 +142,7 @@
               ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}"
               ng-init="numRecs = regRecords.length">
             <td class="date-column">{{entry.date | moment:'ddd M/D/YYYY'}}</td>
-            <td ng-class="{invalid: entry.workHours === undefined}">
+            <td ng-class="{invalid: !areWorkHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="24" ng-disabled="entry.date | momentCmp:'>':'now':'day'"
                      ng-model="entry.workHours" tabindex="1" name="numWorkHours"/>
@@ -151,31 +151,31 @@
               <input type="number" readonly time-record-input class="hours-input"
                      step=".5" min="0" max="7" ng-model="entry.holidayHours" name="numHolidayHours"/>
             </td>
-            <td ng-class="{invalid: entry.vacationHours > 0 && !validation.accruals.vacation || entry.vacationHours === undefined}">
+            <td ng-class="{invalid: !areVacationHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      ng-model="entry.vacationHours" name="numVacationHours"
                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 2 : 1}}"/>
             </td>
-            <td ng-class="{invalid: entry.personalHours > 0 && !validation.accruals.personal || entry.personalHours === undefined}">
+            <td ng-class="{invalid: !arePersonalHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 3 : 1}}"
                      ng-model="entry.personalHours" name="numPersonalHours"/>
             </td>
-            <td ng-class="{invalid: entry.sickEmpHours > 0 && !validation.accruals.sick || entry.sickEmpHours === undefined}">
+            <td ng-class="{invalid: !areEmpSickHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 4 : 1}}"
                      ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
             </td>
-            <td ng-class="{invalid: entry.sickFamHours > 0 && !validation.accruals.sick || entry.sickFamHours === undefined}">
+            <td ng-class="{invalid: !areFamSickHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 5 : 1}}"
                      ng-model="entry.sickFamHours" name="numSickFamHours"/>
             </td>
-            <td ng-class="{invalid: entry.miscHours === undefined}">
+            <td ng-class="{invalid: !areMiscHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 6 : 1}}"
@@ -279,7 +279,7 @@
                 ng-repeat="(i,entry) in state.records[state.iSelectedRecord].timeEntries | filter:{payType: 'TE'}"
                 ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}">
               <td class="date-column">{{entry.date | moment:'ddd M/D/YYYY'}}</td>
-              <td ng-class="{invalid: entry.workHours === undefined}">
+              <td ng-class="{invalid: !areWorkHoursValid(entry)}">
                 <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                        placeholder="--" step="0.25" min="0" max="24" ng-disabled="entry.date | momentCmp:'>':'now':'day'"
                        ng-model="entry.workHours" name="numWorkHours"/>
