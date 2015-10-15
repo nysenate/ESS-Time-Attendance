@@ -70,10 +70,18 @@
   <% /** Accruals and Time entry for regular/special annual time record entries. */ %>
   <div class="content-container" ng-show="state.pageState !== pageStates.FETCHING && state.records[state.iSelectedRecord].timeEntries">
     <p class="content-info">All hours available need approval from appointing authority.</p>
+    <div ess-notification level="warn" title="Record with multiple pay types" class="margin-10"
+         ng-if="state.annualEntries && state.tempEntries">
+      <p>
+        There was a change in pay type during the time covered by this record.<br>
+        Record days have been split into two seperate entry tables, one for Regular/Special Annual pay, another for Temporary pay
+      </p>
+    </div>
     <form id="timeRecordForm" method="post" action="">
 
       <!-- Annual Entry Form -->
       <div class="ra-sa-entry" ng-if="state.annualEntries">
+        <h1 class="time-entry-table-title" ng-if="state.tempEntries">Regular/Special Annual Pay Entries</h1>
         <div class="accrual-hours-container">
           <div class="accrual-component">
             <div class="captioned-hour-square" style="float:left;">
@@ -177,8 +185,8 @@
             <td><span>{{entry.total | number}}</span></td>
           </tr>
           <tr class="time-totals-row">
-            <td>Record Totals</td>
-            <td>{{state.totals.workHours}}</td>
+            <td><span ng-if="state.tempEntries">RA/SA</span> Record Totals</td>
+            <td>{{state.totals.raSaWorkHours}}</td>
             <td>{{state.totals.holidayHours}}</td>
             <td>{{state.totals.vacationHours}}</td>
             <td>{{state.totals.personalHours}}</td>
@@ -186,7 +194,7 @@
             <td>{{state.totals.sickFamHours}}</td>
             <td>{{state.totals.miscHours}}</td>
             <td></td>
-            <td>{{state.totals.total}}</td>
+            <td>{{state.totals.raSaTotal}}</td>
           </tr>
           </tbody>
         </table>
@@ -194,10 +202,11 @@
 
       <!-- Temporary Entry Form -->
       <div class="te-entry" ng-if="state.tempEntries">
-        <div ess-notification level="warn" title="" ng-show="state.salaryRecs.length > 1">
+        <h1 class="time-entry-table-title" ng-if="state.annualEntries">Temporary Pay Entries</h1>
+        <div ess-notification level="warn" title="Record with multiple salaries" ng-show="state.salaryRecs.length > 1" class="margin-10">
           <p>
             There were one or more changes in salary during the time covered by this record.<br>
-            Select a date range from the "Salary Dates" field to see the salary rate and hours available for those dates.
+            Select a date range from the "Salary Dates" field to see the salary rate and hours available for selected dates.
           </p>
         </div>
         <div class="allowance-container">
@@ -241,7 +250,7 @@
                   <div class="hours-caption">Hourly Rate</div>
                   {{state.salaryRecs[state.iSelSalRec].salaryRate | currency}}/hr.
                 </div>
-                <div class="ytd-hours" style="border-right:none;">
+                <div class="ytd-hours" style="border-right:none; flex-grow: 0.6">
                   <div class="hours-caption">Hrs. Used/Avail.</div>
                   {{state.totals.tempWorkHours}} / {{getAvailableHours() | number}}
                 </div>
@@ -266,9 +275,7 @@
               <td ng-class="{invalid: entry.workHours === undefined}">
                 <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                        placeholder="--" step="0.25" min="0" max="24" ng-disabled="entry.date | momentCmp:'>':'now':'day'"
-                       ng-model="entry.workHours" tabindex="{{$index+1}}" name="numWorkHours"
-                       <%--ng-model-options="{debounce: 300}"--%>
-                    />
+                       ng-model="entry.workHours" tabindex="{{$index+1}}" name="numWorkHours"/>
               </td>
               <td class="entry-comment-col">
                 <input type="text" ng-change="setDirty()" class="entry-comment"
@@ -276,7 +283,7 @@
               </td>
             </tr>
             <tr class="time-totals-row">
-              <td>Record Totals</td>
+              <td><span ng-if="state.annualEntries">TE</span> Record Totals</td>
               <td>{{state.totals.tempWorkHours}}</td>
               <td></td>
             </tr>
