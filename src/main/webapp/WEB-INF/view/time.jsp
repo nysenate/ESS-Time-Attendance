@@ -11,6 +11,7 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/time.js"></script>
 
         <!-- Time Entry -->
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-filters.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-directives.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-utils.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/time/record/record-entry-ctrl.js"></script>

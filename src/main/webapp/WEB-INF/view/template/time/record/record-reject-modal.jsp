@@ -2,5 +2,5 @@
 <textarea class="reject-modal-textarea" placeholder="Reason for disapproval" ng-model="remarks" tabindex="1"></textarea>
 <div class="reject-modal-button-wrapper">
   <input type="button" style="float:left;" class="neutral-button" value="Cancel" ng-click="cancel()"/>
-  <input type="button" style="float:right;" class="reject-button" value="Reject Record" ng-click="resolve()"/>
+  <input type="button" style="float:right;" class="reject-button" value="Disapprove Record" ng-click="resolve()"/>
 </div>

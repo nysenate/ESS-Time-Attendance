@@ -53,8 +53,8 @@ function locationService($location, $window, $anchorScroll, appProps) {
     /**
      * Goes to the specified path.
      */
-    function go(path, reload) {
-        $location.path(appProps.ctxPath + path);
+    function go(path, reload, params) {
+        $location.path(appProps.ctxPath + path).search((params) ? params : {});
         if (reload === true) $window.location.reload();
     }
 

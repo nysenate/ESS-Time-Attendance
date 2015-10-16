@@ -1,41 +1,8 @@
-var essApp = angular.module('ess');
-
-/** --- Filters --- */
-
-essApp.filter('timeRecordStatus', function () {
-    var statusDispMap = {
-        NOT_SUBMITTED: "Not Submitted",
-        SUBMITTED: "Submitted",
-        DISAPPROVED: "Supervisor Disapproved",
-        APPROVED: "Supervisor Approved",
-        DISAPPROVED_PERSONNEL: "Personnel Disapproved",
-        SUBMITTED_PERSONNEL: "Submitted Personnel",
-        APPROVED_PERSONNEL: "Personnel Approved"
-    };
-    return function (status) {
-        if (statusDispMap.hasOwnProperty(status)) {
-            return statusDispMap[status];
-        }
-        return status + "?!";
-    };
-});
-
-// Returns a display label for the given misc leave id
-essApp.filter('miscLeave', ['appProps', function (appProps) {
-    return function (miscLeave, defaultLabel) {
-        if (appProps.miscLeaves.hasOwnProperty(miscLeave)) {
-            return appProps.miscLeaves[miscLeave];
-        }
-        if (!miscLeave) {
-            return defaultLabel ? defaultLabel : '--';
-        }
-        return miscLeave + "?!";
-    };
-}]);
+var essTime = angular.module('essTime');
 
 /** --- Directives --- */
 
-essApp.directive('timeRecordInput', [function(){
+essTime.directive('timeRecordInput', [function(){
     return {
         restrict: 'A',
         link: function(scope, element, attrs) {
@@ -54,7 +21,7 @@ essApp.directive('timeRecordInput', [function(){
 /**
  * A table that displays details for a specific time record
  */
-essApp.directive('recordDetails', ['appProps', 'modals', function (appProps, modals) {
+essTime.directive('recordDetails', ['appProps', 'modals', function (appProps, modals) {
     return {
         scope: {
             record: '='
@@ -66,7 +33,7 @@ essApp.directive('recordDetails', ['appProps', 'modals', function (appProps, mod
     };
 }]);
 
-essApp.directive('recordDetailModal', ['modals', function (modals) {
+essTime.directive('recordDetailModal', ['modals', function (modals) {
     return {
         template: '<div class="record-detail-modal" record-details record="record" employee="employee"></div>',
         link: function ($scope, $elem, $attrs) {

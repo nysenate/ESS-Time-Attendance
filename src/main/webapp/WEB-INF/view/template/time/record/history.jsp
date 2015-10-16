@@ -36,7 +36,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="record in records.employee" title="Click to view record details">
+        <tr ng-repeat="record in records.employee" ng-click="go('/time/record/entry', {'record':record.beginDate})" title="Click to view record details">
           <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
           <td>{{record.payPeriod.payPeriodNum}}</td>
           <td>{{record.recordStatus | timeRecordStatus}}</td>

@@ -9,11 +9,11 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     function getInitialState() {
         return {
             empId: appProps.user.employeeId,  // Employee Id
-                miscLeaves: appProps.miscLeaves,  // Listing of misc leave types
+            miscLeaves: appProps.miscLeaves,  // Listing of misc leave types
             accrual: null,                    // Accrual info for selected record
             allowances: {},                   // A map that stores yearly temp employee allowances
             selectedYear: 0,                  // The year of the selected record (makes it easy to get the selected record's allowance)
-                records: [],                      // All active employee records
+            records: [],                      // All active employee records
             iSelectedRecord: 0,               // Index of the currently selected record,
             salaryRecs: [],                   // A list of salary recs that are active during the selected record's date range
             iSelSalRec: 0,                    // Index of the selected salary rec (used when there is a salary change mid record)
@@ -86,7 +86,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 console.log('allowances/accruals got, calling update functions');
                 getSelectedSalaryRecs();
                 onRecordChange();
-                //setRecordSearchParams();
+                setRecordSearchParams();
             });
         }
     });
@@ -106,12 +106,15 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
         }, function (response) {
             if ($scope.state.empId in response.result.items) {
                 $scope.state.records = response.result.items[$scope.state.empId];
-                angular.forEach($scope.state.records, function(record){
+                angular.forEach($scope.state.records, function(record, index) {
                     // Compute the due from dates for each record
                     var endDateMoment = moment(record.endDate);
                     record.dueFromNowStr = endDateMoment.fromNow(false);
                     record.isDue = endDateMoment.isBefore(moment().add(1, 'days').startOf('day'));
+                    // Set the record index
+                    record.index = index;
                 });
+                linkRecordFromQueryParam();
             }
         }).$promise.finally(function() {
             $scope.state.pageState = $scope.pageStates.FETCHED;

@@ -12,6 +12,10 @@ essApp.controller('TimeMainCtrl', ['$scope', 'appProps', 'LocationService', 'bad
             });
         };
 
+        $scope.go = function(path, params) {
+            locationService.go(path, false, params);
+        };
+
         $scope.logout = function() {
             locationService.go('/logout', true);
         };
