@@ -15,11 +15,13 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
                 year: null
             };
 
-            $scope.ytd = {
+            var initialYtd = {
                 gross: 0,
                 directDeposit: 0,
                 check: 0
             };
+
+            $scope.ytd = null;
 
             $scope.init = function() {
                 $scope.checkHistory.recordYears = appProps.empActiveYears;
@@ -47,6 +49,7 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
             };
 
             function initializeYtdValues(paychecks) {
+                $scope.ytd = angular.extend({}, initialYtd);
                 for (var i = 0; i < paychecks.length; i++) {
                     var paycheck = paychecks[i];
                     $scope.ytd.gross += paycheck.grossIncome;

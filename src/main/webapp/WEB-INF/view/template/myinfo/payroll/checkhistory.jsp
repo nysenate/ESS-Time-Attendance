@@ -47,6 +47,6 @@
 
   <%-- No results notification --%>
   <div class="content-container" ng-show="checkHistory.searching === false && paychecks.length === 0">
-    <h1>No results found for {{checkHistory.year}}</h1>
+    <h1>No pay checks found for {{checkHistory.year}}</h1>
   </div>
 </div>
