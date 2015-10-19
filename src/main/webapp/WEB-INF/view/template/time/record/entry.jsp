@@ -24,7 +24,7 @@
           <td>{{record.payPeriod.startDate | moment:'l'}} - {{record.payPeriod.endDate | moment:'l'}}</td>
           <td>{{record.supervisor.fullName}}</td>
           <td ng-class="{'dark-red': record.isDue === true}">{{record.dueFromNowStr}}</td>
-          <td>{{record.recordStatus | timeRecordStatus}}</td>
+          <td ng-bind-html="record.recordStatus | timeRecordStatus:true"></td>
           <td>
             <span ng-show="record.updateDate | momentCmp:'=':record.originalDate:'second' | not">
               {{record.updateDate | moment: 'lll'}}

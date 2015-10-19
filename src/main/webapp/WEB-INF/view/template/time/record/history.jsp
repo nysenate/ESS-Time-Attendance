@@ -32,14 +32,13 @@
           <th>Sick Fam</th>
           <th>Misc</th>
           <th>Total</th>
-          <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="record in records.employee" ng-click="go('/time/record/entry', {'record':record.beginDate})" title="Click to view record details">
           <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
           <td>{{record.payPeriod.payPeriodNum}}</td>
-          <td>{{record.recordStatus | timeRecordStatus}}</td>
+          <td ng-bind-html="record.recordStatus | timeRecordStatus:true"></td>
           <td>{{record.totals.workHours}}</td>
           <td>{{record.totals.holidayHours}}</td>
           <td>{{record.totals.vacationHours}}</td>
@@ -48,7 +47,6 @@
           <td>{{record.totals.sickFamHours}}</td>
           <td>{{record.totals.miscHours}}</td>
           <td>{{record.totals.total}}</td>
-          <td><a ng-href="${ctxPath}/time/record/entry?record={{record.beginDate}}" class="action-link">Edit</a></td>
         </tr>
         </tbody>
       </table>
@@ -76,14 +74,13 @@
           <th>Sick Fam</th>
           <th>Misc</th>
           <th>Total</th>
-          <%--<th>Actions</th>--%>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="record in records.other" ng-click="showDetails(record)">
           <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
           <td>{{record.payPeriod.payPeriodNum}}</td>
-          <td>{{record.recordStatus | timeRecordStatus}}</td>
+          <td ng-bind-html="record.recordStatus | timeRecordStatus:true"></td>
           <td>{{record.totals.workHours}}</td>
           <td>{{record.totals.holidayHours}}</td>
           <td>{{record.totals.vacationHours}}</td>

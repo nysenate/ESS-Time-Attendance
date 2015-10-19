@@ -2,23 +2,25 @@ var essTime = angular.module('essTime');
 
 /** --- Filters --- */
 
-essTime.filter('timeRecordStatus', function () {
+essTime.filter('timeRecordStatus', ['$sce', function($sce) {
     var statusDispMap = {
-        NOT_SUBMITTED: "Not Submitted",
-        SUBMITTED: "Submitted",
-        DISAPPROVED: "Supervisor Disapproved",
-        APPROVED: "Supervisor Approved",
-        DISAPPROVED_PERSONNEL: "Personnel Disapproved",
-        SUBMITTED_PERSONNEL: "Submitted Personnel",
-        APPROVED_PERSONNEL: "Personnel Approved"
+        NOT_SUBMITTED: ["Not Submitted", "#444444"],
+        SUBMITTED: ["Submitted", "#0e4e5a"],
+        DISAPPROVED: ["Supervisor Disapproved", "#B90504"],
+        APPROVED: ["Supervisor Approved", "#799933"],
+        DISAPPROVED_PERSONNEL: ["Personnel Disapproved", "#B90504"],
+        SUBMITTED_PERSONNEL: ["Submitted Personnel", "#808d0a"],
+        APPROVED_PERSONNEL: ["Personnel Approved", "#799933"]
     };
-    return function (status) {
-        if (statusDispMap.hasOwnProperty(status)) {
-            return statusDispMap[status];
+    return function (status, showColor) {
+        var statusDisp = (statusDispMap.hasOwnProperty(status)) ? statusDispMap[status][0] : "Unknown Status";
+        var color = (statusDispMap.hasOwnProperty(status)) ? statusDispMap[status][1] : "red";
+        if (showColor) {
+            return $sce.trustAsHtml("<span style='color:" + color + "'>" + statusDisp + "</span>");
         }
-        return status + "?!";
+        return statusDisp;
     };
-});
+}]);
 
 // Returns a display label for the given misc leave id
 essTime.filter('miscLeave', ['appProps', function (appProps) {

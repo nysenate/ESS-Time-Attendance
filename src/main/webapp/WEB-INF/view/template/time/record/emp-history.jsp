@@ -45,14 +45,13 @@
                         <th>Sick Fam</th>
                         <th>Misc</th>
                         <th>Total</th>
-                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="record in state.records">
+                    <tr ng-repeat="record in state.records" ng-click="showDetails(record)">
                         <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
                         <td>{{record.payPeriod.payPeriodNum}}</td>
-                        <td>{{record.recordStatus | timeRecordStatus}}</td>
+                        <td ng-bind-html="record.recordStatus | timeRecordStatus:true"></td>
                         <td>{{record.totals.workHours}}</td>
                         <td>{{record.totals.holidayHours}}</td>
                         <td>{{record.totals.vacationHours}}</td>
@@ -61,7 +60,6 @@
                         <td>{{record.totals.sickFamHours}}</td>
                         <td>{{record.totals.miscHours}}</td>
                         <td>{{record.totals.total}}</td>
-                        <td><a class="action-link" ng-click="showDetails(record)">View Details</a></td>
                     </tr>
                     </tbody>
                 </table>
