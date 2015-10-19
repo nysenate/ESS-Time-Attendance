@@ -145,7 +145,7 @@
             <td ng-class="{invalid: entry.workHours === undefined}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="24" ng-disabled="entry.date | momentCmp:'>':'now':'day'"
-                     ng-model="entry.workHours" tabindex="{{$index + 1}}" name="numWorkHours"/>
+                     ng-model="entry.workHours" tabindex="1" name="numWorkHours"/>
             </td>
             <td>
               <input type="number" readonly time-record-input class="hours-input"
@@ -154,31 +154,37 @@
             <td ng-class="{invalid: entry.vacationHours > 0 && !validation.accruals.vacation || entry.vacationHours === undefined}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     ng-model="entry.vacationHours" name="numVacationHours" tabindex="{{($index + 1) + numRecs + 1}}"/>
+                     ng-model="entry.vacationHours" name="numVacationHours"
+                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 2 : 1}}"/>
             </td>
             <td ng-class="{invalid: entry.personalHours > 0 && !validation.accruals.personal || entry.personalHours === undefined}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                     placeholder="--" step=".5" min="0" max="7" tabindex="{{($index + 1) + (numRecs * 2) + 1}}"
+                     placeholder="--" step=".5" min="0" max="7"
+                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 3 : 1}}"
                      ng-model="entry.personalHours" name="numPersonalHours"/>
             </td>
             <td ng-class="{invalid: entry.sickEmpHours > 0 && !validation.accruals.sick || entry.sickEmpHours === undefined}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                     placeholder="--" step=".5" min="0" max="7" tabindex="{{($index + 1) + (numRecs * 3) + 1}}"
+                     placeholder="--" step=".5" min="0" max="7"
+                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 4 : 1}}"
                      ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
             </td>
             <td ng-class="{invalid: entry.sickFamHours > 0 && !validation.accruals.sick || entry.sickFamHours === undefined}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                     placeholder="--" step=".5" min="0" max="7" tabindex="{{($index + 1) + (numRecs * 4) + 1}}"
+                     placeholder="--" step=".5" min="0" max="7"
+                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 5 : 1}}"
                      ng-model="entry.sickFamHours" name="numSickFamHours"/>
             </td>
             <td ng-class="{invalid: entry.miscHours === undefined}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
-                     placeholder="--" step=".5" min="0" max="7" tabindex="{{($index + 1) + (numRecs * 5) + 1}}"
+                     placeholder="--" step=".5" min="0" max="7"
+                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 6 : 1}}"
                      ng-model="entry.miscHours" name="numMiscHours"/>
             </td>
             <td>
               <select style="font-size:.9em;" name="miscHourType"
-                      ng-model="entry.miscType" ng-change="setDirty()" tabindex="{{($index + 1) + (numRecs * 6) + 1}}"
+                      ng-model="entry.miscType" ng-change="setDirty()"
+                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 7 : 1}}"
                       ng-options="type as label for (type, label) in state.miscLeaves">
                 <option value="">No Misc Hours</option>
               </select>
@@ -276,7 +282,7 @@
               <td ng-class="{invalid: entry.workHours === undefined}">
                 <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                        placeholder="--" step="0.25" min="0" max="24" ng-disabled="entry.date | momentCmp:'>':'now':'day'"
-                       ng-model="entry.workHours" tabindex="{{$index+1}}" name="numWorkHours"/>
+                       ng-model="entry.workHours" name="numWorkHours"/>
               </td>
               <td class="entry-comment-col">
                 <input type="text" ng-change="setDirty()" class="entry-comment"

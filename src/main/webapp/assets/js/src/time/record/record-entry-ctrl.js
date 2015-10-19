@@ -113,6 +113,10 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                     record.isDue = endDateMoment.isBefore(moment().add(1, 'days').startOf('day'));
                     // Set the record index
                     record.index = index;
+                    // Assign indexes to the entries
+                    angular.forEach(record.timeEntries, function(entry, i) {
+                        entry.index = i;
+                    });
                 });
                 linkRecordFromQueryParam();
             }
