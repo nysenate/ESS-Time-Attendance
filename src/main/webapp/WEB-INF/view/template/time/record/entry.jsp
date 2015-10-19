@@ -285,7 +285,7 @@
                        ng-model="entry.workHours" name="numWorkHours"/>
               </td>
               <td class="entry-comment-col">
-                <input type="text" ng-change="setDirty()" class="entry-comment"
+                <input type="text" maxlength="150" ng-change="setDirty()" class="entry-comment"
                        ng-model="entry.empComment" name="entryComment"/>
               </td>
             </tr>
