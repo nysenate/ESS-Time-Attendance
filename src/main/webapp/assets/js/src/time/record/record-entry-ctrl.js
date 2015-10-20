@@ -664,6 +664,10 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     }
 
     function isInHalfHourIncrements(hours) {
+        // Don't worry about the increment if undefined.
+        if (typeof hours === 'undefined') {
+            return true;
+        }
         return hours % 1 % 0.5 === 0;
     }
 
