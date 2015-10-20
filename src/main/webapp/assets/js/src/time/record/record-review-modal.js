@@ -11,6 +11,7 @@ function (appProps, modals, locationService) {
 
         $scope.iSelectedRecord = 0;
         $scope.records = modals.params().records;
+        $scope.allowApproval = modals.params().allowApproval;
 
         /**
          *  Records are categorized under approved or disapproved, keyed by time record id
@@ -82,6 +83,10 @@ function (appProps, modals, locationService) {
         /** Sets the given index as the index of the selected record */
         $scope.selectRecord = function (index) {
             $scope.iSelectedRecord = index;
+        };
+
+        $scope.next = function() {
+            selectNextPendingRecord();
         };
 
         /**

@@ -47,13 +47,16 @@ table.ess-table {
 
       &.active {
         background: #DAE5EE;
-        td {
-          &:nth-child(1) {
-            border-color: @light-teal;
-            background: @light-teal;
-            color: white;
+        &.highlight-first {
+          td {
+            &:nth-child(1) {
+              border-color: @light-teal;
+              background: @light-teal;
+              color: white;
+            }
           }
         }
+
       }
     }
   }

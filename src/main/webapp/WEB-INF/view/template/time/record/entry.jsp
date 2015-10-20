@@ -137,7 +137,7 @@
             </tr>
           </thead>
           <tbody>
-          <tr class="time-record-row"
+          <tr class="time-record-row highlight-first"
               ng-repeat="(i,entry) in regRecords = (state.records[state.iSelectedRecord].timeEntries | filter:{payType: '!TE'})"
               ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}"
               ng-init="numRecs = regRecords.length">
@@ -275,7 +275,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="time-record-row"
+            <tr class="time-record-row highlight-first"
                 ng-repeat="(i,entry) in state.records[state.iSelectedRecord].timeEntries | filter:{payType: 'TE'}"
                 ng-class="{'weekend': isWeekend(entry.date), 'dummy-entry': entry.dummyEntry}">
               <td class="date-column">{{entry.date | moment:'ddd M/D/YYYY'}}</td>

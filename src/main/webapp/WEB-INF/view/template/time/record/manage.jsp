@@ -15,22 +15,21 @@
 
     <section class="content-container" ng-if="state.supRecords[state.selSupId].SUBMITTED">
       <h1 class="teal">T&A Record(s) Needing Approval ({{state.supRecords[state.selSupId]['SUBMITTED'].length}})</h1>
-
       <p class="content-info">
         Select pending records in the table below and click 'Review Selected Records'<br/>
         at the bottom to review the record details and either approve or reject them.
       </p>
       <ul class="horizontal" style="padding:0;margin:10px">
-        <li style="margin-right:10px;"><a ng-click="selectAll()">Select All</a></li>
-        <li style="margin-right:10px;"><a ng-click="selectNone()">Select None</a></li>
+        <li style="margin-right:10px;"><a ng-click="selectAll('SUBMITTED')">Select All</a></li>
+        <li style="margin-right:10px;"><a ng-click="selectNone('SUBMITTED')">Select None</a></li>
       </ul>
       <div supervisor-record-list records="state.supRecords[state.selSupId]['SUBMITTED']"
-           sup-id="state.selSupId" selected-indices="state.selectedIndices"></div>
+           sup-id="state.selSupId" selected-indices="state.selectedIndices['SUBMITTED']"></div>
       <div style="padding:.5em;text-align:right;">
-        <input type="button" class="submit-button" value="Approve Selected" ng-disabled="hasSelections() == false"
-               ng-click="approveSelections()"/>
+        <input type="button" class="submit-button" value="Approve Selected" ng-disabled="hasSelections('SUBMITTED') == false"
+               ng-click="approveSelections('SUBMITTED')"/>
         <input type="button" class="neutral-button" value="Review Selected"
-               ng-click="review()" ng-disabled="hasSelections() == false"/>
+               ng-click="review('SUBMITTED', true)" ng-disabled="hasSelections('SUBMITTED') == false"/>
       </div>
     </section>
 
@@ -41,7 +40,24 @@
     <toggle-panel open="true" ng-if="state.supRecords[state.selSupId]['NOT_SUBMITTED']"
                   label="T&A Records Not Submitted ({{state.supRecords[state.selSupId]['NOT_SUBMITTED'].length}})">
       <p class="content-info">The records have not yet been submitted by the employee.<br/></p>
-      <div supervisor-record-list records="state.supRecords[state.selSupId]['NOT_SUBMITTED']"></div>
+      <div class="emp-manage-actions-container">
+        <input type="button" class="submit-button" value="View Selected" ng-disabled="hasSelections('NOT_SUBMITTED') == false"
+               ng-click="review('NOT_SUBMITTED', false)"/>
+        <input type="button" class="neutral-button" value="Email Selected"
+               ng-click="alert('Not implemented yet.')" ng-disabled="hasSelections('NOT_SUBMITTED') == false"/>
+      </div>
+      <ul class="horizontal" style="padding:0;margin:10px">
+        <li style="margin-right:10px;"><a ng-click="selectAll('NOT_SUBMITTED')">Select All</a></li>
+        <li style="margin-right:10px;"><a ng-click="selectNone('NOT_SUBMITTED')">Select None</a></li>
+      </ul>
+      <div supervisor-record-list records="state.supRecords[state.selSupId]['NOT_SUBMITTED']"
+           selected-indices="state.selectedIndices['NOT_SUBMITTED']"></div>
+      <div class="emp-manage-actions-container">
+        <input type="button" class="submit-button" value="View Selected" ng-disabled="hasSelections('NOT_SUBMITTED') == false"
+               ng-click="review('NOT_SUBMITTED', false)"/>
+        <input type="button" class="neutral-button" value="Email Selected"
+               ng-click="alert('Not implemented yet.')" ng-disabled="hasSelections('NOT_SUBMITTED') == false"/>
+      </div>
     </toggle-panel>
 
     <br/>

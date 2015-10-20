@@ -33,12 +33,38 @@ essApp.directive('supervisorRecordList', ['appProps', 'modals', function (appPro
          */
         $scope.toggleSelected = function(index) {
             if ($scope.selectedIndices) {
-                if ($scope.selectedIndices[index] === true) {
+                return $scope.setSelected(index, !$scope.selectedIndices[index]);
+            }
+            return false;
+        };
+
+        $scope.setSelected = function(index, isSelected) {
+            if ($scope.selectedIndices) {
+                if (!isSelected) {
                     delete $scope.selectedIndices[index];
+                    return false;
                 } else {
                     $scope.selectedIndices[index] = true;
+                    return true;
                 }
             }
+            return false;
         };
+
+        $scope.toggleRecsForEmp = function(record) {
+            var desiredState = null;
+            if ($scope.selectedIndices) {
+                angular.forEach($scope.records, function(rec, i) {
+                    if (rec.employeeId === record.employeeId) {
+                        if (desiredState === null) {
+                            desiredState = $scope.toggleSelected(i);
+                        }
+                        else {
+                            $scope.setSelected(i, desiredState);
+                        }
+                    }
+                });
+            }
+        }
     }
 }]);

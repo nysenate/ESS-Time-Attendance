@@ -1,12 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div ng-controller="EmpSummaryCtrl">
-    <h1 class="full-name-hero">{{state.emp.fullName}}</h1>
+    <div class="emp-summary-hero">
+        <h1>{{state.emp.fullName}}</h1>
+        <h3>{{state.emp.jobTitle}}</h3>
+    </div>
     <div class="grid" style="background:white;">
         <div class="col-1-2 content-container content-controls padding-10">
             <p class="content-info">Personnel Info</p>
             <table class="simple-table">
                 <tbody>
-                <tr><td>Job Title</td><td>{{state.emp.jobTitle}}</td></tr>
                 <tr><td>Email</td><td>{{state.emp.email}}</td></tr>
                 <tr><td>Date of Birth</td><td>{{state.emp.dateOfBirth | moment:'MM/DD/YYYY'}}</td></tr>
                 <tr><td>Work Phone</td><td>{{state.emp.workPhone}}</td></tr>

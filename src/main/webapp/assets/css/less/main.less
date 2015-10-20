@@ -50,6 +50,10 @@ label {
   .font-weight-light;
 }
 
+.inactive-stitches {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==) repeat;
+}
+
 input[type="text"], input[type="password"], input[type="number"] {
   border: 1px solid #ccc;
   outline: 0;
@@ -80,15 +84,16 @@ input[type="button"].neutral-button {
   background: @bgColor;
   color: @textColor;
   .font-weight-bold;
-  border-style: none none solid none;
-  border-width: 2px;
-  border-color: darken(@bgColor, 10%);
+  border: 2px none darken(@bgColor, 10%);
+  border-bottom-style: solid;
 
   &.inactive, &[disabled="disabled"] {
-    background: none;
     color: #333;
+    border: 0;
+    cursor: not-allowed;
+    .inactive-stitches;
     &:hover {
-      background: #eee;
+      .inactive-stitches;
     }
   }
 
@@ -1113,20 +1118,42 @@ table.attendance-entry-sub-table {
 
 /** --- Manage Employee Records Page --- */
 
+.emp-manage-actions-container {
+  padding:.5em;
+  text-align:right;
+}
+
 table.approve-attendance-rec-table {
   padding: 10px;
   tbody {
     tr {
+      &.name-row {
+        border-top: 2px solid @light-teal;
+      }
       &.active {
-        background: #e7e9f6;
+        &:hover {
+          td {
+            background: #EEF4F9;
+          }
+        }
+        td {
+          &:nth-child(1) {
+            background: white;
+          }
+        }
       }
       &:hover {
-        background: #E4EBFF;
+        td {
+          background: white;
+        }
       }
       cursor: pointer;
     }
     td {
       padding: .5em;
+      &:nth-child(1) {
+        border-right: 1px solid #ddd;
+      }
     }
   }
 }
@@ -1310,15 +1337,20 @@ record-review-modal, [record-review-modal] {
 
 /** --- Emp Summary Page --- */
 
-.full-name-hero {
-  font-size:2.5em;
+.emp-summary-hero {
+  //font-size:2.5em;
   padding:.3em;
-  margin: 0;
-  font-weight:400;
-  color: white;
+  font-weight: bold;
   background: @green;
   text-align:center;
   border-bottom: 1px solid #ddd;
+  h1 {
+    font-size: 2.5em;
+  }
+  h1, h3 {
+    color: white;
+  }
+  margin-bottom: 20px;
 }
 
 /** --- Directives --- */

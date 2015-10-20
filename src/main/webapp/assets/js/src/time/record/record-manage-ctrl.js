@@ -15,7 +15,15 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
         // Page state
         loading: false,     // If data is being fetched
         selSupId: null,     // The currently selected id from the supIds map
-        selectedIndices: {} // Mapping of selected record indices, e,g { 3: true }
+        selectedIndices: {  // Mapping of selected record indices by status code, e,g {'SUBMITTED' : { 1:true, 2:true }}
+            NOT_SUBMITTED: {},         // TODO: Turn this into a constant
+            SUBMITTED: {},
+            DISAPPROVED: {},
+            APPROVED: {},
+            DISAPPROVED_PERSONNEL: {},
+            SUBMITTED_PERSONNEL: {},
+            APPROVED_PERSONNEL: {}
+        }
     };
 
     // This key is used for grouping all records under a single item regardless of supervisor.
@@ -115,16 +123,16 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
     /**
      * Causes all SUBMITTED records to be selected for review
      */
-    $scope.selectAll = function() {
-        for(var i = 0; i < $scope.state.supRecords[$scope.state.selSupId].SUBMITTED.length; i++) {
-            $scope.state.selectedIndices[i] = true;
+    $scope.selectAll = function(status) {
+        for(var i = 0; i < $scope.state.supRecords[$scope.state.selSupId][status].length; i++) {
+            $scope.state.selectedIndices[status][i] = true;
         }
     };
     /**
      * Clears all SUBMITTED currently selected for review
      */
-    $scope.selectNone = function() {
-        $scope.state.selectedIndices = {};
+    $scope.selectNone = function(status) {
+        $scope.state.selectedIndices[status] = {};
     };
 
     /**
@@ -141,19 +149,20 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
      * Passes all selected records
      * Upon resolution, the modal will return an object containing
      */
-    $scope.review = function() {
-        var selectedRecords = getSelectedRecords();
+    $scope.review = function(status, allowApproval) {
+        var selectedRecords = getSelectedRecords(status);
         var params = {
-            records: selectedRecords
+            records: selectedRecords,
+            allowApproval: allowApproval
         };
         modals.open('record-review', params)
             .then(submitReviewedRecords)
             .then($scope.selectNone);
     };
 
-    $scope.hasSelections = function() {
-        for (var p in $scope.state.selectedIndices) {
-            if ($scope.state.selectedIndices.hasOwnProperty(p) && $scope.state.selectedIndices[p] === true) {
+    $scope.hasSelections = function(status) {
+        for (var p in $scope.state.selectedIndices[status]) {
+            if ($scope.state.selectedIndices[status].hasOwnProperty(p) && $scope.state.selectedIndices[status][p] === true) {
                 return true;
             }
         }
@@ -169,7 +178,7 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
      * Submits all displayed records that are awaiting supervisor approval as 'APPROVED'
      */
     $scope.approveSelections = function () {
-        var selectedRecords = getSelectedRecords();
+        var selectedRecords = getSelectedRecords('SUBMITTED');
         if (selectedRecords) {
             selectedRecords.forEach(function (record) {
                 record.recordStatus = 'APPROVED';
@@ -216,11 +225,11 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
      * Returns the records that are selected using the checkboxes.
      * @returns {Array}
      */
-    function getSelectedRecords() {
+    function getSelectedRecords(status) {
         var selectedRecords = [];
-        for (var index in $scope.state.selectedIndices) {
-            if ($scope.state.selectedIndices.hasOwnProperty(index)) {
-                selectedRecords.push($scope.state.supRecords[$scope.state.selSupId].SUBMITTED[index]);
+        for (var index in $scope.state.selectedIndices[status]) {
+            if ($scope.state.selectedIndices[status].hasOwnProperty(index)) {
+                selectedRecords.push($scope.state.supRecords[$scope.state.selSupId][status][index]);
             }
         }
         return selectedRecords;

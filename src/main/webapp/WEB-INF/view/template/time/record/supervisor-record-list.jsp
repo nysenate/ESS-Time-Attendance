@@ -2,8 +2,8 @@
   <table class="ess-table approve-attendance-rec-table">
     <thead>
     <tr>
-      <th>{{selectedIndices ? 'Review' : 'Actions'}}</th>
-      <th colspan="2">Employee</th>
+      <th colspan="1">Employee</th>
+      <th ng-if="selectedIndices">Select</th>
       <th>Pay Period</th>
       <th>Work</th>
       <th>Holiday</th>
@@ -17,17 +17,21 @@
     </thead>
     <tbody>
     <tr ng-repeat="record in records" ng-click="(selectedIndices) ? toggleSelected($index) : showDetails(record)"
-        ng-class="{'active': selectedIndices[$index] === true}" title="View record">
-      <td>
-        <input type="checkbox" ng-if="selectedIndices" ng-checked="selectedIndices[$index] === true"/>
-        <a ng-if="!selectedIndices" ng-click="showDetails(record)">View</a>
+        ng-init="showName = ($first == true || $parent.records[$index - 1].employeeId !== record.employeeId)"
+        ng-class="{'active': selectedIndices[$index] === true, 'name-row': showName}" title="Select record">
+      <%--
+      Display the name only once for each employee's list of records.
+      When clicked, it should toggle all of the records for that employee.
+      --%>
+      <td ng-click="toggleRecsForEmp(record); $event.stopPropagation();">
+        <div ng-if="showName">
+          {{record.employee.fullName || record.employeeId}}
+          <br/>
+          <small class="light-teal">Supervisor: {{record.supervisor.lastName}}</small>
+        </div>
       </td>
-      <td>
-        <div class="small-employee-profile-pic">&nbsp;</div>
-      </td>
-      <td>{{record.employee.fullName || record.employeeId}}
-        <br/>
-        <small class="light-teal">Supervisor: {{record.supervisor.lastName}}</small>
+      <td ng-if="selectedIndices" style="text-align: center;">
+        <input type="checkbox" ng-checked="selectedIndices[$index] === true"/>
       </td>
       <td>{{record.beginDate | moment:'l'}} - {{record.endDate | moment:'l'}}</td>
       <td>{{record.totals.workHours}}</td>

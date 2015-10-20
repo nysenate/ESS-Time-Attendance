@@ -39,7 +39,7 @@
   <div id="record-details-view">
     <div record-details record="records[iSelectedRecord]"></div>
       <hr/>
-      <div id="action-container">
+      <div id="action-container" ng-if="allowApproval === true">
         <div ng-switch="getApprovalStatus(records[iSelectedRecord])" class="record-approval-buttons">
           <input type="button" value="Undo Approval" class="reject-button"
                  ng-switch-when="approved" ng-click="cancelRecord()"/>
@@ -57,5 +57,5 @@
           <input type="button" class="neutral-button" value="Cancel" ng-click="close()"/>
         </div>
       </div>
-    </div>
+  </div>
 </section>
