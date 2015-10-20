@@ -29,17 +29,27 @@ essTime.directive('recordDetails', ['appProps', 'modals', function (appProps, mo
         templateUrl: appProps.ctxPath + '/template/time/record/details',
         link: function($scope, $elem, attrs) {
             $scope.close = modals.reject;
+            $scope.tempEntries = $scope.annualEntries = false;
+            var recordInitialized = false;
+            $scope.$watch('record', function () {
+                if (!recordInitialized) {
+                    angular.forEach($scope.record.timeEntries, function (entry) {
+                        $scope.tempEntries = $scope.tempEntries || entry.payType === 'TE';
+                        $scope.annualEntries = $scope.annualEntries || ['RA', 'SA'].indexOf(entry.payType) > -1;
+                    });
+                    recordInitialized = true;
+                }
+            });
         }
     };
 }]);
 
 essTime.directive('recordDetailModal', ['modals', function (modals) {
     return {
-        template: '<div class="record-detail-modal" record-details record="record" employee="employee"></div>',
+        template: '<div class="record-detail-modal" record-details record="record"></div>',
         link: function ($scope, $elem, $attrs) {
             var params = modals.params();
             $scope.record = params.record;
-            $scope.employee = params.employee;
         }
     }
 }]);

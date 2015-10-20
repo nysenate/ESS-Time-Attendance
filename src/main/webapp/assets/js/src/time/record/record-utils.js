@@ -73,6 +73,7 @@ essTime.service('RecordUtils', [function () {
         totals.raSaWorkHours = getTotal(record, 'workHours', ['RA', 'SA']);
         totals.tempWorkHours = getTotal(record, 'workHours', ['TE']);
         totals.raSaTotal = getTotal(record, 'total', ['RA', 'SA']);
+        totals.total = getTotal(record, 'total');
         return totals;
     }
 }]);

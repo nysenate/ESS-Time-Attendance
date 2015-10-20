@@ -47,18 +47,6 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
         $scope.state = getInitialState();
     };
 
-    // Get a clean validation object where everything is set as valid
-    function getDefaultValidation() {
-        return {
-            accruals: {
-                sick: true,
-                vacation: true,
-                personal: true
-            }
-        }
-    }
-    $scope.validation = getDefaultValidation();
-
     // A map of employee record statuses to the logical next status upon record submission
     var nextStatusMap = {
         NOT_SUBMITTED: "SUBMITTED",
@@ -77,7 +65,6 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     // Update accruals, display entries, totals when a new record is selected
     $scope.$watchGroup(['state.records', 'state.iSelectedRecord'], function() {
         if ($scope.state.records && $scope.state.records[$scope.state.iSelectedRecord]) {
-            $scope.validation = getDefaultValidation();
             detectPayTypes();
             $q.all([    // Get Accruals/Allowances for the record and then call record update methods
                 $scope.getAccrualForSelectedRecord(),
@@ -255,14 +242,6 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     };
 
     /**
-     * Returns true if all validation fields are true in the validation object.
-     * @returns {boolean}
-     */
-    $scope.recordValid = function() {
-        return allTrue($scope.validation);
-    };
-
-    /**
      * This method is called every time a field is modified on the currently selected record.
      */
     $scope.setDirty = function() {
@@ -277,7 +256,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
      */
     $scope.recordSubmittable = function () {
         var record = $scope.state.records[$scope.state.iSelectedRecord];
-        return record && $scope.recordValid() && !moment(record.endDate).isAfter(moment(), 'day');
+        return record && !$scope.errorTypes.raSa.errors && !moment(record.endDate).isAfter(moment(), 'day');
     };
 
     /**
@@ -354,7 +333,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
         recordUtils.calculateDailyTotals(record);
         $scope.state.totals = recordUtils.getRecordTotals(record);
         calculateAllowanceUsage();
-        validateRecord();
+        checkRecordForErrors(record);
     }
 
     /**
@@ -364,7 +343,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     function sanitizeEntries(record) {
         var timeEntryFields = recordUtils.getTimeEntryFields();
         angular.forEach(record.timeEntries, function (entry) {
-            var validInterval = entry.payType == 'TE' ? 0.25 : 0.5;
+            var validInterval = isTemporaryEmployee(entry) ? 0.25 : 0.5;
             var inverse = 1/validInterval;
             angular.forEach(timeEntryFields, function(fieldName) {
                 var value = entry[fieldName];
@@ -386,9 +365,9 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
             var record = $scope.getSelectedRecord();
             for (var iEntry in record.timeEntries) {
                 var entry = record.timeEntries[iEntry];
-                if (entry.payType === 'TE') {
+                if (isTemporaryEmployee(entry)) {
                     $scope.state.tempEntries = true;
-                } else if (entry.payType === 'RA' || entry.payType === 'SA') {
+                } else if (isSalariedEmployee(entry)) {
                     $scope.state.annualEntries = true;
                 }
             }
@@ -424,7 +403,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
             record.moneyUsed = 0;
             for (var i in record.timeEntries) {
                 var entry = record.timeEntries[i];
-                if (entry.payType === 'TE' && entry.workHours) {
+                if (isTemporaryEmployee(entry) && entry.workHours) {
                     record.moneyUsed += entry.workHours * getSalaryAtDate(entry.date);
                 }
             }
@@ -452,43 +431,20 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     }
 
     /**
-     * Recursively ensures that all boolean fields are true within the given object. (see $scope.recordValid)
+     * Recursively ensures that all boolean fields are false within the given object.
      * @param object
      * @returns {boolean}
      */
-    function allTrue(object) {
+    function allFalse(object) {
         if (typeof object === 'boolean') {
             return object;
         }
         for (var prop in object) {
-            if (object.hasOwnProperty(prop) && !allTrue(object[prop])) {
+            if (object.hasOwnProperty(prop) && allFalse(object[prop])) {
                 return false;
             }
         }
         return true;
-    }
-
-    /**
-     * Performs a series of validation checks on the active record, updating $scope.validation with the result of
-     * the checks.
-     */
-    function validateRecord() {
-        validateAccruals();
-        // todo validate more things
-    }
-
-    /**
-     * Ensures that the active record does not use more hours than they have accrued.
-     */
-    function validateAccruals() {
-        var accValidation = $scope.validation.accruals;
-        var accrual = $scope.state.accrual;
-        if (accrual) {
-            var sickUsage = $scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours;
-            accValidation.sick = sickUsage <= accrual.sickAvailable;
-            accValidation.personal = $scope.state.totals.personalHours <= accrual.personalAvailable;
-            accValidation.vacation = $scope.state.totals.vacationHours <= accrual.vacationAvailable;
-        }
     }
 
     /**
@@ -515,6 +471,208 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 }
             }
         }
+    }
+
+    function isTemporaryEmployee(entry) {
+        return entry.payType === 'TE';
+    }
+
+    function isSalariedEmployee(entry) {
+        return entry.payType === 'RA' || entry.payType === 'SA';
+    }
+
+    /** --- Validation --- **/
+
+    // Check for erros in the record, any errors are reflected in the $scope.errorTypes object.
+    function checkRecordForErrors(record) {
+        if (record && record.timeEntries) {
+            $scope.errorTypes.reset();
+            angular.forEach(record.timeEntries, function (entry) {
+                if (typeof entry.workHours === 'undefined') {
+                    $scope.errorTypes.raSa.workHoursInvalidRange = true;
+                }
+                if (typeof entry.vacationHours === 'undefined') {
+                    $scope.errorTypes.raSa.vacationHoursInvalidRange = true;
+                }
+                if (typeof entry.personalHours === 'undefined') {
+                    $scope.errorTypes.raSa.personalHoursInvalidRange = true;
+                }
+                if (typeof entry.sickEmpHours === 'undefined') {
+                    $scope.errorTypes.raSa.empSickHoursInvalidRange = true;
+                }
+                if (typeof entry.sickFamHours === 'undefined') {
+                    $scope.errorTypes.raSa.famSickHoursInvalidRange = true;
+                }
+                if (typeof entry.miscHours === 'undefined') {
+                    $scope.errorTypes.raSa.miscHoursInvalidRange = true;
+                }
+                if (entry.total < 0 || entry.total > 24) {
+                    $scope.errorTypes.raSa.totalHoursInvalidRange = true;
+                }
+                if ($scope.state.totals.vacationHours > $scope.state.accrual.vacationAvailable) {
+                    $scope.errorTypes.raSa.notEnoughVacationTime = true;
+                }
+                if ($scope.state.totals.personalHours > $scope.state.accrual.personalAvailable) {
+                    $scope.errorTypes.raSa.notEnoughPersonalTime = true;
+                }
+                if ($scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours > $scope.state.accrual.sickAvailable) {
+                    $scope.errorTypes.raSa.notEnoughSickTime = true;
+                }
+                // TODO: delay this some so they have a chance to enter a misc type.
+                if (typeof entry.miscHours !== 'undefined' && entry.miscHours !== null && entry.miscType === null) {
+                    $scope.errorTypes.raSa.noMiscTypeGiven = true;
+                }
+                if (!allEntryValuesInHalfHourIncrements(entry)){
+                    $scope.errorTypes.raSa.halfHourIncrements = true;
+                }
+            });
+            $scope.errorTypes.raSa.errors = !allFalse($scope.errorTypes.raSa);
+        }
+    }
+
+    $scope.errorTypes = {
+        // Error messages to display in RA SA time entry form.
+        raSa: {
+            errors: false,
+            workHoursInvalidRange: false,
+            vacationHoursInvalidRange: false,
+            personalHoursInvalidRange: false,
+            empSickHoursInvalidRange: false,
+            famSickHoursInvalidRange: false,
+            miscHoursInvalidRange: false,
+            totalHoursInvalidRange: false,
+            notEnoughVacationTime: false,
+            notEnoughPersonalTime: false,
+            notEnoughSickTime: false,
+            noMiscTypeGiven: false,
+            halfHourIncrements: false
+        },
+        // Error messages to display in TE time entry form.
+        te: {
+            errors: false
+            // TODO: te errors
+        },
+        reset: function() {
+            this.raSa.errors = false;
+            this.raSa.workHoursInvalidRange = false;
+            this.raSa.vacationHoursInvalidRange = false;
+            this.raSa.personalHoursInvalidRange = false;
+            this.raSa.empSickHoursInvalidRange = false;
+            this.raSa.famSickHoursInvalidRange = false;
+            this.raSa.miscHoursInvalidRange = false;
+            this.raSa.totalHoursInvalidRange = false;
+            this.raSa.notEnoughVacationTime = false;
+            this.raSa.notEnoughPersonalTime = false;
+            this.raSa.notEnoughSickTime = false;
+            this.raSa.noMiscTypeGiven = false;
+            this.raSa.halfHourIncrements = false;
+        }
+    };
+
+    $scope.areWorkHoursValid = function(entry) {
+        var hrs = entry.workHours;
+        if (typeof hrs === 'undefined') {
+            return false;
+        }
+        if (hrs === null) {
+            return true;
+        }
+        if (isTemporaryEmployee(entry)) {
+            return isInFifteenMinIncrements(hrs);
+        }
+        else if (isSalariedEmployee(entry)) {
+            return isInHalfHourIncrements(hrs);
+        }
+        return true;
+    };
+
+    $scope.areVacationHoursValid = function(entry) {
+        var hrs = entry.vacationHours;
+        if (typeof hrs === 'undefined') {
+            return false;
+        }
+        if (hrs === null) {
+            return true;
+        }
+        var hasRequestedHours = $scope.state.accrual && $scope.state.totals.vacationHours <= $scope.state.accrual.vacationAvailable;
+        return hasRequestedHours && isInHalfHourIncrements(hrs);
+    };
+
+    $scope.arePersonalHoursValid = function(entry) {
+        var hrs = entry.personalHours;
+        if (typeof hrs === 'undefined') {
+            return false;
+        }
+        if (hrs === null) {
+            return true;
+        }
+        var hasRequestedHours = $scope.state.accrual && $scope.state.totals.personalHours <= $scope.state.accrual.personalAvailable;
+        return hasRequestedHours && isInHalfHourIncrements(hrs);
+    };
+
+    $scope.areEmpSickHoursValid = function(entry) {
+        var hrs = entry.sickEmpHours;
+        if (typeof hrs === 'undefined') {
+            return false;
+        }
+        if (hrs === null) {
+            return true;
+        }
+        var hasRequestedHours = $scope.state.accrual && $scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours <= $scope.state.accrual.sickAvailable;
+        return hasRequestedHours && isInHalfHourIncrements(hrs);
+    };
+
+    $scope.areFamSickHoursValid = function(entry) {
+        var hrs = entry.sickFamHours;
+        if (typeof hrs === 'undefined') {
+            return false;
+        }
+        if (hrs === null) {
+            return true;
+        }
+        var hasRequestedHours = $scope.state.accrual && $scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours <= $scope.state.accrual.sickAvailable;
+        return hasRequestedHours && isInHalfHourIncrements(hrs);
+    };
+
+    $scope.areMiscHoursValid = function(entry) {
+        var hrs = entry.miscHours;
+        if (typeof hrs === 'undefined') {
+            return false;
+        }
+        if (hrs === null) {
+            return true;
+        }
+        return isInHalfHourIncrements(hrs);
+    };
+
+    $scope.areTotalHoursValid = function(entry) {
+        // Don't invalidate total entry if its not a number.
+        // This is to avoid confusion since no number is displayed to the user.
+        if (isNaN(entry.total)) {
+            return true;
+        }
+        return entry.total >= 0 && entry.total <= 24;
+    };
+
+    $scope.isMiscTypeMissing = function(entry) {
+        return entry.miscHours > 0 && entry.miscType === null;
+    };
+
+    function allEntryValuesInHalfHourIncrements(entry) {
+        return isInHalfHourIncrements(entry.workHours) && isInHalfHourIncrements(entry.vacationHours) && isInHalfHourIncrements(entry.personalHours)
+            && isInHalfHourIncrements(entry.sickEmpHours) && isInHalfHourIncrements(entry.sickFamHours) && isInHalfHourIncrements(entry.miscHours);
+    }
+
+    function isInHalfHourIncrements(hours) {
+        // Don't worry about the increment if undefined.
+        if (typeof hours === 'undefined') {
+            return true;
+        }
+        return hours % 1 % 0.5 === 0;
+    }
+
+    function isInFifteenMinIncrements(hours) {
+        return hours % 1 % 0.25 === 0;
     }
 
     $scope.init();

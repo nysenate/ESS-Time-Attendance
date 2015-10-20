@@ -902,6 +902,11 @@ record-detail-modal, [record-detail-modal] {
   text-align: center;
 }
 
+h1.attendance-entry-sub-table-title {
+  color: white;
+  background: #006B80;
+}
+
 table.attendance-entry-sub-table {
   width:100%;
   font-size:1em;
@@ -909,6 +914,12 @@ table.attendance-entry-sub-table {
   border-bottom: 1px solid #ddd;
   thead {
     tr {
+      th.day-col {
+        width: 3.4em;
+      }
+      th.date-col {
+        width: 6em;
+      }
       th.hour-col {
         width: 5em;
       }
@@ -923,6 +934,12 @@ table.attendance-entry-sub-table {
       td {
         padding: .4em !important;
         border-right: 1px solid #ddd;
+
+        &.entry-comment {
+          max-width: 0;  // I don't know why this works, but it does
+          overflow: hidden;
+          //text-overflow: ellipsis; todo how to handle overflow?
+        }
       }
       &.time-totals-row {
         border-top: 2px solid teal;
