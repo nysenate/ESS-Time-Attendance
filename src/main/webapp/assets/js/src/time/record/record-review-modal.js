@@ -19,6 +19,11 @@ function (appProps, modals, locationService) {
         var approved = {};
         var disapproved = {};
 
+        /**
+         * Add a custom fit class to this element so that it isn't sized in the default way
+         */
+        $elem.addClass('custom-fit');
+
         /** --- Display Methods --- */
 
         $scope.submitChanges = function() {

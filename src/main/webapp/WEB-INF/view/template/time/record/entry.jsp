@@ -139,7 +139,7 @@
             <li ng-show="errorTypes.raSa.notEnoughPersonalTime">Personal hours recorded exceeds hours available.</li>
             <li ng-show="errorTypes.raSa.notEnoughSickTime">Sick hours recorded exceeds hours available.</li>
             <li ng-show="errorTypes.raSa.noMiscTypeGiven">A misc type must be given when using misc hours.</li>
-            <li ng-show="errorTypes.raSa.halfHourIncrements">Hours must be in half hour increments.</li>
+            <li ng-show="errorTypes.raSa.halfHourIncrements">Hours must be in increments of 0.5</li>
           </ul>
         </div>
         <table class="ess-table time-record-entry-table" id="ra-sa-time-record-table"
@@ -177,36 +177,36 @@
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      ng-model="entry.vacationHours" name="numVacationHours"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 2 : 1}}"/>
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.vacationHours == null) ? 2 : 1}}"/>
             </td>
             <td ng-class="{invalid: !arePersonalHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 3 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.personalHours == null) ? 3 : 1}}"
                      ng-model="entry.personalHours" name="numPersonalHours"/>
             </td>
             <td ng-class="{invalid: !areEmpSickHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 4 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.sickEmpHours == null) ? 4 : 1}}"
                      ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
             </td>
             <td ng-class="{invalid: !areFamSickHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 5 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.sickFamHours == null) ? 5 : 1}}"
                      ng-model="entry.sickFamHours" name="numSickFamHours"/>
             </td>
             <td ng-class="{invalid: !areMiscHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 6 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.miscHours == null) ? 6 : 1}}"
                      ng-model="entry.miscHours" name="numMiscHours"/>
             </td>
             <td ng-class="{invalid: isMiscTypeMissing(entry)}">
               <select style="font-size:.9em;" name="miscHourType"
                       ng-model="entry.miscType" ng-change="setDirty()"
-                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 7 : 1}}"
+                      tabindex="{{!entry.miscHours ? 7 : 1}}"
                       ng-options="type as label for (type, label) in state.miscLeaves">
                 <option value="">No Misc Hours</option>
               </select>
@@ -290,6 +290,16 @@
           </div>
         </div>
         <hr/>
+        <% /** Display an error message if part of the time record is invalid. */ %>
+        <div ess-notification level="error" title="Time record has errors"
+             message="" class="margin-top-20"
+             ng-show="errorTypes.te.errors">
+          <ul>
+            <li ng-show="errorTypes.te.workHoursInvalidRange">Work hours must be between 0 and 24.</li>
+            <li ng-show="errorTypes.te.notEnoughWorkHours">Work hours recorded exceeds available work hours.</li>
+            <li ng-show="errorTypes.te.fifteenMinIncrements">Work hours must be in incremenets of 0.25</li>
+          </ul>
+        </div>
         <table class="ess-table time-record-entry-table" id="te-time-record-table">
           <thead>
             <tr>

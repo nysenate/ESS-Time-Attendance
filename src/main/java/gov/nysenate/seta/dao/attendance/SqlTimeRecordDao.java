@@ -116,9 +116,10 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
             record.setTimeRecordId(((BigDecimal) tsIdHolder.getKeys().get("NUXRTIMESHEET")).toBigInteger());
         }
         // Insert each entry from the time record
-        final TimeRecord oldRecord = isUpdate ? getTimeRecord(record.getTimeRecordId()) : null;
+        final Optional<TimeRecord> oldRecord = isUpdate ? Optional.of(getTimeRecord(record.getTimeRecordId())) : Optional.empty();
         record.getTimeEntries().stream()
                 .filter(entry -> shouldInsert(entry, oldRecord))
+                .peek(entry -> ensureId(entry, oldRecord))
                 .forEach(timeEntryDao::updateTimeEntry);
         return true;
     }
@@ -205,12 +206,20 @@ public class SqlTimeRecordDao extends SqlBaseDao implements TimeRecordDao
      * @param oldRecord TimeRecord - a record containing the last saved entry set
      * @return true if the entry is fundamentally different than the equivalent entry in oldRecord
      */
-    private static boolean shouldInsert(TimeEntry entry, TimeRecord oldRecord) {
-        if (oldRecord == null) {
-            return !entry.isEmpty();
-        }
-        TimeEntry oldEntry = oldRecord.getEntry(entry.getDate());
-        return oldEntry == null ? !entry.isEmpty() : !entry.equals(oldEntry);
+    private static boolean shouldInsert(TimeEntry entry, Optional<TimeRecord> oldRecord) {
+        return oldRecord
+                .map(rec -> rec.getEntry(entry.getDate()))
+                .map(oldEnt -> oldEnt.equals(entry))
+                .orElse(!entry.isEmpty());
+    }
+
+    /**
+     * Ensure that the time record id matches the id of the saved entry on the same date, if it exists
+     */
+    private static void ensureId(TimeEntry entry, Optional<TimeRecord> oldRecord) {
+        Optional<BigInteger> oldId = oldRecord.map(rec -> rec.getEntry(entry.getDate()))
+                                              .map(TimeEntry::getEntryId);
+        entry.setEntryId(oldId.orElse(null));
     }
 }
 
