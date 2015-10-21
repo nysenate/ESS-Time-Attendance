@@ -174,36 +174,36 @@
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
                      ng-model="entry.vacationHours" name="numVacationHours"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 2 : 1}}"/>
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.vacationHours == null) ? 2 : 1}}"/>
             </td>
             <td ng-class="{invalid: !arePersonalHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 3 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.personalHours == null) ? 3 : 1}}"
                      ng-model="entry.personalHours" name="numPersonalHours"/>
             </td>
             <td ng-class="{invalid: !areEmpSickHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 4 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.sickEmpHours == null) ? 4 : 1}}"
                      ng-model="entry.sickEmpHours" name="numSickEmpHours"/>
             </td>
             <td ng-class="{invalid: !areFamSickHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 5 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.sickFamHours == null) ? 5 : 1}}"
                      ng-model="entry.sickFamHours" name="numSickFamHours"/>
             </td>
             <td ng-class="{invalid: !areMiscHoursValid(entry)}">
               <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                      placeholder="--" step=".5" min="0" max="7"
-                     tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 6 : 1}}"
+                     tabindex="{{(entry.workHours == null || entry.total >= 7 && entry.miscHours == null) ? 6 : 1}}"
                      ng-model="entry.miscHours" name="numMiscHours"/>
             </td>
             <td ng-class="{invalid: isMiscTypeMissing(entry)}">
               <select style="font-size:.9em;" name="miscHourType"
                       ng-model="entry.miscType" ng-change="setDirty()"
-                      tabindex="{{(entry.workHours == null || entry.workHours >= 7) ? 7 : 1}}"
+                      tabindex="{{!entry.miscHours ? 7 : 1}}"
                       ng-options="type as label for (type, label) in state.miscLeaves">
                 <option value="">No Misc Hours</option>
               </select>
