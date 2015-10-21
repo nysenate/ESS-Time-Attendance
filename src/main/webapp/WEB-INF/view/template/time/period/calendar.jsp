@@ -1,8 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <section ng-controller="PayPeriodCalendarCtrl">
+    <div class="time-attendance-hero">
+        <h2>Pay Period Calendar</h2>
+    </div>
     <div class="content-container content-controls">
         <p class="content-info">
-            Display calendar for year &nbsp;
+            Year &nbsp;
             <select ng-model="state.year" ng-options="year for year in yearList"></select>
         </p>
     </div>

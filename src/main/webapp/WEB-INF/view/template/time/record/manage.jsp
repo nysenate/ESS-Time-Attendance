@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <div ng-controller="RecordManageCtrl">
+  <div class="time-attendance-hero">
+    <h2>Review Time Records</h2>
+  </div>
   <div ng-show="state.loading">
     <div loader-indicator></div>
   </div>
@@ -40,13 +43,13 @@
     <toggle-panel open="true" ng-if="state.supRecords[state.selSupId]['NOT_SUBMITTED']"
                   label="T&A Records Not Submitted ({{state.supRecords[state.selSupId]['NOT_SUBMITTED'].length}})">
       <p class="content-info">The records have not yet been submitted by the employee.<br/></p>
-      <div class="emp-manage-actions-container">
+      <div class="emp-manage-actions-container" style="float:right;">
         <input type="button" class="submit-button" value="View Selected" ng-disabled="hasSelections('NOT_SUBMITTED') == false"
                ng-click="review('NOT_SUBMITTED', false)"/>
         <input type="button" class="neutral-button" value="Email Selected"
                ng-click="alert('Not implemented yet.')" ng-disabled="hasSelections('NOT_SUBMITTED') == false"/>
       </div>
-      <ul class="horizontal" style="padding:0;margin:10px">
+      <ul class="horizontal" style="padding:0;margin:10px;float:left">
         <li style="margin-right:10px;"><a ng-click="selectAll('NOT_SUBMITTED')">Select All</a></li>
         <li style="margin-right:10px;"><a ng-click="selectNone('NOT_SUBMITTED')">Select None</a></li>
       </ul>

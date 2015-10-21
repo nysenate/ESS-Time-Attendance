@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div ng-controller="GrantPrivilegesCtrl">
-
+    <div class="time-attendance-hero">
+        <h2>Grant Supervisor Privileges</h2>
+    </div>
     <ess-notification ng-show="state.fetched === true && state.grantees.length == 0" level="warn"
                       title="No supervisor grants available."
                       message="You do not have any supervisors that you can delegate your employee's record approvals to. Please contact Senate Personnel for more information.">

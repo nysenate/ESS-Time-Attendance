@@ -31,6 +31,7 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/location-service.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/badge-service.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/badge-directive.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/ai-filter.js"></script>
 
     </c:when>
     <c:when test="${runtimeLevel eq 'test'}">

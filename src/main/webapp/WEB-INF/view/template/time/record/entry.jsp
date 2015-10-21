@@ -7,6 +7,9 @@
 */
 %>
 <div ng-controller="RecordEntryController">
+  <div class="time-attendance-hero">
+    <h2>Time Record Entry</h2>
+  </div>
   <div id="record-selection-container" class="record-selection-container content-container content-controls"
        ng-show="state.records.length > 0">
     <p class="content-info">Enter a time and attendance record by selecting from the list of active pay periods.</p>

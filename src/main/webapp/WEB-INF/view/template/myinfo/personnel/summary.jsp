@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div ng-controller="EmpSummaryCtrl">
-    <div class="emp-summary-hero">
+    <div class="my-info-hero">
         <h1>{{state.emp.fullName}}</h1>
         <h3>{{state.emp.jobTitle}}</h3>
     </div>

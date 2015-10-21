@@ -1,8 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <section ng-controller="AccrualHistoryCtrl" ng-init="showDialog = false">
+    <div class="time-attendance-hero">
+        <h2>Accrual Summary and Projections</h2>
+    </div>
     <div class="content-container content-controls">
-        <p class="content-info">Display accrual information for year &nbsp;
+        <p class="content-info">Filter By Year &nbsp;
             <select ng-model="state.selectedYear" ng-change="getAccSummaries(state.selectedYear)"
                     ng-options="year for year in state.activeYears">
             </select>

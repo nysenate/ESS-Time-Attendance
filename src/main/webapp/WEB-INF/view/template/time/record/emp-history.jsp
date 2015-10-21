@@ -1,7 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <section ng-controller="EmpRecordHistoryCtrl">
-
+    <div class="time-attendance-hero">
+        <h2>Employee Time Record History</h2>
+    </div>
     <div class="content-container content-controls">
         <p class="content-info">View Attendance Records for Employee &nbsp;
             <select ng-model="state.selectedEmp" ng-if="state.allEmps.length > 0"

@@ -6,11 +6,13 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.seta.client.response.base.BaseResponse;
 import gov.nysenate.seta.client.response.base.ListViewResponse;
+import gov.nysenate.seta.client.response.base.SimpleResponse;
 import gov.nysenate.seta.client.response.base.ViewObjectResponse;
 import gov.nysenate.seta.client.view.EmpTransItemView;
 import gov.nysenate.seta.client.view.EmpTransRecordView;
 import gov.nysenate.seta.client.view.base.MapView;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.model.transaction.TransactionRecord;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +27,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static gov.nysenate.seta.controller.rest.BaseRestCtrl.REST_PATH;
+import static gov.nysenate.seta.model.transaction.TransactionCode.*;
+import static gov.nysenate.seta.model.transaction.TransactionCode.EMP;
 import static java.util.stream.Collectors.toList;
 
 @RestController
@@ -35,6 +39,18 @@ public class EmpTransactionRestCtrl extends BaseRestCtrl
 
     @Autowired private EmpTransactionService transactionService;
 
+    /**
+     * Transactions for employee API
+     * -----------------------------
+     *
+     * Returns a list of transactions within the given date range for a specific employee.
+     *
+     * @param empId int - Employee id
+     * @param fromDate String - from date (inclusive)
+     * @param toDate String - to date (inclusive)
+     * @param codes String - comma separated list of tx codes
+     * @return ListViewResponse of EmpTransRecordViews
+     */
     @RequestMapping("")
     public BaseResponse getTransactionsByEmpId(@RequestParam Integer empId,
                                                @RequestParam(required = false) String fromDate,
@@ -62,6 +78,28 @@ public class EmpTransactionRestCtrl extends BaseRestCtrl
         });
         return new ViewObjectResponse<>(MapView.of(itemMap), "snapshot");
     }
+
+    private static EnumSet<TransactionCode> timelineCodes =
+        EnumSet.of(APP, RTP, TYP, PHO, SAL, SUP, MAR, LEG, LOC, EMP);
+
+    /**
+     * The timeline API returns a subset of the transaction records that can be used to display
+     * the updates that general end users will care about.
+     *
+     * @param empId int - Employee id
+     * @return List of EmpTransRecordViews
+     */
+    @RequestMapping("/timeline")
+    public BaseResponse getEmpTimeline(@RequestParam Integer empId) {
+        return ListViewResponse.of(
+            transactionService.getTransHistory(empId)
+                .getTransRecords(DateUtils.ALL_DATES, timelineCodes, SortOrder.ASC)
+                .stream()
+                .map(EmpTransRecordView::new)
+                .collect(toList()), "transactions");
+    }
+
+    /** --- Internal --- */
 
     private Set<TransactionCode> getTransCodesFromString(String codes) {
         if (StringUtils.isNotBlank(codes)) {

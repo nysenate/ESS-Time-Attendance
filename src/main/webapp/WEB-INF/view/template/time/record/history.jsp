@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <div ng-controller="RecordHistoryCtrl">
+  <div class="time-attendance-hero">
+    <h2>Attendance History</h2>
+  </div>
   <div class="content-container content-controls">
     <p class="content-info" style="margin-bottom:0;">
       View attendance records for year&nbsp;

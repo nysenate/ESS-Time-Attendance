@@ -1,8 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div ng-controller="EmpCheckHistoryCtrl">
+  <div class="my-info-hero">
+    <h2>Pay Check History</h2>
+  </div>
+
   <div class="content-container content-controls">
     <p class="content-info">
-      View Paycheck history for year&nbsp;
+      Filter By Year&nbsp;
       <select ng-model="checkHistory.year" ng-options="year for year in checkHistory.recordYears" ng-change="getRecords()"></select>
     </p>
   </div>
@@ -10,7 +14,7 @@
   <div loader-indicator ng-show="checkHistory.searching === true"></div>
 
   <div class="content-container" ng-show="paychecks.length > 0">
-    <h1>Paycheck Records</h1>
+    <h1>{{checkHistory.year}} Paycheck Records</h1>
     <div class="padding-10 scroll-x">
       <table id="paycheck-history-table" class="ess-table" ng-model="paychecks">
         <thead>

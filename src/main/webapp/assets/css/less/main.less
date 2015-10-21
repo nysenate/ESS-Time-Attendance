@@ -102,6 +102,20 @@ input[type="button"].neutral-button {
   }
 }
 
+.page-hero(@bgColor, @textColor) {
+  padding:.3em;
+  font-weight: bold;
+  background: @bgColor;
+  text-align:center;
+  border-bottom: 1px solid #ddd;
+  h1 {
+    font-size: 2.5em;
+  }
+  h1, h2, h3, h4, p, span {
+    color: @textColor;
+  }
+}
+
 /** Remove the number spinners in chrome */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
@@ -578,6 +592,10 @@ table.simple-table {
 
 /** --- Time Record Entry Page --- */
 
+.time-attendance-hero {
+  .page-hero(@teal, white);
+}
+
 table.time-record-entry-table {
   thead {
     background: white;
@@ -611,6 +629,18 @@ table.time-record-entry-table {
           &:last-child {
             font-size: 1.1em;
             .font-weight-bold;
+          }
+        }
+      }
+
+      &.active {
+        &.highlight-first {
+          td {
+            &:nth-child(1) {
+              border-color: @teal;
+              background: @teal;
+              color: white;
+            }
           }
         }
       }
@@ -720,8 +750,8 @@ table.time-record-entry-table {
 }
 
 .personal {
-  background: @teal;
-  border-color: @teal;
+  background: @light-teal;
+  border-color: @light-teal;
 }
 
 .vacation {
@@ -1258,6 +1288,12 @@ record-review-modal, [record-review-modal] {
   }
 }
 
+/** --- My Info Page --- */
+
+.my-info-hero {
+  .page-hero(@green, white);
+}
+
 /** --- Paycheck History Page --- */
 
 #paycheck-history-table {
@@ -1330,18 +1366,37 @@ record-review-modal, [record-review-modal] {
 
 /** --- Transaction History --- */
 
+.tx-effect-date {
+  color: darken(@teal, 10%);
+}
+
 .tx-container {
   padding: 20px;
   background: #f7f7f7;
+  border-left: 2px dashed @olive;
   border-bottom: 1px solid #f1f1f1;
+  margin-left: 20px;
 }
 
-.tx-heading {
+.tx-container.grid {
+  margin-left: 20px;
+}
+
+.tx-data {
+  margin: 0;
+  border: 0;
+  p {
+    font-size: 1em;
+  }
+}
+
+.tx-label {
   color: @blue;
+  font-weight: bold;
 }
 
 .tx-update-date {
-  font-size: 13px;
+  font-size: 0.9em;
   color: #666;
 }
 
@@ -1350,24 +1405,6 @@ record-review-modal, [record-review-modal] {
 .success-bold-label {
   color: @green;
   font-weight: bold;
-}
-
-/** --- Emp Summary Page --- */
-
-.emp-summary-hero {
-  //font-size:2.5em;
-  padding:.3em;
-  font-weight: bold;
-  background: @green;
-  text-align:center;
-  border-bottom: 1px solid #ddd;
-  h1 {
-    font-size: 2.5em;
-  }
-  h1, h3 {
-    color: white;
-  }
-  margin-bottom: 20px;
 }
 
 /** --- Directives --- */
