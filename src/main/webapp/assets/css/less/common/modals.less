@@ -10,6 +10,9 @@
   .align-parent;
 
   & > ng-transclude > * {
+    &:not(.custom-fit) {
+      .modal-fit;
+    }
     background: #fafafa;
     display: block;
     margin: auto;
@@ -29,4 +32,19 @@
   & .background-modal {
     z-index: 1002;
   }
+}
+
+.modal-max-height {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-max-width {
+  max-width: 80vw;
+  overflow-x: auto;
+}
+
+.modal-fit {
+  .modal-max-height;
+  .modal-max-width;
 }
