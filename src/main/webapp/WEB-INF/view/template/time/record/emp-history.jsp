@@ -16,9 +16,9 @@
 
     <div loader-indicator ng-show="state.searching"></div>
     <section class="content-container" ng-hide="state.searching">
-        <div ng-show="state.recordYears.length == 0">
-            <ess-notification level="warn" title="No time records were found for {{state.selectedEmp.empLastName}}"></ess-notification>
-        </div>
+        <%--<div ng-show="state.recordYears.length == 0">--%>
+            <%--<ess-notification level="warn" title="No time records were found for {{state.selectedEmp.empLastName}}"></ess-notification>--%>
+        <%--</div>--%>
         <div ng-show="state.recordYears.length > 0">
             <h1>{{state.selectedEmp.empLastName}}'s Attendance Records</h1>
             <div class="content-controls">
