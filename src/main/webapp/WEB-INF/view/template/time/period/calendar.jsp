@@ -24,49 +24,4 @@
             </div>
         </div>
     </div>
-
-    <div class="grid margin-top-20 hidden">
-        <div class="col-1-2">
-            <div class="content-container padding-10">
-                <h1 class="content-info">Pay Periods during {{state.year}}</h1>
-                <table class="simple-table">
-                    <thead>
-                    <tr>
-                        <th>Pay Period Number</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="period in periods">
-                        <td>{{period.payPeriodNum}}</td>
-                        <td>{{period.startDate | moment:'MMMM D'}}</td>
-                        <td>{{period.endDate | moment:'MMMM D'}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-1-2" style="padding-right: 2px;">
-            <div class="content-container padding-10">
-                <h1 class="content-info">Holidays during {{state.year}}</h1>
-                <table class="simple-table">
-                    <thead>
-                    <tr>
-                        <th>Holiday</th>
-                        <th>Official</th>
-                        <th>Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="holiday in holidays">
-                        <td>{{holiday.name}}</td>
-                        <td><span ng-if="!holiday.unofficial">Yes</span><span ng-if="holiday.unofficial">No</span></td>
-                        <td>{{holiday.date | moment:'MMMM D'}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 </section>
