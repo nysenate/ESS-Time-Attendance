@@ -256,7 +256,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
      */
     $scope.recordSubmittable = function () {
         var record = $scope.state.records[$scope.state.iSelectedRecord];
-        return record && !$scope.errorTypes.raSa.errors && !moment(record.endDate).isAfter(moment(), 'day');
+        return record && !$scope.errorTypes.raSa.errors && !$scope.errorTypes.te.errors && !moment(record.endDate).isAfter(moment(), 'day');
     };
 
     /**
@@ -483,50 +483,75 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
 
     /** --- Validation --- **/
 
-    // Check for erros in the record, any errors are reflected in the $scope.errorTypes object.
+    /** Check for errors in the record, any errors are reflected in the $scope.errorTypes object. */
     function checkRecordForErrors(record) {
         if (record && record.timeEntries) {
             $scope.errorTypes.reset();
             angular.forEach(record.timeEntries, function (entry) {
-                if (typeof entry.workHours === 'undefined') {
-                    $scope.errorTypes.raSa.workHoursInvalidRange = true;
+                if (isSalariedEmployee(entry)) {
+                    checkSalariedEntryForErrors(entry);
                 }
-                if (typeof entry.vacationHours === 'undefined') {
-                    $scope.errorTypes.raSa.vacationHoursInvalidRange = true;
-                }
-                if (typeof entry.personalHours === 'undefined') {
-                    $scope.errorTypes.raSa.personalHoursInvalidRange = true;
-                }
-                if (typeof entry.sickEmpHours === 'undefined') {
-                    $scope.errorTypes.raSa.empSickHoursInvalidRange = true;
-                }
-                if (typeof entry.sickFamHours === 'undefined') {
-                    $scope.errorTypes.raSa.famSickHoursInvalidRange = true;
-                }
-                if (typeof entry.miscHours === 'undefined') {
-                    $scope.errorTypes.raSa.miscHoursInvalidRange = true;
-                }
-                if (entry.total < 0 || entry.total > 24) {
-                    $scope.errorTypes.raSa.totalHoursInvalidRange = true;
-                }
-                if ($scope.state.totals.vacationHours > $scope.state.accrual.vacationAvailable) {
-                    $scope.errorTypes.raSa.notEnoughVacationTime = true;
-                }
-                if ($scope.state.totals.personalHours > $scope.state.accrual.personalAvailable) {
-                    $scope.errorTypes.raSa.notEnoughPersonalTime = true;
-                }
-                if ($scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours > $scope.state.accrual.sickAvailable) {
-                    $scope.errorTypes.raSa.notEnoughSickTime = true;
-                }
-                // TODO: delay this some so they have a chance to enter a misc type.
-                if (typeof entry.miscHours !== 'undefined' && entry.miscHours !== null && entry.miscType === null) {
-                    $scope.errorTypes.raSa.noMiscTypeGiven = true;
-                }
-                if (!allEntryValuesInHalfHourIncrements(entry)){
-                    $scope.errorTypes.raSa.halfHourIncrements = true;
+                else if (isTemporaryEmployee(entry)) {
+                    checkTempEntryForErrors(entry);
                 }
             });
+            // These will be true if any errors of their type exist. raSa for salaried, te for temporary.
             $scope.errorTypes.raSa.errors = !allFalse($scope.errorTypes.raSa);
+            $scope.errorTypes.te.errors = !allFalse($scope.errorTypes.te);
+        }
+    }
+
+    /** Checks all input in a salaried employees time entry record for errors. */
+    function checkSalariedEntryForErrors(entry) {
+        if (typeof entry.workHours === 'undefined') {
+            $scope.errorTypes.raSa.workHoursInvalidRange = true;
+        }
+        if (typeof entry.vacationHours === 'undefined') {
+            $scope.errorTypes.raSa.vacationHoursInvalidRange = true;
+        }
+        if (typeof entry.personalHours === 'undefined') {
+            $scope.errorTypes.raSa.personalHoursInvalidRange = true;
+        }
+        if (typeof entry.sickEmpHours === 'undefined') {
+            $scope.errorTypes.raSa.empSickHoursInvalidRange = true;
+        }
+        if (typeof entry.sickFamHours === 'undefined') {
+            $scope.errorTypes.raSa.famSickHoursInvalidRange = true;
+        }
+        if (typeof entry.miscHours === 'undefined') {
+            $scope.errorTypes.raSa.miscHoursInvalidRange = true;
+        }
+        if (entry.total < 0 || entry.total > 24) {
+            $scope.errorTypes.raSa.totalHoursInvalidRange = true;
+        }
+        if ($scope.state.totals.vacationHours > $scope.state.accrual.vacationAvailable) {
+            $scope.errorTypes.raSa.notEnoughVacationTime = true;
+        }
+        if ($scope.state.totals.personalHours > $scope.state.accrual.personalAvailable) {
+            $scope.errorTypes.raSa.notEnoughPersonalTime = true;
+        }
+        if ($scope.state.totals.sickEmpHours + $scope.state.totals.sickFamHours > $scope.state.accrual.sickAvailable) {
+            $scope.errorTypes.raSa.notEnoughSickTime = true;
+        }
+        // TODO: delay this some so they have a chance to enter a misc type.
+        if (typeof entry.miscHours !== 'undefined' && entry.miscHours !== null && entry.miscType === null) {
+            $scope.errorTypes.raSa.noMiscTypeGiven = true;
+        }
+        if (!allEntryValuesInHalfHourIncrements(entry)) {
+            $scope.errorTypes.raSa.halfHourIncrements = true;
+        }
+    }
+
+    /** Checks all input in a temporary employees time entry record for errors. */
+    function checkTempEntryForErrors(entry) {
+        if (typeof entry.workHours === 'undefined') {
+            $scope.errorTypes.te.workHoursInvalidRange = true;
+        }
+        if (entry.workHours > 0 && $scope.getAvailableHours() < 0) {
+            $scope.errorTypes.te.notEnoughWorkHours = true;
+        }
+        if (!isInFifteenMinIncrements(entry.workHours)) {
+            $scope.errorTypes.te.fifteenMinIncrements = true;
         }
     }
 
@@ -549,8 +574,10 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
         },
         // Error messages to display in TE time entry form.
         te: {
-            errors: false
-            // TODO: te errors
+            errors: false,
+            workHoursInvalidRange: false,
+            notEnoughWorkHours: false,
+            fifteenMinIncrements: false
         },
         reset: function() {
             this.raSa.errors = false;
@@ -566,6 +593,10 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
             this.raSa.notEnoughSickTime = false;
             this.raSa.noMiscTypeGiven = false;
             this.raSa.halfHourIncrements = false;
+            this.te.errors = false;
+            this.te.workHoursInvalidRange = false;
+            this.te.notEnoughWorkHours = false;
+            this.te.fifteenMinIncrements = false;
         }
     };
 
@@ -664,7 +695,7 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     }
 
     function isInHalfHourIncrements(hours) {
-        // Don't worry about the increment if undefined.
+        // Don't check increment if undefined.
         if (typeof hours === 'undefined') {
             return true;
         }
@@ -672,6 +703,10 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
     }
 
     function isInFifteenMinIncrements(hours) {
+        // Don't check increment if undefined.
+        if (typeof hours === 'undefined') {
+            return true;
+        }
         return hours % 1 % 0.25 === 0;
     }
 

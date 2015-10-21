@@ -136,7 +136,7 @@
             <li ng-show="errorTypes.raSa.notEnoughPersonalTime">Personal hours recorded exceeds hours available.</li>
             <li ng-show="errorTypes.raSa.notEnoughSickTime">Sick hours recorded exceeds hours available.</li>
             <li ng-show="errorTypes.raSa.noMiscTypeGiven">A misc type must be given when using misc hours.</li>
-            <li ng-show="errorTypes.raSa.halfHourIncrements">Hours must be in half hour increments.</li>
+            <li ng-show="errorTypes.raSa.halfHourIncrements">Hours must be in increments of 0.5</li>
           </ul>
         </div>
         <table class="ess-table time-record-entry-table" id="ra-sa-time-record-table"
@@ -287,6 +287,16 @@
           </div>
         </div>
         <hr/>
+        <% /** Display an error message if part of the time record is invalid. */ %>
+        <div ess-notification level="error" title="Time record has errors"
+             message="" class="margin-top-20"
+             ng-show="errorTypes.te.errors">
+          <ul>
+            <li ng-show="errorTypes.te.workHoursInvalidRange">Work hours must be between 0 and 24.</li>
+            <li ng-show="errorTypes.te.notEnoughWorkHours">Work hours recorded exceeds available work hours.</li>
+            <li ng-show="errorTypes.te.fifteenMinIncrements">Work hours must be in incremenets of 0.25</li>
+          </ul>
+        </div>
         <table class="ess-table time-record-entry-table" id="te-time-record-table">
           <thead>
             <tr>
