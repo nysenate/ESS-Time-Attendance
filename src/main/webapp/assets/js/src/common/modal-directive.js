@@ -5,8 +5,8 @@ var essApp = angular.module('ess');
  *
  * Insert markup for one or more modals inside this directive and display based on $scope.subview
  */
-essApp.directive('modalContainer', ['$rootScope', 'modals',
-function ($rootScope, modals) {
+essApp.directive('modalContainer', ['$rootScope', '$document', 'modals',
+function ($rootScope, $document, modals) {
 
     return {
         template:
@@ -39,6 +39,13 @@ function ($rootScope, modals) {
             $scope.$apply(modals.reject);
         };
 
+        // Reject modal when the user presses ESC
+        $document.bind('keyup', function (event) {
+            if (event.keyCode === 27) {
+                $scope.$apply(modals.reject);
+            }
+        });
+
         // Set subview upon modal open event
         $rootScope.$on('modals.open', function (event, modalType) {
             console.log('showing modal of type', modalType);
@@ -54,6 +61,21 @@ function ($rootScope, modals) {
 
         function updateTop() {
             $scope.top = $scope.openModals[$scope.openModals.length - 1];
+            if ($scope.top) {
+                lockScrollbar();
+            } else {
+                unlockScrollbar();
+            }
+        }
+
+        function lockScrollbar() {
+            var rootEle = angular.element('html');
+            rootEle.addClass('overflow-hidden');
+        }
+
+        function unlockScrollbar() {
+            var rootEle = angular.element('html');
+            rootEle.removeClass('overflow-hidden');
         }
     }
 }]);
