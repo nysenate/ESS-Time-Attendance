@@ -174,7 +174,7 @@ public class TimeRecordRestCtrl extends BaseRestCtrl
      * --------------------
      *
      * Active record cache eviction API
-     * (POST) /api/v1/timerecords/active/cacheEvict
+     * (DELETE) /api/v1/timerecords/active/cacheEvict
      *
      * Params:
      * all [required] (true/false) - Indicate if active time records for all employees should be evicted
