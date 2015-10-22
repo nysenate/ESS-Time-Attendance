@@ -52,5 +52,5 @@
             </table>
         </div>
     </div>
-
+    <div modal-container></div>
 </div>

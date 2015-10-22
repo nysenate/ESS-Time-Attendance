@@ -28,6 +28,7 @@
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/not-filter.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/modal-service.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/modal-directive.js"></script>
+        <script type="text/javascript" src="${ctxPath}/assets/js/src/common/internal-error-modal.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/location-service.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/badge-service.js"></script>
         <script type="text/javascript" src="${ctxPath}/assets/js/src/common/badge-directive.js"></script>

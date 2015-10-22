@@ -53,4 +53,5 @@
   <div class="content-container" ng-show="checkHistory.searching === false && paychecks.length === 0">
     <h1>No pay checks found for {{checkHistory.year}}</h1>
   </div>
+  <div modal-container></div>
 </div>

@@ -51,7 +51,8 @@ function ($scope, appProps, $q, ActiveYearsTimeRecordsApi, timeRecordsApi, modal
             $scope.state.searching = false;
         }, function(response) {
             $scope.state.searching = false;
-            // todo error handling
+            modals.open('500', {details: resp});
+            console.log(resp);
         })
     };
 

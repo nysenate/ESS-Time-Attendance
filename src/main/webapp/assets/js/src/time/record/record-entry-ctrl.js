@@ -107,6 +107,8 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 });
                 linkRecordFromQueryParam();
             }
+        }, function (response) {    // handle request error
+            modals.open('500', {action: 'get active records', details: response});
         }).$promise.finally(function() {
             $scope.state.pageState = $scope.pageStates.FETCHED;
         });
@@ -137,8 +139,12 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 record.dirty = false;
                 $scope.state.pageState = $scope.pageStates.SAVED;
             }, function (resp) {
-                alert("Failed to save record!");
-                console.log(resp);
+                if (resp.status === 400) {
+                    // todo invalid record response
+                } else {
+                    modals.open('500', {details: resp});
+                    console.log(resp);
+                }
                 $scope.state.pageState = $scope.pageStates.SAVE_FAILURE;
                 record.recordStatus = currentStatus;
             });
@@ -157,8 +163,12 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
         recordsApi.save(record, function (resp) {
             $scope.state.pageState = $scope.pageStates.SUBMITTED;
         }, function (resp) {
-            alert("Failed to submit time record!");
-            console.log(resp);
+            if (resp.status === 400) {
+                //todo invalid record response
+            } else {
+                modals.open('500', {details: resp});
+                console.log(resp);
+            }
             $scope.state.pageState = $scope.pageStates.SUBMIT_FAILURE;
             record.recordStatus = currentStatus;
         });
@@ -180,6 +190,9 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                 if (resp.success) {
                     $scope.state.accrual = resp.result;
                 }
+            }, function (resp) {
+                modals.open('500', {details: resp});
+                console.log(resp);
             }).$promise;
         }
         // Return an automatically resolving promise if no request was made
@@ -204,6 +217,9 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                     console.log('got allowance', allowance.empId, allowance.year);
                     $scope.state.allowances[allowance.year] = allowance;
                 }
+            }, function(resp) {
+                modals.open('500', {details: resp});
+                console.log(resp);
             }).$promise;
         }
         // Return an automatically resolving promise if no request was made

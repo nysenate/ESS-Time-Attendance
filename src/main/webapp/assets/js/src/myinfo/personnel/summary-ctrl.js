@@ -1,8 +1,8 @@
 var essMyInfo = angular.module('essMyInfo');
 
 essMyInfo.controller('EmpSummaryCtrl',
-    ['$scope', '$http', 'appProps', 'EmpInfoApi', 'EmpActiveYearsApi', 'EmpTransactionsApi', 'EmpTransactionSnapshotApi',
-        function($scope, $http, appProps, EmpInfoApi, EmpActiveYearsApi, EmpTransactionsApi, EmpTransactionSnapshotApi) {
+    ['$scope', '$http', 'appProps', 'EmpInfoApi', 'EmpActiveYearsApi', 'EmpTransactionsApi', 'EmpTransactionSnapshotApi', 'modals',
+        function($scope, $http, appProps, EmpInfoApi, EmpActiveYearsApi, EmpTransactionsApi, EmpTransactionSnapshotApi, modals) {
 
             $scope.state = {
                 empId: appProps.user.employeeId,

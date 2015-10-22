@@ -94,6 +94,7 @@
         <br/>
     </div>
 
+    <div modal-container></div>
     <script>
         $('#from-date-input, #to-date-input').datepicker({"dateFormat": "DD, MM d, yy"});
         $(".radio-button-set").buttonset();

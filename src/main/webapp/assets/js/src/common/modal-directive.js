@@ -12,6 +12,9 @@ function ($rootScope, $document, modals) {
         template:
             '<div id="modal-container" ng-show="top">' +
             '  <div id="modal-backdrop"></div>' +
+            '  <div id="common-modals">' +
+            '    <div internal-error-modal ng-if="isOpen(\'500\')"></div>' +
+            '  </div>' +
             '  <ng-transclude></ng-transclude>' +
             '</div>',
         transclude: true,

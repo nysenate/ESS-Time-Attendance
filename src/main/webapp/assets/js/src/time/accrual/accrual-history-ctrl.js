@@ -1,8 +1,8 @@
 var essTime = angular.module('essTime');
 
 essTime.controller('AccrualHistoryCtrl',
-    ['$scope', '$http', 'appProps', 'AccrualHistoryApi', 'EmpActiveYearsApi',
-    function($scope, $http, appProps, AccrualHistoryApi, EmpActiveYearsApi) {
+    ['$scope', '$http', 'appProps', 'AccrualHistoryApi', 'EmpActiveYearsApi', 'modals',
+    function($scope, $http, appProps, AccrualHistoryApi, EmpActiveYearsApi, modals) {
 
     $scope.state = {
         empId: appProps.user.employeeId,
@@ -49,13 +49,14 @@ essTime.controller('AccrualHistoryCtrl',
                         }
                     }
                 }
-                else {
-                    $scope.state.error = {
-                        title: "Could not retrieve accrual information.",
-                        message: "If you are eligible for accruals please try again later."
-                    }
-                }
                 $scope.state.searching = false;
+            }, function(resp) {
+                modals.open('500', {details: resp});
+                console.log(resp);
+                $scope.state.error = {
+                    title: "Could not retrieve accrual information.",
+                    message: "If you are eligible for accruals please try again later."
+                }
             });
         }
     };
@@ -65,6 +66,9 @@ essTime.controller('AccrualHistoryCtrl',
             $scope.state.activeYears = resp.activeYears.reverse();
             $scope.state.selectedYear = resp.activeYears[0];
             if (callBack) callBack();
+        }, function(resp) {
+            modals.open('500', {details: resp});
+            console.log(resp);
         });
     };
 

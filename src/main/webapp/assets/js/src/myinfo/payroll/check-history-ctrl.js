@@ -1,8 +1,8 @@
 var essMyInfo = angular.module('essMyInfo');
 
 essMyInfo.controller('EmpCheckHistoryCtrl',
-    ['$scope', 'appProps', 'EmpCheckHistoryApi',
-        function($scope, appProps, EmpCheckHistoryApi) {
+    ['$scope', 'appProps', 'EmpCheckHistoryApi', 'modals',
+        function($scope, appProps, EmpCheckHistoryApi, modals) {
 
             /** Map with deduction descriptions as keys.
              * Map is used instead of array for faster look ups.
@@ -44,7 +44,8 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
                     $scope.checkHistory.searching = false;
                 }, function(response) {
                     $scope.checkHistory.searching = false;
-                    // todo error handling
+                    modals.open('500', {details: response});
+                    console.log(response);
                 })
             };
 

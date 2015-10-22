@@ -58,6 +58,8 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
                 $scope.state.searching = false;
             }, function(resp) {
                 $scope.state.searching = false;
+                modals.open('500', {details: resp});
+                console.log(resp);
             });
         };
 
@@ -77,6 +79,9 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
                         $scope.getTimeRecordForEmpByYear(emp, $scope.state.selectedRecYear);
                     }
                 }
+            }, function(resp) {
+                modals.open('500', {details: resp});
+                console.log(resp);
             });
         };
 
@@ -98,6 +103,8 @@ essTime.controller('EmpRecordHistoryCtrl', ['$scope', 'appProps',  'ActiveYearsT
                     }
                     $scope.state.searching = false;
                 }, function(resp) {
+                    modals.open('500', {details: resp});
+                    console.log(resp);
                     $scope.state.searching = false;
                 });
         };

@@ -63,8 +63,8 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
             $scope.state.loading = false;
         }, function onFail(resp) {
             $scope.state.loading = false;
-            console.log('get employee records failed:', resp);
-            // TODO: Handle failed response
+            modals.open('500', {details: resp});
+            console.log(resp);
         });
     }
 
@@ -94,10 +94,10 @@ function recordManageCtrl($scope, $q, appProps, recordUtils, modals, badgeServic
             .then(function onFulfilled() {
                 console.log(records.length, 'records submitted');
                 getEmployeeActiveRecords();
-            }, function onRejected(response) {
+            }, function onRejected(resp) {
                 $scope.state.loading = false;
-                console.log('record submission failed:', response);
-                // Todo handle failed response
+                modals.open('500', {details: resp});
+                console.log(resp);
             })
     }
 

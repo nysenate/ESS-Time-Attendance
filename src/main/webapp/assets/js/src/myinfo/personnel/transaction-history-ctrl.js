@@ -1,8 +1,8 @@
 var essMyInfo = angular.module('essMyInfo');
 
 essMyInfo.controller('EmpTransactionHistoryCtrl',
-    ['$scope', '$http', 'appProps', '$q', 'EmpTransactionTimelineApi',
-    function($scope, $http, appProps, $q, EmpTransactionTimelineApi) {
+    ['$scope', '$http', 'appProps', '$q', 'EmpTransactionTimelineApi', 'modals',
+    function($scope, $http, appProps, $q, EmpTransactionTimelineApi, modals) {
 
     $scope.state = {
         empId: appProps.user.employeeId,
@@ -32,7 +32,8 @@ essMyInfo.controller('EmpTransactionHistoryCtrl',
             },
             function(resp) {
                 $scope.state.timeline = false;
-                alert("An error occurred while fetching employee updates.");
+                modals.open('500', {details: resp});
+                console.log(resp);
                 deferred.reject("Failed to retrieve timeline.");
             });
         return deferred;
