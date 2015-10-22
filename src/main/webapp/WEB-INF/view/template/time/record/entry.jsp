@@ -130,7 +130,7 @@
           <ul>
             <li ng-show="errorTypes.raSa.workHoursInvalidRange">Work hours must be between 0 and 24.</li>
             <li ng-show="errorTypes.raSa.vacationHoursInvalidRange">Vacation hours must be between 0 and 7.</li>
-            <li ng-show="errorTypes.raSa.personalHoursInvalidRange">Cannot use more vacation hours than available.</li>
+            <li ng-show="errorTypes.raSa.personalHoursInvalidRange">Personal hours must be between 0 and 7.</li>
             <li ng-show="errorTypes.raSa.empSickHoursInvalidRange">Employee sick hours must be between 0 and 7.</li>
             <li ng-show="errorTypes.raSa.famSickHoursInvalidRange">Family sick hours must be between 0 and 7.</li>
             <li ng-show="errorTypes.raSa.miscHoursInvalidRange">Misc hours must be between 0 and 7.</li>
@@ -283,7 +283,7 @@
                 </div>
                 <div class="ytd-hours" style="border-right:none; flex-grow: 0.6">
                   <div class="hours-caption">Hrs. Used/Avail.</div>
-                  {{state.totals.tempWorkHours}} / {{getAvailableHours() | number}}
+                  {{state.totals.tempWorkHours}} / <span ng-bind-html="getAvailableHours() | number | hoursDiffHighlighter"></span>
                 </div>
               </div>
             </div>
@@ -297,7 +297,7 @@
           <ul>
             <li ng-show="errorTypes.te.workHoursInvalidRange">Work hours must be between 0 and 24.</li>
             <li ng-show="errorTypes.te.notEnoughWorkHours">Work hours recorded exceeds available work hours.</li>
-            <li ng-show="errorTypes.te.fifteenMinIncrements">Work hours must be in incremenets of 0.25</li>
+            <li ng-show="errorTypes.te.fifteenMinIncrements">Work hours must be in increments of 0.25</li>
           </ul>
         </div>
         <table class="ess-table time-record-entry-table" id="te-time-record-table">
