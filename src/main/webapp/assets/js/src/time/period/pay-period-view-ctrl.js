@@ -73,7 +73,7 @@ essTime.controller('PayPeriodCalendarCtrl',
                     toolTips.push($scope.holidayMap[mDateStr]['name']);
                     cssClasses.push('holiday-date');
                 }
-                if ($scope.periodMap[mDateStr]) {
+                if ($scope.periodMap[mDateStr] && !$scope.periodMap[mDateStr].endYearSplit) {
                     toolTips.push('Last Day of Pay Period ' + $scope.periodMap[mDateStr]['payPeriodNum']);
                     cssClasses.push('pay-period-end-date');
                 }

@@ -45,7 +45,7 @@ public class HolidayRestCtrl extends BaseRestCtrl
     }
 
     private List<Holiday> getHolidaysDuring(LocalDate fromDate, LocalDate toDate, WebRequest request) {
-        return holidayService.getHolidays(Range.closed(fromDate, toDate), true, SortOrder.ASC);
+        return holidayService.getHolidays(Range.closed(fromDate, toDate), false, SortOrder.ASC);
     }
 
     private BaseResponse getListViewResponse(List<Holiday> holidays) {
