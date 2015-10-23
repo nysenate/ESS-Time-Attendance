@@ -316,11 +316,11 @@
               <td ng-class="{invalid: !areWorkHoursValid(entry)}">
                 <input type="number" ng-change="setDirty()" time-record-input class="hours-input"
                        placeholder="--" step="0.25" min="0" max="24" ng-disabled="entry.date | momentCmp:'>':'now':'day'"
-                       ng-model="entry.workHours" name="numWorkHours"/>
+                       ng-model="entry.workHours" name="numWorkHours" tabindex="1"/>
               </td>
               <td class="entry-comment-col">
                 <input type="text" maxlength="150" ng-change="setDirty()" class="entry-comment"
-                       ng-model="entry.empComment" name="entryComment"/>
+                       ng-model="entry.empComment" name="entryComment" tabindex="{{entry.workHours ? 1 : 2}}"/>
               </td>
             </tr>
             <tr class="time-totals-row">
