@@ -104,6 +104,8 @@ function recordEntryCtrl($scope, $filter, $q, $timeout, appProps, activeRecordsA
                     angular.forEach(record.timeEntries, function(entry, i) {
                         entry.index = i;
                     });
+                    // Set initial comment
+                    record.initialRemarks = record.remarks;
                 });
                 linkRecordFromQueryParam();
             }

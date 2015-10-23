@@ -59,7 +59,7 @@
 
   <% /** Display an error message if there are notes for a disapproved time record. */ %>
   <div ess-notification level="error" title="Time record requires correction"
-       message="{{state.records[state.iSelectedRecord].remarks}}" class="margin-top-20"
+       message="{{state.records[state.iSelectedRecord].initialRemarks}}" class="margin-top-20"
        ng-show="state.records[state.iSelectedRecord].recordStatus === 'DISAPPROVED' ||
                 state.records[state.iSelectedRecord].recordStatus === 'DISAPPROVED_PERSONNEL'">
   </div>
