@@ -10,7 +10,6 @@
             <table class="simple-table">
                 <tbody>
                 <tr><td>Email</td><td>{{state.emp.email}}</td></tr>
-                <tr><td>Date of Birth</td><td>{{state.emp.dateOfBirth | moment:'MM/DD/YYYY'}}</td></tr>
                 <tr><td>Work Phone</td><td>{{state.emp.workPhone}}</td></tr>
                 <tr><td>Home Phone</td><td>{{state.emp.homePhone}}</td></tr>
                 <tr><td>Address Line 1</td><td>{{state.emp.snapshot['ADSTREET1'].value}}</td></tr>

@@ -19,7 +19,6 @@ public class EmployeeView extends SimpleEmployeeView implements ViewObject
     protected String suffix;
     protected String workPhone;
     protected String homePhone;
-    protected LocalDate dateOfBirth;
     protected String gender;
 
     public EmployeeView() {}
@@ -34,7 +33,6 @@ public class EmployeeView extends SimpleEmployeeView implements ViewObject
             this.suffix = employee.getSuffix();
             this.workPhone = employee.getWorkPhone();
             this.homePhone = employee.getHomePhone();
-            this.dateOfBirth = employee.getDateOfBirth();
             this.gender = employee.getGender().name();
         }
     }
@@ -54,7 +52,6 @@ public class EmployeeView extends SimpleEmployeeView implements ViewObject
         emp.setEmail(email);
         emp.setWorkPhone(workPhone);
         emp.setHomePhone(homePhone);
-        emp.setDateOfBirth(dateOfBirth);
         emp.setGender(Gender.valueOf(gender));
         return emp;
     }
@@ -98,11 +95,6 @@ public class EmployeeView extends SimpleEmployeeView implements ViewObject
     @XmlElement
     public String getHomePhone() {
         return homePhone;
-    }
-
-    @XmlElement
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
     }
 
     @XmlElement
