@@ -11,6 +11,6 @@
     </ul>
     <h3 class="main-topic">Payroll</h3>
     <ul class="sub-topic-list">
-        <li class="sub-topic"><a href="${ctxPath}/myinfo/payroll/checkhistory">Pay Check History</a></li>
+        <li class="sub-topic"><a href="${ctxPath}/myinfo/payroll/checkhistory">Paycheck History</a></li>
     </ul>
 </section>

@@ -6,8 +6,8 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
 
             /** Map with deduction descriptions as keys.
              * Map is used instead of array for faster look ups.
-             * If key is defined, at least one paycheck has that deduction. */
-            $scope.deductionSet = {};
+             * This map's keys represent the set of all deductions used in $scope.paychecks. */
+            $scope.deductionMap = {};
 
             $scope.checkHistory = {
                 searching: false,
@@ -39,8 +39,9 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
                 };
                 EmpCheckHistoryApi.get(params, function(response) {
                     $scope.paychecks = response.paychecks.sort(function(a, b) {return new Date(a.checkDate) - new Date(b.checkDate)});
-                    initializeYtdValues(response.paychecks);
-                    processDeductions(response.paychecks);
+                    initDeductionMap(response.paychecks);
+                    addDeductionsToPaychecks(response.paychecks);
+                    initYtdValues(response.paychecks);
                     $scope.checkHistory.searching = false;
                 }, function(response) {
                     $scope.checkHistory.searching = false;
@@ -49,23 +50,27 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
                 })
             };
 
-            function initializeYtdValues(paychecks) {
+            function initYtdValues(paychecks) {
                 $scope.ytd = angular.extend({}, initialYtd);
                 for (var i = 0; i < paychecks.length; i++) {
                     var paycheck = paychecks[i];
                     $scope.ytd.gross += paycheck.grossIncome;
                     $scope.ytd.directDeposit += paycheck.directDepositAmount;
                     $scope.ytd.check += paycheck.checkAmount;
+                    for (var key in paycheck.deductions) {
+                        if (paycheck.deductions.hasOwnProperty(key)) {
+                            addDeductionToYtd(paycheck.deductions[key]);
+                        }
+                    }
                 }
             }
 
-             function processDeductions(paychecks) {
+            function initDeductionMap(paychecks) {
                 for (var i = 0; i < paychecks.length; i++) {
-                    var deductionMap = paychecks[i].deductions;
-                    for (var key in deductionMap) {
-                        if (deductionMap.hasOwnProperty(key)) {
-                            addToDeductionSet(deductionMap[key]);
-                            addToYtdValue(deductionMap[key]);
+                    var checkDeductMap = paychecks[i].deductions;
+                    for (var key in checkDeductMap) {
+                        if (checkDeductMap.hasOwnProperty(key)) {
+                            addToDeductionSet(checkDeductMap[key]);
                         }
                     }
                 }
@@ -74,17 +79,39 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
             /** Must have a set of all deductions to display in table;
              * if a deduction only occurs in one paycheck we still need a column for it. */
             function addToDeductionSet(deduction) {
-                if (!$scope.deductionSet.hasOwnProperty(deduction.description)) {
-                    $scope.deductionSet[deduction.description] = true;
+                if (!$scope.deductionMap.hasOwnProperty(deduction.description)) {
+                    $scope.deductionMap[deduction.description] = true;
                 }
             }
 
-            function addToYtdValue(deduction) {
+            function addDeductionToYtd(deduction) {
                 if ($scope.ytd[deduction.description]) {
                     $scope.ytd[deduction.description] += deduction.amount;
                 } else {
                     $scope.ytd[deduction.description] = deduction.amount;
                 }
+            }
+
+            /** Ensure paychecks have entries for all deduction types.
+             * If missing add it with a amount of 0. */
+            function addDeductionsToPaychecks(paychecks) {
+                for (var i = 0; i < paychecks.length; i++) {
+                    for (var deductionKey in $scope.deductionMap) {
+                        if ($scope.deductionMap.hasOwnProperty(deductionKey)) {
+                            // If paycheck is missing deduction
+                            if (!paychecks[i].deductions.hasOwnProperty(deductionKey)) {
+                                // Add deduction to paycheck
+                                paychecks[i].deductions[deductionKey] = createEmptyDeduction();
+                            }
+                        }
+                    }
+                }
+            }
+
+            /** Returns a stub deduction containing only the amount property where amount = 0.
+             * Removes the need to default to 0 in view if deduction is undefined, which simplifies bolding of changes. */
+            function createEmptyDeduction() {
+                return { amount: 0 };
             }
 
             $scope.init();
