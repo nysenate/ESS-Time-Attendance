@@ -26,6 +26,7 @@
             <table class="simple-table">
                 <tbody>
                 <tr><td>Pay Type</td><td>{{state.emp.payType}}</td></tr>
+                <tr><td>Emp Number</td><td>{{state.emp.nid}}</td></tr>
                 <tr><td>T&A Supervisor</td><td>{{state.emp.snapshot['NAFIRSTSUP'].value}} {{state.emp.snapshot['NALASTSUP'].value}}</td></tr>
                 <tr><td>Continuous Service From</td><td>{{state.emp.snapshot['DTCONTSERV'].value | moment:'MM/DD/YYYY'}}</td></tr>
                 <tr><td>State Exemptions</td><td>{{state.emp.snapshot['NUSTATTAXEX'].value}}</td></tr>

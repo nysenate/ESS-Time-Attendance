@@ -14,6 +14,7 @@ public class Employee extends Person
     protected String uid;
     protected String jobTitle;
     protected PayType payType;
+    protected String nid;
     protected ResponsibilityCenter respCenter;
     protected Location workLocation;
 
@@ -31,6 +32,7 @@ public class Employee extends Person
         this.uid = other.uid;
         this.jobTitle = other.jobTitle;
         this.payType = other.payType;
+        this.nid = other.nid;
         this.respCenter = other.respCenter;
         this.workLocation = other.workLocation;
     }
@@ -105,5 +107,13 @@ public class Employee extends Person
 
     public void setWorkLocation(Location workLocation) {
         this.workLocation = workLocation;
+    }
+
+    public String getNid() {
+        return nid;
+    }
+
+    public void setNid(String nid) {
+        this.nid = nid;
     }
 }
