@@ -1,5 +1,6 @@
 var essMyInfo = angular.module('essMyInfo');
 
+/** Filter to capitalize first letter of each word and remove ':' characters*/
 essMyInfo.filter('formatDeductionHeader', function() {
     return function(input, scope) {
         if (input !== null) {
