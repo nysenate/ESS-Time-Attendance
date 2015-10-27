@@ -114,6 +114,16 @@ essMyInfo.controller('EmpCheckHistoryCtrl',
                 return { amount: 0 };
             }
 
+            /** Compares two currency values, returning true if they differ by more than 3 cents. */
+            $scope.isSignificantChange = function(curr, previous) {
+                if (typeof previous !== 'undefined') {
+                    if (Math.abs(curr - previous) > 0.03) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             $scope.init();
         }
     ]

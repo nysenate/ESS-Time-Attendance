@@ -31,10 +31,19 @@
         <tr ng-repeat="paycheck in paychecks">
           <td>{{paycheck.checkDate | moment:'l'}}</td>
           <td>{{paycheck.payPeriod}}</td>
-          <td>{{paycheck.grossIncome | currency}}</td>
-          <td ng-repeat="(desc, value) in deductionSet">{{paycheck.deductions[desc].amount || 0 | currency}}</td>
-          <td>{{paycheck.directDepositAmount | currency}}</td>
-          <td>{{paycheck.checkAmount | currency}}</td>
+          <td ng-class="{bold: isSignificantChange(paycheck.grossIncome, paychecks[$index - 1].grossIncome)}">
+            {{paycheck.grossIncome | currency}}
+          </td>
+          <td ng-repeat="(desc, value) in deductionMap"
+              ng-class="{bold: isSignificantChange(paycheck.deductions[desc].amount, paychecks[$parent.$index - 1].deductions[desc].amount)}">
+            {{paycheck.deductions[desc].amount | currency}}
+          </td>
+          <td ng-class="{bold: isSignificantChange(paycheck.directDepositAmount, paychecks[$index - 1].directDepositAmount)}">
+            {{paycheck.directDepositAmount | currency}}
+          </td>
+          <td ng-class="{bold: isSignificantChange(paycheck.checkAmount, paychecks[$index - 1].checkAmount)}">
+            {{paycheck.checkAmount | currency}}
+          </td>
         </tr>
         <tr class="yearly-totals">
           <td>Annual Totals</td>
