@@ -27,10 +27,9 @@
                 <thead>
                 <tr>
                     <th colspan="2">Pay Period</th>
-                    <th colspan="4" class="">Personal</th>
-                    <th colspan="5" class="">Vacation</th>
-                    <th colspan="5" class="">Sick</th>
-                    <%--<th colspan="1" class="misc">Misc</th>--%>
+                    <th colspan="4" class="">Personal Hours</th>
+                    <th colspan="5" class="">Vacation Hours</th>
+                    <th colspan="5" class="">Sick Hours</th>
                 </tr>
                 <tr>
                     <th>#</th>
@@ -49,7 +48,6 @@
                     <th class="sick">Used</th>
                     <th class="sick">Used Ytd</th>
                     <th class="sick">Avail</th>
-                    <%--<th>Used</th>--%>
                 </tr>
                 </thead>
                 <tbody>
@@ -59,17 +57,17 @@
                     <td>{{record.personalAccruedYtd}}</td>
                     <td>{{record.personalUsedDelta}}</td>
                     <td>{{record.personalUsed}}</td>
-                    <td>{{record.personalAvailable}}</td>
+                    <td class="available-hours personal">{{record.personalAvailable}}</td>
                     <td>{{record.vacationRate}}</td>
                     <td>{{record.vacationAccruedYtd + record.vacationBanked}}</td>
                     <td>{{record.vacationUsedDelta}}</td>
                     <td>{{record.vacationUsed}}</td>
-                    <td>{{record.vacationAvailable}}</td>
+                    <td class="available-hours vacation">{{record.vacationAvailable}}</td>
                     <td>{{record.sickRate}}</td>
                     <td>{{record.sickAccruedYtd}}</td>
                     <td>{{record.sickUsedDelta}}</td>
                     <td>{{record.empSickUsed + record.famSickUsed}}</td>
-                    <td>{{record.sickAvailable}}</td>
+                    <td class="available-hours sick">{{record.sickAvailable}}</td>
                     <%--<td>{{record.miscUsed}}</td>--%>
                 </tr>
                 </tbody>

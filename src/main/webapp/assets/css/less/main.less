@@ -1167,6 +1167,21 @@ table.attendance-entry-sub-table {
         border-right: 1px solid #eee;
         text-align: center;
         padding: 8px;
+
+        &.available-hours {
+          border: 0;
+          color: #333;
+          font-weight: bold;
+          &.personal {
+            background: fade(@light-teal, 10%);
+          }
+          &.sick {
+            background: fade(#d19525, 10%);
+          }
+          &.vacation {
+            background: fade(#799933, 10%);
+          }
+        }
       }
     }
   }
