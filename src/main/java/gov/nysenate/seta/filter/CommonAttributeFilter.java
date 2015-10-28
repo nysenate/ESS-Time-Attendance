@@ -1,4 +1,4 @@
-package gov.nysenate.seta.web;
+package gov.nysenate.seta.filter;
 
 import gov.nysenate.seta.model.payroll.MiscLeaveType;
 import gov.nysenate.seta.security.xsrf.XsrfValidator;
@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ import java.util.Set;
  * This filter is responsible for setting attributes on the servlet request that are commonly used
  * by jsp templates.
  */
+@Component("commonAttributeFilter")
 public class CommonAttributeFilter implements Filter
 {
     @Autowired

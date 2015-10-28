@@ -1,5 +1,6 @@
 package gov.nysenate.seta.config;
 
+import gov.nysenate.seta.controller.rest.BaseRestCtrl;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -70,5 +71,9 @@ public class WebIntializer implements WebApplicationInitializer
         servletContext.addFilter("commonAttributeFilter", commonAttributeFilter)
                       .addMappingForUrlPatterns(EnumSet.of(FORWARD), false, "/*");
 
+        /** Registers the restApiFilter which affects all REST API calls. */
+        DelegatingFilterProxy restApiFilter = new DelegatingFilterProxy("restApiFilter", dispatcherContext);
+        servletContext.addFilter("restApiFilter", restApiFilter)
+                .addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD, INCLUDE), false, BaseRestCtrl.REST_PATH + "*");
     }
 }

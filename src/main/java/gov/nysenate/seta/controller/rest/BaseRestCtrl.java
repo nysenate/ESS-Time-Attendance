@@ -33,7 +33,7 @@ public class BaseRestCtrl
 {
     private static final Logger logger = LoggerFactory.getLogger(BaseRestCtrl.class);
 
-    protected static final String REST_PATH = "/api/v1/";
+    public static final String REST_PATH = "/api/v1/";
 
     @Autowired protected EventBus eventBus;
 
