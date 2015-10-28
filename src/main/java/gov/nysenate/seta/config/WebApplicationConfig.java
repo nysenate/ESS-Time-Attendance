@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import gov.nysenate.seta.util.AsciiArt;
 import gov.nysenate.seta.web.CommonAttributeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -42,6 +44,11 @@ import java.util.List;
 public class WebApplicationConfig extends WebMvcConfigurerAdapter
 {
     private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
+
+    @PostConstruct
+    public void init() {
+        logger.info("{}", AsciiArt.TS_LOGO.getText().replace("DATE", LocalDateTime.now().toString()));
+    }
 
     @Value("${resource.path}") private String resourcePath;
     @Value("${resource.location}") private String resourceLocation;
