@@ -74,11 +74,10 @@ essApp.config(function($routeProvider, $locationProvider) {
         templateUrl: ctxPath + '/template/help/ta/plan'
     });
 
-    /** Logout */
-    //$routeProvider.when(ctxPath + '/logout', {
-    //    redirectTo: ctxPath + '/logout',
-    //    reloadOnSearch: true
-    //});
+    /** 404 */
+    $routeProvider.otherwise({
+        templateUrl: ctxPath + '/template/404'
+    });
 
     $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix('!');
