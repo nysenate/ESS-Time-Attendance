@@ -6,12 +6,10 @@ import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.common.WorkInProgress;
+import gov.nysenate.seta.dao.attendance.AttendanceDao;
 import gov.nysenate.seta.dao.attendance.TimeRecordDao;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
-import gov.nysenate.seta.model.attendance.TimeEntry;
-import gov.nysenate.seta.model.attendance.TimeRecord;
-import gov.nysenate.seta.model.attendance.TimeRecordScope;
-import gov.nysenate.seta.model.attendance.TimeRecordStatus;
+import gov.nysenate.seta.model.attendance.*;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
@@ -50,6 +48,7 @@ public class EssTimeRecordManager implements TimeRecordManager {
     @Autowired PayPeriodService payPeriodService;
     @Autowired EmpTransactionService transService;
     @Autowired EmployeeInfoService empInfoService;
+    @Autowired AttendanceDao attendanceDao;
 
     /** When set to false, the scheduled run of ensureAllRecords wont run */
     @Value("${scheduler.timerecord.ensureall.enabled:false}")
@@ -61,7 +60,8 @@ public class EssTimeRecordManager implements TimeRecordManager {
         List<PayPeriod> payPeriods = payPeriodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC);
         List<TimeRecord> existingRecords =
                 timeRecordService.getTimeRecords(Collections.singleton(empId), payPeriods, TimeRecordStatus.getAll());
-        return ensureRecords(empId, payPeriods, existingRecords);
+        List<AttendanceRecord> attendanceRecords = attendanceDao.getOpenAttendanceRecords(empId);
+        return ensureRecords(empId, payPeriods, existingRecords, attendanceRecords);
     }
 
     @Override
@@ -69,14 +69,15 @@ public class EssTimeRecordManager implements TimeRecordManager {
         // Get all employees with open attendance periods, also get all active time records
         Set<Integer> empIds = employeeDao.getActiveEmployeeIds();
         logger.info("getting active time records...");
-        ListMultimap<Integer, TimeRecord> existingRecordMap = timeRecordDao.getAllActiveRecords();
+        ListMultimap<Integer, AttendanceRecord> activeAttendanceRecords = attendanceDao.getOpenAttendanceRecords();
 
         // Create and patch records for each employee
         int totalSaved = empIds.stream()
                 .sorted()
                 .map(empId -> ensureRecords(empId,
                         payPeriodService.getOpenPayPeriods(PayPeriodType.AF, empId, SortOrder.ASC),
-                        Optional.of(existingRecordMap.get(empId)).orElse(Collections.emptyList()) ))
+                        timeRecordService.getActiveTimeRecords(empId),
+                        Optional.ofNullable(activeAttendanceRecords.get(empId)).orElse(Collections.emptyList())))
                 .reduce(0, Integer::sum);
         logger.info("saved {} records", totalSaved);
     }
@@ -113,12 +114,13 @@ public class EssTimeRecordManager implements TimeRecordManager {
      * Existing records are split/modified as needed to ensure correctness
      * If createTempRecords is false, then records will only be created for periods with annual pay work days
      */
-    private int ensureRecords(int empId, Collection<PayPeriod> payPeriods, Collection<TimeRecord> existingRecords) {
+    private int ensureRecords(int empId, Collection<PayPeriod> payPeriods, Collection<TimeRecord> existingRecords,
+                              Collection<AttendanceRecord> attendanceRecords) {
         logger.info("Generating records for {} over {} pay periods with {} existing records",
                 empId, payPeriods.size(), existingRecords.size());
 
         // Get a set of ranges for which there should be time records
-        LinkedHashSet<Range<LocalDate>> recordRanges = getRecordRanges(payPeriods, empId);
+        LinkedHashSet<Range<LocalDate>> recordRanges = getRecordRanges(empId, payPeriods, attendanceRecords);
         List<TimeRecord> recordsToSave = new LinkedList<>();
         TransactionHistory transHistory = transService.getTransHistory(empId);
 
@@ -175,10 +177,19 @@ public class EssTimeRecordManager implements TimeRecordManager {
                             .filter(range -> range.isConnected(record.getDateRange()) &&
                                     !range.intersection(record.getDateRange()).isEmpty())
                             .collect(Collectors.toList());
-                    if (rangesUnderRecord.size() != 1 ||
+                    // If there are no active record dates for the record, set it as inactive
+                    if (rangesUnderRecord.isEmpty()) {
+                        logger.info("deactivating record empid: {}  dates: {}", record.getEmployeeId(), record.getDateRange());
+                        record.setActive(false);
+                        recordsToSave.add(record);
+                    }
+                    // If there are multiple active record date ranges for the record, split it
+                    else if (rangesUnderRecord.size() != 1 ||
                             !rangesUnderRecord.get(0).equals(record.getDateRange())) {
                         recordsToSave.addAll(splitRecord(rangesUnderRecord, record, empId));
-                    } else if (patchRecord(record)) {
+                    }
+                    // otherwise, check the record for inconsistencies and patch it if necessary
+                    else if (patchRecord(record)) {
                         recordsToSave.add(record);
                     }
                     recordRanges.removeAll(rangesUnderRecord);
@@ -286,10 +297,11 @@ public class EssTimeRecordManager implements TimeRecordManager {
     }
 
     /**
-     * Get ranges corresponding to record dates for over a range of dates
+     * Get date ranges corresponding to active record dates over a collection of pay periods
      * Determined by pay periods, supervisor changes, and active dates of service
      */
-    private LinkedHashSet<Range<LocalDate>> getRecordRanges(Collection<PayPeriod> periods, int empId) {
+    private LinkedHashSet<Range<LocalDate>> getRecordRanges(int empId, Collection<PayPeriod> periods,
+                                                            Collection<AttendanceRecord> attendanceRecords) {
         TransactionHistory transHistory = transService.getTransHistory(empId);
 
         // Get dates when there was a change of supervisor
@@ -298,6 +310,9 @@ public class EssTimeRecordManager implements TimeRecordManager {
         // Get active dates of service
         RangeSet<LocalDate> activeDates = empInfoService.getEmployeeActiveDatesService(empId);
 
+        RangeSet<LocalDate> attendanceRecDates = TreeRangeSet.create();
+        attendanceRecords.stream().map(AttendanceRecord::getDateRange).forEach(attendanceRecDates::add);
+
         return periods.stream()
                 .sorted()
                 .map(PayPeriod::getDateRange)
@@ -305,6 +320,8 @@ public class EssTimeRecordManager implements TimeRecordManager {
                 .flatMap(periodRange -> RangeUtils.splitRange(periodRange, newSupDates).stream())
                 // get the intersection of each range with the active dates of service
                 .flatMap(range -> activeDates.subRangeSet(range).asRanges().stream())
+                // Filter out ranges that are covered by already entered attendance periods
+                .filter(range -> !attendanceRecDates.encloses(range))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

@@ -108,8 +108,7 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
                 List<TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(empId, periodRange);
 
                 Map.Entry<PayPeriod, PeriodAccSummary> periodAccRecord = periodAccruals.lowerEntry(lastPeriod);
-                Optional<PeriodAccSummary> optPeriodAccRecord =
-                        (periodAccRecord != null) ? Optional.of(periodAccRecord.getValue()) : Optional.empty();
+                Optional<PeriodAccSummary> optPeriodAccRecord = Optional.ofNullable(periodAccRecord).map(Map.Entry::getValue);
 
                 AccrualState accrualState = computeInitialAccState(empTrans, optPeriodAccRecord, annualAcc.get(lastPeriod.getYear()));
 

@@ -31,7 +31,7 @@ public class HourlyWorkPayment {
         this.endDate = endDate;
         this.hoursPaid = hoursPaid;
         this.moneyPaid = moneyPaid;
-        this.prevYearMoneyPaid = Optional.of(prevYearMoneyPaid).orElse(BigDecimal.ZERO);
+        this.prevYearMoneyPaid = Optional.ofNullable(prevYearMoneyPaid).orElse(BigDecimal.ZERO);
     }
 
     /** --- Functional Getters / Setters */
