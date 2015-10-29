@@ -29,7 +29,7 @@ public class LifeCycleTRV implements TimeRecordValidator {
     /** {@inheritDoc} */
     @Override
     public void checkTimeRecord(TimeRecord record, Optional<TimeRecord> previousState) throws TimeRecordErrorException {
-        Optional<TimeRecordStatus> newStatus = Optional.of(record.getRecordStatus());
+        Optional<TimeRecordStatus> newStatus = Optional.ofNullable(record.getRecordStatus());
         Optional<TimeRecordStatus> prevStatus = previousState.map(TimeRecord::getRecordStatus);
         // Get valid statuses that occur after previous status and ensure that the new status is contained in this set
         Set<TimeRecordStatus> validStatuses = getValidStatuses(prevStatus);

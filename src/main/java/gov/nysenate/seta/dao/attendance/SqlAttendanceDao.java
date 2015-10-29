@@ -1,13 +1,14 @@
 package gov.nysenate.seta.dao.attendance;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeSet;
-import com.google.common.collect.TreeRangeSet;
+import com.google.common.collect.*;
+import gov.nysenate.seta.dao.attendance.mapper.AttendanceRecordRowMapper;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
+import gov.nysenate.seta.model.attendance.AttendanceRecord;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -31,5 +32,20 @@ public class SqlAttendanceDao extends SqlBaseDao implements AttendanceDao {
                         : Range.closedOpen(LocalDate.ofYearDay(year, 1), LocalDate.ofYearDay(year + 1, 1)))
                 .forEach(activeDates::add);
         return activeDates;
+    }
+
+    @Override
+    public ListMultimap<Integer, AttendanceRecord> getOpenAttendanceRecords() {
+        ListMultimap<Integer, AttendanceRecord> openRecords = ArrayListMultimap.create();
+        remoteNamedJdbc.query(SqlAttendanceQuery.GET_OPEN_ATTENDANCE_RECORDS.getSql(schemaMap()), new AttendanceRecordRowMapper())
+                .forEach(attRec -> openRecords.put(attRec.getEmployeeId(), attRec));
+        return openRecords;
+    }
+
+    @Override
+    public List<AttendanceRecord> getOpenAttendanceRecords(Integer empId) {
+        MapSqlParameterSource params = new MapSqlParameterSource("empId", empId);
+        return remoteNamedJdbc.query(SqlAttendanceQuery.GET_OPEN_ATTENDANCE_RECORDS_FOR_EMPID.getSql(schemaMap())
+                ,params , new AttendanceRecordRowMapper());
     }
 }
