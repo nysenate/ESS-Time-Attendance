@@ -19,7 +19,7 @@ function ($scope, appProps, $q, ActiveYearsTimeRecordsApi, timeRecordsApi, modal
                 $scope.getRecords();
             }
             else {
-                alert("Error getting time records.");
+                modals.open('500', {action: 'Get time record history', details: resp});
             }
         });
     };
@@ -45,13 +45,14 @@ function ($scope, appProps, $q, ActiveYearsTimeRecordsApi, timeRecordsApi, modal
                 $scope.state.year.toString() + '-12-31' :
                 now.format('YYYY-MM-DD')
         };
-        console.log('getting new records', params);
         timeRecordsApi.get(params, function(response) {
             initializeRecords(response.result.items[empId]);
             $scope.state.searching = false;
+            // Show historical records in reverse chrono order.
+            $scope.records.other.reverse();
         }, function(response) {
             $scope.state.searching = false;
-            modals.open('500', {details: resp});
+            modals.open('500', {details: response});
             console.log(resp);
         })
     };

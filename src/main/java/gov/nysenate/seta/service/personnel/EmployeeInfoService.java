@@ -55,6 +55,6 @@ public interface EmployeeInfoService
                 return IntStream.rangeClosed(r.lowerEndpoint().getYear(), upperBound);
             }
             return IntStream.empty();
-        }).boxed().collect(Collectors.toList());
+        }).boxed().distinct().collect(Collectors.toList());
     }
 }

@@ -2,18 +2,13 @@ package gov.nysenate.seta.service.accrual;
 
 import com.google.common.collect.Range;
 import gov.nysenate.common.LimitOffset;
-import gov.nysenate.common.OutputUtils;
 import gov.nysenate.common.SortOrder;
-import gov.nysenate.seta.dao.accrual.AccrualDao;
-import gov.nysenate.seta.dao.attendance.TimeRecordDao;
-import gov.nysenate.seta.dao.transaction.EmpTransDaoOption;
 import gov.nysenate.seta.model.accrual.*;
 import gov.nysenate.seta.model.attendance.TimeRecord;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.period.PayPeriod;
 import gov.nysenate.seta.model.period.PayPeriodType;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
-import gov.nysenate.seta.service.base.CachingService;
 import gov.nysenate.seta.service.base.SqlDaoBackedService;
 import gov.nysenate.seta.service.period.PayPeriodService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
@@ -27,9 +22,22 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Objects.firstNonNull;
+
 /**
  * Service layer for computing accrual information for an employee based on processed accrual
  * and employee transaction data in SFMS.
+ *
+ * Accrual computation is slightly tricky because we have to rely on transaction data to adjust
+ * the accrual rates. @see SqlAccrualDao for details on how the accruals are stored in the database.
+ *
+ * Essentially the high-level approach we take here is to:
+ * 1. Pull in all the relevant data from the dao layer (which may be cached periodically)
+ * 2. Figure out which pay periods we are missing accrual data for
+ * 3. For those pay periods compute the accrual state which indicates what the rates are
+ *    based on several factors obtained from the transaction history
+ * 4. Apply the accrual state to increment/decrement the accruals for the given pay period
+ * 5. Repeat steps 3 and 4 until all the pay periods are filled in.
  */
 @Service
 public class EssAccrualComputeService extends SqlDaoBackedService implements AccrualComputeService
@@ -51,15 +59,18 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
     /** {@inheritDoc} */
     @Override
     public TreeMap<PayPeriod, PeriodAccSummary> getAccruals(int empId, List<PayPeriod> payPeriods) throws AccrualException {
+        // Short circuit when no periods are requested.
         if (payPeriods.isEmpty()) {
             return new TreeMap<>();
         }
+
+        // Store all the fetched and computed accruals into this map, keyed by the pay period.
         TreeMap<PayPeriod, PeriodAccSummary> resultMap = new TreeMap<>();
 
-        // Sorted set of the supplied pay periods
+        // Sorted set of the supplied pay periods.
         TreeSet<PayPeriod> periodSet = new TreeSet<>(payPeriods);
 
-        // Get period accrual records up to last pay period
+        // Get period accrual records up to last pay period.
         LocalDate beforeDate = periodSet.last().getEndDate().plusDays(1);
         TreeMap<PayPeriod, PeriodAccSummary> periodAccruals =
             accrualDao.getPeriodAccruals(empId, beforeDate, LimitOffset.ALL, SortOrder.ASC);
@@ -75,14 +86,19 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
             }
         }
 
+        // Check if we have pay periods that are missing accrual data, these are the periods we need to
+        // compute accruals for.
         if (!periodSet.isEmpty()) {
+
+            // Fetch the annual accrual records (PM23ATTEND) because it provides the pay period counter which
+            // is necessary for determining if the accrual rates should change.
             PayPeriod lastPeriod = periodSet.last();
             TreeMap<Integer, AnnualAccSummary> annualAcc = accrualInfoService.getAnnualAccruals(empId, lastPeriod.getYear());
             if (annualAcc.isEmpty()) {
                 throw new AccrualException(empId, AccrualExceptionType.NO_ACTIVE_ANNUAL_RECORD_FOUND);
             }
-            LocalDate fromDate = com.google.common.base.Objects.firstNonNull(
-                annualAcc.lastEntry().getValue().getEndDate(), annualAcc.lastEntry().getValue().getContServiceDate());
+            LocalDate fromDate = firstNonNull(annualAcc.lastEntry().getValue().getEndDate(),
+                                              annualAcc.lastEntry().getValue().getContServiceDate());
 
             if (fromDate.isBefore(lastPeriod.getEndDate())) {
                 Range<LocalDate> periodRange = Range.openClosed(fromDate, lastPeriod.getEndDate());
@@ -90,13 +106,12 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
                 TransactionHistory empTrans = empTransService.getTransHistory(empId);
                 TreeMap<PayPeriod, PeriodAccUsage> periodUsages = accrualDao.getPeriodAccrualUsages(empId, periodRange);
                 List<TimeRecord> timeRecords = timeRecordDao.getRecordsDuring(empId, periodRange);
-//                logger.info("{}", OutputUtils.toJson(timeRecords.get(timeRecords.size() -1)));
 
                 Map.Entry<PayPeriod, PeriodAccSummary> periodAccRecord = periodAccruals.lowerEntry(lastPeriod);
                 Optional<PeriodAccSummary> optPeriodAccRecord =
                         (periodAccRecord != null) ? Optional.of(periodAccRecord.getValue()) : Optional.empty();
 
-                AccrualState accrualState = computeAccrualState(empTrans, optPeriodAccRecord, annualAcc.get(lastPeriod.getYear()));
+                AccrualState accrualState = computeInitialAccState(empTrans, optPeriodAccRecord, annualAcc.get(lastPeriod.getYear()));
 
                 // Generate a list of all the pay periods between the period immediately following the DTPERLSPOST and
                 // before the pay period we are trying to compute available accruals for. We will call these the accrual
@@ -118,15 +133,18 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
         return resultMap;
     }
 
+    /** --- Internal Methods --- */
+
     /**
      * Compute an initial accrual state that is effective up to the DTPERLSPOST date from the annual accrual record.
+     *
      * @param transHistory TransactionHistory
      * @param periodAccSum Optional<PeriodAccSummary>
      * @param annualAcc AnnualAccSummary
      * @return AccrualState
      */
-    private AccrualState computeAccrualState(TransactionHistory transHistory, Optional<PeriodAccSummary> periodAccSum,
-                                             AnnualAccSummary annualAcc) {
+    private AccrualState computeInitialAccState(TransactionHistory transHistory, Optional<PeriodAccSummary> periodAccSum,
+                                                AnnualAccSummary annualAcc) {
         AccrualState accrualState = new AccrualState(annualAcc);
         Range<LocalDate> initialRange = Range.atMost(accrualState.getEndDate());
 
@@ -197,8 +215,6 @@ public class EssAccrualComputeService extends SqlDaoBackedService implements Acc
             accrualState.setEmployeeActive(empStatus.lastEntry().getValue());
         }
     }
-
-    /** --- Internal Methods --- */
 
     private void verifyValidPayPeriod(PayPeriod payPeriod) {
         if (payPeriod == null) {

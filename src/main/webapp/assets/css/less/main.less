@@ -1174,10 +1174,9 @@ table.attendance-entry-sub-table {
         text-align: center;
         padding: 8px;
 
-        &.available-hours {
+        &.accrual-hours {
           border: 0;
           color: #333;
-          font-weight: bold;
           &.personal {
             background: fade(@light-teal, 10%);
           }
@@ -1186,6 +1185,19 @@ table.attendance-entry-sub-table {
           }
           &.vacation {
             background: fade(#799933, 10%);
+          }
+        }
+
+        &.available-hours {
+          font-weight: bold;
+          &.personal {
+            background: fade(@light-teal, 20%);
+          }
+          &.sick {
+            background: fade(#d19525, 20%);
+          }
+          &.vacation {
+            background: fade(#799933, 20%);
           }
         }
 

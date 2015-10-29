@@ -42,6 +42,7 @@ public class AccrualState extends AccrualSummary
         PeriodAccSummary periodAccSummary = new PeriodAccSummary(this);
         periodAccSummary.setYear(currPeriod.getEndDate().getYear());
         periodAccSummary.setComputed(true);
+        periodAccSummary.setEmpAccrualState(new EmpAccrualState(this));
         periodAccSummary.setRefPayPeriod(refPeriod);
         periodAccSummary.setPayPeriod(currPeriod);
         periodAccSummary.setExpectedTotalHours(this.getYtdHoursExpected());
@@ -147,8 +148,8 @@ public class AccrualState extends AccrualSummary
         return employeeActive;
     }
 
-    public void setEmployeeActive(boolean isTerminated) {
-        this.employeeActive = isTerminated;
+    public void setEmployeeActive(boolean isActive) {
+        this.employeeActive = isActive;
     }
 
     public PayType getPayType() {

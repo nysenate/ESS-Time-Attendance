@@ -21,7 +21,12 @@ public class PeriodAccSummary extends AccrualSummary
 {
     private static final Logger logger = LoggerFactory.getLogger(PeriodAccSummary.class);
 
+    /** If true, this summary record was computed. */
     protected boolean computed = false;
+
+    /** The accrual state used for computing this record if applicable. */
+    protected EmpAccrualState empAccrualState = null;
+
     protected PayPeriod refPayPeriod;
     protected PayPeriod payPeriod;
 
@@ -30,9 +35,7 @@ public class PeriodAccSummary extends AccrualSummary
     protected BigDecimal expectedTotalHours;
     protected BigDecimal expectedBiweekHours;
 
-    /**
-     * The rates should reflect the current pay period, not the base pay period.
-     */
+    /** The rates should reflect the current pay period, not the base pay period. */
     protected BigDecimal sickRate;
     protected BigDecimal vacRate;
 
@@ -73,6 +76,14 @@ public class PeriodAccSummary extends AccrualSummary
 
     public void setComputed(boolean computed) {
         this.computed = computed;
+    }
+
+    public EmpAccrualState getEmpAccrualState() {
+        return empAccrualState;
+    }
+
+    public void setEmpAccrualState(EmpAccrualState empAccrualState) {
+        this.empAccrualState = empAccrualState;
     }
 
     public PayPeriod getRefPayPeriod() {

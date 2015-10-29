@@ -7,6 +7,7 @@ essTime.controller('AccrualHistoryCtrl',
     $scope.state = {
         empId: appProps.user.employeeId,
         today: moment(),
+        projections: {},
         accSummaries: {},
         activeYears: [],
         selectedYear: null,
@@ -31,22 +32,17 @@ essTime.controller('AccrualHistoryCtrl',
             }, function(resp) {
                 if (resp.success) {
                     $scope.state.error = null;
-                    $scope.state.accSummaries[year] = resp.result;
                     // Compute deltas
-                    for (var i = 0; i < $scope.state.accSummaries[year].length; i++) {
-                        var currSummary = $scope.state.accSummaries[year][i];
-                        if (i == 0) {
-                            currSummary.vacationUsedDelta = currSummary.vacationUsed;
-                            currSummary.personalUsedDelta = currSummary.personalUsed;
-                            currSummary.sickUsedDelta = currSummary.empSickUsed + currSummary.famSickUsed;
-                        }
-                        else {
-                            var prevSummary = $scope.state.accSummaries[year][i - 1];
-                            currSummary.vacationUsedDelta = currSummary.vacationUsed - prevSummary.vacationUsed;
-                            currSummary.personalUsedDelta = currSummary.personalUsed - prevSummary.personalUsed;
-                            currSummary.sickUsedDelta = (currSummary.empSickUsed + currSummary.famSickUsed) -
-                                (prevSummary.empSickUsed + prevSummary.famSickUsed);
-                        }
+                    computeDeltas(resp.result);
+                    // Gather historical acc summaries
+                    $scope.state.accSummaries[year] = resp.result.filter(function(acc) {
+                        return !acc.computed;
+                    }).reverse();
+                    // Gather projected acc records if year is current or future.
+                    if (year >= $scope.state.today.year()) {
+                        $scope.state.projections[year] = resp.result.filter(function(acc) {
+                            return acc.computed && acc.empState.payType !== 'TE' && acc.empState.employeeActive;
+                        }).reverse();
                     }
                 }
                 $scope.state.searching = false;
@@ -61,6 +57,62 @@ essTime.controller('AccrualHistoryCtrl',
         }
     };
 
+    /**
+     * Compute the hours used during the given pay periods based on the change in the YTD usage.
+     * @param accruals
+    */
+    var computeDeltas = function(accruals) {
+        for (var i = 0; i < accruals.length; i++) {
+            var currSummary = accruals[i];
+            if (i == 0) {
+                currSummary.vacationUsedDelta = currSummary.vacationUsed;
+                currSummary.personalUsedDelta = currSummary.personalUsed;
+                currSummary.sickUsedDelta = currSummary.empSickUsed + currSummary.famSickUsed;
+            }
+            else {
+                var prevSummary = accruals[i - 1];
+                currSummary.vacationUsedDelta = currSummary.vacationUsed - prevSummary.vacationUsed;
+                currSummary.personalUsedDelta = currSummary.personalUsed - prevSummary.personalUsed;
+                currSummary.sickUsedDelta = (currSummary.empSickUsed + currSummary.famSickUsed) -
+                    (prevSummary.empSickUsed + prevSummary.famSickUsed);
+            }
+        }
+    };
+
+    /**
+     * When a user enters in hours in the projections table, the totals need to be re-computed for
+     * the projected accrual records.
+     * @param year - the selected year
+     */
+    $scope.recalculateProjectionTotals = function(year) {
+        var projLen = $scope.state.projections[year].length;
+        var summLen = $scope.state.accSummaries[year].length;
+        var baseRec = null, startIndex = 0;
+        if (summLen > 0) {
+            baseRec = $scope.state.accSummaries[year][0];
+            startIndex = projLen - 1;
+        }
+        else {
+            baseRec = $scope.state.projections[year][projLen - 1];
+            startIndex = projLen - 2;
+        }
+        var per = baseRec.personalUsed, vac = baseRec.vacationUsed, sick = baseRec.empSickUsed + baseRec.famSickUsed;
+        // Acc projections are stored in reverse chrono order
+        for (var i = startIndex; i >= 0; i--) {
+            var rec = $scope.state.projections[year][i];
+            per += rec.personalUsedDelta || 0;
+            vac += rec.vacationUsedDelta || 0;
+            sick += rec.sickUsedDelta || 0;
+            rec.personalAvailable = rec.personalAccruedYtd - per;
+            rec.vacationAvailable = rec.vacationAccruedYtd + rec.vacationBanked - vac;
+            rec.sickAvailable = rec.sickAccruedYtd + rec.sickBanked - sick;
+        }
+    };
+
+    /**
+     * Retrieves the years that an employee has been employed during.
+     * @param callBack
+     */
     $scope.getEmpActiveYears = function(callBack) {
         EmpActiveYearsApi.get({empId: $scope.state.empId}, function(resp) {
             $scope.state.activeYears = resp.activeYears.reverse();
@@ -76,6 +128,9 @@ essTime.controller('AccrualHistoryCtrl',
         scrollingTop: 47
     };
 
+    /**
+     * Initialize
+     */
     $scope.init = function() {
         $scope.getEmpActiveYears(function() {
             $scope.getAccSummaries($scope.state.selectedYear);

@@ -14,13 +14,13 @@
     <jsp:body>
         <input type="hidden" value="0LOKZECwqdNGvKZFy3uB"> <!-- Used by angular to check if response is the login page. -->
         <c:if test="${runtimeLevel != 'prod'}">
-            <div ess-notification level="info" title="Running in ${runtimeLevel} mode"
+            <div ess-notification level="warn" title="Running in ${runtimeLevel} mode"
                  message="Actions performed here will not affect the production database."></div>
         </c:if>
         <section id="loginContainer" class="login-container">
             <p style="display:none" class="login-message">You have been logged out.</p>
             <div id="loginHeader">
-                <p class="font-weight-bold">New York State Senate Employee Self Service</p>
+                <p>New York State Senate Employee Self Service</p>
             </div>
             <div id="photoContainer" class="login-info-container">
                 <img src="${ctxPath}/assets/img/capital-exterior.jpg" width="400px"/>

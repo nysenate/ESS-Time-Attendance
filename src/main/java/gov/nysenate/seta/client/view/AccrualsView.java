@@ -3,6 +3,7 @@ package gov.nysenate.seta.client.view;
 import gov.nysenate.seta.client.view.base.ViewObject;
 import gov.nysenate.seta.model.accrual.PeriodAccSummary;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 
@@ -11,6 +12,7 @@ public class AccrualsView implements ViewObject
 {
     protected PayPeriodView payPeriod;
     protected boolean computed;
+    protected AccrualStateView empState;
 
     protected BigDecimal sickAccruedYtd;
     protected BigDecimal personalAccruedYtd;
@@ -37,6 +39,9 @@ public class AccrualsView implements ViewObject
         if (pac != null) {
             this.payPeriod = new PayPeriodView(pac.getPayPeriod());
             this.computed = pac.isComputed();
+            if (this.computed) {
+                this.empState = new AccrualStateView(pac.getEmpAccrualState());
+            }
             this.sickAccruedYtd = pac.getEmpHoursAccrued();
             this.personalAccruedYtd = pac.getPerHoursAccrued();
             this.vacationAccruedYtd = pac.getVacHoursAccrued();
@@ -71,70 +76,92 @@ public class AccrualsView implements ViewObject
 
     /** --- Basic Getters --- */
 
+    @XmlElement
     public PayPeriodView getPayPeriod() {
         return payPeriod;
     }
 
+    @XmlElement
     public boolean isComputed() {
         return computed;
     }
 
+    @XmlElement
+    public AccrualStateView getEmpState() {
+        return empState;
+    }
+
+    @XmlElement
     public BigDecimal getSickAccruedYtd() {
         return sickAccruedYtd;
     }
 
+    @XmlElement
     public BigDecimal getPersonalAccruedYtd() {
         return personalAccruedYtd;
     }
 
+    @XmlElement
     public BigDecimal getVacationAccruedYtd() {
         return vacationAccruedYtd;
     }
 
+    @XmlElement
     public BigDecimal getServiceYtd() {
         return serviceYtd;
     }
 
+    @XmlElement
     public BigDecimal getServiceYtdExpected() {
         return serviceYtdExpected;
     }
 
+    @XmlElement
     public BigDecimal getSickBanked() {
         return sickBanked;
     }
 
+    @XmlElement
     public BigDecimal getVacationBanked() {
         return vacationBanked;
     }
 
+    @XmlElement
     public BigDecimal getEmpSickUsed() {
         return empSickUsed;
     }
 
+    @XmlElement
     public BigDecimal getFamSickUsed() {
         return famSickUsed;
     }
 
+    @XmlElement
     public BigDecimal getPersonalUsed() {
         return personalUsed;
     }
 
+    @XmlElement
     public BigDecimal getVacationUsed() {
         return vacationUsed;
     }
 
+    @XmlElement
     public BigDecimal getHolidayUsed() {
         return holidayUsed;
     }
 
+    @XmlElement
     public BigDecimal getMiscUsed() {
         return miscUsed;
     }
 
+    @XmlElement
     public BigDecimal getVacationRate() {
         return vacationRate;
     }
 
+    @XmlElement
     public BigDecimal getSickRate() {
         return sickRate;
     }
