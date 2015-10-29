@@ -13,7 +13,7 @@
                           not a complete listing of all updates that have been posted.">
         </ess-notification>
         <div ng-repeat="(date,txArr) in state.timeline">
-            <h2 class="tx-effect-date">{{date | moment:'MMMM d, YYYY'}}</h2>
+            <h2 class="tx-effect-date">{{date | moment:'ll'}}</h2>
             <div class="grid tx-container" ng-repeat="tx in txArr">
                 <div class="col-5-12" style="padding-right: 0;">
                     <div class="tx-heading" >
