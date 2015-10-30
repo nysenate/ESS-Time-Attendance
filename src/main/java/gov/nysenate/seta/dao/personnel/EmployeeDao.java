@@ -5,6 +5,7 @@ import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,4 +51,16 @@ public interface EmployeeDao extends BaseDao
      * @return The ids for all currently active employees
      */
     public Set<Integer> getActiveEmployeeIds();
+
+    /**
+     * @return LocalDateTime - the date/time of the latest employee table update
+     */
+    public LocalDateTime getLastUpdateTime();
+
+    /**
+     * Get all employees with fields that were updated after the given date time
+     * @param fromDateTime LocalDateTime
+     * @return List<Employee>
+     */
+    public List<Employee> getUpdatedEmployees(LocalDateTime fromDateTime);
 }

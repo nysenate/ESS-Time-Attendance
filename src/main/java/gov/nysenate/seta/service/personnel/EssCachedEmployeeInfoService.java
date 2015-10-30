@@ -6,6 +6,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.RangeUtils;
+import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.personnel.*;
@@ -27,6 +28,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -41,11 +45,14 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
     @Autowired protected EhCacheManageService cacheManageService;
 
     protected volatile Cache empCache;
+    private LocalDateTime lastUpdateDateTime;
 
     @PostConstruct
     protected void init() {
         this.eventBus.register(this);
         this.empCache = this.cacheManageService.registerEternalCache("employees");
+//        lastUpdateDateTime = employeeDao.getLastUpdateTime();
+        lastUpdateDateTime = DateUtils.LONG_AGO.atStartOfDay();
     }
 
     /** {@inheritDoc} */
@@ -119,7 +126,34 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
         empCache.releaseWriteLockOnKey(empId);
     }
 
-//    @Scheduled(fixedDelayString = "${cache.poll.delay.employees:43200000}")
+    @Scheduled(fixedDelayString = "${cache.poll.delay.employees:43200000}")
+    @WorkInProgress(author = "sam", since = "10/30/2015", desc = "insufficient live testing")
+    public void syncEmployeeCache() {
+        // Get employees updated since the last check
+        logger.debug("syncing employee cache: getting emps updated since {}", lastUpdateDateTime);
+        List<Employee> updatedEmps = employeeDao.getUpdatedEmployees(lastUpdateDateTime);
+
+        if (!updatedEmps.isEmpty()) {
+            logger.debug("found {} updated employees, updating the cache", updatedEmps.size());
+            // Update the last update date time with the most recent update date
+            lastUpdateDateTime = updatedEmps.stream()
+                    .map(Employee::getUpdateDateTime)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo).orElse(lastUpdateDateTime);
+
+            logger.info("new latest employee update date: {}", lastUpdateDateTime);
+
+            // Insert all updated employees that are active or already cached
+            long cached = updatedEmps.stream()
+                    .filter(emp -> emp.isActive() || empCache.get(emp.getEmployeeId()) != null)
+                    .peek(this::cacheEmployee)
+                    .count();
+            logger.info("cached {} of {} updated employees", cached, updatedEmps.size());
+        } else {
+            logger.debug("found no updated employees");
+        }
+    }
+
     public void cacheActiveEmployees() {
         if (env.acceptsProfiles("!test")) {
             logger.debug("Refreshing employee cache..");

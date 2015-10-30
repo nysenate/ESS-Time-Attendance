@@ -11,6 +11,7 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static gov.nysenate.seta.dao.personnel.SqlEmployeeQuery.*;
@@ -70,6 +71,18 @@ public class SqlEmployeeDao extends SqlBaseDao implements EmployeeDao
     public Set<Integer> getActiveEmployeeIds(){
         return new HashSet<>(remoteNamedJdbc.query(GET_ACTIVE_EMP_IDS.getSql(schemaMap()),
                 (rs, rowNum) -> rs.getInt("NUXREFEM")));
+    }
+
+    @Override
+    public LocalDateTime getLastUpdateTime() {
+        return remoteNamedJdbc.queryForObject(GET_LATEST_UPDATE_DATE.getSql(schemaMap()), new MapSqlParameterSource(),
+                (rs, rowNum) -> getLocalDateTime(rs, "MAX_UPDATE_DATE"));
+    }
+
+    @Override
+    public List<Employee> getUpdatedEmployees(LocalDateTime fromDateTime) {
+        return remoteNamedJdbc.query(GET_EMP_BY_UPDATE_DATE.getSql(schemaMap()),
+                new MapSqlParameterSource("lastUpdate", toDate(fromDateTime)), getEmployeeRowMapper());
     }
 
     /**

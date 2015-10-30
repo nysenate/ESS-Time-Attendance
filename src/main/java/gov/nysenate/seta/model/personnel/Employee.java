@@ -3,6 +3,8 @@ package gov.nysenate.seta.model.personnel;
 import gov.nysenate.seta.model.payroll.PayType;
 import gov.nysenate.seta.model.unit.Location;
 
+import java.time.LocalDateTime;
+
 /**
  * Represents information that identifies an employee in the NYS Senate
  */
@@ -17,6 +19,7 @@ public class Employee extends Person
     protected String nid;
     protected ResponsibilityCenter respCenter;
     protected Location workLocation;
+    protected LocalDateTime updateDateTime;
 
     public Employee() {}
 
@@ -115,5 +118,13 @@ public class Employee extends Person
 
     public void setNid(String nid) {
         this.nid = nid;
+    }
+
+    public LocalDateTime getUpdateDateTime() {
+        return updateDateTime;
+    }
+
+    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+        this.updateDateTime = updateDateTime;
     }
 }

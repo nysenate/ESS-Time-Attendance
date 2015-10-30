@@ -1,20 +1,20 @@
 package gov.nysenate.seta.dao;
 
+import gov.nysenate.common.DateUtils;
 import gov.nysenate.common.OutputUtils;
 import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.personnel.EmployeeDao;
 import gov.nysenate.seta.model.personnel.Employee;
 import gov.nysenate.seta.model.personnel.EmployeeNotFoundEx;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -56,6 +56,25 @@ public class SqlEmployeeDaoTests extends BaseTests
         assertNotNull(employeeDao);
         String invalidEmail = "moose@kitten.com";
         Employee emp = employeeDao.getEmployeeByEmail(invalidEmail);
+    }
+
+    @Test
+    public void getLastUpdateTimeTest() {
+        logger.info("Last update was {}", employeeDao.getLastUpdateTime());
+    }
+
+    @Test
+    public void getUpdatedEmployeesTest() {
+        LocalDateTime fromDateTime = LocalDate.of(2015, 1, 2).atStartOfDay();
+        List<Employee> updatedEmps = employeeDao.getUpdatedEmployees(fromDateTime);
+        LocalDateTime latestUpdate = updatedEmps.stream()
+                .map(Employee::getUpdateDateTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo).orElse(DateUtils.LONG_AGO.atStartOfDay());
+        logger.info("{} emps updated since {}", updatedEmps.size(), fromDateTime);
+        LocalDateTime queriedLatestUpdate = employeeDao.getLastUpdateTime();
+        Assert.assertTrue(Objects.equals(latestUpdate, queriedLatestUpdate));
+        logger.info("latest update was {}", latestUpdate);
     }
 
     @Test

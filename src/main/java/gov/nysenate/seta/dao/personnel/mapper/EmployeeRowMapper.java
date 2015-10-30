@@ -1,5 +1,6 @@
 package gov.nysenate.seta.dao.personnel.mapper;
 
+import com.google.common.collect.Sets;
 import gov.nysenate.seta.dao.base.BaseRowMapper;
 import gov.nysenate.seta.dao.payroll.mapper.RespCenterRowMapper;
 import gov.nysenate.seta.dao.unit.AddressRowMapper;
@@ -11,8 +12,12 @@ import gov.nysenate.seta.model.personnel.MaritalStatus;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.TreeSet;
 
 import static gov.nysenate.seta.dao.base.SqlBaseDao.getLocalDate;
+import static gov.nysenate.seta.dao.base.SqlBaseDao.getLocalDateTime;
 
 public class EmployeeRowMapper extends BaseRowMapper<Employee>
 {
@@ -53,6 +58,18 @@ public class EmployeeRowMapper extends BaseRowMapper<Employee>
         emp.setHomeAddress(addressRowMapper.mapRow(rs, rowNum));
         emp.setRespCenter(respCenterRowMapper.mapRow(rs, rowNum));
         emp.setWorkLocation(locationRowMapper.mapRow(rs, rowNum));
+        emp.setUpdateDateTime(Arrays.asList(
+                getLocalDateTime(rs, "DTTXNUPDATE"),
+                getLocalDateTime(rs, "TTL_DTTXNUPDATE"),
+                getLocalDateTime(rs, "ADDR_DTTXNUPDATE"),
+                getLocalDateTime(rs, "XREF_DTTXNUPDATE"),
+                getLocalDateTime(rs, "RCTR_DTTXNUPDATE"),
+                getLocalDateTime(rs, "RCTRHD_DTTXNUPDATE"),
+                getLocalDateTime(rs, "AGCY_DTTXNUPDATE"),
+                getLocalDateTime(rs, "LOC_DTTXNUPDATE")
+        ).stream()
+                .filter(dateTime -> dateTime != null)
+                .max(LocalDateTime::compareTo).orElse(null));
 
         if (emp.getEmail() != null) {
             emp.setUid(emp.getEmail().split("@")[0]);
