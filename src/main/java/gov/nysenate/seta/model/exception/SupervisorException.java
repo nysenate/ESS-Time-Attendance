@@ -1,6 +1,6 @@
 package gov.nysenate.seta.model.exception;
 
-public class SupervisorException extends Exception
+public class SupervisorException extends RuntimeException
 {
     public SupervisorException() {}
 

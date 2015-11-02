@@ -69,6 +69,8 @@ cache.max.size = 1000
 cache.poll.delay.transactions = 60000
 # Delay (ms) during which the employee cache is refreshed from the DB.
 cache.poll.delay.employees = 60000
+# Delay (ms) during which the supervisor cache is refreshed from the DB.
+cache.poll.delay.employees = 60000
 
 # --- URL Configuration -------------------------------------------------------
 

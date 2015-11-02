@@ -8,13 +8,18 @@ import gov.nysenate.seta.BaseTests;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
 import gov.nysenate.seta.model.personnel.SupGrantType;
 import gov.nysenate.seta.model.personnel.SupervisorEmpGroup;
+import gov.nysenate.seta.model.personnel.SupervisorOverride;
+import gov.nysenate.seta.model.transaction.TransactionInfo;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class SqlSupervisorDaoTests extends BaseTests
 {
@@ -47,5 +52,25 @@ public class SqlSupervisorDaoTests extends BaseTests
     @Test
     public void testSetSupervisorOverrides() throws Exception {
         supervisorDao.setSupervisorOverride(9896, 7048, true, null, null);
+    }
+
+    @Test
+    public void getSupChangesTest() {
+        LocalDateTime fromDate = LocalDate.of(2015, 9, 1).atStartOfDay();
+        List<TransactionInfo> supChanges = supervisorDao.getSupTransChanges(fromDate);
+        logger.info("{}", supChanges.stream().map(TransactionInfo::getEmployeeId).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void getSupOvrChangesTest() {
+        LocalDateTime fromDate = LocalDate.of(2015, 9, 1).atStartOfDay();
+        List<SupervisorOverride> ovrChanges = supervisorDao.getSupOverrideChanges(fromDate);
+        logger.info("{}", ovrChanges.size());
+    }
+
+    @Test
+    public void getLatestSupdateTest() {
+        LocalDateTime latestUpdate = supervisorDao.getLastSupUpdateDate();
+        logger.info("{}", latestUpdate);
     }
 }

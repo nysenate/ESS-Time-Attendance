@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static gov.nysenate.seta.dao.base.BaseMapper.getLocalDateFromRs;
 import static gov.nysenate.seta.dao.base.BaseMapper.getLocalDateTimeFromRs;
 
 public class TransRecordRowMapper implements RowMapper<TransactionRecord>
@@ -27,25 +26,21 @@ public class TransRecordRowMapper implements RowMapper<TransactionRecord>
     /** Options to indicate certain processing behaviors. */
     protected EmpTransDaoOption options;
 
+    /** A RowMapper to extract the transaction metadata */
+    protected TransInfoRowMapper infoRowMapper;
+
     public TransRecordRowMapper(String pfx, String auditPfx, EmpTransDaoOption options) {
         this.pfx = pfx;
         this.auditPfx = auditPfx;
         this.options = options;
+        this.infoRowMapper = new TransInfoRowMapper(pfx);
     }
 
     @Override
     public TransactionRecord mapRow(ResultSet rs, int i) throws SQLException {
-        TransactionCode code = TransactionCode.valueOf(rs.getString(pfx + "CDTRANS"));
-        TransactionRecord transRec = new TransactionRecord();
-        transRec.setEmployeeId(rs.getInt(pfx + "NUXREFEM"));
-        transRec.setActive(rs.getString(pfx + "CDSTATUS").equals("A"));
-        transRec.setChangeId(rs.getInt(pfx + "NUCHANGE"));
-        transRec.setTransCode(code);
-        transRec.setDocumentId(rs.getString(pfx + "NUDOCUMENT"));
-        transRec.setOriginalDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNORIGIN"));
-        transRec.setUpdateDate(getLocalDateTimeFromRs(rs, pfx + "DTTXNUPDATE"));
-        transRec.setEffectDate(getLocalDateFromRs(rs, pfx + "DTEFFECT"));
-        transRec.setAuditDate(getLocalDateTimeFromRs(rs, pfx + "AUD_DTTXNORIGIN"));
+        TransactionRecord transRec = new TransactionRecord(infoRowMapper.mapRow(rs, i));
+        transRec.setAuditDate(getLocalDateTimeFromRs(rs, auditPfx + "DTTXNORIGIN"));
+        transRec.setAuditUpdateDate(getLocalDateTimeFromRs(rs, auditPfx + "DTTXNUPDATE"));
         transRec.setNote((transRec.getTransCode().getType().equals(TransactionType.PER))
                 ? rs.getString(pfx + "DETXNNOTE50") : rs.getString(pfx + "DETXNNOTEPAY"));
 
@@ -55,10 +50,11 @@ public class TransRecordRowMapper implements RowMapper<TransactionRecord>
          * since they represent the initial snapshot of the data.
          */
         Map<String, String> valueMap = new HashMap<>();
-        Set<String> columns = (code.isAppointType() || (options.shouldInitialize() && rs.isFirst()))
-                ? TransactionCode.getAllDbColumnsList() : TransactionCode.getTypeDbColumnsList(code.getType());
+        Set<String> columns = (transRec.getTransCode().isAppointType() || (options.shouldInitialize() && rs.isFirst()))
+                ? TransactionCode.getAllDbColumnsList()
+                : TransactionCode.getTypeDbColumnsList(transRec.getTransCode().getType());
         for (String col : columns) {
-            valueMap.put(col.trim(), rs.getString(auditPfx + col.trim()));
+            valueMap.put(col.trim(), rs.getString(col.trim()));
         }
         transRec.setValueMap(valueMap);
         return transRec;

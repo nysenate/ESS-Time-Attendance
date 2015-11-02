@@ -6,10 +6,12 @@ import com.google.common.collect.Table;
 import gov.nysenate.seta.dao.base.SqlBaseDao;
 import gov.nysenate.seta.dao.personnel.mapper.SupervisorOverrideRowMapper;
 import gov.nysenate.seta.dao.transaction.SqlEmpTransactionDao;
+import gov.nysenate.seta.dao.transaction.mapper.TransInfoRowMapper;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorMissingEmpsEx;
 import gov.nysenate.seta.model.personnel.*;
 import gov.nysenate.seta.model.transaction.TransactionCode;
+import gov.nysenate.seta.model.transaction.TransactionInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,6 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static gov.nysenate.common.DateUtils.endOfDateRange;
+import static gov.nysenate.common.DateUtils.getLocalDateTime;
 import static gov.nysenate.common.DateUtils.startOfDateRange;
 import static gov.nysenate.seta.dao.personnel.SqlSupervisorQuery.GET_SUP_CHAIN_EXCEPTIONS;
 import static gov.nysenate.seta.dao.personnel.SqlSupervisorQuery.GET_SUP_EMP_TRANS_SQL;
@@ -254,5 +256,25 @@ public class SqlSupervisorDao extends SqlBaseDao implements SupervisorDao
         if (remoteNamedJdbc.update(SqlSupervisorQuery.UPDATE_SUP_GRANT.getSql(schemaMap()), params) == 0) {
             remoteNamedJdbc.update(SqlSupervisorQuery.INSERT_SUP_GRANT.getSql(schemaMap()), params);
         }
+    }
+
+    @Override
+    public List<TransactionInfo> getSupTransChanges(LocalDateTime fromDateTime) {
+        MapSqlParameterSource params = new MapSqlParameterSource("fromDate", toDate(fromDateTime));
+        return remoteNamedJdbc.query(SqlSupervisorQuery.GET_SUP_EMP_TRANS_UPDATED_SINCE.getSql(schemaMap()),
+                params, new TransInfoRowMapper());
+    }
+
+    @Override
+    public List<SupervisorOverride> getSupOverrideChanges(LocalDateTime fromDateTime) {
+        MapSqlParameterSource params = new MapSqlParameterSource("fromDate", toDate(fromDateTime));
+        return remoteNamedJdbc.query(SqlSupervisorQuery.GET_SUP_OVR_IDS_UPDATED_SINCE.getSql(schemaMap()),
+                params, new SupervisorOverrideRowMapper());
+    }
+
+    @Override
+    public LocalDateTime getLastSupUpdateDate() {
+        return remoteNamedJdbc.queryForObject(SqlSupervisorQuery.GET_LATEST_SUP_UPDATE_DATE.getSql(schemaMap()),
+                new MapSqlParameterSource(), (rs, rowNum) -> getLocalDateTime(rs, "DTTXNUPDATE"));
     }
 }

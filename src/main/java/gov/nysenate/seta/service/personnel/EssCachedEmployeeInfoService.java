@@ -141,14 +141,14 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
                     .filter(Objects::nonNull)
                     .max(LocalDateTime::compareTo).orElse(lastUpdateDateTime);
 
-            logger.info("new latest employee update date: {}", lastUpdateDateTime);
+            logger.debug("new latest employee update date: {}", lastUpdateDateTime);
 
             // Insert all updated employees that are active or already cached
             long cached = updatedEmps.stream()
                     .filter(emp -> emp.isActive() || empCache.get(emp.getEmployeeId()) != null)
                     .peek(this::cacheEmployee)
                     .count();
-            logger.info("cached {} of {} updated employees", cached, updatedEmps.size());
+            logger.debug("cached {} of {} updated employees", cached, updatedEmps.size());
         } else {
             logger.debug("found no updated employees");
         }

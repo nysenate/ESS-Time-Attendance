@@ -20,43 +20,20 @@ import java.util.stream.Collectors;
  * employee's personnel or payroll data and is identified by a TransactionCode.
  * A map of the values affected in the database are stored in this record.
  */
-public class TransactionRecord implements Comparable<TransactionRecord>
+public class TransactionRecord extends TransactionInfo implements Comparable<TransactionRecord>
 {
     private static final Logger logger = LoggerFactory.getLogger(TransactionRecord.class);
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
-    /** The employee id that this record belongs to. */
-    protected int employeeId;
-
-    /** A reference to the change id used for grouping transactions. */
-    protected int changeId;
-
-    /** Indicates if record is active or inactive. */
-    protected boolean active;
-
-    /** The transaction code indicates the kinds of changes made. */
-    protected TransactionCode transCode;
-
-    /** Document Id for the transaction
-     *  For temporary employees, this corresponds to a pay period and is prefixed with 'T'
-     *  For annual employees, this uniquely identifies a group of transactions */
-    protected String documentId;
-
     /** A mapping of the transaction's database column names to their values. */
     protected Map<String, String> valueMap;
 
-    /** The date in which this transaction is effective. */
-    protected LocalDate effectDate;
-
-    /** The date when this record was created. */
-    protected LocalDateTime originalDate;
-
-    /** The date when this record was updated. */
-    protected LocalDateTime updateDate;
-
     /** The date the actual audit record was created. */
     protected LocalDateTime auditDate;
+
+    /** The date when this audit record was last updated */
+    protected LocalDateTime auditUpdateDate;
 
     /** A note that is often associated with the record. */
     protected String note;
@@ -64,6 +41,10 @@ public class TransactionRecord implements Comparable<TransactionRecord>
     /** --- Constructors --- */
 
     public TransactionRecord() {}
+
+    public TransactionRecord(TransactionInfo info) {
+        super(info);
+    }
 
     /** --- Functional Getters/Setters --- */
 
@@ -159,45 +140,6 @@ public class TransactionRecord implements Comparable<TransactionRecord>
 
     /** --- Basic Getters/Setters --- */
 
-    public int getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(int employeeId) {
-        this.employeeId = employeeId;
-    }
-
-    public int getChangeId() {
-        return changeId;
-    }
-
-    public void setChangeId(int changeId) {
-        this.changeId = changeId;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public TransactionCode getTransCode() {
-        return transCode;
-    }
-
-    public void setTransCode(TransactionCode transCode) {
-        this.transCode = transCode;
-    }
-
-    public String getDocumentId() {
-        return documentId;
-    }
-
-    public void setDocumentId(String documentId) {
-        this.documentId = documentId;
-    }
 
     public Map<String, String> getValueMap() {
         return valueMap;
@@ -207,20 +149,12 @@ public class TransactionRecord implements Comparable<TransactionRecord>
         this.valueMap = valueMap;
     }
 
-    public LocalDateTime getOriginalDate() {
-        return originalDate;
+    public String getNote() {
+        return note;
     }
 
-    public void setOriginalDate(LocalDateTime originalDate) {
-        this.originalDate = originalDate;
-    }
-
-    public LocalDateTime getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(LocalDateTime updateDate) {
-        this.updateDate = updateDate;
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public LocalDateTime getAuditDate() {
@@ -231,19 +165,11 @@ public class TransactionRecord implements Comparable<TransactionRecord>
         this.auditDate = auditDate;
     }
 
-    public LocalDate getEffectDate() {
-        return effectDate;
+    public LocalDateTime getAuditUpdateDate() {
+        return auditUpdateDate;
     }
 
-    public void setEffectDate(LocalDate effectDate) {
-        this.effectDate = effectDate;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
+    public void setAuditUpdateDate(LocalDateTime auditUpdateDate) {
+        this.auditUpdateDate = auditUpdateDate;
     }
 }

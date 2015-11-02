@@ -5,13 +5,16 @@ import com.google.common.collect.Range;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import gov.nysenate.common.DateUtils;
+import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.client.view.SupervisorGrantView;
 import gov.nysenate.seta.dao.personnel.SupervisorDao;
 import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.exception.SupervisorNotFoundEx;
 import gov.nysenate.seta.model.personnel.*;
+import gov.nysenate.seta.model.transaction.TransactionCode;
 import gov.nysenate.seta.model.transaction.TransactionHistory;
+import gov.nysenate.seta.model.transaction.TransactionInfo;
 import gov.nysenate.seta.service.cache.EhCacheManageService;
 import gov.nysenate.seta.service.transaction.EmpTransactionService;
 import net.sf.ehcache.Cache;
@@ -19,12 +22,14 @@ import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.TreeMap;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EssCachedSupervisorInfoService implements SupervisorInfoService
@@ -38,10 +43,14 @@ public class EssCachedSupervisorInfoService implements SupervisorInfoService
 
     private Cache supEmployeeGroupCache;
 
+    private LocalDateTime lastSupOvrUpdate;
+    private LocalDateTime lastSupTransUpdate;
+
     @PostConstruct
     public void init() {
         eventBus.register(this);
         supEmployeeGroupCache = cacheManageService.registerTimeBasedCache(ContentCache.SUPERVISOR_EMP_GROUP.name(), 3600L);
+        lastSupOvrUpdate = lastSupTransUpdate = supervisorDao.getLastSupUpdateDate();
     }
 
     @Override
@@ -148,6 +157,8 @@ public class EssCachedSupervisorInfoService implements SupervisorInfoService
         }
     }
 
+    /** --- Internal Methods --- */
+
     private SupervisorEmpGroup getAndCacheSupEmpGroup(int supId) throws SupervisorException {
         SupervisorEmpGroup supervisorEmpGroup = supervisorDao.getSupervisorEmpGroup(supId, DateUtils.ALL_DATES);
         putSupEmpGroupInCache(supervisorEmpGroup);
@@ -162,5 +173,54 @@ public class EssCachedSupervisorInfoService implements SupervisorInfoService
         finally {
             supEmployeeGroupCache.releaseWriteLockOnKey(empGroup.getSupervisorId());
         }
+    }
+
+    /**
+     * Check for updates to supervisor assignments and update the cache as necessary
+     */
+    @WorkInProgress(author = "sam", since = "11/2/2015", desc = "insufficient live testing")
+    @Scheduled(fixedDelayString = "${cache.poll.delay.supervisors:60000}")
+    public void syncSupervisorCache() {
+        Set<Integer> modifiedSups = new HashSet<>();
+        logger.debug("Checking for supervisor updates...");
+
+        modifiedSups.addAll(getTransUpdatedSups());
+        modifiedSups.addAll(getOvrUpdatedSups());
+
+        modifiedSups.forEach(this::getAndCacheSupEmpGroup);
+
+        logger.debug("Refreshed {} supervisor emp groups", modifiedSups.size());
+    }
+
+    /**
+     * @return Set<Integer> - supervisor ids whose employee group has been changed by a transaction since the last check
+     * todo scrap this and use transaction update events instead
+     */
+    private Set<Integer> getTransUpdatedSups() {
+        Set<Integer> modifiedSups = new HashSet<>();
+
+        supervisorDao.getSupTransChanges(lastSupTransUpdate).forEach(transInfo -> {
+            // Add any sups that were active before or after the transaction effect date
+            TransactionHistory transHistory = empTransService.getTransHistory(transInfo.getEmployeeId());
+            Range<LocalDate> relevantDates = Range.closedOpen(
+                    transInfo.getEffectDate().minusDays(1), transInfo.getEffectDate().plusDays(1));
+            modifiedSups.addAll(transHistory.getEffectiveSupervisorIds(relevantDates).values());
+
+            lastSupTransUpdate = transInfo.getUpdateDate().isAfter(lastSupTransUpdate)
+                    ? transInfo.getUpdateDate() : lastSupTransUpdate;
+        });
+
+        return modifiedSups;
+    }
+
+    /**
+     * @return Set<Integer> - supervisor ids for override grantees whose overrides have been updated since the last check
+     */
+    private Set<Integer> getOvrUpdatedSups() {
+        return supervisorDao.getSupOverrideChanges(lastSupOvrUpdate).stream()
+                .peek(supOvr -> lastSupOvrUpdate = supOvr.getUpdateDate().isAfter(lastSupOvrUpdate)
+                        ? supOvr.getUpdateDate() : lastSupOvrUpdate)
+                .map(SupervisorOverride::getGranteeSupervisorId)
+                .collect(Collectors.toSet());
     }
 }

@@ -65,7 +65,7 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
             sql = GET_TRANS_HISTORY_SQL_FILTER_BY_CODE.getSql(schemaMap());
         }
         sql = applyAuditColsToSql(sql, "audColumns", "AUD.", codes, options);
-        TransHistoryHandler handler = new TransHistoryHandler(empId, "", "", codes, options);
+        TransHistoryHandler handler = new TransHistoryHandler(empId, "", "AUD_", codes, options);
         remoteNamedJdbc.query(sql, params, handler);
         return handler.getTransactionHistory();
     }
@@ -82,7 +82,7 @@ public class SqlEmpTransactionDao extends SqlBaseDao implements EmpTransactionDa
         EmpTransDaoOption options = EmpTransDaoOption.NONE;
         String sql = SqlEmpTransactionQuery.GET_LAST_UPDATED_RECS_SQL.getSql(schemaMap());
         sql = applyAuditColsToSql(sql, "audColumns", "AUD.", TransactionCode.getAll(), options);
-        return remoteNamedJdbc.query(sql, params, new TransRecordRowMapper("", "", options));
+        return remoteNamedJdbc.query(sql, params, new TransRecordRowMapper("", "AUD_", options));
     }
 
     /** --- Internal Methods --- */

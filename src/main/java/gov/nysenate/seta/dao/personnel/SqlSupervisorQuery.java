@@ -53,6 +53,35 @@ public enum SqlSupervisorQuery implements BasicSqlQuery
         "AND ptx.CDSTATUS = 'A' AND ptx.DTEFFECT <= :endDate\n" +
         "ORDER BY NUXREFEM, TRANS_RANK"),
 
+    GET_SUP_EMP_TRANS_UPDATED_SINCE(
+        "SELECT PTX.NUXREFEM, PTX.NUCHANGE, PTX.CDSTATUS, PTX.CDTRANS, PTX.NUDOCUMENT,\n" +
+        "    PTX.DTEFFECT, PTX.DTTXNORIGIN, GREATEST(AUD.DTTXNUPDATE, PTX.DTTXNUPDATE) AS DTTXNUPDATE\n" +
+        "FROM ${masterSchema}.PM21PERAUDIT AUD\n" +
+        "JOIN ${masterSchema}.PD21PTXNCODE PTX ON AUD.NUCHANGE = PTX.NUCHANGE AND AUD.NUXREFEM = PTX.NUXREFEM\n" +
+        "WHERE AUD.CDSTATUS = 'A' AND PTX.CDSTATUS = 'A'\n" +
+        "    AND PTX.CDTRANS IN ('APP', 'RTP', 'SUP', 'EMP')\n" +
+        "    AND (AUD.DTTXNUPDATE > :fromDate OR PTX.DTTXNUPDATE > :fromDate)"
+    ),
+
+    GET_LATEST_SUP_UPDATE_DATE(
+        "SELECT MAX(DTTXNUPDATE) AS DTTXNUPDATE\n" +
+        "FROM (\n" +
+        "    SELECT GREATEST(AUD.DTTXNUPDATE, PTX.DTTXNUPDATE) AS DTTXNUPDATE\n" +
+        "    FROM ${masterSchema}.PM21PERAUDIT AUD\n" +
+        "    JOIN ${masterSchema}.PD21PTXNCODE PTX ON AUD.NUCHANGE = PTX.NUCHANGE AND AUD.NUXREFEM = PTX.NUXREFEM\n" +
+        "    WHERE AUD.CDSTATUS = 'A' AND PTX.CDSTATUS = 'A'\n" +
+        "        AND PTX.CDTRANS IN ('APP', 'RTP', 'SUP', 'EMP')\n" +
+        "    UNION\n" +
+        "    SELECT DTTXNUPDATE FROM ${tsSchema}.PM23SUPOVRRD\n" +
+        ")"
+    ),
+
+    GET_SUP_OVR_IDS_UPDATED_SINCE(
+        "SELECT *\n" +
+        "FROM ${tsSchema}.PM23SUPOVRRD\n" +
+        "WHERE DTTXNUPDATE > :fromDate"
+    ),
+
     GET_SUP_CHAIN_EXCEPTIONS(
         "SELECT NUXREFEM, NUXREFSV, CDTYPE, CDSTATUS FROM ${masterSchema}.PM23SPCHNEX\n" +
         "WHERE CDSTATUS = 'A' AND NUXREFEM = :empId"),

@@ -4,8 +4,10 @@ import com.google.common.collect.Range;
 import gov.nysenate.seta.dao.base.BaseDao;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.personnel.*;
+import gov.nysenate.seta.model.transaction.TransactionInfo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -65,4 +67,26 @@ public interface SupervisorDao extends BaseDao
      * @param endDate LocalDate - set to null for no end date.
      */
     void setSupervisorOverride(int granterSupId, int granteeSupId, boolean active, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Get a list of supervisor-relevant (APP, RTP, EMP, SUP) transactions
+     * that were updated since the given date time
+     *
+     * @param fromDateTime LocalDateTime - Gets transactions after this date
+     * @return List<TransactionInfo>
+     */
+    List<TransactionInfo> getSupTransChanges(LocalDateTime fromDateTime);
+
+    /**
+     * Return all supervisor overrides updated since the given date time
+     *
+     * @param fromDateTime LocalDateTime - Looks for changes after this date
+     * @return List<Integer>
+     */
+    List<SupervisorOverride> getSupOverrideChanges(LocalDateTime fromDateTime);
+
+    /**
+     * @return LocalDateTime - The date and time of the latest sup-related transaction or sup override update
+     */
+    LocalDateTime getLastSupUpdateDate();
 }
