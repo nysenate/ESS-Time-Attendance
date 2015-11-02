@@ -51,8 +51,7 @@ public class EssCachedEmployeeInfoService implements EmployeeInfoService
     protected void init() {
         this.eventBus.register(this);
         this.empCache = this.cacheManageService.registerEternalCache("employees");
-//        lastUpdateDateTime = employeeDao.getLastUpdateTime();
-        lastUpdateDateTime = DateUtils.LONG_AGO.atStartOfDay();
+        lastUpdateDateTime = employeeDao.getLastUpdateTime();
     }
 
     /** {@inheritDoc} */
