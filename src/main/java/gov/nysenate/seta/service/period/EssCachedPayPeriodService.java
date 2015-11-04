@@ -40,6 +40,9 @@ public class EssCachedPayPeriodService implements PayPeriodService
     public void init() {
         this.eventBus.register(this);
         this.payPeriodCache = this.cacheManageService.registerEternalCache("pay-periods");
+        if (this.cacheManageService.isWarmOnStartup()) {
+            cacheAfPayPeriods();
+        }
     }
 
     /**
@@ -121,7 +124,7 @@ public class EssCachedPayPeriodService implements PayPeriodService
         return null;
     }
 
-    @Scheduled(fixedDelay = 43200000L) // Refresh the AF pay period cache every 12 hours
+    @Scheduled(cron = "${cache.cron.period}")
     private void cacheAfPayPeriods() {
         cachePayPeriods(PayPeriodType.AF);
     }

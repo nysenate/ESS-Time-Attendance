@@ -8,6 +8,7 @@ import net.sf.ehcache.config.SizeOfPolicyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static net.sf.ehcache.config.SizeOfPolicyConfiguration.MaxDepthExceededBehavior.ABORT;
@@ -18,6 +19,9 @@ public class EssEhEhCacheManageService implements EhCacheManageService
     private static final Logger logger = LoggerFactory.getLogger(EssEhEhCacheManageService.class);
 
     @Autowired CacheManager cacheManager;
+
+    @Value("${cache.warm.onstartup:false}")
+    protected boolean warmOnStartup;
 
     @Override
     public Cache registerEternalCache(String cacheName) {
@@ -58,5 +62,9 @@ public class EssEhEhCacheManageService implements EhCacheManageService
 
     private SizeOfPolicyConfiguration defaultSizeOfPolicy() {
         return new SizeOfPolicyConfiguration().maxDepth(50000).maxDepthExceededBehavior(ABORT);
+    }
+
+    public boolean isWarmOnStartup() {
+        return warmOnStartup;
     }
 }

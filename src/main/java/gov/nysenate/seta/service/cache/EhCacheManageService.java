@@ -16,4 +16,6 @@ public interface EhCacheManageService
     Cache registerCustomCache(CacheConfiguration config);
 
     void clearAllCaches();
+
+    boolean isWarmOnStartup();
 }

@@ -58,6 +58,9 @@ public class EssCachedHolidayService implements HolidayService
     public void init() {
         this.eventBus.register(this);
         this.holidayCache = this.cacheManageService.registerEternalCache(ContentCache.HOLIDAY.name());
+        if (this.cacheManageService.isWarmOnStartup()) {
+            cacheHolidays();
+        }
     }
 
     @Override
@@ -93,7 +96,7 @@ public class EssCachedHolidayService implements HolidayService
         return (HolidayCacheTree) elem.getObjectValue();
     }
 
-    @Scheduled(fixedDelay = 43200000L) // Refresh the cache every 12 hours
+    @Scheduled(cron = "${cache.cron.holiday}") // Refresh the cache every 12 hours
     private void cacheHolidays() {
         logger.info("Caching holidays...");
         holidayCache.acquireWriteLockOnKey(HOLIDAY_CACHE_KEY);
