@@ -7,6 +7,7 @@ import gov.nysenate.common.RangeUtils;
 import gov.nysenate.common.SortOrder;
 import gov.nysenate.common.WorkInProgress;
 import gov.nysenate.seta.model.attendance.*;
+import gov.nysenate.seta.model.cache.ContentCache;
 import gov.nysenate.seta.model.exception.SupervisorException;
 import gov.nysenate.seta.model.payroll.Holiday;
 import gov.nysenate.seta.model.payroll.PayType;
@@ -25,6 +26,7 @@ import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +61,7 @@ public class EssCachedTimeRecordService extends SqlDaoBackedService implements T
     @PostConstruct
     public void init() {
         this.eventBus.register(this);
-        this.activeRecordCache = this.cacheManageService.registerEternalCache("activeRecords");
+        this.activeRecordCache = this.cacheManageService.registerEternalCache(ContentCache.ACTIVE_TIME_RECORDS.name());
     }
 
     /** Helper class to store a collection of time records in a cache. */
